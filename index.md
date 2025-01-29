@@ -22,6 +22,6 @@ Here are some of the projects I've worked on:
 - [Project 3](https://example.com/project3)
 
 ## Contact Me
-Feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/lukesprangers) or [Twitter](https://twitter.com/lukesprangers).
+Feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/lukesprangers) or [Github](https://github.com/lsprangers).
 
 ![Footer Image](https://via.placeholder.com/150)
