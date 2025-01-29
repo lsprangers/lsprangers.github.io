@@ -5,11 +5,7 @@ filename: index.md
 --- 
 
 # Who am I
-<div style="display: flex; align-items: center;">
-  <div style="flex: 1;">
-    I'm Luke Sprangers and I've worked in ML Engineering and Analytics since I've graduated
-  </div>
-</div>
+I'm Luke Sprangers and I've worked in ML Engineering and Analytics since I've graduated
 
 ## My Projects
 Here are some of the projects I've worked on:
@@ -19,6 +15,4 @@ Here are some of the projects I've worked on:
 - [Project 3](https://example.com/project3)
 
 ## Contact Me
-Feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/lukesprangers) or [Github](https://github.com/lsprangers).
-
-![Footer Image](https://via.placeholder.com/150)
+Feel free to reach out to me on [LinkedIn](https://www.linkedin.com/in/lukesprangers) or [Github](https://github.com/lsprangers)
