@@ -9,9 +9,6 @@ filename: index.md
   <div style="flex: 1;">
     I'm Luke Sprangers and I've worked in ML Engineering and Analytics since I've graduated
   </div>
-  <div style="flex: 0;">
-    <img src="images/profile_pic.jpg" alt="Profile Picture" style="width:150px;height:150px;border-radius:50%;margin-left:20px;">
-  </div>
 </div>
 
 ## My Projects
