@@ -4,13 +4,18 @@ title: Intro
 
 ### Who am I
 
-<div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
-    <p style="font-size: 1.1em; color: #34495e;">
-        I have a dog named Bowie<br>
-        I live in Cincinnati, OH (for now...)<br>
-        I work in ML Engineering and Analytics<br>
-        and I enjoy running, traveling, and gardening
-    </p>
+<div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; align-items: center;">
+    <div style="flex-grow: 1;">
+        <p style="font-size: 1.1em; color: #34495e;">
+            I have a dog named Bowie<br>
+            I live in Cincinnati, OH (for now...)<br>
+            I work in ML Engineering and Analytics<br>
+            and I enjoy running, traveling, and gardening
+        </p>
+    </div>
+    <div style="flex-shrink: 0;">
+        <img src="images/mecircle.jpg" alt="Profile Picture" style="max-width: 150px; height: auto; border-radius: 50%; margin-left: 20px;">
+    </div>
 </div>
 
 
@@ -19,11 +24,11 @@ title: Intro
 
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
     <div style="display: flex; align-items: center;">
-        <img src="images/ma_logo.png" alt="MA Logo" style="width: 50px; height: auto; margin-right: 15px;">
+        <img src="images/ma_logo.png" alt="MA Logo" style="width: 200px; height: auto; margin-right: 15px;">
         <div>
             <p style="font-size: 1.1em; color: #2c3e50; margin: 0;">
-                <strong>Lead Software Engineer - ML and Data Analytics</strong><br>
-                Moody's Analytics
+                <strong>Lead Software Engineer</strong><br>
+                ML and Data Analytics
             </p>
         </div>
     </div>

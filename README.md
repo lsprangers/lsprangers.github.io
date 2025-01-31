@@ -1,0 +1,1 @@
+Minimal mistakes docs - https://mmistakes.github.io/minimal-mistakes/docs/structure/
