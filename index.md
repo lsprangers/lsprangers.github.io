@@ -2,7 +2,7 @@
 title: Intro
 --- 
 
-## Who am I
+#### Who am I
 <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <p style="font-size: 1.1em; color: #34495e;">
         I have a dog named Bowie<br>
@@ -12,7 +12,9 @@ title: Intro
     </p>
 </div>
 
-## Current
+<div><br></br></div>
+
+#### Current
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <div style="display: flex; align-items: center;">
         <img src="images/ma_logo.png" alt="MA Logo" style="width: 50px; height: auto; margin-right: 15px;">
@@ -25,7 +27,9 @@ title: Intro
     </div>
 </div>
 
-## Past
+<div><br></br></div>
+
+#### Past
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <ul style="font-size: 1.1em; color: #2c3e50;">
         <li>I was an ML Engineer at Corrigo (which is now apart of JLL-Technologies)</li>
@@ -35,7 +39,9 @@ title: Intro
     </ul>
 </div>
 
-## Education
+<div><br></br></div>
+
+#### Education
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <div style="display: flex; align-items: center;">
         <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 20px; height: auto; margin-right: 8px;">
@@ -47,16 +53,17 @@ title: Intro
     </ul>
 </div>
 
-## My Projects
+<div><br></br></div>
+
+#### My Projects
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <ul style="font-size: 1.1em; color: #2c3e50;">
         <li><a href="https://github.com/lsprangers/raft-course">RAFT Consensus Implementation</a></li>
     </ul>
-
 </div>
 
-## Contact Me
-Feel free to reach out to me on 
+<div><br></br></div>
+
 <div style="display: flex; gap: 10px; align-items: center;">
     <a href="https://www.linkedin.com/in/luke-sprangers" style="text-decoration: none; color: #0e76a8;">
         <i class="fab fa-linkedin"></i> LinkedIn
