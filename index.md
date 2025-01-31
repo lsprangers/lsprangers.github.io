@@ -12,7 +12,7 @@ title: Intro
     </p>
 </div>
 
-<div><br></br></div>
+
 
 #### Current
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -27,7 +27,7 @@ title: Intro
     </div>
 </div>
 
-<div><br></br></div>
+
 
 #### Past
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -39,7 +39,7 @@ title: Intro
     </ul>
 </div>
 
-<div><br></br></div>
+
 
 #### Education
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -53,7 +53,7 @@ title: Intro
     </ul>
 </div>
 
-<div><br></br></div>
+
 
 #### My Projects
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
@@ -61,8 +61,6 @@ title: Intro
         <li><a href="https://github.com/lsprangers/raft-course">RAFT Consensus Implementation</a></li>
     </ul>
 </div>
-
-<div><br></br></div>
 
 <div style="display: flex; gap: 10px; align-items: center;">
     <a href="https://www.linkedin.com/in/luke-sprangers" style="text-decoration: none; color: #0e76a8;">
