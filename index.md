@@ -1,5 +1,5 @@
 ---
-title: Intro
+title: Luke Sprangers Blog
 --- 
 
 ### Who am I
