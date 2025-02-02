@@ -1,10 +1,6 @@
 version: 2
 updates:
-  - package-ecosystem: "npm" # or "bundler", "docker", etc.
-    directory: "/" # location of the package manifests
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
-      interval: "daily" # or "weekly", "monthly"
-    commit-message:
-      prefix: "deps"
-    open-pull-requests-limit: 10
-    rebase-strategy: "auto"
+      interval: "monthly"
