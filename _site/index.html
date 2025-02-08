@@ -4,26 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luke Sprangers Blog</title>
-    <link rel="stylesheet" href="/assets/css/home.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
+    <header class="header" id="header">
+        <img src="/images/mecircle.jpg" alt="Profile Photo" class="profile-photo">
+        <h1>Luke Sprangers Blog</h1>
+    </header>
     <div class="container">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-content">
-                <h1>Luke Sprangers' Blog</h1>
-                <img src="images/mecircle.jpg" alt="Profile Photo" class="profile-photo">
                 <nav>
                     <ul>
-                        
                         <li><a href="/">Home</a></li>
-                        
-                        <li><a href="/career">Career</a></li>
-                        
-                        <li><a href="/projects">Projects</a></li>
-                        
-                        <li><a href="/contact">Contact</a></li>
-                        
+                        <li><a href="/career/">Career</a></li>
+                        <li><a href="/projects/">Projects</a></li>
+                        <li><a href="/contact/">Contact</a></li>
                     </ul>
                 </nav>
             </div>
@@ -41,7 +38,57 @@
     </div>
 </div>
 
+<p><br /></p>
+
+<div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
+    <div style="display: flex; align-items: center;">
+        <img src="images/ma_logo.png" alt="MA Logo" style="width: 200px; height: auto; margin-right: 15px;" />
+        <div>
+            <p style="font-size: 1.1em; color: #2c3e50; margin: 0;">
+                <strong>Lead Software Engineer</strong><br />
+                Machine Learning and Data Analytics
+            </p>
+        </div>
+    </div>
+</div>
+
+<p><br /></p>
+<div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+    <div style="display: flex; align-items: center;">
+        <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 20px; height: auto; margin-right: 8px;" />
+        <strong>University of Wisconsin - Madison</strong>
+    </div>
+    <ul style="font-size: 1.1em; color: #2c3e50;">
+        <li>BS Applied Mathematics (CS Emphasis)</li>
+        <li>BS Quantitative Economics</li>
+    </ul>
+</div>
+
+<p><br /></p>
+
+<div style="display: flex; gap: 10px; align-items: center;">
+    <a href="https://www.linkedin.com/in/luke-sprangers" style="text-decoration: none; color: #0e76a8;">
+        <i class="fab fa-linkedin"></i> LinkedIn
+    </a>
+    <a href="https://github.com/lsprangers" style="text-decoration: none; color:rgb(10, 10, 10);">
+        <i class="fab fa-github"></i> GitHub
+    </a>
+</div>
+
         </main>
     </div>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.getElementById('header');
+            var sidebar = document.getElementById('sidebar');
+            if (window.scrollY > 50) {
+                header.style.top = '-100px'; // Hide the header
+                sidebar.style.top = '0'; // Move sidebar to the top
+            } else {
+                header.style.top = '0'; // Show the header
+                sidebar.style.top = '60px'; // Position sidebar below the header
+            }
+        });
+    </script>
 </body>
 </html>

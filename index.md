@@ -1,6 +1,6 @@
 ---
 title: Luke Sprangers Blog
-layout: home
+layout: default
 ---
 
 <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; align-items: center;">
@@ -36,7 +36,7 @@ layout: home
         <strong>University of Wisconsin - Madison</strong>
     </div>
     <ul style="font-size: 1.1em; color: #2c3e50;">
-        <li>BS Applied Mathematics (CS Focus)</li>
+        <li>BS Applied Mathematics (CS Emphasis)</li>
         <li>BS Quantitative Economics</li>
     </ul>
 </div>

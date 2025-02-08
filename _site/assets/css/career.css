@@ -1,0 +1,55 @@
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+}
+
+.career-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.career-item {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.career-item:hover {
+    background-color: #e9e9e9;
+    transform: translateY(-5px);
+}
+
+.company-logo {
+    width: 30px; /* Adjust the width to match the font size */
+    height: auto;
+    margin-right: 10px; /* Adjust margin for better spacing */
+    vertical-align: middle; /* Align the logo with the middle of the text */
+}
+
+.career-details {
+    display: none;
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    transition: max-height 0.3s ease-out;
+}
+
+.career-details ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.career-details ul li {
+    margin-bottom: 10px;
+}
