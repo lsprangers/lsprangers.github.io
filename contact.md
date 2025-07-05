@@ -3,7 +3,7 @@ title: Contact
 layout: default
 ---
 
-# Contact
+<!-- # Contact -->
 
 <div class="contact-container">
     <div class="contact-section">
