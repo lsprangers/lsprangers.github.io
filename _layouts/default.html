@@ -11,6 +11,9 @@
     <header class="header" id="header">
         <img src="{{ '/images/mecircle.jpg' | relative_url }}" alt="Profile Photo" class="profile-photo">
         <h1>Luke Sprangers Blog</h1>
+        <button class="mobile-nav-toggle" id="mobileNavToggle">
+            <i class="fas fa-bars"></i>
+        </button>
     </header>
     <div class="container">
         <aside class="sidebar" id="sidebar">
@@ -39,6 +42,42 @@
             } else {
                 header.style.top = '0'; // Show the header
                 sidebar.style.top = '60px'; // Position sidebar below the header
+            }
+        });
+
+        // Mobile navigation functionality
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const sidebar = document.getElementById('sidebar');
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Reset sidebar position for mobile
+            sidebar.style.top = '0';
+        }
+
+        mobileNavToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = mobileNavToggle.contains(event.target);
+                
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
             }
         });
     </script>

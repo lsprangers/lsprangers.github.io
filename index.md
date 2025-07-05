@@ -6,8 +6,8 @@ layout: default
 <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; align-items: center;">
     <div style="flex-grow: 1;">
         <p style="font-size: 1.1em; color: #34495e;">
-            I live in Cincinnati, OH with my dog named Bowie<br>
-            and I enjoy running, traveling, and gardening
+            I live in Columbia, MO with my dog Bowie<br>
+            I enjoy running, traveling, and gardening
         </p>
     </div>
     <div style="flex-shrink: 0; display: flex; justify-content: center; align-items: center;">
@@ -19,7 +19,7 @@ layout: default
 
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
     <div style="display: flex; align-items: center;">
-        <img src="images/ma_logo.png" alt="MA Logo" style="width: 200px; height: auto; margin-right: 15px;">
+        <img src="images/ma_logo.png" alt="MA Logo" style="width: 120px; height: auto; margin-right: 15px; object-fit: contain;">
         <div>
             <p style="font-size: 1.1em; color: #2c3e50; margin: 0;">
                 <strong>Lead Software Engineer</strong><br>
@@ -32,10 +32,12 @@ layout: default
 <br>
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <div style="display: flex; align-items: center;">
-        <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 20px; height: auto; margin-right: 8px;">
-        <strong>University of Wisconsin - Madison</strong>
+        <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 40px; height: auto; margin-right: 15px; object-fit: contain;">
+        <div>
+            <strong>University of Wisconsin - Madison</strong>
+        </div>
     </div>
-    <ul style="font-size: 1.1em; color: #2c3e50;">
+    <ul style="font-size: 1.1em; color: #2c3e50; margin-top: 10px; margin-left: 55px;">
         <li>BS Applied Mathematics (CS Emphasis)</li>
         <li>BS Quantitative Economics</li>
     </ul>

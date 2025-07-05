@@ -11,6 +11,9 @@
     <header class="header" id="header">
         <img src="/images/mecircle.jpg" alt="Profile Photo" class="profile-photo">
         <h1>Luke Sprangers Blog</h1>
+        <button class="mobile-nav-toggle" id="mobileNavToggle">
+            <i class="fas fa-bars"></i>
+        </button>
     </header>
     <div class="container">
         <aside class="sidebar" id="sidebar">
@@ -29,8 +32,8 @@
             <div style="background-color: #f9f9f9; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; align-items: center;">
     <div style="flex-grow: 1;">
         <p style="font-size: 1.1em; color: #34495e;">
-            I live in Cincinnati, OH with my dog named Bowie<br />
-            and I enjoy running, traveling, and gardening
+            I live in Columbia, MO with my dog Bowie<br />
+            I enjoy running, traveling, and gardening
         </p>
     </div>
     <div style="flex-shrink: 0; display: flex; justify-content: center; align-items: center;">
@@ -42,7 +45,7 @@
 
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); margin-bottom: 20px;">
     <div style="display: flex; align-items: center;">
-        <img src="images/ma_logo.png" alt="MA Logo" style="width: 200px; height: auto; margin-right: 15px;" />
+        <img src="images/ma_logo.png" alt="MA Logo" style="width: 120px; height: auto; margin-right: 15px; object-fit: contain;" />
         <div>
             <p style="font-size: 1.1em; color: #2c3e50; margin: 0;">
                 <strong>Lead Software Engineer</strong><br />
@@ -55,10 +58,12 @@
 <p><br /></p>
 <div style="background-color: #ffffff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
     <div style="display: flex; align-items: center;">
-        <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 20px; height: auto; margin-right: 8px;" />
-        <strong>University of Wisconsin - Madison</strong>
+        <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" style="width: 40px; height: auto; margin-right: 15px; object-fit: contain;" />
+        <div>
+            <strong>University of Wisconsin - Madison</strong>
+        </div>
     </div>
-    <ul style="font-size: 1.1em; color: #2c3e50;">
+    <ul style="font-size: 1.1em; color: #2c3e50; margin-top: 10px; margin-left: 55px;">
         <li>BS Applied Mathematics (CS Emphasis)</li>
         <li>BS Quantitative Economics</li>
     </ul>
@@ -87,6 +92,42 @@
             } else {
                 header.style.top = '0'; // Show the header
                 sidebar.style.top = '60px'; // Position sidebar below the header
+            }
+        });
+
+        // Mobile navigation functionality
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const sidebar = document.getElementById('sidebar');
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Reset sidebar position for mobile
+            sidebar.style.top = '0';
+        }
+
+        mobileNavToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = mobileNavToggle.contains(event.target);
+                
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
             }
         });
     </script>
