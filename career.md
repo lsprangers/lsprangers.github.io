@@ -6,9 +6,12 @@ layout: default
 <!-- # Career -->
 
 <div class="career-container">
-    <div class="career-item" onclick="toggleDetails('corrigo')">
+    <div class="career-item" onclick="toggleDetails('moodys')">
         <img src="{{ '/images/ma_logo.png' | relative_url }}" alt="Moodys Logo" class="company-logo">
-        <h3>ML + Data Tech Lead at Moodys Analytics</h3>
+        <div class="career-info">
+            <h3>ML + Data Tech Lead at Moodys Analytics</h3>
+            <p class="career-date">2023 - Present</p>
+        </div>
     </div>
     <div id="moodys" class="career-details">
         <p>I lead a group under the Data and AI Functional Group in the KYC OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.</p>
@@ -21,7 +24,10 @@ layout: default
 
     <div class="career-item" onclick="toggleDetails('corrigo')">
         <img src="{{ '/images/corrigo_logo.png' | relative_url }}" alt="Corrigo Logo" class="company-logo">
-        <h3>ML Engineer at Corrigo (now part of JLL-Technologies)</h3>
+        <div class="career-info">
+            <h3>ML Engineer at Corrigo (now part of JLL-Technologies)</h3>
+            <p class="career-date">2021 - 2023</p>
+        </div>
     </div>
     <div id="corrigo" class="career-details">
         <p>As an ML Engineer at Corrigo, I worked on developing machine learning models to improve operational efficiency and predictive maintenance.</p>
@@ -34,7 +40,10 @@ layout: default
 
     <div class="career-item" onclick="toggleDetails('senior-data-scientist')">
         <img src="{{ '/images/corrigo_logo.png' | relative_url }}" alt="Corrigo Logo" class="company-logo">
-        <h3>Senior Data Scientist at Corrigo</h3>
+        <div class="career-info">
+            <h3>Senior Data Scientist at Corrigo</h3>
+            <p class="career-date">2020 - 2021</p>
+        </div>
     </div>
     <div id="senior-data-scientist" class="career-details">
         <p>As a Senior Data Scientist, I led data science projects to extract insights from large datasets and drive business decisions.</p>
@@ -47,7 +56,10 @@ layout: default
 
     <div class="career-item" onclick="toggleDetails('co-star')">
         <img src="{{ '/images/costar_logo.png' | relative_url }}" alt="Co Star Logo" class="company-logo">
-        <h3>Data Scientist at Co Star</h3>
+        <div class="career-info">
+            <h3>Data Scientist at Co Star</h3>
+            <p class="career-date">2019 - 2020</p>
+        </div>
     </div>
     <div id="co-star" class="career-details">
         <p>At Co Star, I focused on building data-driven solutions to enhance real estate market analysis and forecasting.</p>
@@ -60,7 +72,10 @@ layout: default
 
     <div class="career-item" onclick="toggleDetails('analytics-consulting')">
         <img src="{{ '/images/musigma.png' | relative_url }}" alt="Consulting Logo" class="company-logo">
-        <h3>Mu Sigma - Analytics & Consulting</h3>
+        <div class="career-info">
+            <h3>Technical Consultant at Mu Sigma</h3>
+            <p class="career-date">2018 - 2019</p>
+        </div>
     </div>
     <div id="analytics-consulting" class="career-details">
         <p>I started my career in analytics and consulting, helping clients leverage data to solve complex business problems.</p>

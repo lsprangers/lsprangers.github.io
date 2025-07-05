@@ -28,10 +28,31 @@ body {
     transform: translateY(-5px);
 }
 
+.career-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.career-info h3 {
+    margin: 0;
+    color: #003366;
+    font-weight: 500;
+}
+
+.career-date {
+    color: #888;
+    font-style: italic;
+    font-size: 0.9em;
+    margin: 0;
+    font-weight: 400;
+}
+
 .company-logo {
-    width: 30px; /* Adjust the width to match the font size */
+    width: 50px; /* Increased from 30px to 50px for slightly larger logos */
     height: auto;
-    margin-right: 10px; /* Adjust margin for better spacing */
+    margin-right: 15px; /* Increased margin for better spacing */
     vertical-align: middle; /* Align the logo with the middle of the text */
 }
 
