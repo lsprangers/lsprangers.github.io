@@ -116,22 +116,17 @@
 
 <script>
 function toggleDetails(id) {
-    console.log('Toggling details for ID:', id);
     var element = document.getElementById(id);
     if (!element) {
-        console.error('Element with ID "' + id + '" not found');
         return;
     }
     
     var currentDisplay = window.getComputedStyle(element).display;
-    console.log('Current display:', currentDisplay);
     
     if (currentDisplay === "none" || currentDisplay === "") {
         element.style.display = "block";
-        console.log('Showing element:', id);
     } else {
         element.style.display = "none";
-        console.log('Hiding element:', id);
     }
 }
 
