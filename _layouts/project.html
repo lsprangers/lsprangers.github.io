@@ -1,33 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title }}</title>
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <aside class="sidebar">
-            <div class="sidebar-content">
-                <h1>Luke Sprangers' Blog</h1>
-                <!-- <img src="/path/to/your/photo.jpg" alt="Profile Photo" class="profile-photo"> -->
-                <nav>
-                    <ul>
-                        {% for item in site.data.navigation.main %}
-                        <li><a href="{{ item.url }}">{{ item.title }}</a></li>
-                        {% endfor %}
-                    </ul>
-                </nav>
-            </div>
-        </aside>
-        <main class="content">
-            <article>
-                <h1>{{ page.title }}</h1>
-                {{ content }}
-            </article>
-        </main>
+---
+layout: just-the-docs
+---
+
+<article class="project-article">
+    <header class="project-header">
+        <h1>{{ page.title }}</h1>
+        {% if page.description %}
+        <p class="project-description">{{ page.description }}</p>
+        {% endif %}
+    </header>
+    
+    <div class="project-content">
+        {{ content }}
     </div>
-</body>
-</html>
+</article>

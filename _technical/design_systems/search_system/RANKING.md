@@ -1,9 +1,8 @@
 ---
-layout: technical
+layout: page
 title: Search System - Ranking
-category: Search System Design
-difficulty: Advanced
 description: Discussion around Ranking, the final area in search and recommendation systems
+show_back_link: true
 ---
 
 # Table of Contents

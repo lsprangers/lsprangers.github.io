@@ -1,0 +1,24 @@
+<header class="masthead">
+  <div class="masthead__inner-wrap">
+    <div class="masthead__menu">
+      <nav id="site-nav" class="greedy-nav">
+        <a class="site-title" href="{{ '/' | relative_url }}">
+          <img src="{{ '/images/mecircle.jpg' | relative_url }}" alt="Profile Photo" class="profile-photo">
+          {{ site.title }}
+        </a>
+        <ul class="visible-links">
+          <li><a href="{{ '/' | relative_url }}">Home</a></li>
+          <li><a href="{{ '/career/' | relative_url }}">Career</a></li>
+          <li><a href="{{ '/projects/' | relative_url }}">Projects</a></li>
+          <li><a href="{{ '/technical/' | relative_url }}">Technical</a></li>
+          <li><a href="{{ '/contact/' | relative_url }}">Contact</a></li>
+        </ul>
+        <button class="greedy-nav__toggle hidden" type="button">
+          <span class="visually-hidden">{{ site.data.ui-text[site.locale].menu_label | default: "Toggle menu" }}</span>
+          <div class="navicon"></div>
+        </button>
+        <ul class="hidden-links hidden"></ul>
+      </nav>
+    </div>
+  </div>
+</header> 

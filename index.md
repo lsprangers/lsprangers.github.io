@@ -1,6 +1,6 @@
 ---
 title: Luke Sprangers Blog
-layout: default
+layout: home
 ---
 
 <div class="profile-section">

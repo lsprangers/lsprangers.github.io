@@ -1,9 +1,8 @@
 ---
-layout: technical
+layout: page
 title: Search System - Candidate Generation
-category: Search System Design
-difficulty: Advanced
 description: Discussion around Candidate Generation in the context of search and recommendation systems
+show_back_link: true
 ---
 
 # Table of Contents

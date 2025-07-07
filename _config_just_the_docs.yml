@@ -1,0 +1,112 @@
+# Site Settings
+title                    : "Luke Sprangers Blog"
+description              : "Personal blog and technical documentation"
+url                      : # the base hostname & protocol for your site
+baseurl                  : # the subpath of your site, e.g. "/blog"
+logo                     : # path of logo image to display in the masthead
+copyright                : # "copyright" name, defaults to site.title
+
+# Just the Docs theme configuration
+theme: just-the-docs
+
+# Site Author
+author:
+  name             : "Luke Sprangers"
+  email            :
+
+just_the_docs:
+  # Color scheme supports "light" (default) and "dark"
+  color_scheme: light
+  
+  # Enable or disable the site title
+  title: true
+  
+  # Enable or disable the back-to-top button
+  back_to_top: true
+  
+  # Enable or disable the "Edit this page on GitHub" link
+  gh_edit_link: false
+  
+  # Enable or disable the "Last modified" date
+  last_edit_timestamp: false
+  
+  # Enable or disable the "Last modified" author
+  last_edit_author: false
+  
+  # Navigation structure - this will be auto-generated from your collections
+  nav_external_links:
+    - title: "GitHub"
+      url: "https://github.com/lsprangers"
+    - title: "LinkedIn"
+      url: "https://www.linkedin.com/in/luke-sprangers"
+  
+  # Search
+  search_enabled: true
+  search:
+    # Split pages into sections that can be searched individually
+    heading_level: 1
+    previews: 3
+    preview_words_before: 5
+    preview_words_after: 10
+    tokenizer_separator: /[\s/\-]+/
+  
+  # Heading anchor links appear on hover over h1-h6 tags
+  heading_anchors: true
+  
+  # Navigation configuration
+  nav_exclude_pages:
+    - "index"
+    - "career"
+    - "contact"
+    - "projects"
+  
+  # Include technical collection in navigation
+  nav_exclude_collections:
+    - "posts"
+
+# Reading Files
+include:
+  - .htaccess
+exclude:
+  - "*.sublime-project"
+  - "*.sublime-workspace"
+  - vendor
+  - .asset-cache
+  - .bundle
+  - .jekyll-assets-cache
+  - .sass-cache
+  - assets/js/plugins
+  - assets/js/_main.js
+  - assets/js/vendor
+  - Capfile
+  - CHANGELOG
+  - config
+  - Gemfile
+  - Gruntfile.js
+  - gulpfile.js
+  - LICENSE
+  - log
+  - node_modules
+  - package.json
+  - package-lock.json
+  - Rakefile
+  - README
+  - tmp
+keep_files:
+  - .git
+  - .svn
+encoding: "utf-8"
+markdown_ext: "markdown,mkdown,mkdn,mkd,md"
+
+# Collections
+collections:
+  technical:
+    output: true
+    permalink: /technical/:path/
+
+# Conversion
+markdown: kramdown
+highlighter: rouge
+lsi: false
+excerpt_separator: "\n\n"
+incremental: false 

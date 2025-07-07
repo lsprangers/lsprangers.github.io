@@ -1,0 +1,175 @@
+// Import Just the Docs styles
+@import "just-the-docs";
+
+// Custom home page styles
+.profile-section {
+  margin-bottom: 2rem;
+}
+
+.home-flex {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.profile-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.home-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.home-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+}
+
+.home-logo {
+  max-width: 100%;
+  height: auto;
+}
+
+.home-text-container {
+  flex-grow: 1;
+}
+
+.home-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.social-links {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.social-link:hover {
+  background-color: #0056b3;
+  color: white;
+  text-decoration: none;
+}
+
+.social-link.github {
+  background-color: #333;
+}
+
+.social-link.github:hover {
+  background-color: #555;
+}
+
+// Custom page description styles
+.page-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.technical-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+.project-description {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 1rem;
+  font-style: italic;
+}
+
+// Technical article styles
+.technical-article {
+  .technical-header {
+    margin-bottom: 2rem;
+  }
+  
+  .technical-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .technical-category {
+    background-color: #e9ecef;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+  }
+  
+  .technical-difficulty {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: bold;
+    
+    &.easy { background-color: #d4edda; color: #155724; }
+    &.medium { background-color: #fff3cd; color: #856404; }
+    &.hard { background-color: #f8d7da; color: #721c24; }
+  }
+  
+  .technical-footer {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+  }
+}
+
+// Project article styles
+.project-article {
+  .project-header {
+    margin-bottom: 2rem;
+  }
+  
+  .project-content {
+    line-height: 1.6;
+  }
+}
+
+// Override Just the Docs search box to be more prominent
+.search {
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  border: 2px solid #dee2e6;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 1rem;
+  
+  &:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+} 

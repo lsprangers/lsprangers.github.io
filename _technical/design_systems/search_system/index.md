@@ -1,9 +1,8 @@
 ---
-layout: technical
+layout: page
 title: Search System Design
-category: System Design
-difficulty: Advanced
 description: Complete search and recommendation system with candidate generation, ranking, and inverted index
+show_back_link: true
 ---
 
 

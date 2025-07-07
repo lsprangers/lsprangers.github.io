@@ -1,0 +1,219 @@
+{"0": {
+    "doc": "Career",
+    "title": "Career",
+    "content": "ML + Data Tech Lead at Moodys Analytics . November 2022 - Present . I lead a group under the Data and AI Functional Group in the KYC OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference. | Data and ML Platforms | Engineering manager responsibilites for Data Engineering group | Help communicate and set strategy for SWE, MLE, DE, and Analytics across the org | . ML Engineer at Corrigo (JLL-T) . January 2022 - November 2022 . As an ML Engineer at Corrigo, I worked on developing machine learning models to improve operational efficiency and predictive maintenance. | Developed predictive maintenance models | Improved operational efficiency through ML solutions | Collaborated with cross-functional teams | . Senior Data Scientist at Corrigo (JLL-T) . March 2020 - January 2022 . As a Senior Data Scientist, I led data science projects to extract insights from large datasets and drive business decisions. | Led data science projects | Extracted insights from large datasets | Drove business decisions through data analysis | . Data Scientist at Co Star . July 2019 - March 2020 . At Co Star, I focused on building data-driven solutions to enhance real estate market analysis and forecasting. | Built data-driven solutions for market analysis | Enhanced real estate market forecasting | Worked closely with stakeholders to deliver insights | . Technical Consultant at Mu Sigma . August 2018 - July 2019 . I started my career in analytics and consulting, helping clients leverage data to solve complex business problems. | Provided data-driven consulting services | Helped clients solve complex business problems | Developed analytical models to support decision-making | . ",
+    "url": "/career.html",
+    
+    "relUrl": "/career.html"
+  },"1": {
+    "doc": "Contact",
+    "title": "Get in Touch",
+    "content": "I'm always interested in hearing about new opportunities and interesting projects. Feel free to reach out! . Email . sprangersluke@gmail.com . I typically respond within 24 hours . LinkedIn . linkedin.com/in/luke-sprangers . Connect with me for professional networking . GitHub . github.com/lsprangers . Check out my open source projects . ",
+    "url": "/contact.html",
+    
+    "relUrl": "/contact.html"
+  },"2": {
+    "doc": "Contact",
+    "title": "What I'm Looking For",
+    "content": ". | Distributed systems and cloud infrastructure projects | Data engineering and analytics opportunities | Open source contributions and collaborations | Technical leadership and architecture roles | . ",
+    "url": "/contact.html",
+    
+    "relUrl": "/contact.html"
+  },"3": {
+    "doc": "Contact",
+    "title": "Contact",
+    "content": " ",
+    "url": "/contact.html",
+    
+    "relUrl": "/contact.html"
+  },"4": {
+    "doc": "Luke Sprangers Blog",
+    "title": "Luke Sprangers Blog",
+    "content": "I live in Columbia, MO with my dog Bowie I enjoy running, traveling, gardening, and pickleball In my day-to-day, I work at Moody's Analytics, leading a team in the ML and Data space, where we help fight financial crime in the KYC OU . Tech Lead Machine Learning and Data Analytics . University of Wisconsin - Madison B.S. Applied Mathematics (CS Emphasis) B.S. Quantitative Economics . LinkedIn GitHub ",
+    "url": "/",
+    
+    "relUrl": "/"
+  },"5": {
+    "doc": "Just the Docs Demo",
+    "title": "Just the Docs Demo",
+    "content": "This is a demonstration of a pure Just the Docs layout without any custom HTML components. ",
+    "url": "/just_the_docs_demo.html",
+    
+    "relUrl": "/just_the_docs_demo.html"
+  },"6": {
+    "doc": "Just the Docs Demo",
+    "title": "Features",
+    "content": ". | Clean Navigation: Auto-generated from your collections | Search: Built-in search functionality | Responsive: Works on all devices | No Custom HTML: Pure Just the Docs theme | . ",
+    "url": "/just_the_docs_demo.html#features",
+    
+    "relUrl": "/just_the_docs_demo.html#features"
+  },"7": {
+    "doc": "Just the Docs Demo",
+    "title": "Configuration",
+    "content": "The layout uses the following configuration: . just_the_docs: color_scheme: light title: true search: true back_to_top: true gh_edit_link: false last_edit_timestamp: false last_edit_author: false footer_content: false heading_anchors: true . ",
+    "url": "/just_the_docs_demo.html#configuration",
+    
+    "relUrl": "/just_the_docs_demo.html#configuration"
+  },"8": {
+    "doc": "Just the Docs Demo",
+    "title": "Navigation Structure",
+    "content": "The navigation is automatically generated from your _technical collection and follows the folder structure. Each markdown file becomes a page in the navigation. ",
+    "url": "/just_the_docs_demo.html#navigation-structure",
+    
+    "relUrl": "/just_the_docs_demo.html#navigation-structure"
+  },"9": {
+    "doc": "Just the Docs Demo",
+    "title": "Code Example",
+    "content": "def hello_world(): print(\"Hello, Just the Docs!\") return \"Success\" . ",
+    "url": "/just_the_docs_demo.html#code-example",
+    
+    "relUrl": "/just_the_docs_demo.html#code-example"
+  },"10": {
+    "doc": "Just the Docs Demo",
+    "title": "Lists",
+    "content": ". | Item 1 | Item 2 | Item 3 | . ",
+    "url": "/just_the_docs_demo.html#lists",
+    
+    "relUrl": "/just_the_docs_demo.html#lists"
+  },"11": {
+    "doc": "Just the Docs Demo",
+    "title": "Tables",
+    "content": "| Feature | Status | . | Search | ✅ Enabled | . | Navigation | ✅ Auto-generated | . | Custom HTML | ❌ Disabled | . | Responsive | ✅ Yes | . ",
+    "url": "/just_the_docs_demo.html#tables",
+    
+    "relUrl": "/just_the_docs_demo.html#tables"
+  },"12": {
+    "doc": "Just the Docs Demo",
+    "title": "Callouts",
+    "content": "This is a note callout. This is a warning callout. This is a tip callout. ",
+    "url": "/just_the_docs_demo.html#callouts",
+    
+    "relUrl": "/just_the_docs_demo.html#callouts"
+  },"13": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Pure Just the Docs Layout",
+    "content": "This is what a page looks like with zero custom HTML - just pure Just the Docs theme. ",
+    "url": "/just_the_docs_example.html#pure-just-the-docs-layout",
+    
+    "relUrl": "/just_the_docs_example.html#pure-just-the-docs-layout"
+  },"14": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Features",
+    "content": ". | Clean navigation on the left | Search functionality at the top | Responsive design | No custom CSS or HTML | . ",
+    "url": "/just_the_docs_example.html#features",
+    
+    "relUrl": "/just_the_docs_example.html#features"
+  },"15": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Code Example",
+    "content": "def example_function(): return \"This is pure Just the Docs!\" . ",
+    "url": "/just_the_docs_example.html#code-example",
+    
+    "relUrl": "/just_the_docs_example.html#code-example"
+  },"16": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Lists",
+    "content": ". | Feature 1 | Feature 2 | Feature 3 | . ",
+    "url": "/just_the_docs_example.html#lists",
+    
+    "relUrl": "/just_the_docs_example.html#lists"
+  },"17": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Callouts",
+    "content": "This is a note callout. This is a warning callout. ",
+    "url": "/just_the_docs_example.html#callouts",
+    
+    "relUrl": "/just_the_docs_example.html#callouts"
+  },"18": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Tables",
+    "content": "| Feature | Status | . | Navigation | ✅ | . | Search | ✅ | . | Custom HTML | ❌ | . | Responsive | ✅ | . That’s it! No custom HTML, no custom CSS, just the default Just the Docs theme. ",
+    "url": "/just_the_docs_example.html#tables",
+    
+    "relUrl": "/just_the_docs_example.html#tables"
+  },"19": {
+    "doc": "Pure Just the Docs Example",
+    "title": "Pure Just the Docs Example",
+    "content": " ",
+    "url": "/just_the_docs_example.html",
+    
+    "relUrl": "/just_the_docs_example.html"
+  },"20": {
+    "doc": "Projects",
+    "title": "Projects",
+    "content": "RAFT . The RAFT consensus algorithm from scratch . Implemented the RAFT consensus algorithm from scratch using core OS libraries only, which is used for managing a replicated log in distributed systems. View Project BYO Cloud . A project to build your own cloud infrastructure. Developed a project to build your own cloud infrastructure, providing a scalable and flexible solution for cloud computing. View Project Pregel &amp; GraphX: Map-Reduce Based Graph Algorithms . Graph traversal and connected components algorithm using MapReduce. Implemented graph traversal and connected components algorithms using MapReduce, leveraging functional programming constructs in Scala. View Project Scalable Streaming Entity Resolution Using Commodity Hardware . BYO Inverted Index and Streaming ER Solution on Delta Lake . Terrabyte Sized ER via Spark and Delta Lake - Create an in-memory partitioned inverted index for our Streaming Entity Resolution use case . View Project ",
+    "url": "/projects.html",
+    
+    "relUrl": "/projects.html"
+  },"21": {
+    "doc": "Technical Content",
+    "title": "Technical Content",
+    "content": "A collection of my technical implementations, system designs, and concepts. Each section contains detailed documentation and code examples. ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"22": {
+    "doc": "Technical Content",
+    "title": "System Design",
+    "content": "Large-scale system architectures and distributed systems . View System Designs ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"23": {
+    "doc": "Technical Content",
+    "title": "Data Structures &amp; Algorithms",
+    "content": "Custom implementations and algorithmic concepts . View DSA Content ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"24": {
+    "doc": "Technical Content",
+    "title": "Implementations",
+    "content": "Custom data structure and algorithm implementations . View Implementations ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"25": {
+    "doc": "Technical Content",
+    "title": "Real-Time Event Architecture",
+    "content": "Streaming systems and event processing pipelines . View Event Systems ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"26": {
+    "doc": "Technical Content",
+    "title": "Machine Learning &amp; LLMs",
+    "content": "Neural networks, embeddings, and language models . View ML Content ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"27": {
+    "doc": "Technical Content",
+    "title": "Mathematical Concepts",
+    "content": "Linear algebra, optimization, and mathematical foundations . View Math Notes ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"28": {
+    "doc": "Technical Content",
+    "title": "Other Concepts",
+    "content": "Miscellaneous technical concepts and implementations . View Other Concepts ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"29": {
+    "doc": "Technical Content",
+    "title": "Research Papers",
+    "content": "Notes and summaries from academic papers . View Papers ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  },"30": {
+    "doc": "Technical Content",
+    "title": "Design Systems",
+    "content": "Search System . Complete search and recommendation system with candidate generation, ranking, and inverted index . View System Design ",
+    "url": "/technical.html",
+    
+    "relUrl": "/technical.html"
+  }
+}

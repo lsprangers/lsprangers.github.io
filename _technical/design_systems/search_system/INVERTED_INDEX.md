@@ -1,8 +1,7 @@
 ---
-layout: technical
+layout: page
 title: Search System - Inverted Index
-category: Search System Design
-difficulty: Medium
+show_back_link: true
 description: Discussion around Inverted Indexes, one of the first implementations of search systems
 ---
 
