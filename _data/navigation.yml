@@ -14,12 +14,12 @@ main:
     url: "/technical"
     children:
       - title: "Design Systems"
-        url: "/technical/design_systems/"
+        url: "/_technical/design_systems/"
         children:
           - title: "Search System"
-            url: "/technical/design_systems/search_system/"
+            url: "/_technical/design_systems/search_system/"
           - title: "URL Shortener"
-            url: "/technical/design_systems/url_shortening_system/"
+            url: "/_technical/design_systems/url_shortening_system/"
           - title: "YouTube System"
             url: "/technical/design_systems/youtube/"
           - title: "Top-K Problem"

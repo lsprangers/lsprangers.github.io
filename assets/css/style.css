@@ -823,3 +823,24 @@ body {
     }
 }
 
+/* Sub-navigation styles */
+.sub-nav {
+    list-style: none;
+    padding-left: 20px;
+    margin: 5px 0;
+}
+
+.sub-nav li {
+    margin: 2px 0;
+}
+
+.sub-nav a {
+    font-size: 0.9em;
+    color: #666;
+    text-decoration: none;
+}
+
+.sub-nav a:hover {
+    color: #003366;
+}
+

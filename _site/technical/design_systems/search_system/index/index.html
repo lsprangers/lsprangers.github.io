@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search System Design</title>
+    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/career.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header class="header" id="header">
+        <img src="/images/mecircle.jpg" alt="Profile Photo" class="profile-photo">
+        <h1>Luke Sprangers Blog</h1>
+        <button class="mobile-nav-toggle" id="mobileNavToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </header>
+    <div class="container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-content">
+                <nav>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/career/">Career</a></li>
+                        <li><a href="/projects/">Projects</a></li>
+                        <li class="nav-item">
+                            <a href="/technical/" onclick="toggleSubNav(event)">Technical Content</a>
+                            <ul class="sub-nav" id="technicalSubNav" style="display: none;">
+                                <li><a href="/technical/design_systems/search_system/">Search System</a></li>
+                                <li><a href="/technical/design_systems/url_shortening_system/">URL Shortener</a></li>
+                                <li><a href="/technical/design_systems/youtube/">YouTube System</a></li>
+                                <li><a href="/technical/design_systems/top_k/">Top-K Problem</a></li>
+                                <li><a href="/technical/design_systems/_typical_reusable_resources/">Reusable Resources</a></li>
+                                <li><a href="/technical/design_systems/_reference_material/">Reference Materials</a></li>
+                                <li><a href="/technical/design_systems/calculations_and_timings/">Calculations & Timings</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="/contact/">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <main class="content">
+            <article class="technical-article">
+    <div class="technical-header">
+        <div class="technical-meta">
+            <span class="technical-category">System Design</span>
+            <span class="technical-difficulty advanced">Advanced</span>
+        </div>
+        <h1>Search System Design</h1>
+        
+        <p class="technical-description">Complete search and recommendation system with candidate generation, ranking, and inverted index</p>
+        
+    </div>
+    
+    <div class="technical-content">
+        <h1 id="table-of-contents">Table of Contents</h1>
+<ul>
+  <li><a href="#ecommerce-diagram">Ecommerce Diagram</a></li>
+  <li><a href="#search-systems">Search Systems</a>
+    <ul>
+      <li><a href="#terminology">Terminology</a></li>
+    </ul>
+  </li>
+  <li><a href="#history">History</a>
+    <ul>
+      <li><a href="#inverted-indexes">Inverted Indexes</a></li>
+      <li><a href="#embeddings">Embeddings</a></li>
+    </ul>
+  </li>
+  <li><a href="#scalable-real-serving-systems">Scalable, Real Serving Systems</a>
+    <ul>
+      <li><a href="#candidate-generation">Candidate Generation</a>
+        <ul>
+          <li><a href="#embedding-space-updates">Embedding Space Updates</a></li>
+          <li><a href="#user-item-matrix-updates">User-Item Matrix Updates</a></li>
+          <li><a href="#dnn-updates">DNN Updates</a></li>
+        </ul>
+      </li>
+      <li><a href="#filtering">Filtering</a></li>
+      <li><a href="#scoring">Scoring</a>
+        <ul>
+          <li><a href="#knn">KNN</a>
+            <ul>
+              <li><a href="#branch-and-bound">Branch And Bound</a></li>
+              <li><a href="#locality-sensitive-hashing">Locality Sensitive Hashing</a></li>
+              <li><a href="#faiss">FAISS</a></li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><a href="#reranking--ordering">Reranking / Ordering</a></li>
+    </ul>
+  </li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#youtube-dnn-system">Youtube DNN System</a>
+    <ul>
+      <li><a href="#candidate-generation-1">Candidate Generation</a></li>
+      <li><a href="#ranking">Ranking</a>
+        <ul>
+          <li><a href="#learn-to-rank">Learn To Rank</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="ecommerce-diagram">Ecommerce Diagram</h1>
+<p>Below we can see a generic E-Commerce website setup that includes a recommendation system</p>
+
+<p>This flow only includes the default user recommendations, and in other flows we’d have to include “current search item” or “returned order item” or something similar</p>
+
+<p>The dotted lines represent our <a href="#filtering">Filtering Steps</a> which is the part of our rec service that should be fairly “online and up to date”, whereas our <a href="#candidate-generation">Candidate Generation</a> and <a href="#ranking">Ranking</a> are trained / updated over time, but not always “up to date”</p>
+
+<p><img src="./images/SysArchTemplate-ECommerce%20Search%20System.png" alt="Ecommerce Arch" /></p>
+
+<ul>
+  <li><strong><em>Notes</em></strong>
+    <ul>
+      <li>We specify CDN + User Sessions and Cookies because at a high level they show how we are going to run some sort of personalization
+        <ul>
+          <li>We will process user + item history and eventually create interaction data in our data warehouse, and that’s only possible if we have general click data</li>
+        </ul>
+      </li>
+      <li>Parallel / Concurrent calls
+        <ul>
+          <li>Our calls to <code class="language-plaintext highlighter-rouge">/GET Homepage</code> to our API GW and <code class="language-plaintext highlighter-rouge">/GET Recs ? userId=...</code> should happen in parallel, and each database should be able to handle async concurrent requests so that all of this info can get aggregated and returned to users browser</li>
+        </ul>
+      </li>
+      <li>Our Rec System
+        <ul>
+          <li><a href="#candidate-generation">Candidate Generation</a> is a very important step that should be altered for whatever we are looking to do…some tasks might need collaborative filtering, some content, some plain old lists</li>
+          <li><a href="#filtering">Filtering</a> is <strong><em>stateful</em></strong> meaning it makes multiple database calls to other services <strong><em>(distributed monolith not microservice)</em></strong>, it is where we can <strong><em>inject experiments</em></strong>, and really update it to anything we want</li>
+          <li><a href="#ranking">Ranking</a> is using a DNN, and we should train it for <strong><em>multi-task</em></strong> learning to ensure it maximizes engagement, conversion, usefullness, and other tasks. We don’t cover that paradigm below, most of the DNN discussion is around “probability of engagement” or “predicted watch time” which are both prone to clickbait, but are an intuitive start</li>
+          <li>Most of the time these issues would be handled in our Filtering phase with yet another model tied to it for predicting click-bait!</li>
+        </ul>
+      </li>
+      <li>Event Streaming + Warehousing is used across the board for CDC from the databases to ensure we can run analytics and retrain models for future recommendation systems</li>
+      <li><a href="../top_k/README.md">Top K Heavy Hitters</a> is covered in another system design, but here we could use our warehouse to implement it. We’d want to observe real-time trends, seasonal patterns, and viral content</li>
+      <li>This is all handled via an <a href="../_typical_reusable_resources/_typical_frontend/README.md">API Gateway</a>, or typical frontend, which, along with proper load balancing and caching, can help ensure all of our requests are secure, correctly routed, and even minimal aggregation for returning to users browser
+        <ul>
+          <li>It can also help with experimentation routing!</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="search-systems">Search Systems</h1>
+<p>Search Systems (also Recommendation systems since we recommend something back) are used for finding relevant content based on a query</p>
+
+<ul>
+  <li>“What day is it today”</li>
+  <li>“Michael Jordan Dunk”</li>
+  <li>etc…</li>
+</ul>
+
+<p>All of these things are queries and we’d expect different content to be returned</p>
+
+<p>For a further look at <a href="../../nn_and_llm/EMBEDDINGS.md#embeddings">Embeddings</a> check out the sub-document</p>
+
+<p>Youtube will typically return Videos, Google will return almost any content type, App Store would return applications, and Facebook might return posts / users (friends)</p>
+
+<p>An Example from Nvidia
+<img src="./images/nvidia.png" alt="Nvidia" /></p>
+
+<h2 id="terminology">Terminology</h2>
+<ul>
+  <li>An <strong><em>item</em></strong> is generally the thing we’d want to recommend</li>
+  <li>A <strong><em>user</em></strong> uses items and can be recommended items
+    <ul>
+      <li>Users have a history of item usage</li>
+    </ul>
+  </li>
+  <li>A <strong><em>query</em></strong> comes in at some time, usually from a user, and we would recommend items for that query
+    <ul>
+      <li>A query can be considered the general context / information a system uses to make recommendations</li>
+    </ul>
+  </li>
+  <li>An <strong><em><a href="../../nn_and_llm/EMBEDDINGS.md#embeddings">embedding</a></em></strong> is a way to create numeric representations of items, users, and queries which help us in the steps below</li>
+  <li>Recommendation Scenarios:
+    <ul>
+      <li><em>Log-On:</em> When a user logs on and the system will recommend items to them</li>
+      <li><em>Search:</em> When a user queries for a specific item and we return items based on that query</li>
+      <li>For each of the types above we will need to <em>project</em> the query context into some sort of <em>embedding space</em> and ultimately return some sort of Top K item results to the user</li>
+    </ul>
+  </li>
+  <li>General architecture:
+    <ul>
+      <li><strong><em>Candidate Generation:</em></strong> is where we efficiently distill the entire corpus of items down to a manageable size - this typically has high precision where anything we return is good, but we might have missed some good items in the process</li>
+      <li><strong><em>Retrieval and Scoring:</em></strong> is where we take the distilled space and run large scale heavy computations against the query / user context to decide on the best videos. This step typically has high recall where we will ensure we get every possible candidate the user might find interesting</li>
+      <li><strong><em>Re-Ranking:</em></strong> Takes into account user history, current trends, and other policies we might want to have included in our system that change more quickly. Typical policies include pirated content, child restrictions, user personalization, and clickbait removes, among many other policies. We woudln’t want to include all of this in our generic candidate generation or ranking steps since it’d ultimately cause heavy retraining and recomputing of our Embedding Space</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="history">History</h1>
+<p>Over time recommendation / search systems have gone through a lot of changes</p>
+<ul>
+  <li>At first we used inverted indexes for text based lookups of documents which would allow things like webpage lookup on google</li>
+  <li>Most of this stayed with token-based matching using more advanced methods like n-grams, maybe using distance metrics like Levenshtein, or even some minimal ranking with TF-IDF based methods
+    <ul>
+      <li>The takeaway here was that we were always comparing text-to-text</li>
+      <li>These systems had <strong><em>high precision, but low recall</em></strong>…if a word matches char for chat, it matches! But finding the matches that didn’t 100% overlap became an issue</li>
+    </ul>
+  </li>
+  <li>Over time:
+    <ul>
+      <li>Scale occurred:
+        <ul>
+          <li>Recommendation systems started to span multiple content types, from videos to other users to generic multimedia, and the systems had to keep up</li>
+          <li>Companies started to have humongous web scale for items like Amazon, Google, and Facebook</li>
+          <li>These evolutions led to new search systems that had multiple stages across various content types <strong><em>which led systems to converge on Candidate Generation and Scoring over projected embeddings</em></strong></li>
+        </ul>
+      </li>
+      <li>Embeddings occurred:
+        <ul>
+          <li>We started to look to scores that could be calculated between <code class="language-plaintext highlighter-rouge">&lt;query, candidate&gt;</code> pairs to give us high precision and higher recall</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Search has started to move away from returning items to returning summaries and question answering live through “GenAI”, but in reality this is mostly still based on Transformer models and NLP tasks where we surround it with new context / query information</p>
+
+<p>Here’s a list of Examples from the Wild from NVIDIA
+<img src="./images/examples.png" alt="Example" /></p>
+
+<h2 id="inverted-indexes">Inverted Indexes</h2>
+<p><a href="INVERTED_INDEX.md">Inverted Indexes</a> have been around for a long time, and they built the original search systems we think of. When you hear of “Google indexed my page” or “Google crawled my page” it is referring to a system similar to this</p>
+
+<p>There’s many still used today, but for the most part systems require utilizing context, user features / demographics, and many other inputs to help design Search and Recommendation Systems</p>
+
+<h2 id="embeddings">Embeddings</h2>
+<p><a href="../../nn_and_llm/EMBEDDINGS.md#embeddings">Embeddings</a> are a way to create dense, numeric representations, that can have geometric operations like subtraction, addition, and “closeness”, performed on them</p>
+
+<ul>
+  <li>Types:
+    <ul>
+      <li><a href="../../nn_and_llm/EMBEDDINGS.md#bert-word-embeddings">Word Embeddings</a> are how we turn words into vectors, and was the start of most embedding models…everything changed when we started to use <a href="../../nn_and_llm/EMBEDDINGS.md#attention">attention</a></li>
+      <li><a href="../../nn_and_llm/EMBEDDINGS.md#bert-sentence-embeddings">Sentence Embeddings</a> are basically just aggregations of word embeddings, but things get a bit tricky and we start using multiple hidden layers</li>
+      <li><a href="../../nn_and_llm/EMBEDDINGS.md#bert-sentence-embeddings">Document Embeddings</a> are basically just concatenated or aggregated sentence embeddings</li>
+      <li><a href="../../nn_and_llm/EMBEDDINGS.md#user-embeddings">User Embeddings</a> are typically created using User-Item interactions, along with other features like demographics, click through data, or history</li>
+      <li>We can create embeddings for almost anything, but at the end of the day the embeddings need to make sense for what we want to do, which is typically find “similar” things, or find geometric interpretations of “things” like Paris is to France as Berlin is to Germany</li>
+    </ul>
+  </li>
+</ul>
+
+<h1 id="scalable-real-serving-systems">Scalable, Real Serving Systems</h1>
+<p>We’ll walk through how serving systems would be architected in the current world</p>
+
+<h2 id="candidate-generation">Candidate Generation</h2>
+<p>The <a href="./CANDIDATE_GENERATION.md">Candidate Generation</a> sub-document covers all main areas of candidate generation phase, but in most cases we’ll basically be creating the user-item matrices as a batch at some specific time, and then updating it at some cadence as users interact with our service</p>
+
+<p>If we choose to simply use filtering methods then all of the updates and batch creation can be done offline, and if we truly want our recommendations to be as up-to-date as possible we’d have to rerun the WALS update of user-item engagement each time a user uses our service</p>
+
+<p>If we choose DNN, the DNN needs to be ran each time for a specific user to get the output Candidate Generation which leads us into ML Engineering Inference API’s</p>
+
+<h3 id="embedding-space-updates">Embedding Space Updates</h3>
+<p>How do we update our embedding space as users use our services?</p>
+
+<p>We would need to capture the user click information as it’s happening, and stream that data into a user database or an analytical data warehouse</p>
+
+<h3 id="user-item-matrix-updates">User-Item Matrix Updates</h3>
+<p>Once the data is in some sort of processing engine, we’d need to update the specific pointed row-column $r_{ij}$ corresponding to user I on item J. This might be incrementing some usage statistic, upadting metrics on the fly, or something else. This can be apart of <em>Feature Engineering</em> pipelines that run on streaming data</p>
+
+<p>The toughest part will be recomputing the user-item embeddings using WALS or SGD, as we’d have to clone the matrix somewhere else or pause updates on it as we created our new latent matrices $U$ and $V$ during <a href="./CANDIDATE_GENERATION.md#matrix-factorization">Matrix Factorization</a></p>
+
+<p>Then as the user returns, we’d have updated embeddings to serve them with</p>
+
+<h3 id="dnn-updates">DNN Updates</h3>
+<p>The DNN needs to be ran each time for a specific user to get the output Candidate Generation, and updating the model parameters each time wouldn’t be smart so DNN gets retrained as our training data drifts from our User-Item data</p>
+
+<p>The data drift detection can be a separate background feature pipeline in our processing engine, and once there’s a significant enough change we can schedule a new model to be trained for inference</p>
+
+<h2 id="filtering">Filtering</h2>
+<p>Since our Candidate Generation models must run in milliseconds over gigantic corpus, we shouldn’t embed any sort of “business logic” inside of them - things like product being out of stock, product not being child friendly, or product being too far away. These things should be based on user-features, but shouldn’t fluff up our Candidate Generation model</p>
+
+<p>In the past a <strong><em>Bloom Filter</em></strong>, which is now common place in many scenarios, was used to disregard items that the user has already interacted with!</p>
+
+<p>Once the filtering is done, we can send things through to Scoring</p>
+
+<h2 id="scoring">Scoring</h2>
+<p>Given a user coming online, or a query being submitted, how do we actually obtain a set of items to present? This is the main focus of Retrieval and Scoring, sometimes called Ranking, and there are even some Re-Ranking steps involved…</p>
+
+<p>For a <a href="../../nn_and_llm/EMBEDDINGS.md#matrix-factorization">Matrix Factorization</a> technique, we’d have the static embeddings sitting in an API or on disk somewhere for us to look up at query time. We can simply look things up from the User Embedding Matrix to get our query embedding $q_u$</p>
+
+<p>For a DNN model we need to run an inference forward-pass to compute the query embedding at query time by using the weights that were trained from <a href="#dnn-updates">DNN Updates</a> $q_u = \phi(u)$</p>
+
+<p>The algorithms described in <a href="./RANKING.md">Ranking and Scoring</a> can also be used here - it’s really a horse a piece and what features you put into each and the objective function they’re trained to “solve”</p>
+
+<ul>
+  <li>Typical Scoring features / policies:
+    <ul>
+      <li>Geographic closeness for things like Restaurants and Bars</li>
+      <li>User account features for personalization</li>
+      <li>Popular or trending items for the day</li>
+    </ul>
+  </li>
+</ul>
+
+<p>This is typically done using heavier models, and / or new features &amp; policies, to create a finalized list to present to the user</p>
+
+<p>Heavier models would include things like DNN predicted user watch time of each video (item) from the final Candidate Generation list. In this case we could have a DNN for Candidate Generation over our entire corpus, and then another DNN with more hidden layers and features to predict watch time for each video, but some systems just combine these into one for latency requirements</p>
+
+<p>Why do we split Candidate Generation from Ranking?</p>
+<ul>
+  <li>Some systems don’t!</li>
+  <li>Some systems use multiple Candidate Generation models</li>
+  <li>Some Ranking models use heavier sets of features or heavier models that can’t run over the entire corpus</li>
+</ul>
+
+<h3 id="knn">KNN</h3>
+<p>Once we have our query embedding $q_u$ we need need to search for the Top K Nearest Neighbors (KNN) items $V_j$ in the Item Matrix that are closest to $q_u$ - this is typically done with the <a href="./RANKING.md">Ranking and Scoring</a> algorithms described elsewhere, which help us compute a score $s(q_u \cdot v_j)$ for our query across the Item Embedding Space</p>
+
+<ul>
+  <li>This is a fairly large and complex thing to do online for each query, but there are ways to alleviate this:
+    <ul>
+      <li>If the query embedding is known statically, the system can perform exhaustive scoring offline, precomputing and storing a list of the top candidates for each query. This is a common practice for related-item recommendation.</li>
+      <li>Use approximate nearest neighbors. Google provides an open-source tool on GitHub called <a href="https://github.com/google-research/google-research/tree/master/scann">ScaNN (Scalable Nearest Neighbors)</a>. This tool performs efficient vector similarity search at scale
+        <ul>
+          <li>ScaNN using space pruning and quantization, among many other things, to scale up their Inner Product Search capabilities, which basically means they make running Dot Product search very fast, and they also mention support of other distance metrics like Euclidean</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>Most of the time computing Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead</p>
+
+<h4 id="branch-and-bound">Branch And Bound</h4>
+<ul>
+  <li><strong>Description</strong>:
+    <ul>
+      <li>A search algorithm used to efficiently find the <strong>Top K nearest neighbors</strong> by pruning irrelevant regions of the search space.</li>
+      <li>It systematically explores the search space while maintaining bounds on the best possible solution.</li>
+    </ul>
+  </li>
+  <li><strong>How It Works</strong>:
+    <ul>
+      <li>Calculates a <strong>lower bound</strong> for each candidate region and compares it to the current best solution.</li>
+      <li>Regions that cannot contain better solutions are pruned, reducing the number of comparisons.</li>
+    </ul>
+  </li>
+  <li><strong>Use Case</strong>:
+    <ul>
+      <li>Effective for <strong>exact nearest neighbor search</strong> in structured datasets where pruning can significantly reduce computation.</li>
+    </ul>
+  </li>
+  <li><strong>Limitations</strong>:
+    <ul>
+      <li>Computationally expensive for high-dimensional data unless combined with other techniques like space partitioning.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="locality-sensitive-hashing-lsh">Locality Sensitive Hashing (LSH)</h4>
+<ul>
+  <li><strong>Description</strong>:
+    <ul>
+      <li>A technique for <strong>approximate nearest neighbor search</strong> that hashes similar items into the same bucket with high probability.</li>
+      <li>Reduces the dimensionality of the data while preserving similarity.</li>
+    </ul>
+  </li>
+  <li><strong>How It Works</strong>:
+    <ul>
+      <li>Uses hash functions designed to maximize the probability that similar items (based on a distance metric like cosine similarity or Euclidean distance) map to the same hash bucket.</li>
+      <li>Instead of comparing all items, only items in the same bucket are considered for nearest neighbor search.</li>
+    </ul>
+  </li>
+  <li><strong>Use Case</strong>:
+    <ul>
+      <li>Ideal for <strong>high-dimensional data</strong> and large-scale systems where exact search is computationally infeasible.</li>
+      <li>Commonly used in recommendation systems, plagiarism detection, and image similarity search.</li>
+    </ul>
+  </li>
+  <li><strong>Limitations</strong>:
+    <ul>
+      <li>May miss some neighbors due to the approximate nature of the algorithm.</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="faiss-facebook-ai-similarity-search">FAISS (Facebook AI Similarity Search)</h4>
+<ul>
+  <li><strong>Description</strong>:
+    <ul>
+      <li>An open-source library developed by Facebook for <strong>efficient similarity search</strong> and <strong>clustering of dense vectors</strong>.</li>
+      <li>Optimized for both exact and approximate nearest neighbor search.</li>
+    </ul>
+  </li>
+  <li><strong>How It Works</strong>:
+    <ul>
+      <li>Supports multiple indexing methods, including:
+        <ul>
+          <li><strong>Flat Index</strong>: Exhaustive search for exact results.</li>
+          <li><strong>IVF (Inverted File Index)</strong>: Partitions the dataset into clusters for faster approximate search.</li>
+          <li><strong>HNSW (Hierarchical Navigable Small World)</strong>: Graph-based search for high recall and low latency.</li>
+        </ul>
+      </li>
+      <li>Uses GPU acceleration for large-scale datasets.</li>
+    </ul>
+  </li>
+  <li><strong>Use Case</strong>:
+    <ul>
+      <li>Widely used in <strong>recommendation systems</strong>, <strong>image retrieval</strong>, and <strong>embedding-based search</strong>.</li>
+      <li>Scales well to billions of vectors with low latency.</li>
+    </ul>
+  </li>
+  <li><strong>Limitations</strong>:
+    <ul>
+      <li>Requires tuning of indexing parameters for optimal performance.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="reranking--ordering">Reranking / Ordering</h2>
+<p>This final part of the model is to mostly filter out items that may have made it through and aren’t useful…these reranking models are much more dynamic and trained on “current issues” like pirated sports streams or child restriction content which could change much faster than our generic ranking systems need to</p>
+
+<p>Typical examples include:</p>
+<ul>
+  <li>Clickbait videos</li>
+  <li>Overtrending videos</li>
+  <li>Videos that may not be part of a specific experiment</li>
+  <li>Child restrictions</li>
+  <li>Piracy restrictions</li>
+  <li>etc….</li>
+</ul>
+
+<p>It’s just another way to pick down at the final list to make sure it’s useful</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Discussing Candidate Generation, Ranking, Retrieval, Scoring, and Reranking might be confusing and repetitive, but in reality all of these components can and do make up recommender systems. In most scenarios the algorithms discussed are used in possibly all steps, and some systems have multiple models of each type (for example multiple Candidate Generation and Reranking models) which all support creating and whittling away at a finalized recommendation list</p>
+
+<p>This is all important because we want to engage users with relevant content without “being evil” - showing trending videos, clickbait videos, or pirated sports streams is hard to combat without all of this context, and at some points we don’t want to include all of that logic in our ranking and scoring. The decision on which model to place where and for what reason is what makes up our recommendation sytem’s choices</p>
+
+<h1 id="youtube-dnn-system">Youtube DNN System</h1>
+<p><a href="https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45530.pdf">Paper Link</a></p>
+
+<p>So what could Youtube use in it’s recommender system?</p>
+
+<h2 id="candidate-generation-1">Candidate Generation</h2>
+<ul>
+  <li>Candidate Generation is around finding a manageable set of videos to compare to an incoming user Query in a very short timeframe
+    <ul>
+      <li>Youtube paper mentions “taking recent user history into context and outputting a small sample of videos (100’s) from our total corpus”</li>
+    </ul>
+  </li>
+  <li>It will have high precision meaning anything it generates is most likely relevant to the user
+    <ul>
+      <li>It “provides broad personalization via collaborative filtering”</li>
+    </ul>
+  </li>
+  <li>The actual DNN is a non-linear generalization of matrix factorization techniques
+    <ul>
+      <li>This basically means they used to use matrix factorization techniques, and the DNN means to mimic that, but DNN’s are more flexible (non-linear)</li>
+      <li>They mention the CGeneration task is extreme classification</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="ranking">Ranking</h2>
+<ul>
+  <li>Ranking will take the output of Candidate Generation, which is high precision, and will create a fine-level representation for the user</li>
+  <li>Ranking will have high recall to ensure out of the videos Candidate Generation finds, Ranking doesn’t leave anything behind
+    <ul>
+      <li>It ranks these videos with a rich set of Query (User) - Document (Video) Features
+        <h3 id="learn-to-rank">Learn To Rank</h3>
+        <p>This would be a good first thought - we could basically have user context as input along with some previous history, and then we could rank potential videos that get passed through from Candidate Generation</p>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+    </div>
+    
+    <div class="technical-footer">
+        <p><i class="fas fa-arrow-left"></i> <a href="/technical/">Back to Technical Content</a></p>
+    </div>
+</article> 
+        </main>
+    </div>
+    <script>
+        window.addEventListener('scroll', function() {
+            var header = document.getElementById('header');
+            var sidebar = document.getElementById('sidebar');
+            if (window.scrollY > 50) {
+                header.style.top = '-100px'; // Hide the header
+                sidebar.style.top = '0'; // Move sidebar to the top
+            } else {
+                header.style.top = '0'; // Show the header
+                sidebar.style.top = '60px'; // Position sidebar below the header
+            }
+        });
+
+        // Mobile navigation functionality
+        const mobileNavToggle = document.getElementById('mobileNavToggle');
+        const sidebar = document.getElementById('sidebar');
+        const isMobile = window.innerWidth <= 768;
+
+        if (isMobile) {
+            // Reset sidebar position for mobile
+            sidebar.style.top = '0';
+        }
+
+        mobileNavToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+
+        // Close sidebar when clicking on a link (mobile)
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+
+        // Close sidebar when clicking outside (mobile)
+        document.addEventListener('click', function(event) {
+            if (window.innerWidth <= 768) {
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = mobileNavToggle.contains(event.target);
+                
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                }
+            }
+        });
+
+        // Sub-navigation toggle
+        function toggleSubNav(event) {
+            event.preventDefault();
+            const subNav = document.getElementById('technicalSubNav');
+            if (subNav.style.display === 'none') {
+                subNav.style.display = 'block';
+            } else {
+                subNav.style.display = 'none';
+            }
+        }
+
+    </script>
+</body>
+</html>

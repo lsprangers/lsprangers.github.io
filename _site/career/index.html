@@ -24,7 +24,18 @@
                         <li><a href="/">Home</a></li>
                         <li><a href="/career/">Career</a></li>
                         <li><a href="/projects/">Projects</a></li>
-                        <li><a href="/technical/">Technical Content</a></li>
+                        <li class="nav-item">
+                            <a href="/technical/" onclick="toggleSubNav(event)">Technical Content</a>
+                            <ul class="sub-nav" id="technicalSubNav" style="display: none;">
+                                <li><a href="/technical/design_systems/search_system/">Search System</a></li>
+                                <li><a href="/technical/design_systems/url_shortening_system/">URL Shortener</a></li>
+                                <li><a href="/technical/design_systems/youtube/">YouTube System</a></li>
+                                <li><a href="/technical/design_systems/top_k/">Top-K Problem</a></li>
+                                <li><a href="/technical/design_systems/_typical_reusable_resources/">Reusable Resources</a></li>
+                                <li><a href="/technical/design_systems/_reference_material/">Reference Materials</a></li>
+                                <li><a href="/technical/design_systems/calculations_and_timings/">Calculations & Timings</a></li>
+                            </ul>
+                        </li>
                         <li><a href="/contact/">Contact</a></li>
                     </ul>
                 </nav>
@@ -192,6 +203,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
+        // Sub-navigation toggle
+        function toggleSubNav(event) {
+            event.preventDefault();
+            const subNav = document.getElementById('technicalSubNav');
+            if (subNav.style.display === 'none') {
+                subNav.style.display = 'block';
+            } else {
+                subNav.style.display = 'none';
+            }
+        }
 
     </script>
 </body>

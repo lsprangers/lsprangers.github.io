@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luke Sprangers Blog</title>
+    <title>URL Shortening System Design</title>
     <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="/assets/css/career.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -42,57 +42,64 @@
             </div>
         </aside>
         <main class="content">
-            <div class="profile-section">
-    <div class="home-flex">
-        <div style="flex-grow: 1;">
-            <p class="profile-text">
-                I live in Columbia, MO with my dog Bowie<br /><br />
-                I enjoy running, traveling, gardening, and pickleball<br /><br />
-                In my day-to-day, I work at Moody's Analytics, leading a team in the ML and Data space, where we help fight financial crime in the KYC OU
-            </p>
+            <article class="technical-article">
+    <div class="technical-header">
+        <div class="technical-meta">
+            <span class="technical-category">System Design</span>
+            <span class="technical-difficulty intermediate">Intermediate</span>
         </div>
-        <img src="images/bowie.jpg" alt="Profile Picture" class="profile-image" />
+        <h1>URL Shortening System Design</h1>
+        
+        <p class="technical-description">Design and implementation of a URL shortening service</p>
+        
     </div>
-</div>
+    
+    <div class="technical-content">
+        <h1 id="system">System</h1>
+<p>A URL shortening system is one where you give some URL and it returns a shortened version of it!
+It’s pretty straightforward, except the shortened URL typically needs to be kept alive for some period of time
+Altogether it’s basically another layer in DNS</p>
 
-<div class="home-section">
-    <div class="home-flex">
-        <div class="home-logo-container">
-            <img src="images/ma_logo.png" alt="MA Logo" class="home-logo" style="width: 120px;" />
-        </div>
-        <div class="home-text-container">
-            <p class="home-text">
-                <strong>Tech Lead</strong>
-                Machine Learning and Data Analytics
-            </p>
-        </div>
+<h3 id="functional-requirements">Functional requirements</h3>
+<ul>
+  <li>Availabile: We can always give a shortened URL, and anyone can find the shortened URL for their origin</li>
+  <li>*Consistent: We don’t want multiple short URL’s to point to different original URL’s, but the actual level of consistency depends</li>
+  <li>Scalable: Same thing as always - in this case we’ll choose higher consistency over higher availability, because let’s say someone told us that’s the design choice…we can design both ways</li>
+</ul>
+
+<h3 id="non-functional-requirements">Non-functional requirements</h3>
+<ul>
+  <li>URLs should have only alphanumeric components</li>
+  <li>URLs should have a known maximum length, say 20 characters</li>
+  <li>We do not make choices around the actual websites it points to (could be nefarious websites)</li>
+  <li>There’s a typical expiration time of the shortened URL, say a month, where after the client would need to re-register a URL for shorterning</li>
+</ul>
+
+<h3 id="key-actors">Key actors</h3>
+<ul>
+  <li>Users will call this website to get a registered shortened URL for their input URL</li>
+  <li>Clients will call this website as a step in DNS resolution
+    <ul>
+      <li><code class="language-plaintext highlighter-rouge">shorturl.com --resolves--&gt; superlongandtediousurl.com</code></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="key-components">Key components</h3>
+<ul>
+  <li></li>
+</ul>
+
+<h3 id="high-level-architecture">High-level architecture</h3>
+
+<p>How these key components are connected with each other.</p>
+
     </div>
-</div>
-
-<div class="home-section">
-    <div class="home-flex">
-        <div class="home-logo-container">
-            <img src="images/uw-crest-color-web-digital.png" alt="UW Logo" class="home-logo" style="width: 40px;" />
-        </div>
-        <div class="home-text-container">
-            <p class="home-text">
-                <strong>University of Wisconsin - Madison</strong>
-                B.S. Applied Mathematics (CS Emphasis)<br />
-                B.S. Quantitative Economics
-            </p>
-        </div>
+    
+    <div class="technical-footer">
+        <p><i class="fas fa-arrow-left"></i> <a href="/technical/">Back to Technical Content</a></p>
     </div>
-</div>
-
-<div class="social-links">
-    <a href="https://www.linkedin.com/in/luke-sprangers" class="social-link">
-        <i class="fab fa-linkedin"></i> LinkedIn
-    </a>
-    <a href="https://github.com/lsprangers" class="social-link github">
-        <i class="fab fa-github"></i> GitHub
-    </a>
-</div>
-
+</article> 
         </main>
     </div>
     <script>

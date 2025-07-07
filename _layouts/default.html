@@ -24,7 +24,18 @@
                         <li><a href="{{ '/' | relative_url }}">Home</a></li>
                         <li><a href="{{ '/career/' | relative_url }}">Career</a></li>
                         <li><a href="{{ '/projects/' | relative_url }}">Projects</a></li>
-                        <li><a href="{{ '/technical/' | relative_url }}">Technical Content</a></li>
+                        <li class="nav-item">
+                            <a href="{{ '/technical/' | relative_url }}" onclick="toggleSubNav(event)">Technical Content</a>
+                            <ul class="sub-nav" id="technicalSubNav" style="display: none;">
+                                <li><a href="{{ '/technical/design_systems/search_system/' | relative_url }}">Search System</a></li>
+                                <li><a href="{{ '/technical/design_systems/url_shortening_system/' | relative_url }}">URL Shortener</a></li>
+                                <li><a href="{{ '/technical/design_systems/youtube/' | relative_url }}">YouTube System</a></li>
+                                <li><a href="{{ '/technical/design_systems/top_k/' | relative_url }}">Top-K Problem</a></li>
+                                <li><a href="{{ '/technical/design_systems/_typical_reusable_resources/' | relative_url }}">Reusable Resources</a></li>
+                                <li><a href="{{ '/technical/design_systems/_reference_material/' | relative_url }}">Reference Materials</a></li>
+                                <li><a href="{{ '/technical/design_systems/calculations_and_timings/' | relative_url }}">Calculations & Timings</a></li>
+                            </ul>
+                        </li>
                         <li><a href="{{ '/contact/' | relative_url }}">Contact</a></li>
                     </ul>
                 </nav>
@@ -83,6 +94,16 @@
             }
         });
 
+        // Sub-navigation toggle
+        function toggleSubNav(event) {
+            event.preventDefault();
+            const subNav = document.getElementById('technicalSubNav');
+            if (subNav.style.display === 'none') {
+                subNav.style.display = 'block';
+            } else {
+                subNav.style.display = 'none';
+            }
+        }
 
     </script>
 </body>
