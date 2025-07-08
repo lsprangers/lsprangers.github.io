@@ -1,0 +1,90 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    align-items: flex-start;
+  }
+  
+  .bubbleContainer {
+    width: 100%;
+  }
+  
+  .bubble {
+    background: #e0e7ff;
+    border: none;
+    border-radius: 2em;
+    padding: 1em 2em;
+    cursor: pointer;
+    font-size: 1.1em;
+    width: 100%;
+    text-align: left;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  
+  .bubble:hover {
+    background: #c7d2fe;
+  }
+  
+  .title {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+  
+  .company {
+    font-size: 0.95em;
+    color: #555;
+  }
+  
+  .period {
+    font-size: 0.9em;
+    color: #888;
+  }
+  
+  /* The logo in the bubble */
+  .logo {
+    width: 125px;
+    height: 80px;
+    object-fit: contain;
+    margin: 0;           /* Remove extra margin */
+    display: block;
+  }
+  
+  /* The actual info when you click bubble */
+  .excerpt {
+    margin: 0.5em 0 0 1.5em;
+    padding: 0.8em 1em;
+    background: #f1f5f9;
+    border-radius: 1em;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    font-size: 1em;
+  }
+
+  .careerHeader {
+    display: flex;
+    align-items: center; /* Vertically center logo and text */
+    gap: 1.5em;          /* Space between logo and text */
+  }
+  
+  .careerLogo {
+    width: 125px;
+    height: 125px;
+    object-fit: contain;
+    margin: 0;           /* Remove extra margin */
+    display: block;
+  }
+  
+  .careerTitle {
+    font-weight: bold;
+    font-size: 1.3em;
+  }
+  
+  .careerCompany {
+    font-size: 1.1em;
+    color: #444;
+  }
+  
+  .careerPeriod {
+    font-size: 1em;
+    color: #888;
+  }
