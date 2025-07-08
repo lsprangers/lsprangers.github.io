@@ -20,6 +20,10 @@ jobs:
           node-version: 18
           cache: npm
 
+      - name: Custom Installs
+        run: |
+          npm install remark-math rehype-katex katex
+          npm install
       - name: Install dependencies
         run: npm ci
       - name: Build website
