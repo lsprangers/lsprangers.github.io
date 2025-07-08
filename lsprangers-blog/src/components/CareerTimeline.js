@@ -5,7 +5,7 @@ const jobs = [
   {
     title: "ML + Data Tech Lead",
     company: "Moody's Analytics",
-    logo: "/img/ma_logo.png",
+    logo: "/img/ma_logo_no_left.png",
     period: "November 2022 - Present",
     excerpt: "I lead a group under the Data and AI Functional Group in the KYC OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.",
     bullets: [
@@ -17,7 +17,7 @@ const jobs = [
   {
     title: "ML Engineer",
     company: "Corrigo (JLL-T)",
-    logo: "/img/corrigo_logo.png",
+    logo: "/img/corrigo_logo_no_left.png",
     period: "January 2022 - November 2022",
     excerpt: "As an ML Engineer at Corrigo, I worked on developing machine learning models to improve operational efficiency and predictive maintenance.",
     bullets: [
@@ -41,7 +41,7 @@ const jobs = [
   {
     title: "Data Scientist",
     company: "Co Star",
-    logo: "/img/costar_logo.png",
+    logo: "/img/costar_logo_no_left.png",
     period: "July 2019 - March 2020",
     excerpt: "At Co Star, I focused on building data-driven solutions to enhance real estate market analysis and forecasting.",
     bullets: [
@@ -53,7 +53,7 @@ const jobs = [
   {
     title: "Technical Consultant",
     company: "Mu Sigma",
-    logo: "/img/musigma.png",
+    logo: "/img/musigma_no_left.png",
     period: "August 2018 - July 2019",
     excerpt: "I started my career in analytics and consulting, helping clients leverage data to solve complex business problems.",
     bullets: [

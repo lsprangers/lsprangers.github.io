@@ -1,1 +1,1 @@
-Minimal mistakes docs - https://mmistakes.github.io/minimal-mistakes/docs/structure/
+All blog content under `lsprangers-blog/` and is based on Docusaurus

@@ -86,7 +86,7 @@ const config = {
         title: 'Luke Sprangers',
         logo: {
           alt: 'Luke Sprangers Logo',
-          src: 'img/logo.svg', // Place your logo in static/img/
+          src: 'img/mecircle.png', // Place your logo in static/img/
         },
         items: [
           {
