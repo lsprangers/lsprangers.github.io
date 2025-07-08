@@ -40,7 +40,6 @@ Note: The /docs/ prefix is used if your Docusaurus site is configured with the d
 Example blog structure posted in `2021-08026-welcome`
 
 # Docusaurus
-`cd lsprangers-blog`
 `npm install`
 `npm run start`
 `npm run clear`
