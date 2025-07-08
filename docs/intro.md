@@ -15,33 +15,33 @@ It's a structured dump of stuff I've pulled out of old word files and tweaked in
 
 ---
 
-## 📖 Table of Contents
-- [Design Systems](#-design-systems)
-  - [Databases and Storage](#-databases-and-storage)
-  - [Messaging](#-messaging)
-  - [Typical Resources](#-typical-resources)
-- [DSA](#-dsa)
-- [Other Concepts](#-other-concepts)
-- [Implementations](#-implementations)
-- [Leet](#-leet)
-- [Arxiv Papers](#-arxiv)
-- [References](#-references)
+## Table of Contents
+- [Design Systems](#)
+  - [Databases and Storage](#databases-and-storage)
+  - [Messaging](#messaging)
+  - [Typical Resources](#typical-resources)
+- [DSA](#dsa)
+- [Other Concepts](#other-concepts)
+- [Implementations](#implementations)
+- [Leet](#leet)
+- [Arxiv Papers](#arxiv)
+- [References](#references)
 ---
 
-## 🛠️ Design Systems
+## Design Systems
 
 This section focuses on building specific systems, often inspired by technical interviews or real-world use cases. Examples include URL shorteners, YouTube Search, Top K Heavy Hitters, and more.
 
 To implement these systems, you'll find notes on Databases, Messaging, Calculations, and other essential components.
 
-### 📂 Databases and Storage
+### Databases and Storage
 - Covers SQL and NoSQL architectures/products.
 - Includes discussions on Relational Databases, NoSQL Key-Value Stores, Blob Storage, and Data Warehousing Solutions.
 
-### 📩 Messaging
+### Messaging
 - Explains how to send messages between services using Queues, Brokers, and Pub/Sub systems.
 
-### ⚙️ Typical Resources
+### Typical Resources
 - Discussions and implementations of "typical" resources like:
   - Distributed Key-Value Stores.
   - Front-end Load Balancers with Metadata.
@@ -50,7 +50,7 @@ To implement these systems, you'll find notes on Databases, Messaging, Calculati
 
 ---
 
-## 🧮 DSA
+## DSA
 
 This section contains:
 - General Data Structures and Algorithms.
@@ -58,7 +58,7 @@ This section contains:
 
 ---
 
-## 💡 Other Concepts
+## Other Concepts
 
 This section includes generic concepts that don't fit into DSA or System Design, such as:
 - Embeddings.
@@ -69,7 +69,7 @@ These are useful but don't belong in the other categories.
 
 ---
 
-## 🛠️ Implementations
+## Implementations
 
 A collection of generic implementations, including:
 - A Key-Value Store with Transactions.
@@ -78,18 +78,18 @@ A collection of generic implementations, including:
 
 ---
 
-## 🧩 Leet
+## Leet
 
 This is a dump of **Leetcode problems** and comments, organized for easy reference.
 
 ---
 
-## 😀 Arxiv
+## Arxiv
 These are just papers I've read marked up with highlighter - my old iPad died and brought these here
 
 ---
 
-## 📚 References
+## References
 
 These are some of the resources I frequently use and reference throughout this repo:
 
@@ -125,7 +125,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [Another persons blog - AmitNess](https://amitness.com)
 ---
 
-### 🎯 Why This?
+### Why This?
 
 This repo is meant to be a **reference hub** for anyone interested in:
 - Learning **DSA** and **System Design**.

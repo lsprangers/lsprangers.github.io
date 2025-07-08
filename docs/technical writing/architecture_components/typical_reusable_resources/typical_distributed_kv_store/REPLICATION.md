@@ -120,7 +120,7 @@ This type of replication is typically used in the Data Engineering world between
 | Fast (rpc vs disk)  |  |
 Consensus systems are similar to WAL, but we send the log entries over the network (each insert / update / delete is an RPC call) to all of the replicas, and then they reply when they've successsfully gotten it
 
-[RAFT is a consensus implementation](https://github.com/lsprangers/raft-course/blob/main/README.md)
+[RAFT is a consensus implementation](https://github.com/lsprangers/raft-course/blob/main/index.md)
 
 After enough nodes (usually > 1/2) reply they've gotten it (a consensus) we consider the value replicated
     - This reply from a consensus might take a long time, and that would mean a performance and availability reduction 

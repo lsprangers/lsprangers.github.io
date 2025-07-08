@@ -36,7 +36,7 @@ The TLDR; of these two is that HTTP is useful when you can't have both client an
 
 If I setup an API to access some functionality, I don't want to setup the client on every persons phone to have an updated schema definition everytime my schema changes, so I'll just use a generic REST API, but if I have 2 services in my own private network that can have constant CICD and coupled / monitored updates then gRPC is faster and more performant
 
-There's a [sub-document around gRPC](/lsprangers-blog/docs/technical%20writing/architecture_components/communication%20protocols/grpc.md)
+There's a [sub-document around gRPC](/docs/technical%20writing/architecture_components/communication%20protocols/grpc.md)
 
 ChatGPT answer:
     - HTTP: Best for external-facing APIs where flexibility and compatibility with a wide range of clients (e.g., browsers, mobile apps) are more important than performance.
@@ -72,7 +72,7 @@ message ProcessDocumentResponse {
 
 
 ### Serializable Calls
-[Celery](../messaging/Queue/QUEUE.md#celery) ***is not gRPC***, but can be thought of in a similar vein where you serialize a function along with it's arguments, and send it somewhere else to be executed
+[Celery](/docs/technical%20writing/architecture_components/messaging/Queue/index.md#celery) ***is not gRPC***, but can be thought of in a similar vein where you serialize a function along with it's arguments, and send it somewhere else to be executed
 
 There is nothing new about serializing something to unpack somewhere else
 

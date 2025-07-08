@@ -281,7 +281,7 @@ TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, wil
 # Spark Streaming
 Our [Streaming sub-document](STREAM_PROCESSING.md) goes into more detail on the concepts and architectures of streaming, but here we will focus on Spark Streaming
 
-Spark Streaming allows for resilient, durable, and highly available streaming pipelines - common sources and sinks include TCP Sockets /  Network I/O / File Descriptors, [Kafka Brokers](../architecture_components/messaging/Kafka%20Broker/KAFKA.md), [Queue's](../architecture_components/typical_reusable_resources/typical_distributed_queue/README.md), [PubSub](../architecture_components/messaging/PubSub/PUBSUB.md), and [Blob Storage](../architecture_components/typical_reusable_resources/typical_blob_storage/README.md)
+Spark Streaming allows for resilient, durable, and highly available streaming pipelines - common sources and sinks include TCP Sockets /  Network I/O / File Descriptors, [Kafka Brokers](/docs/technical%20writing/architecture_components/messaging/Kafka%20Broker/KAFKA.md), [Queue's](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_queue/index.md), [PubSub](/docs/technical%20writing/architecture_components/messaging/PubSub/PUBSUB.md), and [Blob Storage](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_blob_storage/index.md)
 
 With Spark Streaming we can treat these incoming messages as [RDDs or Datasets](#data-storage-structures) and run our typical functional programming or other high-level API's over it
 

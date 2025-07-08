@@ -29,7 +29,7 @@ This whole fuckin section is going to be on serverless Dynamo I bet
     - Standards
 
 ## DyanmoDB Basics
-Most of these basicas are covered in the [NoSQL Walkthrough](../../architecture_components/databases%20&%20storage/NoSQL/NOSQL.md)
+Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20writing/architecture_components/databases%20&%20storage/NoSQL/index.md)
 - Made of tables
 - Each table has a Primary key
     - Primary Key is either Partition Key, Partition and Sort Keys, or Combo Key
@@ -216,7 +216,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](../../architecture_
 - Backup, Snapshot, and Restore exactly same as RDS
 
 ## HA and Scaling
-- Peer to peer replication + durability is fully discussed in [KV Store Deep Dive Peer to Peer](../../architecture_components/typical_reusable_resources/typical_distributed_kv_store/README.md#peer-to-peer-with-sharding)
+- Peer to peer replication + durability is fully discussed in [KV Store Deep Dive Peer to Peer](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md#peer-to-peer-with-sharding)
 - 6 copies of data across 3 AZ's
     - 4 out of 6 needed for writes
     - 3 out of 6 for reads

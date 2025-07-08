@@ -42,21 +42,21 @@ Almost every single system a set of similar patterns, and there are components l
 #### Front End
 - Front end we usually have some sort of DNS resolution to IP address, where the IP address relates to our Load Balancers
 - Once it reaches (app) load balancers it will do TLS/SSL termination, decrypt, and forward to either API Gateway, or straight to web apps
-- [Arch for Typical frontend](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_frontend/)
+- [Arch for Typical frontend](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_frontend/index.md)
 
-#### [Queue](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_queue/)
+#### [Queue](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_queue/index.md)
 Queue's are reused everywhere, and act as a buffer + messaging channel between multiple services
 
-[Arch for Typical Queue](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_queue/)
+[Arch for Typical Queue](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_queue/index.md)
 
 - Allows services to run at different rates, and scale differently, while ensuring messages are passed 
     - No longer need to directly call POST to a specific service IP we find in service discovery
     - Can POST a message to a queue and it can get picked up by any number of workers
 - Ensures messages are durably stored. If either of the services, or even the queue, goes down the messages are typically saved to disk somewhere
 - Examples:
-    - [SQS](/docs/technical%20writing/architecture_components/messaging/Queue/#SQS) which is the AWS implementation, and the typical "queue" we think of when talking about queue's
-    - [Celery Queue's](/docs/technical%20writing/architecture_components/messaging/Queue/#celery) which are a very odd implementation that tie together producers and consumers 
-    - [Redis Queue](/docs/technical%20writing/architecture_components/messaging/Queue/#Redis) can hold messages in memory or not, and is configurable, and sometimes is distributed or on a single machine! Lots to look into!
+    - [SQS](/docs/technical%20writing/architecture_components/messaging/Queue/index.md#SQS) which is the AWS implementation, and the typical "queue" we think of when talking about queue's
+    - [Celery Queue's](/docs/technical%20writing/architecture_components/messaging/Queue/index.md#celery) which are a very odd implementation that tie together producers and consumers 
+    - [Redis Queue](/docs/technical%20writing/architecture_components/messaging/Queue/index.md#Redis) can hold messages in memory or not, and is configurable, and sometimes is distributed or on a single machine! Lots to look into!
 
 #### KV Store
 - 
@@ -68,8 +68,8 @@ Queue's are reused everywhere, and act as a buffer + messaging channel between m
 
 #### Pub Sub
 - 
-- [Arch for Typical pub sub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_distributed_pubsub/)
+- [Arch for Typical pub sub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_pubsub/index.md)
 
 #### Blob Storage
 - 
-- [Arch for Typical pub sub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_distributed_pubsub/)
+- [Arch for Typical pub sub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_pubsub/index.md)

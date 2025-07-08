@@ -10,14 +10,14 @@ description: Discussion around storage of data
 Storing data is a very wide spectrum, and so we split things up as best we can
 
 ## Blob Storage
-We can checkout [Typical Blob Storage](/lsprangers-blog/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_blob_storage/) to see what this is usually used for 
+We can checkout [Typical Blob Storage](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_blob_storage/) to see what this is usually used for 
 
 Binary Large Object (BLOb) storage, such as Amazon S3, Google Cloud Storage, or Azure Blob Storage, is one of the most common mechanisms for storing pretty much anything
 
 There's no indexing, no schema formats specified, or anything like that - it's just a way to store dumps of data in a "directory structure"
 
 ## Disk Based
-This relates to storing data on disk using mechanisms like [LSMTree](/lsprangers-blog/docs/technical writing/architecture_components/databases & storage/Disk Based/LSMTREE.md), [BTree](/lsprangers-blog/docs/technical writing/architecture_components/databases & storage/Disk Based/BTREE.md), or [Parquet Flat Files](/lsprangers-blog/docs/technical writing/architecture_components/databases & storage/Disk Based/PARQUET.md)
+This relates to storing data on disk using mechanisms like [LSMTree](/docs/technical writing/architecture_components/databases & storage/Disk Based/LSMTREE.md), [BTree](/docs/technical writing/architecture_components/databases & storage/Disk Based/BTREE.md), or [Parquet Flat Files](/docs/technical writing/architecture_components/databases & storage/Disk Based/PARQUET.md)
 
 - B-Tree's are a hierarchical data structure typically used for indexes in relational databases for $O(log n)$ lookup
     - Other nuances like much higher read throughput, but lower write throughput (a write has to go to disk)

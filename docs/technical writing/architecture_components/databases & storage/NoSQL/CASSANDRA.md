@@ -10,7 +10,7 @@ To be fair, it can be used and abused in many ways, but at the end of the day we
 
 Below is a short walkthrough that will help with some downstream design decisions
 
-- ***Maps***: A [Map / Hash Table](../../../dsa/2.%20hashing/README.md)... `key -> value` is a very useful tool, and one people frequently use in development
+- ***Maps***: A [Map / Hash Table](/docs/technical%20writing/dsa/2.%20hashing/index.md)... `key -> value` is a very useful tool, and one people frequently use in development
     - ![Map](./images/cassandra_map.png)
 - ***RowKey***: Given this "set" (Row) of Attributes that we've stored in this "Map", we'd most likely want to access this entire Row in one go
     - AKA Primary Key
@@ -70,7 +70,7 @@ Below is a short walkthrough that will help with some downstream design decision
     - The Partitioner is a program / function that will take the ***Partition Key*** and figure out which Node the Row is assigned to
     - Allows us to PUT the Row to the right Node, and to figure out which Node we need to GET from
         - ![Partitioner Circle](./images/cassandra_partitioner.png)
-    - We discussed this part in depth in [Partitioning Document of our Distributed KV Store Implementation](../../../architecture_components/typical_reusable_resources/typical_distributed_kv_store/PARTITION.md)
+    - We discussed this part in depth in [Partitioning Document of our Distributed KV Store Implementation](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_kv_store/PARTITION.md)
 
 - ***Node***: 
     - Each Node in Cassandra owns a set of Tokens, and each of these Tokens describes a Partition

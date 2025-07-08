@@ -231,7 +231,7 @@
     - AWS Glue (Powered by Spark Streaming)
     - Lambda
     - Write your own on EC2 or ECS Cluster or EKS cluster
-- [What is Kafka?](../../architecture_components/messaging/Kafka%20Broker/KAFKA.md)
+- [What is Kafka?](/docs/technical%20writing/architecture_components/messaging/Kafka%20Broker/KAFKA.md)
     - Kafka has Producers as well, and these Producers write to a Topic
     - A Topic is 
         - Split up into multiple Partitions

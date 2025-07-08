@@ -33,12 +33,12 @@ In this scenario we chose to create a distributed, sharded KV store with node ra
 - The nodes are considered fault tolerant, replicated, and consistent
 - The cluster itself can autoscale by placing new nodes in the ring and shuffling to split, or by deleting nodes and shuffling to merge
 
-Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/README.md) instead of me trying to recreate it heres
+Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
 
 ## Isolation Levels
 Before going into other areas, the [isolation levels](ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems
 
-We know there is always an [Availability and Consistency Tradeoff](../README.md#availability-consistency-during-network-partition) for Partitioned scalable systems, and Databases are one key area where it continually comes up. If I write a value somewhere, how do I ensure other groups reading that value see the same value...
+We know there is always an [Availability and Consistency Tradeoff](/docs/technical%20writing/design_systems/#availability-consistency-during-network-partition) for Partitioned scalable systems, and Databases are one key area where it continually comes up. If I write a value somewhere, how do I ensure other groups reading that value see the same value...
 
 We've already gone through [Isolation Levels](ISOLATION_LEVELS.md) extensively
 

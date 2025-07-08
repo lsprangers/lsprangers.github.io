@@ -1,14 +1,14 @@
 # PubSub
-[PubSub](../../architecture_components/typical_reusable_resources/typical_distributed_pubsub/README.md) is the architecture based on Message Channels, where Publishers post messages to the Channel, and Subscribers subscribe to channels to get Messages pushed to them
+[PubSub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_pubsub/index.md) is the architecture based on Message Channels, where Publishers post messages to the Channel, and Subscribers subscribe to channels to get Messages pushed to them
 
-We design an entire [PubSub](../../architecture_components/typical_reusable_resources/typical_distributed_pubsub/README.md) System from scratch in this folder
+We design an entire [PubSub](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_pubsub/index.md) System from scratch in this folder
 
 The PubSub broker in the middle takes care of receiving and sending messages
 
-PubSub brokers are different from other message brokers like [Kafka](../Kafka%20Broker/KAFKA.md) by how Consumers interact with the Broker
+PubSub brokers are different from other message brokers like [Kafka](/docs/technical%20writing/architecture_components/messaging/Kafka%20Broker/KAFKA.md) by how Consumers interact with the Broker
     - In Kafka the Consumers pull
     - In PubSub the Consumers get pushed to
 
 ## PubSub Systems in Products
 ### Redis PubSub
-Redis, being a distributed KV cache, doesn't sound like the system to use for [PubSub](../../databases%20&%20storage/Redis/PUBSUB.md)
+Redis, being a distributed KV cache, doesn't sound like the system to use for [PubSub](/docs/technical%20writing/architecture_components/databases%20&%20storage/Redis/PUBSUB.md)

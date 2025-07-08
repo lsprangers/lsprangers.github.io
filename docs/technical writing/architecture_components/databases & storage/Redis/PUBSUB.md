@@ -1,5 +1,5 @@
 # Redis PubSub
-Redis, being a distributed KV cache, doesn't sound like the system to use for [PubSub](../../messaging/PubSub/PubSub.md), but Redis has a lot of expertise in this area
+Redis, being a distributed KV cache, doesn't sound like the system to use for [PubSub](/docs/technical%20writing/architecture_components/messaging/PubSub/PUBSUB.md), but Redis has a lot of expertise in this area
 
 ## Non Functional Requirements
 Altogether Redis PubSub does not store messages long term, and doesn't help offline subscribers get caught up - it's really good at flinging messages around in real time in a "stupid" way meaning it ignores offsets and state

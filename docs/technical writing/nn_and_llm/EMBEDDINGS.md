@@ -286,7 +286,7 @@ Vector similarities are useful for comparing our final embeddings to others in s
 
 None of the below are actually useful in real life, as computing these for Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead
 
-[We discuss all of that here](../design_systems/search_system/README.md#knn)
+[We discuss all of that here](/docs/technical%20writing/design_systems/search_system/index.md#knn)
 
 ## Quantization
 Quantization
@@ -343,7 +343,7 @@ There we see discussions of how embeddings, topologically, can be considered a i
 We can also see that from a ML lense, embeddings represent dense numeric features in n-dimensional space
 - Images can go to `3 colors x 256 pixels` dimension using photo represenation on disk (this is just how photos are stored)
 - Text can go from sentences to `256 dimension` vectors in Word2Vec or BERT
-- Text can go from address sentences to `[lat, long]` 2 dimensions - we cover this in [Address Embeddings](./ADDRESS_EMBEDDING_GEOCODING.md)
+- Text can go from address sentences to `[lat, long]` 2 dimensions - we cover this in [Address Embeddings](/docs/technical%20writing/other_concepts/ADDRESS_EMBEDDING_GEOCODING.md)
 
 The main point of all of this is that Embeddings equate to &rarr; topological properties are preserved - that's what allows the famous `King - man + woman = Queen` and `France is to Paris as Germany is to Berlin`
 

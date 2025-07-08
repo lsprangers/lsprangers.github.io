@@ -30,7 +30,7 @@ const config = {
   // organizationName: 'facebook', // Usually your GitHub org/user name.
   projectName: 'lsprangers-blog', // Usually your repo name.
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
@@ -118,8 +118,8 @@ const config = {
           {
             title: 'Docs',
             items: [
-              {label: 'Tech Notes', to: '/docs/intro'},
-              {label: 'Projects', to: '/projects/intro'},
+              {label: 'Projects', to: '/projects'},
+              {label: 'Contact', to: '/contact'},
             ],
           },
           {

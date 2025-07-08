@@ -10,7 +10,7 @@ It's the common OLAP vs OLTP discussion, but it's just on data comprised of node
 # Graph Data Processing and Analytics
 
 ## Pregel
-[Pregel](../z_arxiv_papers/Pregel%20MarkedUp.pdf) is an initial graph processing system built by Google that proposes a way to do Graph Traversals based on message-passing protocols
+[Pregel](/arxiv_papers/Pregel%20MarkedUp.pdf) is an initial graph processing system built by Google that proposes a way to do Graph Traversals based on message-passing protocols
 
 The entirety of an algorithm is based on ***super-steps***, where programs are expressed as a sequence of iterations, in each of which a vertex can receive messages sent in the previous iteration, send messages to other vertices, and modify its own state and that of its outgoing edges or mutate graph topology
 
