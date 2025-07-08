@@ -93,10 +93,10 @@ const config = {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
-            label: 'Knowledge Base',
+            label: 'Tech Notes',
           },
           {to: '/projects', label: 'Projects', position: 'left'},
-          {to: '/about', label: 'About', position: 'left'},
+          // {to: '/about', label: 'About', position: 'left'},
           {to: '/resume', label: 'Resume', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {to: '/contact', label: 'Contact', position: 'left'},
@@ -118,7 +118,7 @@ const config = {
           {
             title: 'Docs',
             items: [
-              {label: 'Knowledge Base', to: '/docs/intro'},
+              {label: 'Tech Notes', to: '/docs/intro'},
               {label: 'Projects', to: '/projects/intro'},
             ],
           },

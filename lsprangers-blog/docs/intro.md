@@ -5,7 +5,7 @@ sidebar_position: 1
 description: A collection of technical notes, implementations, and concepts
 ---
 
-# 📚 Knowledge Base
+# 📚 Tech Notes
 
 This KB is a collection of notes, implementations, and concepts I've gathered over time. 
 

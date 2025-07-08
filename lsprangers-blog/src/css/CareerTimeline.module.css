@@ -28,6 +28,7 @@
   
   .title {
     font-weight: bold;
+    font-size: 1.1em;
   }
   
   .company {
@@ -41,11 +42,11 @@
   }
   
   .logo {
-    height: 2em;
-    width: 2em;
+    width: 80px;
+    height: 80px;
     object-fit: contain;
-    margin-right: 1em;
-    vertical-align: middle;
+    margin: 0;           /* Remove extra margin */
+    display: block;
   }
   
   .excerpt {
@@ -55,4 +56,33 @@
     border-radius: 1em;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
     font-size: 1em;
+  }
+
+  .careerHeader {
+    display: flex;
+    align-items: center; /* Vertically center logo and text */
+    gap: 1.5em;          /* Space between logo and text */
+  }
+  
+  .careerLogo {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    margin: 0;           /* Remove extra margin */
+    display: block;
+  }
+  
+  .careerTitle {
+    font-weight: bold;
+    font-size: 1.3em;
+  }
+  
+  .careerCompany {
+    font-size: 1.1em;
+    color: #444;
+  }
+  
+  .careerPeriod {
+    font-size: 1em;
+    color: #888;
   }
