@@ -25,7 +25,7 @@ main:
           - title: "Top-K Problem"
             url: "/technical/design_systems/top_k/"
           - title: "Reusable Resources"
-            url: "/technical/design_systems/_typical_reusable_resources/"
+            url: "/technical/architecture_components/typical_reusable_resources/"
           - title: "Reference Materials"
             url: "/technical/design_systems/_reference_material/"
           - title: "Calculations & Timings"

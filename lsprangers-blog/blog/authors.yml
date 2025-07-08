@@ -1,0 +1,9 @@
+lsprangers:
+  name: Luke Sprangers
+  title: Technical Lead at Moody's Analytics
+  url: https://linkedin.com/in/luke-sprangers
+  # image_url: /img/mecircle.jpg
+  page: true
+  socials:
+    linkedin: luke-sprangers
+    github: lsprangers

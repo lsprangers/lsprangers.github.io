@@ -1,0 +1,58 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+    align-items: flex-start;
+  }
+  
+  .bubbleContainer {
+    width: 100%;
+  }
+  
+  .bubble {
+    background: #e0e7ff;
+    border: none;
+    border-radius: 2em;
+    padding: 1em 2em;
+    cursor: pointer;
+    font-size: 1.1em;
+    width: 100%;
+    text-align: left;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  
+  .bubble:hover {
+    background: #c7d2fe;
+  }
+  
+  .title {
+    font-weight: bold;
+  }
+  
+  .company {
+    font-size: 0.95em;
+    color: #555;
+  }
+  
+  .period {
+    font-size: 0.9em;
+    color: #888;
+  }
+  
+  .logo {
+    height: 2em;
+    width: 2em;
+    object-fit: contain;
+    margin-right: 1em;
+    vertical-align: middle;
+  }
+  
+  .excerpt {
+    margin: 0.5em 0 0 1.5em;
+    padding: 0.8em 1em;
+    background: #f1f5f9;
+    border-radius: 1em;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    font-size: 1em;
+  }
