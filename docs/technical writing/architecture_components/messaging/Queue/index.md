@@ -1,7 +1,15 @@
+---
+layout: technical
+title: Queue
+category: Architecture Components
+difficulty: Advanced
+description: Discussion around Queue's
+---
+
 # Table of Contents
 TODO:
 
-# Queues
+## Queues
 Queue's are generally used to ensure some sort of buffer between producers and consumers. They can be thought of as a place to keep messages between the two groups so that there's not overload or connectivity issues between the two sets
 
 They also, generally, provide durability, single point connectivity, scaling, and other useful traits like priorities, acknowledgements, and retries
@@ -14,18 +22,16 @@ Example:
 - To ensure timely response, consumer pool may scale to 2-3x the size of the producer pool since each request is light on producer and very heavy on consumer
     - Consumer may need to run multiple NLP pipelines such as Entity Extraction, Sentiment Analysis, and/or Categorization
 
-# Queues In The Wild
+## Queues In The Wild
 Some examples below of queue's typically used "in the wild"
 
-## SQS
+### SQS
 
-## Redis
+### Redis
 
-## RabbitMQ
+### RabbitMQ
 
-## Postgres
-
-## Celery
+### Celery
 Celery is somewhere between a queue, a message broker, and a serializable function passer - ***Celery, IMO, is not actually a queue, but it's often described as one***
 
 At it's core, Celery is probably best described as an Distributed Producer-Consumer Architecture SDK or something in that vein

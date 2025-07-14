@@ -12,7 +12,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 const config = {
   title: 'Luke Sprangers Blog',
   tagline: 'Crappy personal blog',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
   future: {
@@ -30,8 +30,8 @@ const config = {
   // organizationName: 'facebook', // Usually your GitHub org/user name.
   projectName: 'lsprangers-blog', // Usually your repo name.
 
-  onBrokenLinks: 'warn',
-  onBrokenMarkdownLinks: 'warn',
+  // onBrokenLinks: 'warn',
+  // onBrokenMarkdownLinks: 'warn',
 
   // Even if you don't use internationalization, you can use this field to set
   // useful metadata like html lang. For example, if your site is Chinese, you
@@ -81,7 +81,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/favicon.png',
       navbar: {
         title: 'Luke Sprangers',
         logo: {
@@ -89,15 +89,15 @@ const config = {
           src: 'img/mecircle.png', // Place your logo in static/img/
         },
         items: [
+          {to: '/resume', label: 'Resume', position: 'left'},
+          {to: '/projects', label: 'Projects', position: 'left'},
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
             position: 'left',
             label: 'Tech Notes',
           },
-          {to: '/projects', label: 'Projects', position: 'left'},
           // {to: '/about', label: 'About', position: 'left'},
-          {to: '/resume', label: 'Resume', position: 'left'},
           {to: '/blog', label: 'Blog', position: 'left'},
           {to: '/contact', label: 'Contact', position: 'left'},
           {
@@ -130,7 +130,7 @@ const config = {
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} Luke Sprangers.`,
+        copyright: `Copyright © ${new Date().getFullYear()} Luke Sprangers`,
       },
       prism: {
         theme: prismThemes.github,

@@ -8,14 +8,17 @@ description: Discussion around Protocols including HTTP, gRPC, and others
 
 # Table of Contents
 - [Protocols](#protocols)
-- [Protocols In The Wild](#protocols-in-the-wild)
+- [Levels](#levels)
+    - [HTTP vs gRPC](#http-vs-grpc)
+        - [Serializable Calls](#serializable-calls)
+    - [Websockets](#websockets)
 
-# Protocols
+## Protocols
 The biggest gap most people have in their understanding of distributed systems is the protocols that are used to communicate between the different components
 
 This is a very high level overview of some of the most common protocols used in distributed systems, and how they work - async vs sync, push vs pull, HTTP vs gRPC, etc
 
-# Levels
+## Levels
 - **Push:** Server initiates data transfer to client
 - **Pull:** Client requests data from server
 - **Synchronous:** Client waits for server response before - continuing
@@ -31,7 +34,7 @@ After that we start getting into weird next levels of things
     - This is a form of push where the client registers a place it can accept connections to, and over time the server, ***in a one-way fashion***, sends data to the client
 - **Webhooks:** Both the client and the server open up a [Websocket](#websockets) to each other, and they are able to send data to each other in real time
 
-## HTTP vs gRPC
+### HTTP vs gRPC
 The TLDR; of these two is that HTTP is useful when you can't have both client and server accessing files inbetween (IDL schema files), and so they have to communicate with generic HTTP messages that send over data in JSON, XML, or other common formats. HTTP API's do typically have open source documentation like OpenAPI / Swagger, which one could argue is a "shared schema"...so maybe this is a moot point
 
 If I setup an API to access some functionality, I don't want to setup the client on every persons phone to have an updated schema definition everytime my schema changes, so I'll just use a generic REST API, but if I have 2 services in my own private network that can have constant CICD and coupled / monitored updates then gRPC is faster and more performant
@@ -71,7 +74,7 @@ message ProcessDocumentResponse {
 ```
 
 
-### Serializable Calls
+#### Serializable Calls
 [Celery](/docs/technical%20writing/architecture_components/messaging/Queue/index.md#celery) ***is not gRPC***, but can be thought of in a similar vein where you serialize a function along with it's arguments, and send it somewhere else to be executed
 
 There is nothing new about serializing something to unpack somewhere else
@@ -82,6 +85,6 @@ gRPC is actually a superset of HTTP, and is built on top of HTTP/2. It uses Prot
 
 
 
-## WebSockets
+### WebSockets
 - **WebSockets**: A protocol that provides full-duplex communication channels over a single TCP connection - it's used for real-time applications where low latency is required
     - The [RAFT Project](https://github.com/lsprangers/raft-course) from before showcases Websocket protocols

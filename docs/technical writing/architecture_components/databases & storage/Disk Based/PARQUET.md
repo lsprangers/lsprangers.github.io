@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: Databases & Storage - Parquet
+title: Parquet
 category: Architecture Components
 difficulty: Advanced
 description: Discussion around Disk Based Databases

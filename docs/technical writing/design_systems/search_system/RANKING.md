@@ -19,7 +19,7 @@ show_back_link: true
 
 TODO: A lot of these are offline, and some are online, and the Ranking section should actually discuss Ranking + Scoring
 
-# Ranking
+## Ranking
 Ranking queries to items is a fairly large part of a search system, otherwise you're just returning a big list of documents when some might be much more relevant to user
 
 Ranking is typically the second stage of a recommender system, and sometimes it's ***online*** meaning a new ranking calculations per query, ***offline*** where we can calculate results and look them up per query, or somewhere inbetween 
@@ -45,10 +45,10 @@ Ranking is typically used for experiments, explainable results, or something dif
 
 ----
 
-## Count Based Heuristics
+### Count Based Heuristics
 One of the most common ranking / scoring methodologies is using the uniqueness of a word based on specific counts (heuristics) - the word "and" is not very unique, and if it shows up in a document we won't really care. Another word like "aardvark" is fairly unique and not used that often, so it would be more unique
 
-### TF-IDF
+#### TF-IDF
 TF-IDF means Term Frequency Inverse Document Frequency, and it's a fairly simple scoring mechanism for computing the uniqueness of a Term (word) across Documents. Most of the calculations are done offline, and for a query we use our lookup table to find Documents.
 
 - **TF (Term Frequency)**: The count of a term in a specific document.
@@ -74,7 +74,7 @@ High       | Low           | This word is rare throughout the other documents, b
 
 ![General Architecture of TFIDF](./images/inverted_index_tfidf.png)
 
-### BM25
+#### BM25
 - ***Description***: An extension of TF-IDF that considers term frequency saturation and document length normalization.
 - ***Formula***: 
 $text{BM25}(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1)}{f(q_i, D) + k_1 \cdot (1 - b + b \cdot \frac{|D|}{\text{avgdl}})}$ 
@@ -85,11 +85,11 @@ $text{BM25}(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1
 
 -----
 
-## Probabilistic Models
+### Probabilistic Models
 - Probabilistic Models estimate the likelihood of a query given a document! $P(Query | Document)$ 
   - The document with the highest probability is considered the most relevant.
 
-### Bayesian Proba
+#### Bayesian Proba
 - A Bayesian Approach in Statistics is a way of using Bayes' Theorem to iteratively update the probability of a hypothesis as more evidence becomes available. 
   - This is in constrast to Frequentist Statistics which doesn't incorporate prior beliefs or evidence into the analysis. 
   - Likelihood in Bayesian Stastics is $P(Evidence | Hypothesis)$ meaning what's the chance we saw this new evidence based on what we believe?
@@ -110,7 +110,7 @@ $text{BM25}(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1
       $$
   - And then you get the Probability of a Document for each Term, and when your Query comes in it's simply a bunch of terms strung together so you'd find the top Documents for each Term in the Query and Rank the result set
 
-### Decision Trees
+#### Decision Trees
 We cover [Decision Trees](/docs/technical%20writing/other_concepts/DECISION_TREES.md) in depth elsewhere, but they are useful for taking many of our Document, Query-Document, and User features into consideration when we want to predict some general category, but they can't really be used on predicting specific videos
 
 Decision Tree's roles are typically to predict relevance scores (pointwise) or to optimize ranking orders based on features (listwise). We can incorporate them in [Learning To Rank](#learn-to-rank) to optimize ranking orders
@@ -130,10 +130,10 @@ Decision Tree's roles are typically to predict relevance scores (pointwise) or t
   - Decision trees are typically trained offline using labeled data, where each query-document pair has a relevance label (e.g., 1 for relevant, 0 for irrelevant)
   - Once trained, the model can be used online to rank documents for new queries
 
-### Logistic Regression
+#### Logistic Regression
 TODO: Logistic regression 
 
-### Learn To Rank
+#### Learn To Rank
 - A machine learning ***task*** that seeks to train models that rank documents based on features extracted from the documents and queries. Each new query results in a forward pass / inference call, so this would be an online model
   - A classification task is a model whose task is to classify inputs into certain classification buckets, so a Learn To Rank Task is a model whose task is to rank documents based on features extracted from documents
 - A Learning to Rank task is when your input is a set of samples, all with their given features, but the aim is to build a model that outputs a ranking in terms of their relevancy
@@ -173,12 +173,12 @@ TODO: Logistic regression
 
 ---
 
-## Graph
+### Graph
 I can really only think of PageRank off the top of my head, and in PageRank the Features are taken from a graph linkage structure, but it doesn't need to be ran on a graph engine. Most of the time we calculate PageRank scores offline, and then for a specific query we use PageRank as a feature along with other ranking mechanisms. 
 
 Page Rank simply helps us calculate "page importance", but we still need to compare a query to web page terms and themes by doing lookups based on [Document and Query Embedding Similarity](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md#embeddings)
 
-### Page Rank
+#### Page Rank
 An algorithm used by Google Search to rank web pages. It measures the importance of a page based on the number and quality of links to it. PageRank can be used anywhere, not just in Ranking, but makes sense to put it here
 
 It outputs a probability distribution used to represent the likelihood that a person will arrive at any particular page through clicking on random links, similar to probability distribution of the "Wikipedia game" where to try to get to Page B from Page A by visiting referenced links starting at A
@@ -204,5 +204,5 @@ PageRank can be solved using iterations and traversing web links using the ***po
 
 The iterative approach using sum over in-nodes is typically preferred for large graphs because it avoids the computational cost of matrix inversion, and reduces amount that needs to be stored
 
-## DNN For Ranking
+### DNN For Ranking
 TODO: Most use cases today use DNN or GBDT for Ranking

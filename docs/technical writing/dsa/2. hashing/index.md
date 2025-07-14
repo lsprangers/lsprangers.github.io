@@ -1,10 +1,19 @@
+---
+layout: technical
+title: 2. Hashing
+category: Data Structures & Algorithms
+difficulty: Advanced
+description: Hashing
+show_back_link: true
+---
+
 # Table of Contents
 - [Hashing](#hashing)
 
-# Hashing
+## Hashing
 A ***Hash Function $H(x)$*** of something is a function that turns an object from a search space $S$ into an integer within a fixed range $[0, X]$.
 
-## Demonstration / Thoughts
+### Demonstration / Thoughts
 - Hashing most often comes in a ***map*** object, which allows you to interact with keys and values
 - Hashing will take an input and deterministically convert it to an integer that's less than a specified size
     - Inputs are ***keys***, and they must be immutable (that's why we can't hash a list in Python)

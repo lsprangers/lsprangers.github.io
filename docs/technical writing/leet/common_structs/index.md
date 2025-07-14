@@ -18,7 +18,7 @@ This is a place I write common data structures so I can use them in design syste
     - The first non-root node would be at index 1 or 2, depending on the context.
 
 ## Binary Search Tree
-The [BST README](/docs/technical%20writing/dsa/7.%20trees%20&%20graphs/index.md) has more info
+The [BST README](/docs/technical%20writing/dsa/8.%20trees%20&%20graphs/index.md) has more info
 |Type        | Insert     | Search     | Delete     |
 |------------|------------|------------|------------|
 |Best Case   | O(1)       | O(1)       | O(1)       |

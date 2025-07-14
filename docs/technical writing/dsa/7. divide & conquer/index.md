@@ -1,10 +1,19 @@
+---
+layout: technical
+title: 7. Divide & Conquer
+category: Data Structures & Algorithms
+difficulty: Advanced
+description: Divide & Conquer
+show_back_link: true
+---
+
 # Table of Contents
 - []
 
-# Divide And Conquer
+## Divide And Conquer
 The divide and conquer family of DSA is all around splitting up the problem into subproblems that are easily solvable, and then merging at the end (if needed)
 
-## GCD and LCM
+### GCD and LCM
 Euclidean Algorithm: 
 
 $\text{if } b \neq 0: GCD(A, B) = GCD(B, A \mod m)$

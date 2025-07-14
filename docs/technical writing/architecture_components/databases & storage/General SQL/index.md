@@ -1,12 +1,18 @@
 ---
 layout: technical
-title: Databases & Storage - SQL
+title: SQL
 category: Architecture Components
 difficulty: Advanced
 description: Discussion around Relational SQL Databases
 ---
 
-# Relational SQL
+# Table of Contents
+- [Relational SQL Overview](#relational-sql)
+- [ACID](#acid)
+    - [Replication - Consistenty and Durability In Writes](#replication---consistency-durability-write)
+- [Architecture](#architecture)
+
+## Relational SQL
 SQL Databases are used for relational data modeling, and allow us to have typical dimensional-fact, aka dim-fact, tables and models
 
 They also allow us to do things like joining, search / lookup, and CRUD operations on our data after defining the model
@@ -43,4 +49,4 @@ Most databases with transactions will ensure serialization so that there aren't 
 ## Replication - Consistency, Durability, Write 
 The [Replication Documentation](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_kv_store/REPLICATION.md) in the KV Store Implementaion discusses a lot of the nuances around replication, especially sync vs async, and how it affects Consistency, Durability guarantees, and Read vs Write times
 
-# Architecture
+## Architecture

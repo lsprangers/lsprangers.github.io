@@ -1,7 +1,7 @@
-# Cost Allocation
+## Cost Allocation
 Basically just Tagging
 
-## AWS Generated Cost Allocation Tags
+### AWS Generated Cost Allocation Tags
 - Automatically applied to resources you create
 - Start with prefix `aws:` 
 - Not applied to resourecs created before activation
@@ -10,12 +10,12 @@ Basically just Tagging
     - Start with prefix `user:`
 - Cost Allocation Tags only show up in Billing Console
 
-## Tag Editor
+### Tag Editor
 - Allows you to manage tags of multiple resources at once
 - Can add / update / delete tags
 - Search tagged / untagged resources in all AWS Regions
 
-## Trusted Advisor
+### Trusted Advisor
 - No need to install anything
 - Gives high level account assessment
 - Analyzes and provides recommendation for:
@@ -52,7 +52,7 @@ Basically just Tagging
             - Helps us to not get throttled
             - Can create CW Alarms over these events when we're about to approach them
 
-## EC2 Launch Types & Savings
+### EC2 Launch Types & Savings
 - ***On Demand Instances:*** Short workload, predictable pricing, reliable
 - ***Spot Instances:*** Good for short cheap workloads, but AWS can reclaim capacity
 - ***Reserved:***
@@ -63,7 +63,7 @@ Basically just Tagging
     - Great for software licenses that oparte at core or socket level
     - Can define Host Affinity so that instance reboots are kept on same host
 
-## AWS Savings Plan
+### AWS Savings Plan
 - New pricing model to get a discount based on long-term usage
 - Commit to a certain type of usage
     - $10 / hour for 1 to 3 years
@@ -77,7 +77,7 @@ Basically just Tagging
 - Sagemaker Savings Plan
     - Up to 64% savings on sagemaker workloads
 
-## S3 Storage Classes
+### S3 Storage Classes
 - All S3 is 11 9's durability
 - S3 Standard General Purpose
     - 99.99% Availability
@@ -127,7 +127,7 @@ Basically just Tagging
         - If it's an assumed role, then it's the owner of the account role that pays
         - So if you create the role, and they assume it, then you'll end up paying
 
-## AWS Budgets
+### AWS Budgets
 - Create budgets and send alarms when cost exceeds the budget
 - 4 types of budgets: 
     - Usage
@@ -147,6 +147,6 @@ Basically just Tagging
         - Apply an SCP to an OU
         - Stop EC2 or RDS instances
 
-## AWS Compute Optimizer
+### AWS Compute Optimizer
 - Can help us with right sizing EC2 instances based on metrics around CPU, RAM, Network, Disk, etc...
 - Setup CW Agent on EC2 instances and send metrics to AWS Compute Optimizer

@@ -1,4 +1,13 @@
-# Linear Systems
+---
+layout: technical
+title: Linear Systems
+category: Old Math Notes
+difficulty: Advanced
+description: Linear Algebra
+show_back_link: true
+---
+
+## Linear Systems
 Linear Algebra helps us to manipulate matrices, and one of the most important topics / use cases of this are systems of linear equations
 
 ![Linear Systems of Equations](./images/linear_system.png)
@@ -11,7 +20,7 @@ So knowing this, if we have our output $v$ and a Transformation $A$, we could hy
     - This solution is only unique because it means "if you first apply $A$, and then apply $A^{-1}$, you end up where you started"
     - There still may be a solution though...a solution is unique iff it's $det != 0$, but $det(A) = 0$ does not imply there is no solution
 
-# Rank
+## Rank
 - When the output of a transformation is a line, we say the Rank is 1
 - If all output vectors land in 2D plane, the Rank is 2
 - Therefore, ***Rank can be thought of as the number of dimensions in the output of the Transformation***

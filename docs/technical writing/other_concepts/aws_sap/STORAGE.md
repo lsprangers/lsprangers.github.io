@@ -1,6 +1,6 @@
-# Storage
+## Storage
 
-# EBS Volumes
+## EBS Volumes
 - EBS Volumes are network drives 
     - They ***are not physically coupled to instances***
 - Attach to one instance at a time
@@ -33,7 +33,7 @@
         - Must use FS that's cluster-aware
     - Each instance has full read and write permissions to the volume
 
-## Amazon Data Lifecycle Manager
+### Amazon Data Lifecycle Manager
 - Automate creation, retention, and deletion of EBS snapshot and EBS backed AMI's
 - Schedules backups, copies, snapshots, and deletions
 - Use resource tags to identify resources
@@ -44,7 +44,7 @@
     - AWS Backup for management and monitoring of backups across AWS services from a single place
         - Includes EBS volumes
 
-## Local EC2 Instance Store
+### Local EC2 Instance Store
 - EC2 instance store is the physical disk attached to physical server where EC2 is
 - Very high IOPS
 - Disk up to 7.5TB, if you strip or parallelize many you can get up to 60 TB
@@ -57,7 +57,7 @@
     - EBS is network drive
         - Data survives reboot
 
-# EFS
+## EFS
 - Elastic File System
 - Managed Network File System (NFS) that can be mounted on many EC2
 - Multiple EC2, multi AZ, and can be across on prem and on cloud
@@ -91,7 +91,7 @@
     - Archive: Rarely accessed data, and 50% cheaper
     - Implement lifecycle policies to move files between storage tiers
 
-## On Prem and VPC
+### On Prem and VPC
 - Can use VPC peering for VPC-2-VPC connection between EC2 and EFS
     - EC2 instance can use DNS or IP of EFS 
 - Can use Direct Connect and/or Site-To-Site VPN for On-Prem server to connect to EFS
@@ -113,7 +113,7 @@
     - Use case:
         - Meet compliance needs of DR / business continuity
 
-# S3
+## S3
 - Object storage, serverless, unlimited storage
 - Good for static content like image and video
 - Access object by key
@@ -168,7 +168,7 @@
         - If one part fails we just re-request that one part
         - Also useful for only requesting headers of files, instead of GET whole file
 
-## S3 Storage Class Analytics
+### S3 Storage Class Analytics
 - AKA Storage Class Analysis
 - Helps decide when to transition objects to the right storage class
 - Recommendations for Standard and Standard IA 
@@ -176,7 +176,7 @@
 - Report updated daily
 - Visualize in AWS Quicksight
 
-## S3 Storage Lens
+### S3 Storage Lens
 - Understand, Analyze, and Optimize storage across entire AWS org
 - Find anomalies, cost efficiencies, and data protection best practices
 - Aggregate data for Org, accounts, regions, buckets, or prefixes
@@ -208,7 +208,7 @@
         - Prefix Aggregation
         - Data available for 15 months
 
-## S3 Solution Architecture For Exposing Static Objects
+### S3 Solution Architecture For Exposing Static Objects
 - Stand up EC2 with static content
 - Use CloudFront in front of EC2 with EBS on it
     - Caches static content globally
@@ -218,13 +218,13 @@
 - CloudFront in front of S3
     - Works great for static objects that aren't updated often
 
-### Indexing Objects
+#### Indexing Objects
 - We can't natively index objects in S3, to do search we'd need to check all files / prefixes
 - On new writes to S3 we can use an Event Notification to trigger a lambda function
 - Lambda would write object metadata and update indexes on DynamoDB
     - Search by date, total storage used by customers, find all objects w/ certain attribute, etc...
 
-### Dynamic vs Static
+#### Dynamic vs Static
 - To serve both dynamic and static content
 - DNS query on Route53
     - Dynamic content sent to API GW + dynamic backend
@@ -235,7 +235,7 @@
     - Dynamic layer could upload data to S3 backing static layer
         - Can use Event Notifications and Lambdas to talk between the 2 layers as required
 
-# FSx
+## FSx
 - Launch 3rd party file systems on AWS
 - Fully managed systems
 - Similar to RDS hosting database, but we host File Systems
@@ -289,7 +289,7 @@
         - Point In Time instantaneous cloning
         - Up to 1M IOPS with < 0.5ms latency
 
-## FSx Soln Arch
+### FSx Soln Arch
 - Single AZ to Multi AZ
     - Use DataSync to replicate from FSx Single AZ to FSx Multi AZ
     - Shut down Single AZ, manual backup to Multi, restore Multi AZ
@@ -305,7 +305,7 @@
         - This means you can decrease cost and latency!
         - Just dive in to this super abstract and unnecessary feature, and ensure you are getting the most out of your AWS Service!
 
-# DataSync
+## DataSync
 - Synchronize data!
 - Move large amounts of data to and from places
 - On-Prem, other clouds, etc...
@@ -341,12 +341,12 @@
     - Need DirectConnect, PrivateLink, and Interface VPC Endpoint
     - ![Private DataSync](./images/private_datasync.png)
 
-# Data Exchange
+## Data Exchange
 - Find, subscribe to, and use third-party data in cloud
 - Once subscriped to you can use Data Exchange API to load directly into S3 or RedShift
 - We can also license our own data through RedShift onto Exchange
 
-# Transfer Family
+## Transfer Family
 - Send data in and out of S3 or EFS via only the FTP protocol
 - Protocols
     - File Transfer Protocol (FTP)

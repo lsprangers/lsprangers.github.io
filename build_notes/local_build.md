@@ -43,3 +43,5 @@ Example blog structure posted in `2021-08026-welcome`
 `npm install`
 `npm run start`
 `npm run clear`
+
+Real one: `npm run build`

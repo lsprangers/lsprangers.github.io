@@ -1,7 +1,7 @@
-# Monitoring
+## Monitoring
 Most is done via CloudWatch
 
-# CloudWatch Metrics
+## CloudWatch Metrics
 - Provided by many AWS Services out of the box
 - EC2 standard is 5 minutes
 - Detailed monitoring is every 1 minute
@@ -9,7 +9,7 @@ Most is done via CloudWatch
     - Need to create custom metrics for RAM
 - CloudWatch Dashboards display metrics and alarms, and can do so across regions
 
-## CloudWatch Alarms
+### CloudWatch Alarms
 - Can trigger EC2 actions (reboot, terminate, stop, recover, etc)
 - Alarms typically go through EventBridge which can interact with even more AWS Services and includes filtering
 - Typical use case is to monitor critical instances, and if a status check fails we restart
@@ -17,7 +17,7 @@ Most is done via CloudWatch
     - Can also interact with AutoScaling groups, SNS, SQS, or Lambda
 - Can also sent into EventBridge that can interact with Lambda, Step Functins, Kinesis, etc... 
 
-## CW Synthetics Canary
+### CW Synthetics Canary
 - Can upload custom code to monitor and interact with API's, URLs, websites, and other resources
 - Helps us to mimic customers in a repeatable way with our own code
 - Integration with CW Alarms and EventBridge
@@ -34,7 +34,7 @@ Most is done via CloudWatch
     - *Canary recorder*: Used w CW Synthetics recorder to record actions on a website and automatically create a script for that
     - *GUI workflow builder*: Verifies that actions can be taken on your webpage
 
-# CloudWatch Logs
+## CloudWatch Logs
 - ***Sources***:
     - SDK
     - CW Logs Agent
@@ -96,7 +96,7 @@ Most is done via CloudWatch
             - SSM State Manager
             - Storing config in SSM Parameter Store and downloading onto EC2 
 
-# EventBridge
+## EventBridge
 - FKA CW Events
 - Can schedule Cron Jobs (scheduled scripts) for certain services like Lambda
 - Event Pattern
@@ -144,7 +144,7 @@ Most is done via CloudWatch
     - Allow us to manage permissions on Event Bus level
     - Aggregate all acct Events into centralized Event Bus is a good example
 
-# XRay
+## XRay
 - Visual analysis of application
 - Allows for tracing capabilities
 - Similar to Datadog traces
@@ -157,7 +157,7 @@ Most is done via CloudWatch
         - API GW (helps 504 errors)
     - XRay agent needs IAM permissions to XRay
 
-# AWS Personal Health
+## AWS Personal Health
 - Shows how outages, maintenance, and AWS errors will affect your resources
 - Can aggregate over accounts into 1 place
 - Can get these events into EventBridge

@@ -1,7 +1,7 @@
-# Service Communications
+## Service Communications
 How different services can communicate with each other
 
-# AWS Step Functions
+## AWS Step Functions
 To be honest idk why these are included in here
 
 - Build serverless visual workflows to orchestrate your Lambda functions
@@ -19,7 +19,7 @@ To be honest idk why these are included in here
     - Sync returns to caller after everything finishes
     - Async immediately returns that workflow has started 
 
-## Service Integrations
+### Service Integrations
 - Lambda functions
 - Run AWS Batch Job
 - Run ECS Task and wait for completion
@@ -31,7 +31,7 @@ To be honest idk why these are included in here
 - ***AWS STEP FUNCTIONS DOES NOT inregrate with AWS Mechanical Turk***
     - Use SWF instead
 
-## Invocation
+### Invocation
 - Management console
 - AWS SDK
 - AWS CLI
@@ -41,7 +41,7 @@ To be honest idk why these are included in here
 - CodePipeline (CICD)
 - Step Functions can invoke Step Functions
 
-## Tasks
+### Tasks
 - Lambda Tasks
 - Activity Tasks
     - Bit more broad, and you setup an HTTP activity worker
@@ -52,7 +52,7 @@ To be honest idk why these are included in here
 - Wait Task
     - Wait for some duration or until a specific timestamp
 
-## Standard vs Express
+### Standard vs Express
 - Standard is more basic executions
     - 1 year duration
     - 2k / second invocation
@@ -61,12 +61,12 @@ To be honest idk why these are included in here
     - Can start 100k / second
 - ![Step Function Standard vs Express](./images/sf_standard_vs_express.png)
 
-## Error Handling
+### Error Handling
 - Can enable error handling retries, and add alerting to SF State Machine
 - Setup Event Bridge to alert via email if State Machine execution fails
     - SMachine to EventBridge to SNS
 
-# SQS
+## SQS
 - Simple Queue Service!
 - Serverless managed queue, integrated with IAM
 - Extreme scale and no provisioning
@@ -125,14 +125,14 @@ To be honest idk why these are included in here
             - DLQ lambda is only for async invocations
         - Lambda destination for failures means lambda pushes to another queue on failure, but doesn't help on retries
 
-## Solution Architecture Async
+### Solution Architecture Async
 - Client uploads to SQS Request queue
 - Work processor pulls from Request queue
 - Work processor writes to Response queue
 - Client reads from Response queue
 - ![SQS Async](./images/sqs_async_arch.png)
 
-# Amazon MQ
+## Amazon MQ
 - SQS and SNS are cloud native services with proprietary protocols from AWS
 - Traditional applications running on-premise may use open protocols like AMQP or MQTT
 - *AmazonMQ is a managed message broker service* for
@@ -147,7 +147,7 @@ To be honest idk why these are included in here
 - Compatibilities:
     - IBM MQ, TIBCO EMS, RabbitMQ, Apache ActiveMQ
 
-### Remember!
+#### Remember!
 - Queue (e.g., SQS, RabbitMQ Queue)
     - Pattern: Point-to-point messaging.
     - How it works:
@@ -165,7 +165,7 @@ To be honest idk why these are included in here
     - Use case:
         - Broadcasting events, fan-out, notification systems.
 
-# SNS
+## SNS
 - What if we want many receivers for 1 message?
     - Many queue's where producer puts to all of them
 - SNS is a Pub/Sub solution that allows
@@ -215,7 +215,7 @@ To be honest idk why these are included in here
         - Useful for allowing other services (S3, etc) to write to SNS topic
         - S3 / SNS / Resource policies allow us to specify another acct or something similar who can do resources, without having to specifically allow them to assume an IAM role
 
-# SNS + SQS Fan Out
+## SNS + SQS Fan Out
 - Want a message sent to multiple SQS queue's
 - Can have producer write to each one, or
     - Can have producer write to 1 SNS topic
@@ -251,7 +251,7 @@ To be honest idk why these are included in here
     - JSON policy used to filter messages sent to SNS topics subscriptions
     - If a subscription doesn't have a filter policy, it receives every message
 
-# SNS Message Delivery Retries
+## SNS Message Delivery Retries
 - What happens when a message is delivered to SNS subscriber and there's a server side error
     - A delivery policy is applied and retries / backoffs are used
     - Immediate, Pre-Backoff, Post-Backoff
@@ -264,7 +264,7 @@ To be honest idk why these are included in here
     - DLQ are SQS queue's or FIFO queue's
     - DLQ are attached to a ***subscription, not a topic***
 
-# Questions:
+## Questions:
 - Question: You are looking to process tens of thousands of orders per second and you would like to make sure the orders are going to be processed in the order they were placed for each customer. What technology do you recommend using?
     - Answer: Originally thought SQS FIFO because of this section, but 10k orders per second is too much for SQS FIFO
         - Even at max it is "3k messages / second with batching", so this doesn't work

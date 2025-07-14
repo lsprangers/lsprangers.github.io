@@ -5,7 +5,7 @@ show_back_link: true
 description: Discussion around Inverted Indexes, one of the first implementations of search systems
 ---
 
-# Inverted Index
+## Inverted Index
 This is by far the most used search data structure, and it's great for capturing ***lexographic*** similarities such as unique words in a document, common words in documents, and things like that
 
 Allows us to compare a users string query to a large corpus of documents
@@ -13,7 +13,7 @@ Allows us to compare a users string query to a large corpus of documents
 ![A Simple Inverted Index Architecture](images/simple_inverted_index.png)
 
 
-## Discussion
+### Discussion
 This architecture does allow for batch and online (fast) processing of documents, but there are pieces missing
 
 - ***Slow:*** The serving is done from a lookup on Blob Storage which sits on disk

@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Postgres
+category: Architecture Components
+difficulty: Advanced
+description: Discussion around Relational SQL Databases
+---
+
 # Postgres
 Postgres is, in my opinion, the most useful, used, and general purpose Open Source SQL Database on the market
 

@@ -1,0 +1,83 @@
+/* Contact Bubble Theme */
+.contactBubbleContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.contactBlurb {
+  text-align: left;
+  margin-top: 2rem;
+  /* color: #800080; */
+  /* font-size: 1.1rem; */
+}
+
+.contactBubbleCard {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px rgba(128,0,128,0.10), 0 1.5px 6px rgba(128,0,128,0.08);
+  padding: 2rem 2.5rem;
+  min-width: 260px;
+  max-width: 350px;
+  text-align: left;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid #e0d7ec;
+  margin-bottom: 1.5rem;
+}
+
+.contactBubbleCard:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(128,0,128,0.18), 0 3px 12px rgba(128,0,128,0.12);
+  border-color: #800080;
+}
+
+.contactBubbleCard h2 {
+  margin-top: 0;
+  color: #800080;
+}
+
+.contactMethods {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.contactMethod i {
+  font-size: 2rem;
+  color: #800080;
+  margin-bottom: 0.5rem;
+}
+
+.contactMethod h3 {
+  margin: 0.5rem 0 0.25rem 0;
+}
+
+.contactMethod a {
+  color: #800080;
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.contactMethod a:hover {
+  text-decoration: underline;
+}
+
+.contactNote {
+  font-size: 0.95em;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.interestsList {
+  text-align: left;
+  margin: 1.5rem 0 0 0;
+  padding-left: 1.2rem;
+}
+
+.interestsList li {
+  margin-bottom: 0.75rem;
+}

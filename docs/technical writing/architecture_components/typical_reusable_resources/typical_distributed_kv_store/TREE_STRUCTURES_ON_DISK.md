@@ -1,4 +1,4 @@
-# Data Structure and Implementation
+## Data Structure and Implementation
 Why do we need any of this?
 - Durability is important
 - Keeping an entire hash table in RAM is sometimes impossible, even if it's split amongst multiple machines
@@ -26,12 +26,12 @@ So long story short, ***disk writes of sorted data are useful in multiple scenar
 
 The two most common are B+ Trees, and LSMTree's
 
-# Structures
+## Structures
 The [Disk Based Folder](/docs/technical%20writing/architecture_components/databases%20&%20storage/Disk%20Based/) has more thorough discussions of all of these 
 
-## B Tree
+### B Tree
 
-### How They Work:
+#### How They Work:
 - B-Trees are self-balancing tree data structures that split data into fixed-size blocks (pages) stored on disk.
 - Each page contains keys and pointers to child pages, allowing efficient traversal
 - Operations like search, insert, and delete are performed in $ O(\log(n)) $ time
@@ -39,38 +39,38 @@ The [Disk Based Folder](/docs/technical%20writing/architecture_components/databa
     - Self-balancing so that it's not a long tail down, similar to UnionFind, Red-Black Tree, AVL Tree, and other self-balancing data structures
     - These take a small cost during writes to uphold properties, but allow efficient reads
 
-### Why They Ensure Durability:
+#### Why They Ensure Durability:
 - Data is written directly to disk in a structured manner.
 - Changes (e.g., inserts, updates, deletes) are propagated to disk immediately or in batches.
 - B-Trees are commonly used in databases like MySQL (InnoDB) and PostgreSQL for indexing.
 
-### Use Case:
+#### Use Case:
 - Best for workloads with a mix of reads and writes
     - Writes are still fast even with self balancing
 - Suitable for systems where data is frequently updated and needs to be immediately durable
 
 ---
 
-## LSM Trees (Log-Structured Merge Trees)
+### LSM Trees (Log-Structured Merge Trees)
 
-### How They Work:
+#### How They Work:
 - LSM Trees are optimized for write-heavy workloads by batching writes in memory and periodically merging them into sorted files on disk
 - Data is first written to an in-memory structure (e.g., a sorted tree or skip list) and then flushed to disk in sorted order
 - Disk writes are append-only, which reduces random I/O and improves write performance
 - Reads may require merging data from multiple on-disk files, but this is mitigated by maintaining Bloom filters and indexes
 
-### Why They Ensure Durability:
+#### Why They Ensure Durability:
 - Writes are first logged in a **Write-Ahead Log (WAL)** to ensure durability in case of crashes
 - Data is periodically flushed to disk in immutable segments, ensuring no data is lost
 - Compaction processes merge and reorganize on-disk data to optimize reads and reclaim space
 
-### Use Case:
+#### Use Case:
 - Best for write-heavy workloads where data is frequently appended or updated
 - Used in modern KV stores like **Cassandra**, **RocksDB**, **LevelDB**, and **HBase**
 
 ---
 
-## Comparison: B-Trees vs. LSM Trees
+### Comparison: B-Trees vs. LSM Trees
 
 | **Aspect**              | **B-Trees**                              | **LSM Trees**                              |
 |-------------------------|-------------------------------------------|--------------------------------------------|
@@ -82,7 +82,7 @@ The [Disk Based Folder](/docs/technical%20writing/architecture_components/databa
 
 ---
 
-## Other Data Structures for Durable KV Stores
+### Other Data Structures for Durable KV Stores
 
 While B-Trees and LSM Trees are the most common, other data structures are also used depending on the workload:
 
@@ -104,7 +104,7 @@ While B-Trees and LSM Trees are the most common, other data structures are also 
 
 ---
 
-## Conclusion
+### Conclusion
 
 **B-Trees** and **LSM Trees** are the two most common data structures for ensuring durability in KV stores because they are optimized for disk-based storage and provide efficient read/write operations. However, the choice between them depends on the workload:
 - Use **B-Trees** for balanced read/write workloads

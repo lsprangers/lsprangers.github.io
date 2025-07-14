@@ -1,7 +1,7 @@
-# Databases
+## Databases
 This whole fuckin section is going to be on serverless Dynamo I bet
 
-# DynamoDB
+## DynamoDB
 - NoSQL DB, fully managed, massive scale (1M req / sec)
 - Similar architecture to Apache Cassandra
 - No disk space, max object size is 400KB
@@ -28,7 +28,7 @@ This whole fuckin section is going to be on serverless Dynamo I bet
     - Infrequent
     - Standards
 
-## DyanmoDB Basics
+### DyanmoDB Basics
 Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20writing/architecture_components/databases%20&%20storage/NoSQL/index.md)
 - Made of tables
 - Each table has a Primary key
@@ -67,7 +67,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
         - Can be defined after
         - Spans all partitions, would be basically new memory across entire cluster
 
-## Features
+### Features
 - `TTL` can automatically expire row after a specified epoch date
 - `DynamoDB Streams`
     - React to changes to DynamoDB tables in real time
@@ -100,7 +100,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
         - Use DAX when a client directly wants to access DynamoDB and doesn't want to interact wiht other caches / services
         - DAX good for both individual object caches and query / scan caching
 
-## Solution Architecture - Indexing
+### Solution Architecture - Indexing
 - S3 does not have the best search functionality, and there's lots of info that S3 has problems going through
 - A common scenario is that on S3 events, we trigger a lambda and that lambda will update a DynamoDB table that acts as an index on multiple different attributes
 - This allows us to:
@@ -109,7 +109,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
     - List all objects with certain attributes
     - Find all objects within some date range
 
-# OpenSearch (ElasticSearch)
+## OpenSearch (ElasticSearch)
 - Renamed from ElasticSearch to OpenSearch
     - Fork of ES b/c of licensing issues
 - OpenSearch Dashboards === Kibana Dashboards for ElasticSearch
@@ -143,7 +143,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
             - Allows for more robust search over logs
     - ![OS and Dynamo](./images/os_dynamo.png)
 
-# RDS
+## RDS
 - Relational Database Service
 - Engines:
     - MarioDB, Postgres, MySQL, IDM DB2, Oracle, MS SQL Server
@@ -200,13 +200,13 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
         - Supports IAM Auth
         - RDS Proxy is a service outside of RDS itself - it can be deployed in other subnets if needed
 
-## Solution Architecture - Cross Region Failover
+### Solution Architecture - Cross Region Failover
 - Can use RDS events and CW health checks together to get notified of downed RDS clusters
 - These CW Events or RDS events or anything else can trigger lambdas that update DNS and promote read replicas to leader
 - Can't use DNS health checks only because we need to promote RR to leader, and that can't be done without custom logic stored in lambda
 - ![CRFailover](./images/rds_cr_failover.png)
 
-# Aurora
+## Aurora
 - Engines: Postgres compatible and MySQL compatible
 - Storage automatically frows by 10GB increments to 128TB max
     - 6 copies of data across multi AZ by default
@@ -215,7 +215,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
 - Load / offload data directly to / from S3
 - Backup, Snapshot, and Restore exactly same as RDS
 
-## HA and Scaling
+### HA and Scaling
 - Peer to peer replication + durability is fully discussed in [KV Store Deep Dive Peer to Peer](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md#peer-to-peer-with-sharding)
 - 6 copies of data across 3 AZ's
     - 4 out of 6 needed for writes
@@ -245,7 +245,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
         - Connects to specific DB instance in Aurora Cluster
         - Use for diagnosis or fine tuning of one specific instance
 
-## Logs
+### Logs
 - Can monitor the following log files:
     - Error
     - Slow query
@@ -263,7 +263,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
         - Enhanced monitoring metrics at host / process level
     - Go through logs
 
-## Aurora Serverless
+### Aurora Serverless
 - From client perspective you just access 1 single proxy fleet endpoint
 - It scales nodes and volumes for you 
 - Access Aurora Serverless with simple API endpoint
@@ -281,9 +281,9 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/technical%20w
     - Write forwarding
         - Secondary DB clusters can forward writes made to them to primary DB cluster
         - Allows all nodes to accept write queries, but only primary does the actual computations 
-            - Reduces # of endpoints to manage, and all apps can just send reads and writes to the endpoint they know
+            - Reduces ## of endpoints to manage, and all apps can just send reads and writes to the endpoint they know
 
-### RDS To Aurora
+#### RDS To Aurora
 - Can take snaoshot into S3 and restore to Aurora DB Instance
 - Create Aurora RReplica on RDS DB Instance
     - Gets replicated via synchronous replication

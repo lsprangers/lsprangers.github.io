@@ -1,3 +1,12 @@
+---
+layout: technical
+title: Neural Networks (and LLMs)
+category: NN and LLM
+difficulty: Advanced
+description: Discussions around NN's, Transformers, LLMs, and other topics
+show_back_link: true
+---
+
 # NN and LLM
 Everything starts with NN's like linear percepton, and then things get a bit more medium specific like Embeddings for text and CNNs for images, and finally we come all of the way back around to LLM's for multi-model and cross medium use cases
 

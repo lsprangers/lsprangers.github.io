@@ -1,4 +1,4 @@
-# Graph Processing
+## Graph Processing
 Throughout work we've found the need to process humongous graph datasets, and to serve them
 
 Processing large datasets based on graph structures is usually done in a distributed manner using GraphX (Scala) or GraphFrames (PySpark) on Spark....at least from what we've seen
@@ -7,9 +7,9 @@ Serving and making this data available to API's usually means efficiently storin
 
 It's the common OLAP vs OLTP discussion, but it's just on data comprised of nodes and edges!
 
-# Graph Data Processing and Analytics
+## Graph Data Processing and Analytics
 
-## Pregel
+### Pregel
 [Pregel](/arxiv_papers/Pregel%20MarkedUp.pdf) is an initial graph processing system built by Google that proposes a way to do Graph Traversals based on message-passing protocols
 
 The entirety of an algorithm is based on ***super-steps***, where programs are expressed as a sequence of iterations, in each of which a vertex can receive messages sent in the previous iteration, send messages to other vertices, and modify its own state and that of its outgoing edges or mutate graph topology
@@ -18,12 +18,12 @@ This basically comes down to BFS iterations, where in each step we expand anothe
 
 This allows us to run many programs such as Connected Components, Transitive Closure (all reachable nodes from any node), and Shortest Path in an efficient and distributed way
 
-## GraphX
+### GraphX
 GraphX is a Pregel-like implementation that runs on Spark via Scala SDKs
 
 We ended up using this for most of our applications because of the native integration with Spark and by proxy Databricks. This gives us a highly available, distributed, parallel, graph computation engine
 
-### Triplets
+#### Triplets
 Triplets are the main data structures in GraphX, and can help us define Edges
 
 `EdgeTriplet[VD, ED]`
@@ -57,10 +57,10 @@ graph.pregel(initialMsg)(
 )
 ```
 
-## Flink Gelly
+### Flink Gelly
 TODO?
 
-## Transitive Closure Example
+### Transitive Closure Example
 Transitive Closure helps us to identify all transitive paths between records that are connected from other nodes
 
 A &rarr; B &rarr; C &rarr; D
@@ -70,8 +70,8 @@ Using a few different methods we can calculate:
 - A connects to D at exactly the 3rd hop
 - A connects to D via B connecting to C
 
-# Graph Serving
+## Graph Serving
 
-## GraphQL
+### GraphQL
 
-## Neo4J
+### Neo4J

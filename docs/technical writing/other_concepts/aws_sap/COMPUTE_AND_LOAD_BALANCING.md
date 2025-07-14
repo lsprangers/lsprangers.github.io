@@ -1,4 +1,4 @@
-# High Level Solutions Architecture
+## High Level Solutions Architecture
 What usually happens in AWS?
 
 - ***DNS***: User needs to find services, so it uses Route53 DNS Layer
@@ -15,9 +15,9 @@ What usually happens in AWS?
         - These services might need to talk to each other in a ***Service Mesh*** which is communicated via SQS, SNS, Kinesis, MQ, or Step Functions
 - All of these things have ***Authentication and Authorization*** via IAM 
 
-# Compute
+## Compute
 
-## EC2 Instance Types
+### EC2 Instance Types
 - R: Appliactions that need lots of (R)AM - In Memory Caches
 - C: Applications that need lots of (C)PU - Databases / Batch Compute
 - M: Applications that are balanced with (M)edium / Balanced resources - General Web Apps
@@ -26,7 +26,7 @@ What usually happens in AWS?
 - T2/T3: Burstable Instances (to capacity)
 - T2/T3 Unlimited: Unlimited Burst
 
-### EC2 Placement Groups
+#### EC2 Placement Groups
 Can use ***Placement Groups*** so that certain configs are covered
 
 - Group Strategies:
@@ -50,7 +50,7 @@ Can use ***Placement Groups*** so that certain configs are covered
     - Use CLI command `modify-instance-placement`
     - Restart instance
 
-### EC2 Instance Launch Types
+#### EC2 Instance Launch Types
 - ***On Demand Instances***: Short workloads, predictable pricing, reliable, typical
 - ***Spot Instances***: Short workloads that are much cheaper than On-Deamand
     - However, you can lose instances if the pool of them is low and an On-Demand request comes in
@@ -66,10 +66,10 @@ Can use ***Placement Groups*** so that certain configs are covered
         - Typically for software licenses that operate at network I/O socket and file level
     - Can also define *host affinity* so that instance reboots all sit on the same underlying host (server)
 
-#### Graviton
+##### Graviton
 AWS Graviton Processosrs deliver the best price performance, and they are only on linux based instances
 
-### EC2 Metrics
+#### EC2 Metrics
 - CPU: Utilization + Credit Usage
 - Network: In and Out
 - Status Check: Instance and Systems status
@@ -78,7 +78,7 @@ AWS Graviton Processosrs deliver the best price performance, and they are only o
 - Disk: Read/Write for Ops/Bytes
 - RAM: ***RAM IS NOT INCLUDED IN AWS EC2 METRICS*** and must be sent from EC2 into CloudWatch metrics by the user
 
-## HPC
+### HPC
 High Performance COmputing is being pushed by AWS because the costs of doing it yourself are so large, and really groups want to use a ginormous number of clusters at once, and then run something, and then be done
 
 - Data Mgmt and Transfer:
@@ -120,9 +120,9 @@ High Performance COmputing is being pushed by AWS because the costs of doing it 
         - Automate creation of VPC, subnet, cluster type, and instances
         - Useful for researchers who don't wanna IaC
 
-## Auto Scaling
+### Auto Scaling
 
-### Auto Scaling Groups
+#### Auto Scaling Groups
 An Auto Scaling Group is a grouping of EC2 instances, where we track the total number of EC2 in the cluster based on some metrics
 
 - ***Target Tracking Scaling***: Simplest to setup, where we say something like "we want CPU usage to stay at 40%"
@@ -175,7 +175,7 @@ An Auto Scaling Group is a grouping of EC2 instances, where we track the total n
     - `Avg Network I/O` is useful for IO Bound applications like video streaming
     - Custom: We can also create any custom metric and autoscale on thresholds
 
-#### Example
+##### Example
 Say we haev a simple architecture where a client connects to an ALB, and that ALB routes traffic to an ASG that is comprised of EC2 instances based on a specific launch template
 
 What are the options we have for updating the applications inside of the ASG, the launch templates, or any of the instances themselves? Getting a new JAR file into the EC2, changing the OS version, new config file, etc...
@@ -188,12 +188,12 @@ What are the options we have for updating the applications inside of the ASG, th
     - Instead we could set our up threshold to 15%, and do an InstanceRefresh process with our new Launch Tempalte which will take care of the changes, while ensuring 15% of our EC2 desired are up and running
         - After this 100% of our EC2's will have a new launch template, and we will have never had a downed service
 
-#### Docker
+##### Docker
 Docker is used to package up containers, and runs the containers across differnet OS's...lots of other places we talk about Docker
 
-## Docker Container Mgmt
+### Docker Container Mgmt
  
-### Amazon Elastic Container Service (ECS)
+#### Amazon Elastic Container Service (ECS)
 - Typical use cases
     - Running microservices
         - Run multiple containers on a single machine
@@ -267,7 +267,7 @@ Docker is used to package up containers, and runs the containers across differne
             - Base scanning for common vulnerability
             - Enhanced scanning via Amazon Inspector
             - Vulnerabilities can get sent to EventBridge
-###  AWS EKS
+####  AWS EKS
 - Launch managed kubernetes cluster on AWS
 - K8's is an open source system for auto deployment, scaling, and management of containerized apps
 - Alternative to ECS, but a bit more involves
@@ -292,7 +292,7 @@ Docker is used to package up containers, and runs the containers across differne
         - FSx Lustre
         - FSx for NetApp
 
-### AWS App Runner
+#### AWS App Runner
 - Fullymanaged service that makes it easy to deploy web apps and APIs
 - No infra experience needed
 - Start with source code / container image
@@ -302,23 +302,23 @@ Docker is used to package up containers, and runs the containers across differne
 - Connect to DB, Cache, Message queue, etc...
 - ![AWS App Runner](./images/app_runner.png)
 
-### On-Prem Integration
+#### On-Prem Integration
 
-#### Amazon ECS Anywhere
+##### Amazon ECS Anywhere
 - Run containers on customer managed infrastructure
 - Use the ECS control plane to manage containers on premise
     - Need ECS Container Agent and SSM agents on our computerss
     - Both agents register with AWS services, and then we can spin up containers on-prem
 - Good use case for compliance, regions not on AWS, etc...
 
-#### EKS Anywhere
+##### EKS Anywhere
 - Create and operate K8s cluster created outside of AWS
 - Use the Amazon EKS Distro 
 - You use this without connecting to AWS anywhere
     - Use EKS Anywhere installer
     - We ***could***, but don't have to, connect to AWS using EKS Connector, and then it would allow you to use AWS Console to manage EKS cluster
 
-## Lambda
+### Lambda
 It's just running a serverless function - it integrates with almost everything
 
 - Useful, and almost hello world, example:
@@ -346,7 +346,7 @@ It's just running a serverless function - it integrates with almost everything
     - Add tracing into lambda SDK 
     - Lambda needs correct IAMs to write to XRay
 
-### Limitations
+#### Limitations
 - RAM (10GB)
 - CPU (2vCPU)
 - 15 min timeout
@@ -360,7 +360,7 @@ It's just running a serverless function - it integrates with almost everything
 - 6MB invocation payload sync
 - 256KB invocation async
 
-### Lambda in VPC
+#### Lambda in VPC
 - Default:
     - Lambdas, by default, are deployed into AWS's VPC by default (serverless)
     - Can't access private RDS's in our instance
@@ -410,7 +410,7 @@ It's just running a serverless function - it integrates with almost everything
                 - Potential delays
                 - Messages can stay in SQS if lambda fails
 
-# Load Balancers
+## Load Balancers
 - 4 kinds of managed load balancers:
     - Classic Load Balancer (CLB)
         - Only V1 legacy load balancer type
@@ -424,7 +424,7 @@ It's just running a serverless function - it integrates with almost everything
         - Operates at L3 Network IP Protocol layer
 - Load Balancers are deployed in a specific region, and can be configured to span multiple AZ's so that if one AZ goes down the LB does not also go down
     - i.e. they are highly available
-## CLB
+### CLB
 - Health Checks can be HTTP (L7) or TCP (L4)
 - Supports only 1 SSL Certificate
     - SSL can have many Subject Alternative Names (SAN), but SSL cert must be changed when new SAN is added / removed
@@ -432,7 +432,7 @@ It's just running a serverless function - it integrates with almost everything
     - We'd need multiple CLB's if we have multiple SSL Certs
 - TCP => TCP passes all traffic to EC2 instance
 
-## ALB
+### ALB
 - Layer7 HTTP(S) only
     - ***YOU can't assign Static IP to ALB!!***
     - Need to place NLB in front w/ static IP and route to ALB
@@ -450,7 +450,7 @@ It's just running a serverless function - it integrates with almost everything
     - IP addresses - can work, but they must be private IP's
 - ALB can route to multiple target groups
 
-## NLB
+### NLB
 - Layer 4 
 - Forward TCP and UDP traffic to instances
 - Less latency, and millions of requests per second
@@ -473,7 +473,7 @@ It's just running a serverless function - it integrates with almost everything
     - If we only was a specific AZ's DNS name, we can resolve to only a single IP address
     - ![Zonal DNS NLB](./images/zonal_nlb.png)
 
-## GLB
+### GLB
 - Deploy, scale, and manage a fleet of 3rd party Network Virtual Appliances in AWS
 - Firewalls, Intrusion Detection, Payload Manipulation, etc...
 - Operates at L3 IP Packet data
@@ -486,7 +486,7 @@ It's just running a serverless function - it integrates with almost everything
     - EC2
     - IP addresses
 
-## Cross Zone Load Balancing
+### Cross Zone Load Balancing
 - Multi Zone load balancing, or sending requests across zones to other EC2s
 - With Cross-Zone LB each load balancer instance distributes evenly across all registerd instances in all AZ
 - Without Cross-Zone LB, we may have overloaded instances if our zones are uneven
@@ -497,14 +497,14 @@ It's just running a serverless function - it integrates with almost everything
 - NLB: Disabled by default, and pay for inter-AZ if enabled
 - GLB: Disabled by default, and pay for inter-AZ if enabled
 
-### Sticky Sessions (Affinity)
+#### Sticky Sessions (Affinity)
 - Sticky Sessions, or Session Affinity, ensures that a client request is always redirected to the same instance behind a load balancer
 - Available on CLB and ALB
     - Cookie is sent from client to LB
         - Expiration time set my LB configs
     - If cookie expires, user might end up routed to new ALB
 
-### Routing Algorithms
+#### Routing Algorithms
 - Least Outstanding Requests
     - Next instance to receive request has the lowest number of pending / unfinished requests
     - Available on CLB and ALB
@@ -521,7 +521,7 @@ It's just running a serverless function - it integrates with almost everything
     - Each TCP / UDP connection routed to a single target for the life of the connection
     - Works with NLB
 
-# API GW
+## API GW
 An API GW acts as a proxy / general route planner for HTTP endpoints and AWS Services
 
 Most typical architectures will end up sending HTTP requests to Lambda or ECS
@@ -567,7 +567,7 @@ Most typical architectures will end up sending HTTP requests to Lambda or ECS
         - Post a message to SQS
         - Some others, but it allows us to add authentication and deploy publicly
 
-### Example
+#### Example
 API GW in front of S3 for uploading files
 
 - We could directly place API GW in front of S3, but as we know there's a 10MB limit
@@ -575,7 +575,7 @@ API GW in front of S3 for uploading files
     - Then API GW returns the response w/ pre-signed URL to client
     - Client can use that to upload to S3
 
-## Endpoint Types
+### Endpoint Types
 - ***Edge Optimized***
     - Default
     - Requests routed through CloudFront Edge locations...this is because CloudFront has a number of features that shouldn't have been repeated for API GW
@@ -601,7 +601,7 @@ API GW in front of S3 for uploading files
     - Can only be accessed from VPC using an Interface VPC Endpoint (ENI)
     - Use a resource policy to define access
 
-### Security
+#### Security
 - API GW can 
     - Load SSL certificates
         - Do SSL offloading
@@ -624,7 +624,7 @@ API GW in front of S3 for uploading files
         - ![Cognito APIGW](./images/cognito_apigw.png)
     - Lambda based auth allows us to do OAuth, SAML, or 3rd party
 
-### Logging and Monitoring
+#### Logging and Monitoring
 - CloudWatch Logs
     - Enable CWLogs at Stage level
     - Log full request / response data
@@ -637,7 +637,7 @@ API GW in front of S3 for uploading files
     - Enable tracing to get extra info
     - XRay on API GW + Lambda gives full OTEL over req/resp
 
-## Usage Plans & Keys
+### Usage Plans & Keys
 - Making an API avaialble as an offering, i.e. for $$, to customers, the typical advice is to use a usage plan
 - ***Usage Plans*** allow us to define:
     - Who can access one or more deployed API stages and methods (authentication and authorization)
@@ -649,7 +649,7 @@ API GW in front of S3 for uploading files
         - Quota limits for overall number of requests across all customers
     - Throttling and quota limits that are enforced on an individual client (rate limiting)
 
-## WebSockets
+### WebSockets
 - Two Way interactive communication between a browser and a server
 - Server can push information ot the client
 - Allows us to do stateful application use cases
@@ -661,7 +661,7 @@ API GW in front of S3 for uploading files
     - Need to use the special `@connections` sub-URL component, and then parameterize
     - ![WebSocket ConnectionId](./images/websocket_connectionid.png)
 
-## Private APIs
+### Private APIs
 - ***All APIs in API GW are Public and accessible over Internet unless specified***
 - Ways to harden API GW
     - Private API Gateway:
@@ -675,7 +675,7 @@ API GW in front of S3 for uploading files
             - etc...
             - This allows us to ensure even "Public" API GW's act as private ones
 
-## AppSync
+### AppSync
 - Managed service that uses ***GraphQL***
 - Use by mobile apps, web apps, real time dashboards, etc
 - Makes it easy for apps to get exactly the data they need
@@ -687,7 +687,7 @@ API GW in front of S3 for uploading files
     - Can use local data and data synchronization with cloud
 - All relies on GraphQL schemas
 
-### AppSync and Cognito
+#### AppSync and Cognito
 - Can perform authorization on Cognito users based on the groups they belong to
 - In GraphQL schema you can specify the security for Cognito groups
     - Allows us to tackle the age old problem in GraphQL of aggregating requests over multiple API's and having fine grained permissions on each source API
@@ -704,10 +704,10 @@ type Mutation {
 ```
 - ![Cognito Auth AppSync](./images/cognito_appsync.png)
 
-# Route53
+## Route53
 Route53 is a managed DNS service that integrates well with Load Balancers, Container Services, and Databases
 
-## Record Types
+### Record Types
 - A: Maps a hostname to IPV4
 - AAAA: Maps a hostname to IPV6
 - CNAME: Maps a hostname to another hostname
@@ -717,10 +717,10 @@ Route53 is a managed DNS service that integrates well with Load Balancers, Conta
 - NS: Name Servers for the Hosted Zone
     - Control how traffic is routed for a domain
 
-### A Record
+#### A Record
 Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.67` which routes to an IP address
 
-### CName vs Alias
+#### CName vs Alias
 - AWS Resources (LB, CloudFront, etc) expose an AWS Hostname
     - `lb-1234.is-east-2.elb.amazonaws.com` which can route to `myapp.mydomain.com`
 - CNAME:
@@ -734,7 +734,7 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
         - ELB, CLoudFront, API GW, S3 websites, Route53 Record, VPC Interface Endpoint, Global Accelerator, etc..
         - You cannot set an alias record for an EC2 DNS name
 
-## Routing and TTL
+### Routing and TTL
 - Record TTL:
     - TTL sets how long a record stays in a clients cache before expiration
     - Mandatory for every record besides Alias Record
@@ -779,7 +779,7 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
     - Visual tool for seeing routing logic of different zones
     - Enables versioning and repliction across regions
 
-## Hosted Zones
+### Hosted Zones
 - Container for records that define how to route traffic to a domain or subdomain
 - ***Public Hosted Zone***: Contains records that specify how to route traffic on the internet (public domain names)
     - `application1.mypublicdomain.com`
@@ -812,7 +812,7 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
 - Simple arch below shows how we can use lambdas from cloudwatch to trigger read replica failovers during health check failures inside of private VPC's
 ![Simple Soln Arch](./images/health_check_private.png)
 
-## Hybrid DNS
+### Hybrid DNS
 Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) and other on-prem, public, or other cloud networks (other DNS Resolvers)
 
 - Networks can be:
@@ -840,7 +840,7 @@ Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) a
     - Below diagram shows ***inbound***, and we can do the same thing, but reversed, for ***outbound***
     - ![Resolver Diagram OnPrem + Private VPC](./images/dns_onprem_private.png)
 
-# AWS Global Accelerator
+## AWS Global Accelerator
 - Allows you to leverage AWS internal network to route to your application
     - Don't have to go over internet and ISP for everything
 - 2 ***AnyCast IP*** are created for application
@@ -857,16 +857,16 @@ Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) a
     - GA improved performances for a wider variety of things, such as TCP and UDP overall - specifically good fit for non-HTTP use cases like gaming (UDP) and VOiP
     - GA also helps HTTP use cases that require a static IP address
 
-# Comparisons
+## Comparisons
 Comparing some web and compute layer architectures 
 
-## EC2 with Elastic IP
+### EC2 with Elastic IP
 - This is easy, just stick ElasticIP on an EC2, and if the EC2 fails we can move EIP to another EC2
 - Figuring out how it failed would need some sort of Health Check, which we can get from EC2 instance monitoring which is automatically added in EC2
     - After some number of fails a CloudWatch alarm gets triggered, and we can have a lambda move the EIP
 - This architecture does not scale - it's one EIP to one EC2
 
-## Stateless Web App
+### Stateless Web App
 - This allows us to horizontally scale
 - It's a typical architecture, but not perfect
 - Put up multiple EC2 instances, each hosting some web app 
@@ -876,7 +876,7 @@ Comparing some web and compute layer architectures
         - Client needs to deal with hostname failures
     - Adding an instance may not receive full traffic right away because of TTL
 
-## ALB + ASG + EC2
+### ALB + ASG + EC2
 - Route53 Query is an Alias record to ALB
 - ALB setup on 3 AZ's for HA
 - ALB routes to instances sitting in an ASG
@@ -890,7 +890,7 @@ Comparing some web and compute layer architectures
     - Slow scale...few minutes for startup script, ECR pull, boot, etc...
 - ![ALB to ASG Arch](./images/alb_asg_arch.png)
 
-## ALB + ASG + ECS on EC2
+### ALB + ASG + ECS on EC2
 - Exact same as one above, except there are ECS Tasks running on the EC2 instances versus standalone EC2 instances
 - App runs on Docker
 - ECS allows dynamic port mappings
@@ -913,7 +913,7 @@ Comparing some web and compute layer architectures
         - ECS Service scaling policy based on ALB request count per target, or task CPU Usage
             - We must scale ECS Task (app layer) to take advantage of newly added EC2 instances (infra layer)
 
-## ALB + ECS on Fargate
+### ALB + ECS on Fargate
 - You basically remove all the crap above about scaling app and infra layer, and you only worry about scaling app layer based on metrics
 - No ASG, No EC2, blah
 - Route53 Alias Record pointing to ALB
@@ -921,7 +921,7 @@ Comparing some web and compute layer architectures
     - Still have limitations of ALB sudden bursts
 - Fargate handles scaling of infra layer, and we only worry about scaling app layer
 
-## ALB + Lambda
+### ALB + Lambda
 - Easy way to scale
 - Get the functionality of HTTP(S) on ALB
 - Limitations + Benefits of lambda
@@ -929,25 +929,25 @@ Comparing some web and compute layer architectures
     - Hugely scalable (Serverless)
     - Private or public
 
-## API GW + Lambda
+### API GW + Lambda
 - Client directly calls API GW 
     - API GW handles WAF, DDoS, CDN, and Security integrations
     - API GW is 10k req / second, Lambda is 1k concurernt lambda calls
     - API GW also handled auth, rate limit, caching, etc...
 
-### API GW + AWS Service As a Proxy
+#### API GW + AWS Service As a Proxy
 - Can essentially use API GW as auth and proxy to our other services
     - Get all the goodness of auth, caching, rate limiting, SSL / TLS Termination, etc... out of the box
 - Can have API GW directly integrate with other services
     - SQS, SNS, Step Fn etc
     - API GW has 10 MB limit, so might not be great for S3
 
-## API GW + HTTP Backend
+### API GW + HTTP Backend
 - HTTP Server on backend connected to API GW
 - API GW sits in front to handle all of the "tough" things like auth, rate control, API Keys, caching, and SSL / TLS offloading
 
 
-# AWS Outposts
+## AWS Outposts
 - Used for Hybrid (On prem + cloud) infrastructures
 - AWS Outposts are AWS Server Racks that have AWS Services on them, but they're installed on-prem
 - You become responsible for physical security of servers
@@ -966,7 +966,7 @@ Comparing some web and compute layer architectures
             - Standup S3 access point, and then EC2 on VPC can access S3 via access point
             - Use AWS DataSync to sync S3 content from Outpost to Cloud
 
-# AWS WaveLength
+## AWS WaveLength
 - WaveLength Zones are infr deployments embedded within telecommunication providers datcenters at edge of 5G networks
 - Brings AWS Services to edge of 5G
 - Users on 5G that accesses EC2 that's on WaveLength have ultra low latencies
@@ -981,7 +981,7 @@ Comparing some web and compute layer architectures
     - Real Time Gaming
     - etc
 
-# AWS Local Zones
+## AWS Local Zones
 - Allows you to compute AWS Compute, Sotrage, and other AWS Services closer to end-users to run latency-sensitive apps
 - Extension of AWS Region
 - Not all AWS Regions have them

@@ -1,12 +1,17 @@
 ---
 layout: technical
-title: Databases & Storage - LSMTrees
+title: LSMTrees
 category: Architecture Components
 difficulty: Advanced
 description: Discussion around Disk Based Databases
 ---
+# Table of Contents
+- [LSM Tree](#lsm-tree)
+- [Components](##components)
+    - [Implementation](#implementation)
+    - [Optimizations](#optimizations)
 
-# LSM Tree
+## LSM Tree
 
 ## Components
 - 3 components - MemTable, SSTable, WAL
@@ -50,7 +55,7 @@ description: Discussion around Disk Based Databases
         - GET(low_key) and iterate until iterator > high_key
         - Most likely have to scan multiple SSTables at different levels
 
-## Implementation
+### Implementation
 - MemTable
     - Can be any sort of container that supports sorting keys, and scanning retrieval
         - Insert and search can both be $O(log n)$ with a simple Vector
@@ -93,7 +98,7 @@ description: Discussion around Disk Based Databases
     - Start of block is a checksum to verify integrity
     - ![RocksDB Block](./images/rocks_db_block.png)
 
-## Optimizations
+### Optimizations
 - Bloom Filters
 - Indexing (index of index)
 - B+Tree 

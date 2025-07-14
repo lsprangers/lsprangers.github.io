@@ -1,6 +1,8 @@
 ---
-layout: page
-title: Search System Design
+layout: technical
+title: Search System
+category: Design Systems
+difficulty: Advanced
 description: Complete search and recommendation system with candidate generation, ranking, and inverted index
 show_back_link: true
 ---
@@ -22,8 +24,8 @@ show_back_link: true
   - [Scoring](#scoring)
     - [KNN](#knn)
         - [Branch And Bound](#branch-and-bound)
-        - [Locality Sensitive Hashing](#locality-sensitive-hashing)
-        - [FAISS](#faiss)
+        - [Locality Sensitive Hashing](#locality-sensitive-hashing-lsh)
+        - [FAISS](#faiss-facebook-ai-similarity-search)
   - [Reranking / Ordering](#reranking--ordering)
 - [Conclusion](#conclusion)
 - [Youtube DNN System](#youtube-dnn-system)
@@ -31,7 +33,7 @@ show_back_link: true
   - [Ranking](#ranking)
     - [Learn To Rank](#learn-to-rank)
 
-# Ecommerce Diagram
+## Ecommerce Diagram
 Below we can see a generic E-Commerce website setup that includes a recommendation system
 
 This flow only includes the default user recommendations, and in other flows we'd have to include "current search item" or "returned order item" or something similar
@@ -55,7 +57,7 @@ The dotted lines represent our [Filtering Steps](#filtering) which is the part o
     - This is all handled via an [API Gateway](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_frontend/index.md), or typical frontend, which, along with proper load balancing and caching, can help ensure all of our requests are secure, correctly routed, and even minimal aggregation for returning to users browser
         - It can also help with experimentation routing! 
 
-# Search Systems
+## Search Systems
 Search Systems (also Recommendation systems since we recommend something back) are used for finding relevant content based on a query
 
 - "What day is it today"
@@ -71,7 +73,7 @@ Youtube will typically return Videos, Google will return almost any content type
 An Example from Nvidia
 ![Nvidia](./images/nvidia.png)
 
-## Terminology
+### Terminology
 - An ***item*** is generally the thing we'd want to recommend
 - A ***user*** uses items and can be recommended items
     - Users have a history of item usage
@@ -87,7 +89,7 @@ An Example from Nvidia
     - ***Retrieval and Scoring:*** is where we take the distilled space and run large scale heavy computations against the query / user context to decide on the best videos. This step typically has high recall where we will ensure we get every possible candidate the user might find interesting
     - ***Re-Ranking:*** Takes into account user history, current trends, and other policies we might want to have included in our system that change more quickly. Typical policies include pirated content, child restrictions, user personalization, and clickbait removes, among many other policies. We woudln't want to include all of this in our generic candidate generation or ranking steps since it'd ultimately cause heavy retraining and recomputing of our Embedding Space
 
-# History
+## History
 Over time recommendation / search systems have gone through a lot of changes 
 - At first we used inverted indexes for text based lookups of documents which would allow things like webpage lookup on google
 - Most of this stayed with token-based matching using more advanced methods like n-grams, maybe using distance metrics like Levenshtein, or even some minimal ranking with TF-IDF based methods
@@ -106,13 +108,13 @@ Search has started to move away from returning items to returning summaries and 
 Here's a list of Examples from the Wild from NVIDIA
 ![Example](./images/examples.png)
 
-## Inverted Indexes
+### Inverted Indexes
 [Inverted Indexes](INVERTED_INDEX.md) have been around for a long time, and they built the original search systems we think of. When you hear of "Google indexed my page" or "Google crawled my page" it is referring to a system similar to this
 
 There's many still used today, but for the most part systems require utilizing context, user features / demographics, and many other inputs to help design Search and Recommendation Systems
 
 
-## Embeddings
+### Embeddings
 [Embeddings](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md#embeddings) are a way to create dense, numeric representations, that can have geometric operations like subtraction, addition, and "closeness", performed on them
 
 - Types:
@@ -122,41 +124,41 @@ There's many still used today, but for the most part systems require utilizing c
     - [User Embeddings](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md#user-embeddings) are typically created using User-Item interactions, along with other features like demographics, click through data, or history
     - We can create embeddings for almost anything, but at the end of the day the embeddings need to make sense for what we want to do, which is typically find "similar" things, or find geometric interpretations of "things" like Paris is to France as Berlin is to Germany
 
-# Scalable, Real Serving Systems
+## Scalable, Real Serving Systems
 We'll walk through how serving systems would be architected in the current world
 
-## Candidate Generation
+### Candidate Generation
 The [Candidate Generation](./CANDIDATE_GENERATION.md) sub-document covers all main areas of candidate generation phase, but in most cases we'll basically be creating the user-item matrices as a batch at some specific time, and then updating it at some cadence as users interact with our service
 
 If we choose to simply use filtering methods then all of the updates and batch creation can be done offline, and if we truly want our recommendations to be as up-to-date as possible we'd have to rerun the WALS update of user-item engagement each time a user uses our service
 
 If we choose DNN, the DNN needs to be ran each time for a specific user to get the output Candidate Generation which leads us into ML Engineering Inference API's
 
-### Embedding Space Updates
+#### Embedding Space Updates
 How do we update our embedding space as users use our services?
 
 We would need to capture the user click information as it's happening, and stream that data into a user database or an analytical data warehouse 
 
-### User-Item Matrix Updates
+#### User-Item Matrix Updates
 Once the data is in some sort of processing engine, we'd need to update the specific pointed row-column $r_{ij}$ corresponding to user I on item J. This might be incrementing some usage statistic, upadting metrics on the fly, or something else. This can be apart of *Feature Engineering* pipelines that run on streaming data
 
 The toughest part will be recomputing the user-item embeddings using WALS or SGD, as we'd have to clone the matrix somewhere else or pause updates on it as we created our new latent matrices $U$ and $V$ during [Matrix Factorization](./CANDIDATE_GENERATION.md#matrix-factorization) 
 
 Then as the user returns, we'd have updated embeddings to serve them with
 
-### DNN Updates
+#### DNN Updates
 The DNN needs to be ran each time for a specific user to get the output Candidate Generation, and updating the model parameters each time wouldn't be smart so DNN gets retrained as our training data drifts from our User-Item data
 
 The data drift detection can be a separate background feature pipeline in our processing engine, and once there's a significant enough change we can schedule a new model to be trained for inference
 
-## Filtering
+### Filtering
 Since our Candidate Generation models must run in milliseconds over gigantic corpus, we shouldn't embed any sort of "business logic" inside of them - things like product being out of stock, product not being child friendly, or product being too far away. These things should be based on user-features, but shouldn't fluff up our Candidate Generation model
 
 In the past a ***Bloom Filter***, which is now common place in many scenarios, was used to disregard items that the user has already interacted with!
 
 Once the filtering is done, we can send things through to Scoring
 
-## Scoring
+### Scoring
 Given a user coming online, or a query being submitted, how do we actually obtain a set of items to present? This is the main focus of Retrieval and Scoring, sometimes called Ranking, and there are even some Re-Ranking steps involved...
 
 For a [Matrix Factorization](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md#matrix-factorization) technique, we'd have the static embeddings sitting in an API or on disk somewhere for us to look up at query time. We can simply look things up from the User Embedding Matrix to get our query embedding $q_u$
@@ -179,7 +181,7 @@ Why do we split Candidate Generation from Ranking?
 - Some systems use multiple Candidate Generation models
 - Some Ranking models use heavier sets of features or heavier models that can't run over the entire corpus
 
-### KNN
+#### KNN
 Once we have our query embedding $q_u$ we need need to search for the Top K Nearest Neighbors (KNN) items $V_j$ in the Item Matrix that are closest to $q_u$ - this is typically done with the [Ranking and Scoring](./RANKING.md) algorithms described elsewhere, which help us compute a score $s(q_u \cdot v_j)$ for our query across the Item Embedding Space 
 
 - This is a fairly large and complex thing to do online for each query, but there are ways to alleviate this:
@@ -189,7 +191,7 @@ Once we have our query embedding $q_u$ we need need to search for the Top K Near
     
 Most of the time computing Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead
 
-#### Branch And Bound
+##### Branch And Bound
 - **Description**:
   - A search algorithm used to efficiently find the **Top K nearest neighbors** by pruning irrelevant regions of the search space.
   - It systematically explores the search space while maintaining bounds on the best possible solution.
@@ -201,7 +203,7 @@ Most of the time computing Top K is very inefficient - approximate Top K algorit
 - **Limitations**:
   - Computationally expensive for high-dimensional data unless combined with other techniques like space partitioning.
 
-#### Locality Sensitive Hashing (LSH)
+##### Locality Sensitive Hashing (LSH)
 - **Description**:
   - A technique for **approximate nearest neighbor search** that hashes similar items into the same bucket with high probability.
   - Reduces the dimensionality of the data while preserving similarity.
@@ -214,7 +216,7 @@ Most of the time computing Top K is very inefficient - approximate Top K algorit
 - **Limitations**:
   - May miss some neighbors due to the approximate nature of the algorithm.
 
-#### FAISS (Facebook AI Similarity Search)
+##### FAISS (Facebook AI Similarity Search)
 - **Description**:
   - An open-source library developed by Facebook for **efficient similarity search** and **clustering of dense vectors**.
   - Optimized for both exact and approximate nearest neighbor search.
@@ -230,7 +232,7 @@ Most of the time computing Top K is very inefficient - approximate Top K algorit
 - **Limitations**:
   - Requires tuning of indexing parameters for optimal performance.
 
-## Reranking / Ordering
+### Reranking / Ordering
 This final part of the model is to mostly filter out items that may have made it through and aren't useful...these reranking models are much more dynamic and trained on "current issues" like pirated sports streams or child restriction content which could change much faster than our generic ranking systems need to
 
 Typical examples include:
@@ -243,17 +245,17 @@ Typical examples include:
 
 It's just another way to pick down at the final list to make sure it's useful
 
-## Conclusion
+### Conclusion
 Discussing Candidate Generation, Ranking, Retrieval, Scoring, and Reranking might be confusing and repetitive, but in reality all of these components can and do make up recommender systems. In most scenarios the algorithms discussed are used in possibly all steps, and some systems have multiple models of each type (for example multiple Candidate Generation and Reranking models) which all support creating and whittling away at a finalized recommendation list
 
 This is all important because we want to engage users with relevant content without "being evil" - showing trending videos, clickbait videos, or pirated sports streams is hard to combat without all of this context, and at some points we don't want to include all of that logic in our ranking and scoring. The decision on which model to place where and for what reason is what makes up our recommendation sytem's choices
 
-# Youtube DNN System
+## Youtube DNN System
 [Paper Link](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/45530.pdf)
 
 So what could Youtube use in it's recommender system?
 
-## Candidate Generation
+### Candidate Generation
 - Candidate Generation is around finding a manageable set of videos to compare to an incoming user Query in a very short timeframe 
     - Youtube paper mentions "taking recent user history into context and outputting a small sample of videos (100's) from our total corpus"
 - It will have high precision meaning anything it generates is most likely relevant to the user
@@ -262,9 +264,10 @@ So what could Youtube use in it's recommender system?
     - This basically means they used to use matrix factorization techniques, and the DNN means to mimic that, but DNN's are more flexible (non-linear)
     - They mention the CGeneration task is extreme classification
 
-## Ranking
+### Ranking
 - Ranking will take the output of Candidate Generation, which is high precision, and will create a fine-level representation for the user 
 - Ranking will have high recall to ensure out of the videos Candidate Generation finds, Ranking doesn't leave anything behind
     - It ranks these videos with a rich set of Query (User) - Document (Video) Features
-### Learn To Rank
+
+#### Learn To Rank
 This would be a good first thought - we could basically have user context as input along with some previous history, and then we could rank potential videos that get passed through from Candidate Generation

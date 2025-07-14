@@ -1,6 +1,6 @@
-# Caching
+## Caching
 
-# CloudFront
+## CloudFront
 - CloudFront is a CDN
 - This helps to improve read performance seen by clients
     - Content is cached at the "edge" meaning in servers close to ISPs and Clients
@@ -12,7 +12,7 @@
 - Can expose external HTTPS and can talk to internal HTTP(S) backends
 - Supports WebSocket
 
-## Origins
+### Origins
 - S3
     - Distributing files
     - Uploading files to S3
@@ -49,7 +49,7 @@
     - Has secondary origin, which ***can be cross-region***, which takes over if first one fails
     - ![CF Origin Groups HA](./images/cf_ha_cr.png)
 
-## Security
+### Security
 - Geo Restriction:
     - Can restrict who can access origin and distributions
         - Allow and Block lsit
@@ -62,18 +62,18 @@
         - Different from S3 pre-signed URLs since you act as the signer when using S3 PSURL
     - ![CF Pre Signed URL](./images/cf_signed_url.png)
 
-## Pricing and Performance
+### Pricing and Performance
 - Pricing is done by where the CF Origin server sits
 - If we have all regions, it's the best performance, but costs the most
     - Price Class 100 is least expensive regions covered, and so is the least expensive
     - Price Class 200 is most regions but excludes the most expensive ones
     - Price Class All means all regions, best performance
 
-## Custom Errors
+### Custom Errors
 - Return a custom page when origin gives us a 4xx or 5xx error
 - Use static `.html` pages from S3, which CF caches, and then would return that page to client
 
-# Lambda@Edge 
+## Lambda@Edge 
 - You can also run functions / code at the edge
 - Edge Function:
     - Code you write and attach to CF Distributions
@@ -145,7 +145,7 @@
         - Can rely on 3rd party services or SDKs
         - Filesystem access or access to body of HTTP requests
 
-# ElastiCache
+## ElastiCache
 - RDS manages relational databases
 - ElastiCache manages Redis or Memcached
 - Caching helps make apps faster, and take load off of app db
@@ -154,7 +154,7 @@
     - As always, AWS is basically a rolling DevOps person
 - ElastiCache means heabvy app code changes to use ElastiCache
 
-## Architecture
+### Architecture
 - DB Cache
 - ![ElastiCache DB Cache](./images/elasticache.png)
 - User Session store
@@ -172,7 +172,7 @@
     - Backup and restore
     - Multi Threaded Arch
 
-# Extreme Rates
+## Extreme Rates
 - CDN layer:
     - CF can easily get 100k Req / Sec
 - Load Balancers:
@@ -205,7 +205,7 @@
     - S3 3.5k PUT, 5.5k GET per prefix per second
         - KMS limits if encrypted
 
-# Questions
+## Questions
 - Q: You have deployed the same SSL certificate onto your CloudFront and ALB. You would like to ensure you get a high ratio of cache hit but also don't want to break SSL. What do you recommend? 
     - Explanation: Forward the host header because it allows you to maintain the integrity of SSL conncetions while caching content effectively, Preserving the host header ensures that requests are routed correctly. 
     - Break SSL here refers to breaking integrity of secure cnxn b/t client and backend ALB if we incorrectly handle headers

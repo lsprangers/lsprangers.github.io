@@ -1,4 +1,4 @@
-# Historic Local Auth
+## Historic Local Auth
 To get users to authenticate to your services, usually you'd just store a DB with usernames and passwords
 
 Most of the time this just becomes downright annoying, and at the end of the day most people don't want to create Yet Another Username Password (YAUP)
@@ -21,7 +21,7 @@ Key Components:
     - Verifies the token issued by the IdP to grant or deny access
         - IdP might send a random token...doesn't mean that user is even for you
 
-## OpenID Connect
+### OpenID Connect
 OpenID Connect is a way to ensure standard protocols and architecture around IdP provisioning
 
 Most ID Tokens are JWT's

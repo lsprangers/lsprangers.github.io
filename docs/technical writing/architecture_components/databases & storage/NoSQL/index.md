@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: Databases & Storage - NoSQL
+title: NoSQL
 category: Architecture Components
 difficulty: Advanced
 description: Discussion around NoSQL Databases Storage

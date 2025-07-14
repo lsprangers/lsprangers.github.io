@@ -1,3 +1,12 @@
+---
+layout: technical
+title: Embeddings
+category: NN and LLM
+difficulty: Advanced
+description: Discussions around Embeddings used throughout multiple design systems
+show_back_link: true
+---
+
 # Table of Contents
 - [Embeddings](#embeddings)
   - [History](#history)
@@ -25,10 +34,10 @@
   - [Euclidean](#euclidean)
 
 
-# Embeddings
+## Embeddings
 Embeddings are dense vector representations of objects - typically we use them for Documents, Queries, Users, Context, or Items...but they can really be used to represent ***anything***
 
-## History
+### History
 - In the past there have been many ways of creating embeddings
 - ***Encoders*** 
     - ***One Hot Encoding***: When we would replace categorical variables with vectors of sparse 0's and a single 1 representing the category
@@ -40,11 +49,11 @@ Embeddings are dense vector representations of objects - typically we use them f
 - etc...
 
 
-## Categorical Features
+### Categorical Features
 - ***One-Hot Encoding*** represents orthonormal basis of vectors, and typically is useful for categorical variables but becomes infeasible if we try to use it for text features
 - ***Label Encoding*** is similar to One-Hot Encoding, except we use an incremental ID for each of the categories
 
-## Numeric Features
+### Numeric Features
 - This depends on the distribution of the data
     - ***Standardization***: Transforms the data to having a mean of zero, and a standard deviation of one 
         - This allows us to bring data in different distributions onto the same common scale
@@ -62,7 +71,7 @@ Embeddings are dense vector representations of objects - typically we use them f
             - Ensures that all features contribute equally to the model.
 - There are plenty of other ways to treat numeric data as features, but these are two easy and common ways
 
-# Text Embeddings
+## Text Embeddings
 Text Embeddings are one of the harder things to figure out, but there are some standards nowadays
 
 - Training Word2Vec and BERT both involved semi self-supervised training where they take online corpus as input and basically use contextual words $w_{i-k,i+k}$ to try and create an embedding for a current word $w_i$
@@ -71,7 +80,7 @@ Text Embeddings are one of the harder things to figure out, but there are some s
 - [GPT](#gpt-3) is an autoregressive transformer model in the same transformer "family" as [BERT](./BERT.md#bert), but it is ***unidirectional*** where BERT is ***bidirectional*** (which is constantly repeated in the paper)
     - GPT is good for text-to-text tasks like question answering, but like BERT we can pull from the middle hidden layers during it's self-attention steps to find word embeddings
 
-## Word2Vec
+### Word2Vec
 As we said above Word2Vec is essentially a static lookup of words to embeddings, and so ***Word2Vec is an embedding model***
 
 - Parameters:
@@ -80,7 +89,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - $D$ is the embedding size (projection layer)
     - $i$ is the current target word
 
-### Training and Output
+#### Training and Output
 - Word2Vec will use context words to help model a current word $w_i$ - this modeling is done without context (meaning position of other words is irrelevant) and we use words in the past and future
     - When everything is finished, the weights of the shallow network are the actual embeddings themselves!
     - There are 2 types of training tasks:
@@ -90,7 +99,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - This allows us to have a static embedding representation of words
 - Take the final projection layer of size $V \times D$ and ***this is your word embedding matrix***
 
-### Model Architecture
+#### Model Architecture
 - Architecture:
     - Overall the Time Complexity will be around the order of $N \times D + D \times V$ which gets reduced to $N \times D + D \times log_2(V)$ with hierarchical softmax
         - First layer of $N \times D$ comes from taking $N$ local One-Hot Encoded Vectors, all of size $V$ and performing some calculations to get them to $N$ instances of size $D$ which is the size of our embedding
@@ -102,7 +111,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - ***Huffman Tree*** is actually a further optimization of ***Hierarchical Softmax***
         - $log_2(Unigram Perplexity(V))$ which means it's even better than HSoftmax?
 
-#### Continuous Bag of Words Architecture
+##### Continuous Bag of Words Architecture
 - The CBOW architecture will use some surrounding context of words to predict the current word
 - The context words get projected into hidden layer, and then they are basically all averaged
     - ***This means there is no context involved, and that the surrounding words are simply averaged***
@@ -115,7 +124,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - TODO: Explain log-linear classification
 - ![CBOW Architecture](./images/cbow.png)
 
-#### Continuous Skip Gram Architecture
+##### Continuous Skip Gram Architecture
 - The Skip Gram architecture will use the current word to predict some surrounding context of words
 - The current word is sent through a `log-linear classifier` into a continuous projection layer, and then they projection layer is used to predict the best potential context words
     - ***This still! means there is no context involved, and that the surrounding words are simply predicted without specifying placement***
@@ -126,7 +135,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - For each of the $C$ words we need to take our input word $w_i$, do $D$ multiplcations to get it into projection layer, and then go from our projection layer into our sized $V$ vocabulary to try and predict $w_c$
 - ![Skip-Gram Architecture](./images/skipgram.png)
 
-### Evaluation of Model
+#### Evaluation of Model
 - In the past the main way to do this was to just show tables of words with their corresponding Top-K most similar other words, and intuitively check
 - In the Word2Vec Paper they checked over relationships such as *"What is the word that is similar to small in the same sense as bigger is to big"*
     - Ideally this would produce *smaller*
@@ -137,12 +146,12 @@ TODO: Is below correct? Semantic vs Syntactic...Semantic is "underlying meaning 
 - ***Skip Gram performed better on semantic objectives***, which isn't surprising seeing as it's entirely focused on structuring a word to best represent what other words would be around it, so `America` and `United States` should be similar
 - ***Bag of Words performed better on syntactic objectives*** showing how the CBOW model is better at syntax modeling where we could alter the sentence *The quick brown fox jumped over the lazy river* to *Over the lazy river the quick brown fox had jumped*
 
-## BERT
+### BERT
 [BERT](./BERT.md#bert) architecture, training, and fine tuning is descirbed in another page, but given all of that is read through we discuss below how to get useful embeddings out of BERT!
 
 Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it through multiple Encoders, and would send it through an output layer at the end - this output layer tyipcally isn't useful by itself for Word Embeddings, so we would need to go back through the hidden state values and aggregate these in some way to produce Word, Sentence, or Document embeddings
 
-### BERT Word Embeddings
+#### BERT Word Embeddings
 - [Another reference link](https://mccormickml.com/2019/05/14/BERT-word-embeddings-tutorial/#history)
 - Most use cases of word embeddings can come straight out of a pre-trained core BERT model
 - We could send a single word through and it would most likely just be a representation of the WordPiece Embedding layer at the start
@@ -151,7 +160,7 @@ Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it 
     - Typically you would send through the sentence and then pull back each $T_i$, or some mixture of $H_{a, b}$ hidden states, for each $w_i$ and that would represent your finalized word embedding that was attended to / altered from contextual self-attention!
 - ![BERT Word Embeddings](./images/bert_word_embed.png)
 
-### BERT Embeddings Pseudo Code
+#### BERT Embeddings Pseudo Code
 - We'd need to load in the WordPiece Tokenizer
 - Tokenize our sentence input into Word Pieces
     - Will have some words get split into tokens like `embeddings -> [em, ###bed, ###ding, ###s]`
@@ -180,25 +189,25 @@ Why does this work?
 - As you approach the final layer you start to pick up information about the pre-trained BERTs tasks, MLM and NSP respectively
 - BERT is setup well to encode information, but at the end of the day BERT is meant to predict missing words or next sentences
 
-### BERT Sentence Embeddings
+#### BERT Sentence Embeddings
 - Taking the above example, the typical way to get sentence embeddings is to `SUM` or `AVG` the second to last hidden state for each token in the sentence to achieve a sentence embedding
 
-# User Embeddings
+## User Embeddings
 TODO: Outside of collab filtering, how do we get user embeddings?
 TLDR; How do we get meaningful representations of users?
 
-# Embeddings vs Autoencoder vs Variational Autoencoder
+## Embeddings vs Autoencoder vs Variational Autoencoder
 
 This question has come up in my own thoughts, and others have asked me - they all get to a relatively similar output of representing things into a compressed numeric format, but they all have different training objectives, use cases, and architectures - Autoencoders were created to reduce dimensionality, and Embeddings were created to represent, possibly dense items, into dense numeric representations
 
 
 
-## Embeddings
-### Description
+### Embeddings
+#### Description
 - Embeddings are dense vector representations of objects (e.g., words, users, items) that capture their semantic or contextual meaning in a continuous vector space
 - They are typically learned during the training of a neural network and can be static (pre-trained) or dynamic (contextual)
 
-### Use Cases
+#### Use Cases
 - **Static Embeddings**:
   - Pre-trained embeddings like Word2Vec or GloVe are used for tasks where the context does not change (e.g., word similarity tasks)
   - Example: Representing the word "bank" as a fixed vector regardless of its context
@@ -213,15 +222,15 @@ This question has come up in my own thoughts, and others have asked me - they al
   - Pre-trained embeddings for transfer learning
 
 
-## Autoencoder
-### Description
+### Autoencoder
+#### Description
 - An Autoencoder is a type of neural network designed for dimensionality reduction. It learns to encode input data into a compressed representation (embedding) in the hidden layer and then reconstructs the original input from this representation
     - It's typically used to represent sparse data into a more compact format
 - The encoder compresses the input, and the decoder reconstructs it
 - So what's the difference between an Autoencoder and Word2Vec? 
     - Word2Vec doesn't get train input word to be reconstructed on the other side (outright) like an Autoencoder, instead it tries to predict surrounding words...therefore the end results are ultimately the same, but the training tasks are different
 
-### Use Cases
+#### Use Cases
 - **Dimensionality Reduction**:
   - Reducing high-dimensional data into a lower-dimensional embedding while preserving important features
   - Example: Compressing image data for visualization or clustering
@@ -229,19 +238,19 @@ This question has come up in my own thoughts, and others have asked me - they al
   - The hidden layer of the Autoencoder can be used as a static embedding for the input data
   - Example: Representing user profiles or item features in a recommendation system
 
-### When to Use
+#### When to Use
 - Use Autoencoders when:
   - You need ***static embeddings*** for structured data (e.g., tabular data, images)
   - The input and output are the same, and you want to reduce dimensionality
   - You do not need to generate new data points but only want a dense representation of existing data
 
 
-## Variational Autoencoder (VAE)
-### Description
+### Variational Autoencoder (VAE)
+#### Description
 - A Variational Autoencoder is an extension of the Autoencoder that introduces a probabilistic approach. Instead of encoding the input into a single deterministic vector, it encodes it into a distribution (mean and variance)
 - The decoder samples from this distribution to reconstruct the input, allowing the generation of new data points
 
-### Use Cases
+#### Use Cases
 - **Generative Models**:
   - VAEs are used to generate new data points similar to the training data
   - Example: Generating new images, text, or user profiles
@@ -249,7 +258,7 @@ This question has come up in my own thoughts, and others have asked me - they al
   - The latent space of the VAE can be used to create embeddings that capture uncertainty or variability in the data
   - Example: Representing user preferences with variability for personalized recommendations
 
-### When to Use
+#### When to Use
 - Use VAEs when:
   - You need to generate new data points (e.g., synthetic data generation, data augmentation)
   - You want embeddings that capture uncertainty or variability in the data
@@ -257,7 +266,7 @@ This question has come up in my own thoughts, and others have asked me - they al
 
 
 
-## Comparison and When to Choose
+### Comparison and When to Choose
 
 | **Technique**         | **Static Embeddings** | **Dynamic Embeddings** | **Generative Tasks** | **Dimensionality Reduction** |
 |------------------------|-----------------------|-------------------------|-----------------------|------------------------------|
@@ -266,7 +275,7 @@ This question has come up in my own thoughts, and others have asked me - they al
 | **Variational Autoencoder (VAE)** | No                  | Yes                    | Yes                   | Yes                          |
 | **Word2Vec**           | Yes                  | No                     | No                    | No                           |
 
-### Key Considerations
+#### Key Considerations
 1. **Static vs. Dynamic Embeddings**:
    - Use Autoencoders or Word2Vec for static representations
    - Use BERT or some sort of Transformer model with Attention for dynamic embeddings
@@ -281,14 +290,14 @@ This question has come up in my own thoughts, and others have asked me - they al
    - Use Word2Vec for lightweight, static word embeddings
 
 
-# Vector Similarities + Lookup
+## Vector Similarities + Lookup
 Vector similarities are useful for comparing our final embeddings to others in search space
 
 None of the below are actually useful in real life, as computing these for Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead
 
 [We discuss all of that here](/docs/technical%20writing/design_systems/search_system/index.md#knn)
 
-## Quantization
+### Quantization
 Quantization
 - Definition: Quantization is a technique used to reduce the size of vector representations (e.g., embeddings) while preserving their ability to compare similarity effectively
 - How It Works:
@@ -301,13 +310,13 @@ Quantization
   - Edge Devices: Quantization is used to deploy machine learning models on devices with limited memory and computational power (e.g., mobile phones, IoT devices)
 - Limitations:
   - Quantization introduces some loss of precision, which can slightly affect the accuracy of similarity comparisons
-## Sketching
+### Sketching
 TODO:
 
-## Feature Multiplexing
+### Feature Multiplexing
 TODO:
 
-## Cosine
+### Cosine
 Cosine similarity will ultimately find the angle between 2 vectors
 $\text{cosine similarity}(A, B) = \frac{A \cdot B}{|A| |B|}$
 
@@ -321,21 +330,21 @@ $\text{cosine similarity}(A, B) = \frac{A \cdot B}{|A| |B|}$
     - -1 indicates they're pointing in exactly opposite directions
 
 
-## Dot
+### Dot
 The Dot product is similar to the Cosine product, except it doens't ignore the magnitude
 
 $dot(a, b) = \sum_{i=1}^v a_ib_i = {|A| |B|}cosine(a,b)$ 
 
 Which basically means we just compare each item over each dimension. If $a, b$ are normalized then Dot is equivalent to Cosine
 
-## Euclidean
+### Euclidean
 This is the typical distance in euclidean space
 
 $euclidean(a, b) = [\sum_{i=1}^v (a_i \times b_i)^2]^{1/2}$ 
 
 Here magnitude matters, and a smaller distance between vector end-points means a smaller overall distance metric
 
-# Topological Interpretations
+## Topological Interpretations
 Most of this comes from [Yuan Meng Embeddings Post](https://www.yuan-meng.com/posts/ebr/)
 
 There we see discussions of how embeddings, topologically, can be considered a injective one-to-one mapping that preserves properties of both metric spaces

@@ -1,6 +1,6 @@
-# Data Engineering
+## Data Engineering
 
-# Kinesis
+## Kinesis
 - Kinesis is a bunch of streaming services broken out into multiple different AWS services
 - Open source streaming services are horizontals, AWS for some reason breaks them out into verticals / horizontals depending
 - Kinesis Data Streams:
@@ -14,7 +14,7 @@
     - Most similar to Kinesis Data Analytics, and I think was rebranded into it, and is where you write tumbling window operations over data
 - Managed Service for Apache Kafka (MSK) is most similar to Kinesis Data Streams as managed brokers for streaming messages over topics
 
-# Kinesis Data Streams
+## Kinesis Data Streams
 - Most similar to Kafka, and acts as a storage / broker for messages and data that are being streamed
 - Collect and store streaming data in real time
 - Send any real-time data into data streams
@@ -81,7 +81,7 @@
         - If multiple consumers try to read frmo same Kinesis Data Streams shard, they compete and both are apart of same throughput calculation
             - Meaning they basically act as one consumer
 
-# Kinesis Data Firehose
+## Kinesis Data Firehose
 - Basically a connector and mover 
 - Stores data in target destinations
 - Kinesis Data Firehose can get data by pulling, or by being sent data, from:
@@ -152,7 +152,7 @@
         - No data storage on the service itself
         - Serverless transforms with Lambda
 
-# Amazon Managed Service for Apache Flink
+## Amazon Managed Service for Apache Flink
 - FKA Kinesis Data Analytics for Apache Flink
 - Flink (Java, Scala, SQL) is a framework for processing data streams
 - Input:
@@ -168,7 +168,7 @@
     - Use any Flink programming features to transform the data
 
 
-# Streaming Architectures
+## Streaming Architectures
 - Producers are going to write to Kinesis Data Streams
     - KPL
     - Agent
@@ -212,10 +212,10 @@
                 - Comes out to ~$1,450/month
                 - Long term storage, but streaming it out is extremely expensive
 
-## Streaming Resource Comparison Chart
+### Streaming Resource Comparison Chart
 ![Streaming Comparison Chart](./images/streaming_comparison_chart.png)
 
-# Amazon MSK
+## Amazon MSK
 - Amazon Managed Streaming for Kafka
 - Kafka is an alternative to Kinesis
 - MSK is a fully managed cluster(s) and scaling
@@ -231,7 +231,7 @@
     - AWS Glue (Powered by Spark Streaming)
     - Lambda
     - Write your own on EC2 or ECS Cluster or EKS cluster
-- [What is Kafka?](/docs/technical%20writing/architecture_components/messaging/Kafka%20Broker/KAFKA.md)
+- [What is Kafka?](/docs/technical%20writing/architecture_components/messaging/Kafka%20Broker/index.md)
     - Kafka has Producers as well, and these Producers write to a Topic
     - A Topic is 
         - Split up into multiple Partitions
@@ -240,7 +240,7 @@
     - Consumers pull from Topic Partitions
     - Consumers read and transform, and write back into Kafka, or to other downstream destinations
 
-## Kafka vs Data Streams
+### Kafka vs Data Streams
 - Size:
     - Kafka 1MB limit
     - KDS 1MB default, but can grow
@@ -258,7 +258,7 @@
     - KDS in-flight encryption
     - At rest encryption for both
 
-# AWS Batch
+## AWS Batch
 - Run batch jobs as Docker images
 - Two deployment options:
     - Fargate is completely serverless
@@ -271,7 +271,7 @@
 - Invocation:
     - Whenever Batch job is started up it pulls a Docker image from ECR
 
-## AWS Batch Example Architecture
+### AWS Batch Example Architecture
 - AWS Batch cluster
 - Runs Amazon ECS Cluster
     - ECS has EC2, Spot, and Fargate as potential deployments
@@ -281,7 +281,7 @@
 - OR S3 goes to EventBridge, and EventBridge invokes Batch
 - After invocation pulls Docker image, and then runs it
 
-## Batch vs Lambda
+### Batch vs Lambda
 - Lambda:
     - Time limit
     - Limited runtimes / languages
@@ -292,7 +292,7 @@
     - Any runtime that's able to be in Docker image
     - EBS backed disk space, or the EC2 instance if it runs on one
 
-## Compute Environments
+### Compute Environments
 - Unmanaged:
     - You control and manage instance configuration, provisioning, and scaling
     - Pay for instances on your own
@@ -316,7 +316,7 @@
         - Works better for EC2 launched as "cluster" group
             - Enhanced networking + throughput
 
-# Amazon EMR
+## Amazon EMR
 - Elastic Map Reduce
 - Managed Hadoop clusters for big data jobs
     - Can be made of hundreds to thousdands of EC2 instances
@@ -329,7 +329,7 @@
     - Web indexing
     - etc..
 
-## Integrations
+### Integrations
 - Launched within single VPC single AZ
     - Better networking and lower cost
 - Each EC2 will have an EBS volume that runs HDFS
@@ -338,7 +338,7 @@
     - Uses S3 as backbone for EBS volumes
 - Apache Hive on EMR can directly talk to DynamoDB table
 
-## Node Types & Purchasing
+### Node Types & Purchasing
 - EMR made of EC2's
 - Different type of nodes though
     - Leader and Workers
@@ -360,7 +360,7 @@
         - Lets you set a generic target, and EMR will pick and choose among possible capacity in the fleet
         - Does not have autoscaling, you set max
 
-# AWS Glue
+## AWS Glue
 - Essentially managed ETL
 - ***Extract***: Connects to S3 or RDS
     - Sources:
@@ -379,7 +379,7 @@
         - Redshift for tables and lineage
         - EMR
 
-# Amazon Redshift
+## Amazon Redshift
 - Based on Postgres SQL
 - ***NOT AN OLTP, IT IS OLAP!!!***
     - Use DynamoDB for OLTP
@@ -411,7 +411,7 @@
 - Redshift is provisioned, so only worth it for sustained usage of cluster
     - If sporadic, Athena is a better solution
 
-## Snapshots and Disaster Recovery
+### Snapshots and Disaster Recovery
 - Snapshots
     - PIT backups of a cluster, stored in S3
     - Incremental (only what's changed will be saved)
@@ -429,7 +429,7 @@
     - Need to do a `snapshot copy grant` from source region to failover region, and copy key over from Region A to Region B
     - Then we can copy snapshot physically over into new region, and use the copied over encryption key in Region B to access the data
 
-## Redshift Spectrum
+### Redshift Spectrum
 - Query data that's already in S3 without loading it
 - Must have a Redshift cluster available to start the query
 - Query is then submitted to thousands of Redshift Spectrum Nodes
@@ -439,20 +439,20 @@
 - Data is then collected and sent back to Leader node
 - ![Redshift Spectrum](./images/redshift_spectrum.png)
 
-## Redshift Workload Management (WLM)
+### Redshift Workload Management (WLM)
 - Emables you to flexibly manage query priorities within workloads
 - Prevents short lived queries from being blocked by long-running query
 - Define multiple query queue's (superuser, user defined, app db queue)
 - Routes queries to appropriate queue's at runtime
 - *Automatic* and *Manual* WLM where either Redshift or Cluster admin can define WLM queue's
 
-## Concurrency Scaling
+### Concurrency Scaling
 - Enables you to provide consistently fast performance with virtually unlimited concurrent users
 - Requires additional cluster capacity (Concurrency Scaling Cluster) to process an increase in requests
 - Can decide which queries are sent to Concurrency Scaling Cluster via the WLM queue's
     - These queries are charged per second, so they get expensive quickly
 
-# DocumentDB
+## DocumentDB
 - Aurora is "AWS Implementation" of PostgresSQL
 - DocumentDB is same "AWS Implementation" for MongoDB
 - Fully managaed, HA, cross-AZ
@@ -467,7 +467,7 @@
         - Database storage costs per GB / month
     - Backup storage per GB / month
 
-# Amazon Timestream
+## Amazon Timestream
 - AWS Implementation of a time-series database
 - Fully managed, scalable based on capacity
     - Trillions of events per day
@@ -492,7 +492,7 @@
     - Grafana
     - Any JDBC connection
 
-# Athena
+## Athena
 - Serverless query service to query S3 buckets
     - Supports CSV, JSON, ORC, Avro, and Parquet
 - Use standard SQL language
@@ -506,7 +506,7 @@
     - VPC Logs
     - AD HOC!!!!
 
-## Performance Improvement
+### Performance Improvement
 - Use columnar data for cost savings
     - This is because you only scan the columns you need, not all of the data
     - Parquet and ORC
@@ -522,14 +522,14 @@
     - Still need to open and read headers
 - Basically the 5 S's of Spark!!
 
-## Federated Query
+### Federated Query
 - Allows you to run SQL queries across data stored in relational, non-relational, on-prem, and custom data sources
 - Uses data source connectors that run on AWS lambda to run federated queries
     - Can run on ElastiCache, DocumentDB, Dynamo, On-Prem SQL Server, etc...
     - Can then join and collect data back to UI
     - Can store the results into S3 for later analysis
 
-# Amazon Quicksight
+## Amazon Quicksight
 - Serverless machine learning powered BI intelligence service to create interactive dashboards
 - Allows you to connect to multiple data sources
     - Integrates with RDS, Aurora, Athena, Redshift, S3, etc..
@@ -547,7 +547,7 @@
     - Preserves configuration of an analysis (filters, params, controls, sort, etc)
 - Analysis is a long running query 
 
-# Questions:
+## Questions:
 - Q: You are looking for the most cost-efficient way to process CSV files in Amazon S3 using AWS Batch. The jobs can easily be retried, and the job inflows are very unpredictable. How should you set it up? 
     - At first I thought you could do S3 Events into Batch queue w/ a managed Batch spot instance fleet, but S3 Events can only go to SQS, SNS, or Lambda...Therefore
     - A: S3 Events invoke AWS Lambda which places file metadata onto Batch queue, and Batch environment uses spot instance fleet

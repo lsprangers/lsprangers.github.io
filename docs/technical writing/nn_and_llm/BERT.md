@@ -1,3 +1,12 @@
+---
+layout: technical
+title: BERT & BART
+category: NN and LLM
+difficulty: Advanced
+description: Discussions around Transformers
+show_back_link: true
+---
+
 # Table of Contents
 - [BERT](#bert)
 - [Training](#training)
@@ -10,7 +19,7 @@
     - [Fine Tuning Architecture](#fine-tuning-architecture)
     - [Fine Tuning Examples](#fine-tuning-examples)
 
-# BERT
+## BERT
 BERT (Bidirectional Encoder Representations from Transformers) goes a step beyond [Word2Vec](./EMBEDDINGS.md#word2vec) as it is an all around ***language representation model*** that can provide contextual word and sentence embeddings for specific supervised tasks
 
 BERT is technically an ***Encoder Only Model*** even though it has a decoder stack, the Attention is All You Need Paper references Encoder-Decoder, which BART is, but BERT is Encoder only

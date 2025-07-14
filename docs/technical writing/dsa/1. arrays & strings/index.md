@@ -1,4 +1,13 @@
-# Arrays and Strings
+---
+layout: technical
+title: 1. Arrays and Strings
+category: Data Structures & Algorithms
+difficulty: Advanced
+description: Arrays and Strings
+show_back_link: true
+---
+
+## Arrays and Strings
 *Most of the time Strings are created as arrays, so useful to lump them together. Creating new strings from scratch is typically an O(n) operation, so we use lists to store things and create one at the end
 
 ## Time Complexities
@@ -16,9 +25,9 @@
 - The insert / delete in the middle is O(n) because we typically have to shift all elements in the array to a new storage location either +1 or -1, which means we would loop over all the elements and shift
     - Insert or pop from end means we just remove that last storage location, and wouldn't be affected by size of the array
 
-# Common Algorithms
+## Common Algorithms
 
-## Two Pointers
+### Two Pointers
 - Typically useful when we have two pointers, left and right, and we either increment or decrement them based on some criteria
     - Allows us to do things like Palindrome or Two Sum (sorted array) in $O(n)$ time and $O(1)$ space
     - Left and Right can be:
@@ -112,7 +121,7 @@ def isSubsequence(self, s: str, t: str) -> bool:
     return i == len(s)
 ```
 
-## Sliding Window / Subarray
+### Sliding Window / Subarray
 - A Subarray is a contiguous section of the array
 - Subarray problems are usually solved with a variation of [Two Pointers](#two-pointers), where the left is front and right = left, and then we move along the axis checking if the definition for the subarray is true or not
 - If we simply checked each subarray using brute force double loop we'd have
@@ -179,7 +188,7 @@ def find_length(s):
     return ans
 ```
 
-### Number of SubArrays
+#### Number of SubArrays
 - During a sliding window, the number of subarrays between indexes right and left is `right - left + 1`
     - Between left and right there are a number of possible subarrays
     - `[left, right]`
@@ -212,7 +221,7 @@ def numSubarrayProductLessThanK(self, nums: List[int], k: int) -> int:
     return total_count
 ``` 
 
-### Fixed Window Size K
+#### Fixed Window Size K
 - In this situation we just build out K, and then add in `Arr[i]` and remove `Arr[i - k]`
 ```
 function fn(arr, k):
@@ -231,7 +240,54 @@ function fn(arr, k):
     return ans
 ```
 
-## Prefix Sum
+### Prefix Sum
 - A prefix sum array allows us to get the ***sum of subarrays*** throughout a problem
 - Typically this is done by building an array that holds the cumulative sum up to a certain point, and then doing `pfxSum[right] - pfxSum[left - 1]` or `pfxSum[right] - pfxSum[left] + nums[left]` which would get us the sum between [left, right] inclusive
 - It costs $O(n)$ to build, and then access is random so it's $O(1)$ to find sum of subarray gives it's 2 indexes
+- The Prefix Sum also comes up in [Tree Traversal](/docs/technical%20writing/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) because we can use it during a tree traversal technique to find things like 
+    - *Total number of paths that sum to X*
+    - *Total number of paths less than or equal to X*
+    - etc
+    - The same "problems" that Prefix Sum solves for Arrays it can solve for in Trees as well
+
+### Example
+
+One dimensional Prefix Sum is easy, it's just a cumulative sum!
+![1D Array](./images/oned_pfxsum.png)
+
+
+2D Prefix sums are harder because you need to keep track of adjacent cells, however this is useful in Arrays, [Dynamic Programming](/docs/technical%20writing/dsa/10.%20dynamic%20programming/index.md), and some [Graph](/docs/technical%20writing/dsa/8.%20trees%20&%20graphs/index.md#graphs) problems 
+![2D Array](./images/twod_pfxsum.png)
+
+There are even [tree path prefix](/docs/technical%20writing/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) sums!
+
+
+#### Subarray Sum = k
+Mostly goes off the fact that given a Prefix Sum / Cumulative Sum, at any point 
+$cSum[index_j] - cSum[index_i] = \sum_{k=i}^{j} x_k$
+which just means we can find some target $t$ by using a hashmap
+```
+# nums =    [1, 2, 4, -2], t = 4
+# pfxSum =  [1, 3, 7, 5]
+# for any num, j, we'd look for i such that difference of j - i
+# j - i = t i.e. j = t + i
+# if i = 1, we'd be looking for 4 + 1 = 5
+# if i = 3 we'd be looking for 4 + 3 = 7
+# [1, 2, 3] t = 3
+# [1, 3, 6]
+# {1: [0], 3: [1], 6: [2]}
+# 1 look for 4, 3 look for 3, 6 look for -3
+resp = 0
+
+pfxSum = [nums[0]]
+pfxMap = defaultdict(int)
+for num in nums[1:]:
+    cumulSum = num + pfxSum[-1]
+    pfxSum.append(cumulSum)
+    resp += pfxMap[cumulSum - t]
+    pfxMap[cumulSum] += 1
+    
+            
+
+return(resp)
+```

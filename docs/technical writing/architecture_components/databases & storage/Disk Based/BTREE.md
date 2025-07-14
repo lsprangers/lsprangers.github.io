@@ -1,10 +1,14 @@
 ---
 layout: technical
-title: Databases & Storage - Disk Based B Trees
+title: B Trees
 category: Architecture Components
 difficulty: Advanced
 description: Discussion around Disk Based Databases
 ---
+
+# Table of Contents
+- [BTree](#btree)
+- [Implementation](#implementation)
 
 # BTree
 B-Tree's are a durable, on disk, database storage structure 

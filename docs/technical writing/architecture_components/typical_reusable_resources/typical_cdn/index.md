@@ -1,4 +1,12 @@
-# CDN
+---
+layout: technical
+title: Distributed CDN
+category: Architecture Components
+difficulty: Advanced
+description: Architecting a CDN Solution
+---
+
+## Distributed CDN
 - ***Proxy Server*** - Is a server that sits between a client and an origin server
     - Could be a load balancer
     - Could simply be a traffic migration server
@@ -17,7 +25,7 @@
     - Load Balancers help us to distribute the reads to a CDN cluster to one of many of the CDN servers in that cluster
         - Remember that data replication allows us to linearly scale read throughput
 
-## Components
+### Components
 - ***Request Routing System*** are used to direct client requests to the nearest CDN 
 - ***Proxy Servers*** are used to serve the actual content from RAM to clients
 - ***Distribution System*** is responsible for distributing content to the actual Proxy Servers in different CDN facilities
@@ -43,19 +51,19 @@
         - Depending on Network Distance + Load on Proxy Servers the DNS redirect will choose a specific Proxy to send client to
         -  ![CDN DNS](./images/cdn_dns.png)
 
-### Routing Methods
+#### Routing Methods
 - Anycast is a methodology where all edge servers in multiple locations share the same IP address
 - Multiplexing involves sending a client a list of candidate Proxy Servers
 - HTTP Redirection is when an Origin Server responds with an HTTP protocol to URI of content
     -  ![CDN Redirect](./images/cdn_redirect.png)
 
-### Content Consistency
+#### Content Consistency
 - Always a risk that data on CDN Proxy Servers will be inconsistent with Origin Servers
 - Pull CDN's will do periodic polling - this is unnecessary bandwidth on Origin Servers
 - Time To Live (TTL) is a better option than periodic polling, because we can set the TTL of very static content to be longer
 - Leases also work well because they are a promise to the Proxies that if the data should change anytime before the Lease is up, the Origin will notify Proxies
 
-#### Cache Invalidation
+##### Cache Invalidation
 - What It Is:
     - The process of removing or updating stale content from CDN caches to ensure users receive the most up-to-date data
 - Strategies:
@@ -65,7 +73,7 @@
 - Why It Matters:
     - Ensures consistency between the origin server and CDN caches, especially for dynamic or frequently updated content
 
-### Security
+#### Security
 - TLS/SSL Termination:
     - CDNs often handle SSL/TLS termination to offload encryption/decryption from origin servers
 - DDoS Protection:
@@ -77,7 +85,7 @@
 - Geo-Blocking:
     - Restricting access to content based on geographic location
 
-### Performance Optimizations
+#### Performance Optimizations
 - Compression:
     - CDNs often compress content (e.g., Gzip, Brotli) to reduce bandwidth usage and improve delivery speed
 - Edge Computing:
@@ -87,7 +95,7 @@
 - Connection Reuse:
     - Using persistent connections (e.g., HTTP/2) to reduce latency for multiple requests
 
-#### Monitoring and Observability
+##### Monitoring and Observability
 - Metrics Tracked:
     - Cache hit/miss ratio
     - Latency and response times
@@ -97,7 +105,7 @@
     - Helps optimize cache performance and troubleshoot issues
     - Provides insights into user behavior and traffic patterns
 
-## CDN Use Cases
+### CDN Use Cases
 - Static Content Delivery:
     - Images, CSS, JavaScript, videos, and other static assets
 - Dynamic Content Acceleration:
@@ -109,7 +117,7 @@
 - E-Commerce:
     - Delivering product images, reviews, and personalized recommendations quickly
 
-### CDN Integrations
+#### CDN Integrations
 - Load Balancers:
     - CDNs often work with load balancers to distribute traffic across multiple origin servers
 - DNS:

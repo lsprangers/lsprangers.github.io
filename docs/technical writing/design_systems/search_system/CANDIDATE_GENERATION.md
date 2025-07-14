@@ -1,6 +1,6 @@
 ---
-layout: page
-title: Search System - Candidate Generation
+layout: technical
+title: Candidate Generation
 description: Discussion around Candidate Generation in the context of search and recommendation systems
 show_back_link: true
 ---
@@ -20,14 +20,14 @@ show_back_link: true
 - [Two Towers](#two-tower)    
 - [DNN For Candidate Generation](#dnn-for-candidate-generation)
 
-# Candidate Generation
+## Candidate Generation
 The reason candidate generation is so useful, is because it typically allows us to reduce our search space from the entire corpus, typically petabytes in size, to a searchable susbscape of typically hundreds or thousands of items
 
 It's also done relatively quickly, ideally in a way where we can index / lookup a matrix or user history in a relatively fast fashion, on services that have been updated in the background by our web servers. Basically, we are hoping that as users use our service their item and user history have been being updated and sent to our search systems in real-time, and when we need this information our architecture is setup to be real-time responsive
 
 In Candidate Generation, ***Queries are Users and we compare them to Items***
 
-## User-Item Matrices
+### User-Item Matrices
 Our [Embeddings](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md) concept paper discusses this in detail, but for all of our systems we generally have 2 key components - queries (users) and items
 
 Over time users engage with items (which might be other users!), and this is a scorable numeric metric - they either rank them (movies), watch them (Youtube video watch time), read them (Newspaper post read through length), or engage with them (check another users page)
@@ -55,14 +55,14 @@ $$
 
 With this setup we have now projected our Users and Items into an Embedding Space $E \in \real^v$ where $v$ defines the total number of videos in our corpus. Since $v$ is probably humongous, we can use [Matrix Factorization](#matrix-factorization) to decompose this into two separate matrices $U \in \real^\left\{v'\right\}, I \in \real^\left\{v'\right\}$ where $v' \leq v$ to ultimately reduce the total size of our search space while preserving information
 
-## Similarity
+### Similarity
 If we want to find similar users, we have a search function $S: E \times E \rightarrow \real$ where $S(q, x)$ has a query $q$ and compares it to each other embedding $x$ in our embedding space to find similar vectors $x$, which may be Users or Items. This allows us some flexibility in "find similar users / items to user Q" and then we can use [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann) to find the Top K nearest vectors
 
 Our [Vector Similarity Scoring](/docs/technical%20writing/nn_and_llm/EMBEDDINGS.md#vector-similarities) can be anything from Cosine to Dot products, but for this example if we normalize all of the vectors down to $[0, 1]$ we should be able to use either. 
 
 In any other example, a popular video tends to coincide with larger norms, and so our recommendation would probably favor those videos with the Dot product
 
-# Filtering and Factorization
+## Filtering and Factorization
 Filtering leverages the idea that users who have agreed in the past will agree in the future, based on user similarity or item similarity
 
 In either way we can use embedding matrices for Queries (Users) $U$ or Items $I$, or a combination of them. Similarity between items is calculated using metrics such as cosine similarity, Pearson correlation, or Jaccard index
@@ -73,7 +73,7 @@ This example from Google shows how if we have $m$ Playlists who have $n$ songs w
 This is similar to facrotizing User x Item matrix, and then doing a dot product with $n$ items to find what ones would be useful to User. It's a bit odd because we're saying we can compare Track Embeddings to Playlist Embeddings, but ultimately we're calculating the interaction score / goodness score of adding a new Track to a Playlist
 ![Google Songs](./images/google_songs.png)
 
-## Item Content Filtering 
+### Item Content Filtering 
 - Recommends items to a user based on the similarity between items
 - If each of our items has some generic features that describe it, similar to our User-Item matrices we can just host all of these features in a matrix and consider it our ***Item Embeddings***
 - If we have a binary set of features, then the Dot product over them is basically a count of the number of similar features!
@@ -84,10 +84,10 @@ This is similar to facrotizing User x Item matrix, and then doing a dot product 
 | Don't need user information for items| |
 | Can compute quickly, and in a distributed manner| Matrix has a large memory footprint |
 
-## User-Item Collaborative Filteringit 
+### User-Item Collaborative Filteringit 
 Collaborative Filtering allows us to use Users and Items *at the same time!*. It recommends items to user A based on the preferences / history of similar user B
 
-### How Collaborative Filtering Works
+#### How Collaborative Filtering Works
 - Desire is to predict user preferences based on previous history
 - Set of users $U$
 - Set of items $I$ that are to be recommended to $U$
@@ -114,7 +114,7 @@ Collaborative Filtering allows us to use Users and Items *at the same time!*. It
 | Clean interface / interaction| Sparse datasets that take up a lot of memory |
 | Can randomly seed user with user demographics| Popular items get a disproportionate amount of attention|
 
-### Collaborative Filtering Algorithm
+#### Collaborative Filtering Algorithm
 Typically has a User-Item Matrix where Users are rows and Items are columns
 ***The below matrix is our embeddings, and as far as this page is concerned, that's it!***
 
@@ -181,14 +181,14 @@ function calculate_similarity(user_vector1, user_vector2):
 ```
 
 
-## Matrix Factorization
+### Matrix Factorization
 Matrix factorization is a technique used in recommender systems to decompose a large matrix into smaller matrices. This technique is particularly useful for collaborative filtering, where the goal is to predict user preferences for items based on past interactions.
 
 For the above discussion on [Collaborative Filtering](#collaborative-filtering), we noticed one of the Cons was that this was a gigantic matrix and it's difficult to actually run the collaborative filtering algorithm to find similar users...we need a way to get past this
 
 Matrix factorization can help!
 
-### Explanation
+#### Explanation
 1. **Decomposition**:
     - Using the Matrix $M_{ui}$ from our discussion in [collaborative filtering algorithm](#collaborative-filtering-algorithm) where the $U$ rows represent Users and the $I$ columns represent Items
     - [Matrix factorization](https://developers.google.com/machine-learning/recommendation/collaborative/matrix) decomposes the original matrix into two lower-dimensional matrices:
@@ -207,7 +207,7 @@ Matrix factorization can help!
    - The decomposition is typically achieved through optimization techniques that minimize the difference between the original matrix and the product of the two lower-dimensional matrices.
    - Common optimization methods include Singular Value Decomposition (SVD) and Alternating Least Squares (ALS).
 
-### Formula
+#### Formula
 Given a user-item interaction matrix $ R $, matrix factorization aims to find matrices $ U $ and $ V $ such that:
 $$
 R \approx U \cdot V^T
@@ -225,7 +225,7 @@ First thoughts
         - We could treat the unobserved values as 0 to combat this, but that leads to a gigantic sparse matrix
 - So we know we need to hold the unobserved observations and learn against them, but we know that's a gigantic matrix that we need to somehow solve for
 
-### Weighted Matrix Factorization
+#### Weighted Matrix Factorization
 - Weighted Matrix Factorization (WMF) breaks things up between observed and unobserved observations
     - This is helpful because the unobserved observations can be in the range of millions - for all the videos on YouTube, any user probably watches ~100 but there are millions of unobserved ones
     - Therefore WMF allows us to introduce a new hyperparameter, $w_0$, that helps us to weight those unobserved observations and to reduce the computational complexity of it
@@ -261,7 +261,7 @@ Solving for this equation:
     - For items with absolutely no embeddings: Most use cases will just average the embeddings of items in a similar "category" as defined by domain knowledge, and then use that as a starting point to iterate and update
     - For a new item or new user with limited interactions, one single iteration of WALS should give us a useful embedding by holding the other category fixed and finding the closest other item given any interactions
 
-# DNN For Candidate Generation
+## DNN For Candidate Generation
 - DNN will allow us to solve the Cons listed above for filtering
     - Using side features
     - Cold start
@@ -278,7 +278,7 @@ DNN allows us to reduce latency during serving time by decoupling Query Embeddin
 Here's an example of architecture from Google's Blog
 ![Two Towers Example from Google](./images/google_twotowers.png)
 
-## Two Towers
+### Two Towers
 Two Towers will also generate embeddings for users and items, similar to Matrix Factorization, except in this scenario there's one tower for Queries (Users), and one tower for Items. If we ran Two Towers for the same Factorization problem above about Playlist and Tracks it'd look like this
 ![TT Songs](./images/twotowers_songs.png)
 
@@ -286,7 +286,7 @@ The Two Towers will allow us to create Dynamic, and maybe even [attended to](/do
 
 This will allow us to bypass the cold start problem, and the static embedding problem, but increases our latency as we need to use another DNN call in our Ranking service
 
-## Multi Tasks Learning
+### Multi Tasks Learning
 The tasks of this model are important, if we strictly focus on "probability of engaging" we might end up recommending click-bait videos, or if we do "time spent watching" it might recommend videos that try to get the user to keep watching long into the videos
 
 Ultimately we want to use simple tasks to find relevant content for the users, and we could use multi-task learning to do so

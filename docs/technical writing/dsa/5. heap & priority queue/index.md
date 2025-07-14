@@ -1,6 +1,16 @@
+---
+layout: technical
+title: 5. Heap & Priority Queues
+category: Data Structures & Algorithms
+difficulty: Advanced
+description: Heap & Priority Queues
+show_back_link: true
+---
+
 # Table of Contents
 - [Heap & Priority Queue](#heap--priority-queue)
-# Heap / Priority Queue
+
+## Heap / Priority Queue
 |Type        | Insert     | Search (Max only)     | Delete     |
 |------------|------------|------------|------------|
 |Best Case   | O(logn)       | O(1)       | O(logn)       |

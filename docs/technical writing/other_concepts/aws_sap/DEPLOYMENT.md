@@ -1,7 +1,7 @@
-# Deployment and Instance Management
+## Deployment and Instance Management
 This section is all around how to deploy and manage code, applications, and machines
 
-# Elastic Beanstalk
+## Elastic Beanstalk
 - Elastic Beanstalk is a developer centric view of deploying an application on AWS
 - Helpful for porting on-prem to cloud with minimal changes
     - If you can dockerize your container, you can deploy on Beanstalk
@@ -27,7 +27,7 @@ This section is all around how to deploy and manage code, applications, and mach
         - Use Route53 weighted routing to redirect small amounts of tradffic to Green, and shift over time
         - Beanstalk "Swap URLS" DNS Swap feature
 
-# Code Deploy
+## Code Deploy
 - Helps us to Deploy code!
 - Deploy new versions of code to EC2, Docker containers on ECS, etc...
 - Ansible, Terraform, Chef, Puppet, etc... are useful, but can use AWS CodeDeploy out of the box with EC2, ECS, ASG, and Lambda
@@ -59,7 +59,7 @@ This section is all around how to deploy and manage code, applications, and mach
         - Supports Canary deployment `10Percent5Minutes`
         - CodeDeploy just ensures that ECS Task definitions get shifted over time, and then ensures stability
 
-# CloudFormation
+## CloudFormation
 - Brings IaC into AWS
 - Helps to port across accounts and regions
 - Backbone of:
@@ -95,7 +95,7 @@ This section is all around how to deploy and manage code, applications, and mach
 - Can handle imports into individual, or entire stacks
     - Need to create a template that describes the entire stack including currently tracked resources, and newly desired imported resources
 
-# AWS Service Catalog
+## AWS Service Catalog
 - For users new to AWS who have too many options
 - Allows users to access a self-service portal with authorized access
 - Bascially allows users to see pre-authorized resources defined by admins, and then helps them to deploy apps using those resources
@@ -108,7 +108,7 @@ This section is all around how to deploy and manage code, applications, and mach
 - Helps w/ governance, compliance, and security
 - Integrates with 3rd party portals like ServiceNow
 
-# Serverless Application Model (SAM)
+## Serverless Application Model (SAM)
 - Framework for developing and delpoying serverless apps
 - All configs are done via YAML code
     - Lambda, DynamoDB, API GW, Step Functions, etc
@@ -122,14 +122,14 @@ This section is all around how to deploy and manage code, applications, and mach
         - CodeDeploy helps to shift traffic on lambdas
 - Just need to remember SAM uses CodeDEploy on backend for lambdas
 
-# AWS CDK
+## AWS CDK
 - Cloud Development Kit
 - Define clodu infra using familiar language (Python, JS, Java, etc..)
 - When you don't want to use CF directly with YAML
     - After writing CDK it will compile into CFormation YAML
 - Allows for for loops, file access, and other things that YAML can't handle
 
-# AWS SSM
+## AWS SSM
 - Helps to manage cloud and on-prem VM's
 - Need to install SSM agent, or use AMI with it pre-installed
     - Installed by default on AWS Linux AMI + some Ubuntu AMI
@@ -178,7 +178,7 @@ This section is all around how to deploy and manage code, applications, and mach
     - Across all these groups we can use Automation Runbooks via SSM Runbook Automations to resolve the incidents
     - EventBridge and CloudWatch Alarms can create OpsItem events
     
-# AWS Cloud Map
+## AWS Cloud Map
 - Fully managed resource discovery service
 - Helps with service discovery / DNS routing + redeployment
 - Moving from V1 to V2 of a backend service from a frontend service

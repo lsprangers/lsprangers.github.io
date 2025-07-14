@@ -1,5 +1,13 @@
-# Table of Contents
+---
+layout: technical
+title: Layer Normalization
+category: NN and LLM
+difficulty: Advanced
+description: Discussions around Layer Norm
+show_back_link: true
+---
 
+# Table of Contents
 - [Layer Normalization](#layer-normalization)
   - [LayerNorm vs Generic Normalization](#layernorm-vs-generic-normalization)
 - [BatchNorm](#batchnorm)
@@ -7,7 +15,7 @@
     - [Vanishing / Exploding Gradient](#vanishing--exploding-gradient)
     - [Internal Covariate Shift Problem](#internal-covariate-shift-problem)
 
-# Layer Normalization
+## Layer Normalization
 Layer normalization is a technique used in NN's to normalize the activations of a layer, making training more stable and faster
 
 Basically, it helps to ensure activations (inputs) have "normal", or at least more consistent, distribution
@@ -16,7 +24,7 @@ It's the same idea as why we normalize our features for Regression, Classificati
 
 Layer Normalization operates by calculating the mean and variance of the inputs for each sample, and then applying normalization transformation on top of it
 
-## LayerNorm vs Generic Normalization
+### LayerNorm vs Generic Normalization
 TLDR;
 - For each sample (row), you compute the mean and variance across that sample’s features.
 - Each feature in the row is normalized using the statistics (mean/variance) of that row only.
@@ -42,7 +50,7 @@ $ \sigma^2 = \frac{1}{d} \sum_{i=1}^d (x_i - \mu)^2 $
 $\text{LayerNorm}(x) = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}}$
 
 
-## BatchNorm
+### BatchNorm
 TLDR;
 - For each feature (column), you compute the mean and variance across the batch (i.e., across all samples (rows) for that feature (column)).
 - Each feature is normalized using the statistics of that feature across all samples in the batch.
@@ -63,8 +71,8 @@ $\sigma_j^2 = \frac{1}{k} \sum_{i=1}^k (x_{i,j} - \mu_j)^2$
 
 $\text{BatchNorm}(x_{i,j}) = \frac{x_{i,j} - \mu_j}{\sqrt{\sigma_j^2 + \epsilon}}$
 
-# What It Solves
+## What It Solves
 
-## Vanishing / Exploding Gradient
+### Vanishing / Exploding Gradient
 
-## Internal Covariate Shift Problem
+### Internal Covariate Shift Problem

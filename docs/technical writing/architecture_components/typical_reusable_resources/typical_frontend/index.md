@@ -1,10 +1,18 @@
-# Typical Frontend
+---
+layout: technical
+title: Distributed FrontEnd
+category: Architecture Components
+difficulty: Advanced
+description: Architecting a FrontEnd Solution
+---
+
+## Distributed Frontend
 This is one of the common components we'd use across products, and is comprised of a static name / IP for a load balancer and some services
 
-## Architecture
+### Architecture
 ![Typical FrontEnd](images/typical_loadbalancer.png)
 
-## VIP 
+### VIP 
 Virtual IP (VIP) is an IP address not tied to a physical network interface
 - On AWS we can think of Elastic IP for network load balancer
 - Basically allows clients to connect to a single IP address

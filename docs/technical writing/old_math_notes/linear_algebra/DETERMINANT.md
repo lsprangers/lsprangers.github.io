@@ -1,4 +1,13 @@
-# Determinant
+---
+layout: technical
+title: Determinants
+category: Old Math Notes
+difficulty: Advanced
+description: Linear Algebra
+show_back_link: true
+---
+
+## Determinant
 Determinant is based on Transformations, and can therefore be extended to matrices
 
 Determinants help us to quantify how much Transformations scale unit areas of a metric space - meaning in a 2 dimensional space with $i$ and $j$ unit vectors, meaning a 1x1 = 1 area, if our Transformation $T$ turns that into a 2x3 area then our determinant would be 6
@@ -20,11 +29,11 @@ $$
 \det(A) = ad - bc
 $$
 
-# Theorems
+## Theorems
 
-## Commutative Product
+### Commutative Product
 The commutativity makes sense because it would just be 2 transformations chained onto each other...most linear transformations are just linear chains of transformations, so having the determinant also be one isn't surprising
 
 $det(A) \times det(B) = det(AB)$
 
-# Problems
+## Problems

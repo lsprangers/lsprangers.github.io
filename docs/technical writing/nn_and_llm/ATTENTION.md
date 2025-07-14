@@ -1,3 +1,12 @@
+---
+layout: technical
+title: Attention
+category: NN and LLM
+difficulty: Advanced
+description: Discussions around the Attention mechanism in Transformers and LLMs
+show_back_link: true
+---
+
 # Table of Contents
 - [Attention](#attention)
   - [Self Attention](#self-attention)
@@ -16,7 +25,7 @@
     - [Summary of Encoder-Decoder Attention](#summary-of-encoder-decoder-attention)
     - [Training and Loss](#training-and-loss)
 
-# Attention
+## Attention
 Attention is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
 
 Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results
@@ -27,10 +36,10 @@ How is this done? Attention mechanisms in our DNN models. There are multiple for
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
-## Encoding Blocks
+### Encoding Blocks
 The main layer we focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
-### Self Attention
+#### Self Attention
 Self Attention allows words in a single sentence / document to attend to each other to update word embeddings in itself. It's most commonly used when we want a sentence's word embeddings to be updated by other words in the same sentence, but there's nothing stopping us from using it over an entire document.
 
 It was born out of the example of desiring a different embedding outcome of the word bank in:
@@ -41,12 +50,12 @@ Via Self Attention, the word "bank" in the two sentences above would be differen
 
 Self Attention is a mechanism that uses context words (**Keys**) to update the embedding of a current word (**Query**). It allows embeddings to dynamically adjust based on their surrounding context.
 
-### Example
+#### Example
 Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning.
 
 ![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
 
-### Key, Query, and Value Matrices
+#### Key, Query, and Value Matrices
 
 - **Query (Q)**:
    - Represents the word being attended to
@@ -62,7 +71,7 @@ Consider the phrase "fluffy blue creature." The embedding for "creature" is upda
 
 These matrices are learned during training and updated via backpropagation
 
-### How Self Attention Works
+#### How Self Attention Works
 TLDR;
 - The Query vector $Q_i$ represents the current word
 - The Key vector is an embedding representing every other word $K_j \forall  \left\{j \neq i\right\} $
@@ -124,7 +133,7 @@ In depth mathematical explanation below
      $
 ![Multi Headed Attention](./images/multi_attn.png)
 
-### Positional Encoding
+#### Positional Encoding
 
 - Since Self Attention does not inherently consider word order, **Positional Encoding** is added to input embeddings to encode word positions
 - Positional encodings are vectors added to each input embedding, allowing the model to distinguish between words based on their positions in the sequence
@@ -133,7 +142,7 @@ In depth mathematical explanation below
    - We all know neural nets like linear functions! So it's helpful in ensuring a relationship that's understandable 
 ![Positional Encoding](./images/positional_encoding.png)
 
-### Residual Connections and Normalization
+#### Residual Connections and Normalization
 
 - Each encoder layer includes a **residual connection** and **normalization layers** to stabilize training and improve gradient flow
 - This happens after both Self Attention Layer and Feed Forward Layer in the "Add and Normalize" bubble
@@ -147,7 +156,7 @@ In depth mathematical explanation below
 
 ![Self Attention Encoding](./images/summary_self_attention_encoding.png)
 
-### Summary of Self Attention Encoding
+#### Summary of Self Attention Encoding
 
 1. **Input Embedings**:
    - We take our input words, process them, and retrieve static embeddings
@@ -183,14 +192,14 @@ This diagram below shows one single encoding block using Self Attention
 
 ![Self Attention Encoding](./images/summary_self_attention_encoding.png)
 
-### Masked Self Attention
+#### Masked Self Attention
 - In Masked Self Attention, it's the same process as Self Attention except we mask a certain number of words so that the $ Q \cdot K $ results in 0 effectively removing it from attention scoring
     - In BERT training we mask a number of words inside of the sentence
     - In GPT2 training we mask all future words (right hand of sentence from any word)
    
 ![Masked Self Attention](./images/masked_self_attention.png)
 
-### Context Size and Scaling Challenges
+#### Context Size and Scaling Challenges
 
 - The size of the $ Q \cdot K $ matrix grows quadratically with the context size ($ n^2 $), making it computationally expensive for long sequences.
 - To address this, masking is used to prevent future words from influencing current words during training (e.g., in autoregressive tasks).
@@ -200,11 +209,11 @@ This diagram below shows one single encoding block using Self Attention
         - Since for an entire sentence during training for each word we try to predict the next, so if there are 5 words there’s 1, 2, 3, 4, 5 training examples and not just 1
         - Don’t want 4 and 5 to interfere with training 1, 2, 3
  
-## Encoder-Decoder Attention
+### Encoder-Decoder Attention
 
 Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., translation, summarization) to transform an input sequence into an output sequence. It combines **Self Attention** within the encoder and decoder blocks each, and then **cross-attention** between the encoder and decoder
 
-### How Encoder-Decoder Attention Works
+#### How Encoder-Decoder Attention Works
 
 ![Encoder To Decoder Summary](./images/encoder_to_decoder.png)
 
@@ -284,7 +293,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
      - A **linear layer** to expand the vector to the vocabulary size
      - A **softmax layer** to produce a probability distribution over the vocabulary for the next token
 
-### Visual Representation
+#### Visual Representation
 
 1. **Encoder Block**:
    - Self Attention → Feed Forward → Output to next encoder block.
@@ -296,7 +305,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
    - The final decoder output is passed through a linear layer and softmax to produce the next token.
 ![Encoder Decoder Step](./images/encoder_decoder_step.png)
 
-### Summary of Encoder-Decoder Attention
+#### Summary of Encoder-Decoder Attention
 
 1. **Encoder**:
    - Processes the input sequence and generates contextual embeddings using self-attention.

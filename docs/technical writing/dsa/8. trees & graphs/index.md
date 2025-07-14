@@ -1,7 +1,15 @@
-# Trees and Graphs
+---
+layout: technical
+title: 8. Trees & Graphs
+category: Data Structures & Algorithms
+difficulty: Advanced
+description: Examples, definitions, and general knowledge around Trees & Graphs
+show_back_link: true
+---
 
-## Table of Contents
+# Table of Contents
 - [Trees](#trees)
+  - [Prefix Sum](#prefix-sum)
   - [Binary Search Tree](#binary-search-tree)
   - [Self-Balancing Binary Search Tree](#self-balancing-binary-search-tree)
     - [AVL Tree](#avl-tree)
@@ -18,6 +26,86 @@
     - [Dijkstra](#dijkstra)
 
 ## Trees
+
+### Prefix Sum
+- The Prefix Sum is defined, for 1-D arrays, in [Arrays and Strings](/docs/technical%20writing/dsa/1.%20arrays%20&%20strings/index.md#prefix-sum)
+- The Prefix Sum also comes up in Tree Traversal because we can use it during a tree traversal technique to find things like 
+    - *Total number of paths that sum to X*
+    - *Total number of paths less than or equal to X*
+    - etc
+    - The same "problems" that Prefix Sum solves for Arrays it can solve for in Trees as well
+  
+There is just one thing that is particular for the binary tree...there are two ways to go forward - to the left and to the right
+
+To keep parent->child direction, we shouldn't blend prefix sums from the left and right subtrees in one hashmap
+![Tree Path Prefix Sum](./images/tree_pfxsum.png)
+
+So to do this for Binary Tree we start off by defining some global variables
+```
+class Solution:
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
+
+    resp = 0
+    target = targetSum
+    freq = defaultdict(int)
+    preorder(root, 0)
+    return(resp)
+```
+And then we need to create the traversal code
+
+Weird part is removing it from `freq` after passing, but just means we take it out so other traversals aren't affected by it, and is from [Backtracking](/docs/technical%20writing/dsa/9.%20backtracking/index.md) - it ensures that when you return from a recursive call (i.e., move back up the tree), the prefix sum count for the current path is removed from the frequency map
+
+```
+target = 3
+  1
+ / \
+2   3
+
+root(1) - currSum = 1, freq = {0:1, 1:1}
+left to 2 - currSum = 1 + 2 = 3, freq = {0:1, 1:1, 3:1}
+Done
+Move back up
+freq[3] -= 1 --> freq = {0:1, 1:1, 3:0}
+Right to 3 - currSum = 1 + 3 = 4, freq = {0:1, 1:1, 3:0, 4:1}
+```
+Although this wouldn't affect this specific problem, with a large enough tree there'd be sums thrown all throughout here that would most likely affect the outcome
+
+```
+# Definition for a binary tree node.
+# class TreeNode:
+#     def __init__(self, val=0, left=None, right=None):
+#         self.val = val
+#         self.left = left
+#         self.right = right
+class Solution:
+    def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
+        def preorder(curr: Optional[TreeNode], currSum: int) -> None:
+            nonlocal resp # use the global variable
+
+            # check existence here, not if left then left, if right then right
+            if not curr:
+                return
+            
+            currSum += curr.val
+            if currSum == target:
+                resp += 1
+
+            resp += freq[currSum - target]
+            freq[currSum] += 1
+            preorder(curr.left, currSum)
+            preorder(curr.right, currSum)
+
+            # Remove this from map so we don't use it in other parts of tree
+            freq[currSum] -= 1
+
+        resp = 0
+        target = targetSum
+        freq = defaultdict(int)
+        preorder(root, 0)
+        return(resp)
+
+```
+
 ### Binary Search Tree
 
 ### Self-Balancing Binary Search Tree
@@ -73,7 +161,7 @@ void buildSegTree(vector<int>& arr, int treeIndex, int lo, int hi)
 
 ## Graphs
 
-### Graph Traversal
+## Graph Traversal
 - Traversing a graph has generally 2 strategies, either Depth first or Breadth first
 - Depth first means exactly as it says, from any single node you traverse as far down / as far away as you can possibly go
 - Breadth first on the other hand means from any node you explore each degree, or "level away", equally

@@ -1,12 +1,20 @@
+---
+layout: technical
+title: Cassandra
+category: Architecture Components
+difficulty: Advanced
+description: Discussion around Cassandra
+---
+
 # Table of Contents
 TODO
 
-# Cassandra
+## Cassandra
 Cassandra is an Open Source, Apache Licensed, Distributed, NoSQL, "KV" Database 
 
 To be fair, it can be used and abused in many ways, but at the end of the day we're partitioning data across nodes via a `partitionKey`, and accessing our data via that `partitionKey`, so it can be equated to KV, but we could also get multiple keys and some people abuse this in weird ways
 
-## Concepts
+### Concepts
 
 Below is a short walkthrough that will help with some downstream design decisions
 
@@ -79,9 +87,9 @@ Below is a short walkthrough that will help with some downstream design decision
 - ![Key Uses](./images/cassandra_key_uses.png)
 
 
-## Indexes
+### Indexes
 
-### Primary Indexes
+#### Primary Indexes
 Primary indexes are built off of Primary Key's, and should be almost instantaneous access (think of $O(1)$ lookup on Hash Table)
 
 If you have a User Table with `user_id, user_email, <other_attributes>`, your Primary Key is going to be `user_id` and should give you almost instantaneous access to email and other attributes
@@ -92,12 +100,12 @@ This is typically where Secondary Indexes come in, but they have some major pitf
 
 Because of this setup we can say that ***Primary Indexes are Global*** - i.e. the Index itself is spread across multiple Nodes, and realistically it happens because of the *Partitioner* routing PUT and GET to the right Nodes and then using the Hash Table lookup to find the right `PrimaryKey -> Row` to update
 
-## Secondary Index
+### Secondary Index
 Building a Secondary Index over `user_email` would allow us to complete that inverse query, but it would basically mean we need to store every single `user_email -> [user_id]` mapping...we see how this could go poorly
 
 User emails most likely will be 1:1 distinct with `user_id`, and so if we have 1Million rows, our Secondary Index would also be another 1Million rows
 
-### Storage Structure of Secondary Index
+#### Storage Structure of Secondary Index
 - In the above section on [Primary Indexes](#primary-indexes) we mentioned that *Primary Indexes were Global*, and the counter to that is that *Secondary Indexes are Local*
     - This means that all Secondary Indexes are made up of basically a big Union over all Partitions / Nodes
     - ![Secondary Indexes](./images/cassandra_secondary_indexes.png)]
@@ -111,7 +119,7 @@ User emails most likely will be 1:1 distinct with `user_id`, and so if we have 1
         - There might be some optimizations on ordering `user_email` and getting a Binary Search done, but if it's unordered then finding any random `user_email` would require a full seek over the entire index
 - The ***Pitfall*** here, is that high cardinality data shouldn't be used in Secondary Indexes
 
-### Solutions
+#### Solutions
 - Denormalizing data and creating Primary Indexes off of that data can ensure your data is accessible in an efficient manner
     - In this way we would:
         - Create a new table with the `user_email` as the Primary Key
@@ -128,19 +136,19 @@ User emails most likely will be 1:1 distinct with `user_id`, and so if we have 1
     - The Pantheon Reference Website mentions to create and destroy this reference
         - "If an update fails midflight, the data must not be lost. This can be achieved by designing for the Cassandra norm, of favoring false positives—that is, a reference is created before the object is created, and a reference is removed after the model has been destroyed."
 
-# Query Abilities
+## Query Abilities
 
-## Point Queries
+### Point Queries
 
-### Primary Index
+#### Primary Index
 
-### Non-Primary Index (Filtering)
+#### Non-Primary Index (Filtering)
 
-## Range Queries
+### Range Queries
 
-## Materialized View
+### Materialized View
 
-# Storage
+## Storage
 
 ## MemTable
 

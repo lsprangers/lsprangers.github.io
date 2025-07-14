@@ -1,4 +1,4 @@
-# Streaming
+## Streaming
 Streaming is basically a `while true:` over data in micro-batches
 
 It allows us to process data as it arrives, rather than waiting for the entire dataset to be available
@@ -12,12 +12,12 @@ Typical Streaming architectures will have:
 - ***Monitoring and Logging***: Tools to monitor the health and performance of the streaming pipeline. Examples include Prometheus, Grafana, and ELK Stack (Elasticsearch, Logstash, Kibana)
 - ***Checkpointing and State Management***: Mechanisms to save the state of the stream processing job to recover from failures. Examples include Apache Flink's state backend, Spark Streaming's checkpointing, and Kafka Streams' state stores
 
-## Generic Architecture
+### Generic Architecture
 ![Generic Streaming Architecture](./images/generic_streaming.png)
 - In the past generic streaming architectures were based on micro-batches and continuous operators
     - We would collect data for a few seconds, then process it, and repeat
 
-## Key Concepts
+### Key Concepts
 - **Micro-batches**: Instead of processing data as it arrives, we collect it into small batches and process those batches
     - This approach allows us to leverage batch processing techniques and optimizations
     - It also simplifies fault tolerance, as we can reprocess a failed batch rather than dealing with individual records

@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Distributed KV Store
+category: Architecture Components
+difficulty: Advanced
+description: Architecting a Distributed KV Store Solution
+---
+
 # Table of Contents
 - [Key Value Store](#key-value-store)
 - [High Level Implementation](#high-level-implementation)
@@ -22,12 +30,12 @@
   - [Combatting Permanent Failures](#combatting-permanent-failures)
   - [Quorum Example](#quorum-example)
 
-# Key Value Store
+## Key Value Store
 Basically an API over a hash map
 
 There are some other things we can do in terms of indexing, sharding, consistency, and replication that causes differences between different systems
 
-## High Level Implementation
+### High Level Implementation
 In this scenario we chose to create a distributed, sharded KV store with node ranges based on consistent hashing, and replication done via RAFT
 - Each "node" in the system is actually a RAFT cluster with one leader and multiple replicas
 - The nodes are considered fault tolerant, replicated, and consistent
@@ -35,14 +43,14 @@ In this scenario we chose to create a distributed, sharded KV store with node ra
 
 Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
 
-## Isolation Levels
-Before going into other areas, the [isolation levels](ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems
+### Isolation Levels
+Before going into other areas, the [isolation levels](./ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems
 
 We know there is always an [Availability and Consistency Tradeoff](/docs/technical%20writing/design_systems/#availability-consistency-during-network-partition) for Partitioned scalable systems, and Databases are one key area where it continually comes up. If I write a value somewhere, how do I ensure other groups reading that value see the same value...
 
-We've already gone through [Isolation Levels](ISOLATION_LEVELS.md) extensively
+We've already gone through [Isolation Levels](./ISOLATION_LEVELS.md) extensively
 
-## How things got here
+### How things got here
 Old days:
 - Single instance of DB can handle traffic
 - Backups for durability
@@ -55,28 +63,28 @@ Data grew:
 
 ![Situation](images/old_to_current.png)
 
-## Where things are
+### Where things are
 Most database clusters today are actually clusters of clusters!
 
 Sharding our database into multiple nodes, where each node handles a shard, allows us to split up our data so that it's not sitting on one single machine
 
 Replication of those nodes helps us to scale reads on those nodes, and also to provide fault tolerance
 
-![How A Current KV Cluster Looks](images/current_KV_cluster.png)
+![How A Current KV Cluster Looks](./images/current_KV_cluster.png)
 
-### Scaling
+#### Scaling
 If our database grows too large and is crashing we have 2 options - Horizontal or Vertical Scaling
 
 Vertical scaling equates to "make the compute larger" which reaches limitations very quickly, but for some teams and products this is completely fine and then we can ignore all of the issues that come up with distributed systems!
 
 Horizontal scaling is usually the route taken where we take our database and split it up into subsets
 
-## Durability
+### Durability
 Most of the time Durability is covered by [Tree Structures on Disk](./TREE_STRUCTURES_ON_DISK.md) so that we can still retrieve our data in $O(log n)$ from disk. This helps with durability and allowing us to put more of the overall KV Store onto a single node versus scaling out and trying to fit everything into RAM
 
 
-### Sharding
-[Sharding](./SHARDING.md#sharding), which is covered in a sub-document with routing, is useful when we want to have different nodes accept reads and writes for different subsets of our database, and sometimes it's required when our data can't sit on a single machine
+#### Sharding
+[Sharding](/docs/technical%20writing/architecture_components/typical_reusable_resources/typical_distributed_kv_store/SHARDING.md#sharding), which is covered in a sub-document with routing, is useful when we want to have different nodes accept reads and writes for different subsets of our database, and sometimes it's required when our data can't sit on a single machine
 
 ```
 fake table
@@ -89,14 +97,14 @@ Sharding can be done horizontally or vertically as well
     - Horizontal sharding is when we split up by rows, so maybe we have `1 a b c` in one node, and `2 d e f` in another
     - Vertical sharding is when we split things up by columns so maybe `a d g` is on one node, and `c f i` in another
 
-### Replication
+#### Replication
 For each node in a shard (or the single node in a non-sharded database) we can use [Replication](REPLICATION.md) to solve 2 major problems - Fault Tolerance and Scaling 
 
 Fault tolerance is solved by replicating the data onto other nodes, so if the main leader fails then the replica can take over
 
 Scaling can be solved by using those replicas to serve reads
 
-#### Replication and Isolation Levels
+##### Replication and Isolation Levels
 Replication is tied heavily into [Isolation Levels](ISOLATION_LEVELS.md) because the way these nodes are able to serve data depends on that isolation level
 
 The below [Replication](REPLICATION.md) implementations are all covered in the supporting document
@@ -106,7 +114,7 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
 - WAL
 - Snapshot 
 
-## Peer To Peer With Sharding
+### Peer To Peer With Sharding
 - Peer-to-peer approach is the approved method in text, which seems to be some form of quorum with replication of data on other nodes as well
     - Nodes are assigned keys based on the partition in the ring, and then there’s a replication factor n that describes how many other physically separate nodes to replicate data on 
         - We can replicate data on next 3 physically different nodes on the ring, so that if our node fails the next nodes already have the data and don’t need to shuffle
@@ -120,12 +128,12 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
 
 ![alt text](./images/p2pexample.png)
 
-# System Design
+## System Design
 - It is a Distributed Hash Table
     - Values can be BLOB’s, images, server names, or anything
     - Keys are generated by a hash function for some identifier to lookup later
 
-## Functional Requirements
+### Functional Requirements
 - Functional requirements
     - Interfaces
         - Typical interfaces such as get and put
@@ -136,14 +144,14 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
         - Each node in cluster can be different without requiring the same setup
         - Mostly means peer-to-peer design
 
-## Non Functional Requirements
+### Non Functional Requirements
 - Non-functional requirements
     - Scalable
     - Fault tolerant
 
-## Service Design
+### Service Design
 
-### Scaling
+#### Scaling
 - We can use partitioning based on hash of initial key
     - ***WRONG*** - would lead to entire data shuffles across data partitions, and heavy downtime, during autoscaling events (up or down)
 - Can use circular partitioning (i.e. modulo based) to ensure equal distribution among nodes
@@ -158,7 +166,7 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
     - We cannot use modulo based hashing, because there would be an entire shuffle for all data, and ultimately it’s never really a good idea to do this unless you’re sure of uniform load, and very infrequent scaling
     - We can use circular hashing which allows minimal shuffle of data between new nodes, and allows us to infinitely scale our nodes and ring sizes
 
-### Replication
+#### Replication
 - All depends on read/write throughput and consistency
 - *Single leader + multiple followers* - ***WRONG*** - if we have tame velocity for reading and writing
     - Leader takes all writes, and sends data out to replicas
@@ -182,7 +190,7 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
         - We can replicate data on next 3 physically different nodes on the ring, so that if our node fails the next nodes already have the data and don’t need to shuffle
     - Data replication for high durability and availability
 
-#### Sync vs Async
+##### Sync vs Async
 - Sync vs Async
     - Sync means slower writes but higher durability
     - Async means immediate response but lower consistency and possible data loss if node goes down before replicating
@@ -191,18 +199,19 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
     - Basically, we need to decide on a plan based on the requirements of the service, if it’s a high velocity write with high consistency and “always write” needs, then quorum may be the best service
     - If it’s low velocity writes, high throughput of reads, and lower consistency then we can do single leader + primary secondary + followers
 
-## Does It Meet Requirements?
+### Does It Meet Requirements?
 - Scalable
     - Partitioned data will allow us to scale 
 - Fault tolerant
     - Replication will allow us to be fault tolerant
 
-### Combatting temporary failures
+#### Combatting temporary failures
 - If we have a quorum based approach, and one of the nodes is temporarily down, we can use hinted handoffs and sloppy quorum to combat this
 - During a distributed transaction if one of the nodes is temporarily down, we cannot use it in the quorum vote and the availability of the service degrades
     - Sloppy quorum allows us to keep a preference list for all nodes so that the first n healthy nodes from the list can handle operations, and if one node is down we can continue down the list
     - If a node is down that is supposed to handle a request, and coordinator passed quorum vote back somewhere else, then once that initial node is back the receiving node will send that information back, this is a hinted handoff
-### Combatting permanent failures
+
+#### Combatting permanent failures
 - We need to speed up detection of these inconsistencies
 - Merkle Tree’s are a data structure to help us
     - The values of individual keys are hashed and used as the leaves of the tree
@@ -222,7 +231,8 @@ The below [Replication](REPLICATION.md) implementations are all covered in the s
 - Versioning allows conflict resolution even during network partitions 
     - Use write timestamps to figure out which one was written last, or maybe a more important writer vs another
 - We can force our put API requests to also require some sort of metadata context, and then our get requests also either use or return this data for consumer to reuse if multiple rows returned
-### Quorum Example
+
+#### Quorum Example
 - Example below for Quorum Read and Writes
     - N = 3
     - A, B, C, D, and E servers placed clockwise in our ring

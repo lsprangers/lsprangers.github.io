@@ -1,3 +1,11 @@
+---
+layout: technical
+title: NoSQL (Generated)
+category: Architecture Components
+difficulty: Advanced
+description: Discussion around NoSQL Databases Storage
+---
+
 # General NoSQL Databases
 
 TODO: This is all ChatGPT garbage
@@ -21,7 +29,6 @@ NoSQL databases are a class of databases designed to handle large-scale, distrib
 - [Efficiency Gains Using Indexing and Query Patterns](#efficiency-gains-using-indexing-and-query-patterns)
   - [Indexing in NoSQL Databases](#indexing-in-nosql-databases)
   - [Query Patterns](#query-patterns)
-- [Conclusion](#conclusion)
 
 ---
 

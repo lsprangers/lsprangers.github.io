@@ -1,3 +1,11 @@
+---
+layout: technical
+title: DynamoDB
+category: Architecture Components
+difficulty: Advanced
+description: Discussion around Dynamo Databases Storage
+---
+
 # Table of Contents
 TODO
 

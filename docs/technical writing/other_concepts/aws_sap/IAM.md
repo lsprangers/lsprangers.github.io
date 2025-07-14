@@ -1,16 +1,16 @@
-# IAM
+## IAM
 
 **Identity and Access Management (IAM)** allows us to define users and roles over resources via **Effects**, **Actions**, and **Resources**.
 
 ---
 
-## Key Concepts
+### Key Concepts
 
-### Identities
+#### Identities
 - Identities in AWS IAM are Users, Groups of Users, or Roles, and we can attach Policies to Identities or Resources
 - IAM Principals are Users or Roles
 
-### User
+#### User
 - A **User** represents an individual person or service that interacts with AWS resources
 - Users can have:
     - **Keys** (Access Key ID and Secret Access Key)
@@ -18,12 +18,12 @@
     - **Logins** (for the AWS Management Console)
 - Permissions are attached to Users via **IAM Policies**
 
-### User Group
+#### User Group
 - A **User Group** is just an aggregation of Users
 - Similar to other policies, denies on User groups would take precedence over Allows to a specific User
 - Otherwise User Groups follow the same standards, and a User having their own policies, multiple Group policies, and Org SCP policies would have different outcomes based on the precedence levels
 
-### Role
+#### Role
 - A **Role** is a temporary identity that can be assumed by Users, Services, or Applications
 - Key characteristics:
     - Credentials are temporary when a Role is assumed
@@ -34,20 +34,20 @@
     - Cross-account access, like EC2 spin up from Control Planes of 3rd party providers
     - Service-to-service communication (e.g., an EC2 instance accessing an S3 bucket)
 
-### Resources
+#### Resources
 - **Resources** are AWS entities that can be identified by ARNs (Amazon Resource Names)
 - Examples:
     - S3 buckets
     - EC2 instances
     - DynamoDB tables
 
-### Actions
+#### Actions
 - **Actions** correspond to API operations that can be performed on resources
 - Examples:
     - `s3:ListBucket`
     - `ec2:StartInstances`
 
-### Principals
+#### Principals
 - Principal Element:
     - The Principal element in the trust policy specifies who can assume the role
     - Examples of principals:
@@ -55,7 +55,7 @@
         - AWS Services: ec2.amazonaws.com (for EC2 instances)
         - AWS Accounts: arn:aws:iam::123456789012:root (to allow all users in an account)
 
-### Effects
+#### Effects
 - **Effects** define whether an action is allowed or denied on a resource
 - Key rules:
 - Explicit Deny takes precedence over Allow
@@ -68,14 +68,14 @@
     - Use carefully scoped Allow statements to achieve the same result
 
 
-### Variables
+#### Variables
 - IAM supports variables like `aws:Username` to dynamically scope permissions
 - Example:
     - You can scope each User to resources with their own username without defining individual IAM policies for each User
 
 ---
 
-## Policies
+### Policies
 Policies define Permissions, and we attach Policies to Identities (Users or Roles)
 
 
@@ -104,7 +104,7 @@ Policies define Permissions, and we attach Policies to Identities (Users or Role
     - These allow things like `AssumeRoleWithSAML` so that someone can Assume a Role via cookies / authentication for a short lived time
     - This is tied into [***AWS Federated Users***](#federated-users) which are users who access Resources using credentials from an External Identity Provider (IdP) rather than creating AWS user identities
 
-## Permission Boundaries
+### Permission Boundaries
 
 - **Permission Boundaries** allow you to set a standard set of permissions that can be applied to a Role or User
 - Key rules:
@@ -113,12 +113,12 @@ Policies define Permissions, and we attach Policies to Identities (Users or Role
 - Example:
   - If a Permission Boundary allows `s3:*, kafka:*` and the IAM Policy allows `EC2:*`, the User or Role will only have `s3:*, kafka:*` permissions, not the union of all three
 
-## STS
+### STS
 Security Token Service allows us to retrieve and impersonate IAM roles in other accounts that specify we can act on their behalf
 
 Impersonation / Assuming means we can have `role1:account1` and specify, via STS, that `user2:account2` can assume it's identity, meanning user 2 can act inside of account1 with the same persmissions as role1 - similar to `user2:role1:account1` 
 
-### SSO, Federated Users, and Microsoft AD
+#### SSO, Federated Users, and Microsoft AD
 ***Federated Users / Identity Federation*** provides access to externally authenticated users to your AWS account via this STS exchange
 
 Typically happens with corporations that have their own identity system like Active Directory, or if a Web/Mobile App wants to access resources on AWS but you don't want to create a user for the app user, just authenticate
@@ -179,7 +179,7 @@ ADFS SAML
 AD Replication
 ![alt text](./images/AD_replication.png)
 
-#### AWS Organization
+##### AWS Organization
 - Root Organization (OU) has an overall Management Account
     - An OU is a logical grouping of AWS accounts within an AWS Organization
 - Member Accounts (Sub-Accounts)
@@ -202,7 +202,7 @@ AD Replication
         - Ability to apply SCP to prevent Member accounts from leaving the Org
     - ***Movement***: We are able to move Member accounts across different Management Accounts by removing and inviting
 
-#### SCPs
+##### SCPs
 - Define AllowList or BlockList IAM actions
 - Applied to OU or Account level, but doesn't apply to the Management Account
     - If a Management Account applies an SCP, it affects all OU's and Accounts underneath it though
@@ -220,7 +220,7 @@ AD Replication
     - An Accounts permissions are all of it's Denies (taking precedence) with some Allows
 ![IAM Policy Evaluation](./images/iam_policy_eval_flowchart.png)
 
-#### AWS IAM Center (AWS SSO)
+##### AWS IAM Center (AWS SSO)
 - AWS IAM Center (FKA AWS SSO) allows us to have one single sign on for all:
     - AWS Accounts and Orgs
     - Business Apps
@@ -245,7 +245,7 @@ AD Replication
 ![AWS IAM ID Flow](./images/aws_iamid_flow.png)
 
 
-##### External ID
+###### External ID
 External ID's allow us to mitigate the [Confused Deputy problem](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html)
 - `role1:account1` allows `user2:account2` to assume it's role, and to perform some actions over resources
     - `account2` is usually a 3rd party provider like a consulting company
@@ -255,11 +255,11 @@ External ID's allow us to mitigate the [Confused Deputy problem](https://docs.aw
 - The ***External ID*** allows us to uniquely assign an ID to `account2`, and the company that owns `account2` should assign *A unique External ID for all of it's customers*
 - STS Session Tags in STS force each of the STS Assume Role calls to have specific tags brought along with it, which is another layer similar to External ID's, but more for internal users
 
-## IAM Access Analyzer
+### IAM Access Analyzer
 Allows us to check what resources are allowed externally, so we can establish a "ring of trust" and if anything has access to our resources outside of that, it's a ***Finding***
 
 
-## AWS Control Tower
+### AWS Control Tower
 AWS Control Tower helps to automate and establish multiple accounts under a management OU following best practices and supplying interactive dashboards
 
 Guardrails in AWS control tower provide ongoing Governance solutions
@@ -270,7 +270,7 @@ Guardrails in AWS control tower provide ongoing Governance solutions
     - Strongly Recommended
     - Elective
 
-### AWS Resource Access Manager
+#### AWS Resource Access Manager
 - AWS Resource Access Manager (RAM) allows us to share AWS reosources that you own with other AWS accounts
 - Share within any account in your Organization to avoid resource duplication
 - ***Allows us to share VPC's over Accounts***
@@ -282,14 +282,14 @@ Guardrails in AWS control tower provide ongoing Governance solutions
 - Route53 Outbound Resolver: Allows us to share our forwarding rules of our DNS services, so we can share this with other accounts so that if we update a DNS list in one account it moves to all other accounts
 
 
-# Example - Azure AD Integration with AWS
+## Example - Azure AD Integration with AWS
 Say there's an Azure AD hosted in Azure Cloud, and we wanted to reuse the user pool in AWS for multiple reasons, how can we go about this?
 
 If your company uses **Azure Active Directory (Azure AD)** in Azure Cloud and you want to reuse it in AWS, you can do following to integrate Azure AD with AWS for **identity federation**, **single sign-on (SSO)**, and **access management**.
 
 ---
 
-## 1. Use Azure AD for Identity Federation with AWS IAM
+### 1. Use Azure AD for Identity Federation with AWS IAM
 
 ***IAM Identity Center (AWS SSO)*** or ***AWS IAM*** basically allows us to create Federatd Users for AWS. This is what allows us to login to corporate SSO and then access AWS as a `LOBUser/myname`
 
@@ -311,7 +311,7 @@ Once you login you automatically assume a role, and that role can be governed by
 
 ---
 
-## 2. Use Azure AD with AWS IAM Identity Center (AWS SSO)
+### 2. Use Azure AD with AWS IAM Identity Center (AWS SSO)
 
 This is similar to the above use case, except it allows us to go into multiple accounts 
 
@@ -332,7 +332,7 @@ Would need to use permission sets and group to account mappings
 
 ---
 
-## 3. Use Azure AD with AWS Cognito for Application Authentication
+### 3. Use Azure AD with AWS Cognito for Application Authentication
 
 This AWS Cognito setup would allow us to host applications in AWS, and have them call Azure AD for IdP authentication
 
@@ -355,7 +355,7 @@ Once complete Cognito will issue a token back to the client
 
 ---
 
-## 4. Use Azure AD with AWS Directory Service
+### 4. Use Azure AD with AWS Directory Service
 We mention these specifics above, but this would allow us to extend our directory service into AWS
 
 There are many factors here around replication, syncing, and hosting that come into play
@@ -379,7 +379,7 @@ This is the situation where you setup forest trust or other trust mechanisms bet
 
 ---
 
-## 5. Use Azure AD for API Gateway Authentication
+### 5. Use Azure AD for API Gateway Authentication
 This is just using Azure AD as the OIDC provider for API GW
 
 - **What It Does**:
@@ -396,7 +396,7 @@ This is just using Azure AD as the OIDC provider for API GW
 
 ---
 
-## 6. Use Azure AD for Cross-Cloud SSO
+### 6. Use Azure AD for Cross-Cloud SSO
 - **What It Does**:
   - Azure AD provides a unified SSO experience for applications and resources across Azure and AWS.
 - **How It Works**:
@@ -410,7 +410,7 @@ This is just using Azure AD as the OIDC provider for API GW
 
 ---
 
-## Comparison of Options
+### Comparison of Options
 
 | **Option**                          | **Use Case**                                                                 | **Integration Type**       |
 |-------------------------------------|-----------------------------------------------------------------------------|----------------------------|
@@ -423,7 +423,7 @@ This is just using Azure AD as the OIDC provider for API GW
 
 ---
 
-## Best Option for Your Use Case
+### Best Option for Your Use Case
 - **For SSO Across AWS Accounts**: Use **AWS IAM Identity Center** with Azure AD as the IdP.
 - **For Application Authentication**: Use **Amazon Cognito** with Azure AD as the IdP.
 - **For Windows Workloads**: Use **AWS Managed Microsoft AD** with a trust relationship to Azure AD.
