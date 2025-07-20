@@ -11,7 +11,11 @@ Why Dynamic Programming?
 
 When a question asks us to minimize, maximize, or find the number of ways to do something, it doesn't always mean that dynamic programming is the best approach, but it is usually a good indicator that we should at least consider using a dynamic programming approach.
 
-### Memoization
+In many programming languages, iteration is faster than recursion. Therefore, we often want to convert a top-down memoization approach into a bottom-up dynamic programming one (some people go directly to bottom-up, but most people find it easier to come up with a recursive top-down approach first and then convert it; either way is fine).
+
+### Memoization Vs Top-Down
+
+
 
 ### Subsequences
 One of the most common use cases is subsequence problems
