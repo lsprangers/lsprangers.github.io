@@ -42,7 +42,7 @@ This is one of the best self supervised methods for learning latent representati
 
 In this architecture we randomly remove some section of the picture, and the goal is to re-insert the missing section
 
-In this ![image inpainting example](./images/image_inpainting_example.png) we see they pull out random sections of the photo, and then we'll end up trying to use a [GAN Architecture](./GAN.md) to regenerate the missing portion
+In this ![image inpainting example](./images/image_inpainting_example.png) we see they pull out random sections of the photo, and then we'll end up trying to use a [GAN Architecture](/docs/training_and_learning/GAN.md#gan) to regenerate the missing portion
 
 This [has been shown](https://arxiv.org/abs/1604.07379) as a useful transfer learning mechanism to use as starting weights versus random weights for segmentation tasks
 
