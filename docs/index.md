@@ -15,29 +15,26 @@ It's a structured dump of stuff I've pulled out of old word files and tweaked in
 
 ---
 
-## Design Systems
+## Architecture and Systems Design Examples
 
 This section focuses on building specific systems, often inspired by technical interviews or real-world use cases. Examples include URL shorteners, YouTube Search, Top K Heavy Hitters, and more.
 
-To implement these systems, you'll find notes on Databases, Messaging, Calculations, and other essential components.
 
-### Databases and Storage
-- Covers SQL and NoSQL architectures/products.
-- Includes discussions on Relational Databases, NoSQL Key-Value Stores, Blob Storage, and Data Warehousing Solutions.
 
-### Messaging
-- Explains how to send messages between services using Queues, Brokers, and Pub/Sub systems.
+## Architecture Components
+To implement these systems, you'll find notes under Architecture Components about databases, messaging, calculations, and other essential components.
 
-### Typical Resources
-- Discussions and implementations of "typical" resources like:
-  - Distributed Key-Value Stores.
-  - Front-end Load Balancers with Metadata.
-  - Distributed Queues.
-- Includes Kubernetes (K8s) and Terraform configurations to demonstrate how to create these systems natively.
+There's also an entire section on [Typical Resources](/docs/architecture_components/typical_reusable_resources/index.md) where we build all of the typical components from scratch such as:
+- Distributed Key-Value Stores
+  - Front-end Load Balancers with Metadata
+  - Distributed Queues
+  - Distribued Logging
+  - etc..
+- Some includes Kubernetes (K8s) and Terraform configurations to demonstrate how to create these systems natively
 
 ---
 
-## DSA
+## Data Structures & Algorithms
 
 This section contains:
 - General Data Structures and Algorithms.
@@ -65,7 +62,7 @@ A collection of generic implementations, including:
 
 ---
 
-## Leet
+## Leetcode
 
 This is a dump of **Leetcode problems** and comments, organized for easy reference.
 

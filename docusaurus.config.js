@@ -92,6 +92,7 @@ const config = {
           {to: '/resume', label: 'Resume', position: 'left'},
           {to: '/certifications', label: 'Certifications', position: 'left'},
           {to: '/projects', label: 'Projects', position: 'left'},
+          {to: '/docs/design_systems/', label: 'Systems Design', position: 'left'},
           {
             type: 'docSidebar',
             sidebarId: 'tutorialSidebar',
