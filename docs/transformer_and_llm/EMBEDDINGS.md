@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Embeddings
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around Embeddings used throughout multiple design systems
 show_back_link: true

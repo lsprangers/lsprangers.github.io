@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Search System - Inverted Index
+title: Inverted Index
 show_back_link: true
 description: Discussion around Inverted Indexes, one of the first implementations of search systems
 ---

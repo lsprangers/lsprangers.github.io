@@ -9,13 +9,13 @@ const jobs = [
     period: "November 2022 - Present",
     excerpt: "I lead a group under the Data and AI Functional Group in the KYC OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.",
     bullets: [
-      "Data and ML Platforms",
-      "Engineering manager responsibilites for Data Engineering group",
+      "Associate Director (Engineering Manager) - responsible for 4 direct reports and 3 squads",
+      "Focus on Data and ML Platforms for graph analytics, agents, search, and large scale ML features",
       "Help communicate and set strategy for SWE, MLE, DE, and Analytics across the org"
     ]
   },
   {
-    title: "ML Engineer",
+    title: "Senior ML Engineer",
     company: "Corrigo (JLL-T)",
     logo: "/img/corrigo_logo_no_left.png",
     period: "January 2022 - November 2022",

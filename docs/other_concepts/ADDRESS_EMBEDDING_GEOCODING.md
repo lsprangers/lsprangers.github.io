@@ -13,7 +13,7 @@ The tough part is getting `100 Main St, Springfield, IL` and `100 Main St, Sprin
 
 Clean data and text is by far the most useful part of all of this, and if your input data is clean you can get fairly creative with what you do to convert it into a lat/long on a map
 
-It's difficult to just [Embed](/docs/nn_and_llm/EMBEDDINGS.md) the text with any old model like [Word2Vec](/docs/nn_and_llm/EMBEDDINGS.md#word2vec) without using some serious preprocessing and context rules...chunking out the tokens is useful, and can get [decent results](https://datascience.stackexchange.com/a/108692), but ideally focusing on GeoCoding to Latitude / Longitude pairs is the better route. However, GeoCoding is tough and relies on expensive outside services, and so many groups for things like Record Linkage and Entity Resolution might just use Text Embeddings
+It's difficult to just [Embed](/docs/transformer_and_llm/EMBEDDINGS.md) the text with any old model like [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) without using some serious preprocessing and context rules...chunking out the tokens is useful, and can get [decent results](https://datascience.stackexchange.com/a/108692), but ideally focusing on GeoCoding to Latitude / Longitude pairs is the better route. However, GeoCoding is tough and relies on expensive outside services, and so many groups for things like Record Linkage and Entity Resolution might just use Text Embeddings
 
 ### Data Parsing
 If your data is not clean then you'll need some sort of cleaning / standardization on top of it

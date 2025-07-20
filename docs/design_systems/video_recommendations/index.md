@@ -105,7 +105,7 @@ For something like Netflix with more "static" content, we could simply have a sc
 
 For something like Youtube, depending on the functional requirements, we may need new videos and user-video data to be prepped as features as close to real-time as possible
 
-Let's take our new non-functional requirements, and setup new video features to be [event driven](/docs/real_time_event_architecture/index.md), and our user-item features to be daily scheduled [Spark Jobs](/docs/other_concepts/SPARK.md)
+Let's take our new non-functional requirements, and setup new video features to be [event driven](/docs/event_driven_architecture/index.md), and our user-item features to be daily scheduled [Spark Jobs](/docs/other_concepts/SPARK.md)
 
 #### Features
 The features we can create are almost unlimited

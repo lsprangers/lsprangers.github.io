@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: GPT(s)
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around GPT LLMs
 show_back_link: true

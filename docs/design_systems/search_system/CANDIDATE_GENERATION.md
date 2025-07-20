@@ -13,7 +13,7 @@ It's also done relatively quickly, ideally in a way where we can index / lookup 
 In Candidate Generation, ***Queries are Users and we compare them to Items***
 
 ### User-Item Matrices
-Our [Embeddings](/docs/nn_and_llm/EMBEDDINGS.md) concept paper discusses this in detail, but for all of our systems we generally have 2 key components - queries (users) and items
+Our [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) concept paper discusses this in detail, but for all of our systems we generally have 2 key components - queries (users) and items
 
 Over time users engage with items (which might be other users!), and this is a scorable numeric metric - they either rank them (movies), watch them (Youtube video watch time), read them (Newspaper post read through length), or engage with them (check another users page)
 
@@ -28,7 +28,7 @@ M = \begin{pmatrix}
     110 & 46 & \cdots & 38
 \end{pmatrix}
 $$
-Or maybe we can make it percentage of video watched through (it would be some [numeric feature standardization](/docs/nn_and_llm/EMBEDDINGS.md#numeric-features)) which would bring each number into the standardized range of $[0, 1]$
+Or maybe we can make it percentage of video watched through (it would be some [numeric feature standardization](/docs/transformer_and_llm/EMBEDDINGS.md#numeric-features)) which would bring each number into the standardized range of $[0, 1]$
 $$
 M = \begin{pmatrix}
     .9 & .2 & \cdots & .1 \\
@@ -45,7 +45,7 @@ The usual idea is to split this into two separate matrices $U \in \mathbb{R}^{v'
 ### Similarity
 If we want to find similar users, we have a search function $S: E \times E \rightarrow \real$ where $S(q, x)$ has a query $q$ and compares it to each other embedding $x$ in our embedding space to find similar vectors $x$, which may be Users or Items. This allows us some flexibility in "find similar users / items to user Q" and then we can use [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann) to find the Top K nearest vectors
 
-Our [Vector Similarity Scoring](/docs/nn_and_llm/EMBEDDINGS.md#vector-similarities) can be anything from Cosine to Dot products, but for this example if we normalize all of the vectors down to $[0, 1]$ we should be able to use either. 
+Our [Vector Similarity Scoring](/docs/transformer_and_llm/EMBEDDINGS.md#vector-similarities) can be anything from Cosine to Dot products, but for this example if we normalize all of the vectors down to $[0, 1]$ we should be able to use either. 
 
 In any other example, a popular video tends to coincide with larger norms, and so our recommendation would probably favor those videos with the Dot product
 
@@ -281,7 +281,7 @@ Where:
     - Another way this is done is by weighting $w_{i,j}$ carefully, and disregarding the regularization parameter entirely
 
 Solving for this equation:
-- We can use [Stochastic Gradient Descent (SGD)](/docs/nn_and_llm/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/nn_and_llm/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
+- We can use [Stochastic Gradient Descent (SGD)](/docs/training_and_learning/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/training_and_learning/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
     - SGD is more generic, but is battle tested and true
     - WALS is more specific and helpful for this specific objective
     - WALS is most likely the ideal function since both matrices we solve for are quadratic
@@ -312,9 +312,9 @@ That being said, there are methods to incrementally update these models:
     - Cold start
     - "Freshness" and bypassing "popular only" items via Dot product
 - Pretty much everything is the same for creating / fetching the user-item embeddings, but we can also add in other features such as generic user embeddings, user metadata and categorical features, and other account information that might be relevant
-- [A Softmax Layer](/docs/nn_and_llm/LOSS_FUNCTIONS.md#softmax) will allow us to do multi-class classification, where we basically predict the probability of usage over an entire corpus / corpus subset of videos
+- [A Softmax Layer](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax) will allow us to do multi-class classification, where we basically predict the probability of usage over an entire corpus / corpus subset of videos
     - The softmax layer would need to be trained over the entire corpus since any of the videos have a potential to be included in this (sub)set
-    - Since our output is a probability distribution that's comparable to truth (all 0's and a 1) we can use [cross-entropy loss function](/docs/nn_and_llm/LOSS_FUNCTIONS.md#cross-entropy)
+    - Since our output is a probability distribution that's comparable to truth (all 0's and a 1) we can use [cross-entropy loss function](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy)
 - We could also add in other hidden layers and non-linear (ReLU) layers, or anything else, to capture non-linear relationships
 - We could also change the entire hidden layers to remove the matrix factorization phase, and use the hidden layers as a way to map user features into a projected embedding layer
 
@@ -327,7 +327,7 @@ Here's an example of architecture from Google's Blog
 Two Towers will also generate embeddings for users and items, similar to Matrix Factorization, except in this scenario there's one tower for Queries (Users), and one tower for Items. If we ran Two Towers for the same Factorization problem above about Playlist and Tracks it'd look like this
 ![TT Songs](./images/twotowers_songs.png)
 
-The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/nn_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where we compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
+The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/transformer_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where we compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
 
 This will allow us to bypass the cold start problem, and the static embedding problem, but increases our latency as we need to use another DNN call in our Ranking service
 

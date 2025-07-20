@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: BERT & BART
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around Transformers
 show_back_link: true

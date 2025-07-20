@@ -90,6 +90,7 @@ const config = {
         },
         items: [
           {to: '/resume', label: 'Resume', position: 'left'},
+          {to: '/certifications', label: 'Certifications', position: 'left'},
           {to: '/projects', label: 'Projects', position: 'left'},
           {
             type: 'docSidebar',

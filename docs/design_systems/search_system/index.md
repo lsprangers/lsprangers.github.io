@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: Search System
+title: Generic Search System
 category: Design Systems
 difficulty: Advanced
 description: Complete search and recommendation system with candidate generation, ranking, and inverted index
@@ -14,7 +14,9 @@ This flow only includes the default user recommendations, and in other flows we'
 
 The dotted lines represent our [Filtering Steps](#filtering) which is the part of our rec service that should be fairly "online and up to date", whereas our [Candidate Generation](#candidate-generation) and [Ranking](#ranking) are trained / updated over time, but not always "up to date"
 
-![Ecommerce Arch](./images/SysArchTemplate-ECommerce%20Search%20System.png)
+The diagram below is for the ***Log-On*** scenario for a user, and doesn't include any query terms or search context. This "involved" diagram is one of the simpler cases!
+
+![Ecommerce Arch](./images/SysArchTemplate-ECommerce%20Search%20System.drawio.png)
 
 - ***Notes***
     - We specify CDN + User Sessions and Cookies because at a high level they show how we are going to run some sort of personalization
@@ -23,10 +25,12 @@ The dotted lines represent our [Filtering Steps](#filtering) which is the part o
         - Our calls to `/GET Homepage` to our API GW and `/GET Recs ? userId=...` should happen in parallel, and each database should be able to handle async concurrent requests so that all of this info can get aggregated and returned to users browser
     - Our Rec System
         - [Candidate Generation](#candidate-generation) is a very important step that should be altered for whatever we are looking to do...some tasks might need collaborative filtering, some content, some plain old lists
-        - [Filtering](#filtering) is ***stateful*** meaning it makes multiple database calls to other services ***(distributed monolith not microservice)***, it is where we can ***inject experiments***, and really update it to anything we want
+        - [Filtering](#filtering) is ***stateful*** meaning it makes multiple database calls to other services - it is where we can inject experiments, place in ever-changing business rules, and really update it to anything we want
+          - Keeping a place to "remove any videos that are viral in Asia" is easier to do in a Filtering phase with configs versus placing that logic in a model somehow
         - [Ranking](#ranking) is using a DNN, and we should train it for ***multi-task*** learning to ensure it maximizes engagement, conversion, usefullness, and other tasks. We don't cover that paradigm below, most of the DNN discussion is around "probability of engagement" or "predicted watch time" which are both prone to clickbait, but are an intuitive start
         - Most of the time these issues would be handled in our Filtering phase with yet another model tied to it for predicting click-bait!
     - Event Streaming + Warehousing is used across the board for CDC from the databases to ensure we can run analytics and retrain models for future recommendation systems
+      - ***This system relies heavily on a Data Platform*** which is more than just a Data Warehouse which allows us to retrain models, run queries, and implement online and offline queries and transformations
     - [Top K Heavy Hitters](/docs/design_systems/top_k/index.md) is covered in another system design, but here we could use our warehouse to implement it. We'd want to observe real-time trends, seasonal patterns, and viral content
     - This is all handled via an [API Gateway](/docs/architecture_components/typical_reusable_resources/typical_frontend/index.md), or typical frontend, which, along with proper load balancing and caching, can help ensure all of our requests are secure, correctly routed, and even minimal aggregation for returning to users browser
         - It can also help with experimentation routing! 
@@ -40,7 +44,7 @@ Search Systems (also Recommendation systems since we recommend something back) a
 
 All of these things are queries and we'd expect different content to be returned
 
-For a further look at [Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#embeddings) check out the sub-document
+For a further look at [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#embeddings) check out the sub-document
 
 Youtube will typically return Videos, Google will return almost any content type, App Store would return applications, and Facebook might return posts / users (friends)
 
@@ -53,7 +57,7 @@ An Example from Nvidia
     - Users have a history of item usage
 - A ***query*** comes in at some time, usually from a user, and we would recommend items for that query
     - A query can be considered the general context / information a system uses to make recommendations
-- An ***[embedding](/docs/nn_and_llm/EMBEDDINGS.md#embeddings)*** is a way to create numeric representations of items, users, and queries which help us in the steps below
+- An ***[embedding](/docs/transformer_and_llm/EMBEDDINGS.md#embeddings)*** is a way to create numeric representations of items, users, and queries which help us in the steps below
 - Recommendation Scenarios:
     - *Log-On:* When a user logs on and the system will recommend items to them
     - *Search:* When a user queries for a specific item and we return items based on that query
@@ -89,14 +93,13 @@ There's many still used today, but for the most part systems require utilizing c
 
 
 ### Embeddings
-[Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#embeddings) are a way to create dense, numeric representations, that can have geometric operations like subtraction, addition, and "closeness", performed on them
+[Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#embeddings) are a way to create dense, numeric representations, that can have geometric operations like subtraction, addition, and "closeness", performed on them
 
-- Types:
-    - [Word Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#bert-word-embeddings) are how we turn words into vectors, and was the start of most embedding models...everything changed when we started to use [attention](/docs/nn_and_llm/EMBEDDINGS.md#attention)
-    - [Sentence Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#bert-sentence-embeddings) are basically just aggregations of word embeddings, but things get a bit tricky and we start using multiple hidden layers
-    - [Document Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#bert-sentence-embeddings) are basically just concatenated or aggregated sentence embeddings
-    - [User Embeddings](/docs/nn_and_llm/EMBEDDINGS.md#user-embeddings) are typically created using User-Item interactions, along with other features like demographics, click through data, or history
-    - We can create embeddings for almost anything, but at the end of the day the embeddings need to make sense for what we want to do, which is typically find "similar" things, or find geometric interpretations of "things" like Paris is to France as Berlin is to Germany
+- [Word Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#bert-word-embeddings) are how we turn words into vectors, and was the start of most embedding models...everything changed when we started to use [attention](/docs/transformer_and_llm/EMBEDDINGS.md#attention)
+- [Sentence Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#bert-sentence-embeddings) are basically just aggregations of word embeddings, but things get a bit tricky and we start using multiple hidden layers
+- [Document Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#bert-sentence-embeddings) are basically just concatenated or aggregated sentence embeddings
+- [User Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md#user-embeddings) are typically created using User-Item interactions, along with other features like demographics, click through data, or history
+- We can create embeddings for almost anything, but at the end of the day the embeddings need to make sense for what we want to do, which is typically find "similar" things, or find geometric interpretations of "things" like Paris is to France as Berlin is to Germany
 
 ## Scalable, Real Serving Systems
 We'll walk through how serving systems would be architected in the current world
@@ -114,7 +117,7 @@ How do we update our embedding space as users use our services?
 We would need to capture the user click information as it's happening, and stream that data into a user database or an analytical data warehouse 
 
 #### User-Item Matrix Updates
-Once the data is in some sort of processing engine, we'd need to update the specific pointed row-column $r_{ij}$ corresponding to user I on item J. This might be incrementing some usage statistic, upadting metrics on the fly, or something else. This can be apart of *Feature Engineering* pipelines that run on streaming data
+Once the data is in some sort of processing engine, we'd need to update the specific pointed row-column $r_{ij}$ corresponding to user $i$ on item $j$. This might be incrementing some usage statistic, upadting metrics on the fly, or something else. This can be apart of *Feature Engineering* pipelines that run on streaming data
 
 The toughest part will be recomputing the user-item embeddings using WALS or SGD, as we'd have to clone the matrix somewhere else or pause updates on it as we created our new latent matrices $U$ and $V$ during [Matrix Factorization](./CANDIDATE_GENERATION.md#matrix-factorization) 
 
@@ -130,12 +133,16 @@ Since our Candidate Generation models must run in milliseconds over gigantic cor
 
 In the past a ***Bloom Filter***, which is now common place in many scenarios, was used to disregard items that the user has already interacted with!
 
+Bloom Filters are a way to quickly check if something is part of a set. Bloom filters are extremely fast probabilistic data structures - they are bit arrays that are set to all 0's and then we add items to it over time. When we add a new item we apply some hash functions to it, and the resulting index is updated to 1. 
+
+Therefore, when searching for a new item we apply the same hash functions to it, and if we find a 0 the item is definitely NOT in the list (high recall - no false negatives), but if there's a 1 the item is likely in the set (hash collisions could bring about false positives)
+
 Once the filtering is done, we can send things through to Scoring
 
 ### Scoring
 Given a user coming online, or a query being submitted, how do we actually obtain a set of items to present? This is the main focus of Retrieval and Scoring, sometimes called Ranking, and there are even some Re-Ranking steps involved...
 
-For a [Matrix Factorization](/docs/nn_and_llm/EMBEDDINGS.md#matrix-factorization) technique, we'd have the static embeddings sitting in an API or on disk somewhere for us to look up at query time. We can simply look things up from the User Embedding Matrix to get our query embedding $q_u$
+For a [Matrix Factorization](/docs/transformer_and_llm/EMBEDDINGS.md#matrix-factorization) technique, we'd have the static embedding matrices sitting in an API or on disk somewhere for us to look up at query time. We can simply look things up from the User Embedding Matrix to get our query embedding $q_u$
 
 For a DNN model we need to run an inference forward-pass to compute the query embedding at query time by using the weights that were trained from [DNN Updates](#dnn-updates) $q_u = \phi(u)$
 
@@ -158,10 +165,19 @@ Why do we split Candidate Generation from Ranking?
 #### KNN
 Once we have our query embedding $q_u$ we need need to search for the Top K Nearest Neighbors (KNN) items $V_j$ in the Item Matrix that are closest to $q_u$ - this is typically done with the [Ranking and Scoring](./RANKING.md) algorithms described elsewhere, which help us compute a score $s(q_u \cdot v_j)$ for our query across the Item Embedding Space 
 
-- This is a fairly large and complex thing to do online for each query, but there are ways to alleviate this:
-    - If the query embedding is known statically, the system can perform exhaustive scoring offline, precomputing and storing a list of the top candidates for each query. This is a common practice for related-item recommendation.
-    - Use approximate nearest neighbors. Google provides an open-source tool on GitHub called [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann). This tool performs efficient vector similarity search at scale
-        - ScaNN using space pruning and quantization, among many other things, to scale up their Inner Product Search capabilities, which basically means they make running Dot Product search very fast, and they also mention support of other distance metrics like Euclidean 
+Pseudocode:
+  - Get the user’s embedding vector $u$ from $U$ (for the target user)
+  - Compute similarity scores between $u$ and every item vector $v_j$ in $V$
+    - Most commonly, use dot product: $s_j = u \cdot v_j$
+    - You can also use cosine similarity or Euclidean distance
+  - Sort all items by their similarity scores (descending for dot product/cosine, ascending for distance)
+  - Select the Top K items with the highest scores
+
+
+This is a fairly large and complex thing to do online for each query, but there are ways to alleviate this!
+  - If the query embedding is known statically, the system can perform exhaustive scoring offline, precomputing and storing a list of the top candidates for each query. This is a common practice for related-item recommendation.
+  - Use approximate nearest neighbors. Google provides an open-source tool on GitHub called [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann). This tool performs efficient vector similarity search at scale
+      - ScaNN using space pruning and quantization, among many other things, to scale up their Inner Product Search capabilities, which basically means they make running Dot Product search very fast, and they also mention support of other distance metrics like Euclidean 
     
 Most of the time computing Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead
 

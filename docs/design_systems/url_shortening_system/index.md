@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: RL Shortening System Design
+title: URL Shortening System Design
 category: Design Systems
 difficulty: Advanced
 description: Design and implementation of a URL shortening service

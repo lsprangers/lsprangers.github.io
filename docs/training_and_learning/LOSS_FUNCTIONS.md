@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Loss Functions
-category: NN and LLM
+category: Training and Learning (ML)
 difficulty: Advanced
 description: Discussions around Loss Functions in NN's
 show_back_link: true
@@ -9,17 +9,6 @@ show_back_link: true
 
 ## Output Layers
 The final output layers of our models typically go hand-in-hand with the [Loss Functions](#loss-functions) that we use
-
-### Catches 
-Some gotchas apart of model training and loss functions
-
-#### Folding
-If we only focus on the "positive" examples during training, and we don't introduce negatives for the model to "learn" / iterate over, then our model could be prone to Folding
-
-Folding is what occurs when embeddings of different items end up close to each other in the metric space, even though they may be unrelated. When this occurs the embedding representations "look close" to each other, but in reality they should be separated. 
-
-In the picture below the Green and Blue subspaces should be learned to be separated (i.e. create triangle 3d structure) instead of keeping them both on the 2d plane and overlapping, which would lead to Green being served for Blue queries and vice versa
-![Folding Picture](./images/google_folding.png)
 
 ### Regression
 Regression output layers are used when the task is to predict continuous values
@@ -67,28 +56,6 @@ Why do we use these output formulas? We want them to be "nice" for derivates and
 
 ## Loss Functions
 Loss functions are the entire heart of model training and tuning 
-
-### Gradient Descent
-Gradient Descent is the main algorithm for updating weights based on our loss functions - it will basically chain together a bunch of partial derivatives which show each parameters effects on the output, and based on the output's loss the weights will be updated in the negative direction
-
-It's simply a way to move parameters towards places that create "good" layers to create the final output layer as close as possible to what we're trying to model
-
-Gradient Descent will run over all training examples
-
-### Negative Sampling
-To combat [Folding](#folding) we know we must use negative samples, but instead of using every single negative example we should pick a sample of negatives! In this way we can randomly choose "bad" examples and feed them through as 0's.
-
-#### Stochastic Gradient Descent (SGD)
-Stochastic Gradient Descent updates the model parameters using a single training example at each iteration. This introduces noise into the optimization process, which can help escape local minima.
-
-#### Mini Batch
-Mini Batch Gradient Descent updates the model parameters using a small batch of training examples at each iteration. This balances the efficiency of batch gradient descent with the noise reduction of stochastic gradient descent.
-
-#### Mini Batch Stochastic Gradient Descent
-Mini Batch Stochastic Gradient Descent combines the concepts of mini batch and stochastic gradient descent. It updates the model parameters using a small, randomly selected batch of training examples at each iteration.
-
-### Weighted Alternating Least Squares
-Weighted Alternating Least Squares is an optimization algorithm used in matrix factorization techniques, particularly for recommendation systems. It alternates between fixing the user matrix and optimizing the item matrix, and vice versa, while incorporating weights for observed and unobserved interactions.
 
 ### Cross Entropy
 Cross Entropy is a loss function commonly used for **classification tasks**. It measures the difference between the true probability distribution (ground truth) and the predicted probability distribution (output of the model). It is particularly effective when the output of the model is a probability distribution (e.g., from a softmax layer).
@@ -183,3 +150,13 @@ Given a set $X = \{x_1, x_2, ..., x_N\}$ of $N$ random samples containing one po
 $
 \mathcal{L}_{\text{InfoNCE}} = -\mathbb{E} \left[ \log \frac{\exp(\text{sim}(z, z^+)/\tau)}{\exp(\text{sim}(z, z^+)/\tau) + \sum_{j=1}^{N-1} \exp(\text{sim}(z, z_j^-)/\tau)} \right]
 $
+
+## Weight Updating
+How to actually update weights from output of loss function
+
+### Gradient Descent
+Gradient Descent is the main algorithm for updating weights based on our loss functions - it will basically chain together a bunch of partial derivatives which show each parameters effects on the output, and based on the output's loss the weights will be updated in the negative direction
+
+It's simply a way to move parameters towards places that create "good" layers to create the final output layer as close as possible to what we're trying to model
+
+Gradient Descent will run over all training examples

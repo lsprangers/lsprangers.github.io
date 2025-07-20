@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Layer Normalization
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around Layer Norm
 show_back_link: true

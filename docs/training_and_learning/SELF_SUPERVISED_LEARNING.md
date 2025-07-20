@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Self Supervised Learning
-category: NN and LLM
+category: Training and Learning (ML)
 difficulty: Advanced
 description: Discussions around Self Supervised Learning
 show_back_link: true
@@ -11,7 +11,7 @@ show_back_link: true
 Yann Lecun!
 “If intelligence is a cake, the bulk of the cake is self-supervised learning, the icing on the cake is supervised learning, and the cherry on the cake is reinforcement learning (RL).”
 
-Self Supervised Learning was a large part of the NLP movement in the beginning with [Word Embeddings](./EMBEDDINGS.md) and [Attention](./ATTENTION.md#attention) - it gave rise to Word2Vec, Glove, ELMO, BERT and many other models that learned underlying representations of words by self supervising learning of existing text
+Self Supervised Learning was a large part of the NLP movement in the beginning with [Word Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) - it gave rise to Word2Vec, Glove, ELMO, BERT and many other models that learned underlying representations of words by self supervising learning of existing text
 
 Supervised learning itself requires a humongous amount of labeled data, and in most cases we just cannot create that level of human labeled data for text and image classification / embeddings, and even if we could it would be outdated after a week or so 
 
@@ -30,7 +30,7 @@ How can we create models that can re-create photos?
 #### Image Coloring
 If we have a set of 1 million images, how can we create latent representations of photo colors and images?
 
-We can pair up (original phot, greyscale) pairs, after that we can train a model to "color in" the photos and use [L2 Loss](./LOSS_FUNCTIONS.md#l2-loss) between predicted "colored in" photo and the original photo 
+We can pair up (original phot, greyscale) pairs, after that we can train a model to "color in" the photos and use [L2 Loss](/docs/training_and_learning/LOSS_FUNCTIONS.md#l2-loss) between predicted "colored in" photo and the original photo 
 
 The blog I pulled this from mentioned an encoder-decoder architecture to encode greyscale, and decoder to generate the "colored in" image
 

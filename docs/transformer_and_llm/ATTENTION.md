@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Attention
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around the Attention mechanism in Transformers and LLMs
 show_back_link: true
@@ -158,7 +158,7 @@ In depth mathematical explanation below
       - Use the attention weights to compute a weighted sum of $ V $, and add that onto the input word, producing the output.
 
    3.4 **Residual + Normalization**:
-      - [LayerNorm](./LAYER_NORM.md#layer-normalization) add together input and self-attended to matrices
+      - [LayerNorm](/docs/training_and_learning/LAYER_NORM.md#layer-normalization) add together input and self-attended to matrices
 
    3.5 **Feed Forward Layer**:
       - Each position’s output from the self-attention layer is passed through a fully connected feed-forward neural network (the same network is applied independently to each position)
@@ -301,5 +301,5 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
    - The decoder's output is passed through a linear layer and softmax to produce the next token.
 
 4. **Training**:
-   - The model is trained using [cross-entropy loss](./LOSS_FUNCTIONS.md#cross-entropy) and [KL divergence](./LOSS_FUNCTIONS.md#kl-divergence), with each token in the output sequence contributing to the loss.
+   - The model is trained using [cross-entropy loss](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) and [KL divergence](/docs/training_and_learning/LOSS_FUNCTIONS.md#kl-divergence), with each token in the output sequence contributing to the loss.
 ![EncoderDecoder Output](./images/encoder_decoder_output.png)

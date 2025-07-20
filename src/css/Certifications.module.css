@@ -1,0 +1,52 @@
+.certBubbleContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.certBubbleCard {
+  background: #fff;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px rgba(128,0,128,0.10), 0 1.5px 6px rgba(128,0,128,0.08);
+  padding: 2rem 2.5rem;
+  min-width: 260px;
+  max-width: 350px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 2px solid #e0d7ec;
+  margin-bottom: 1.5rem;
+}
+
+.certBubbleCard:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 8px 32px rgba(128,0,128,0.18), 0 3px 12px rgba(128,0,128,0.12);
+  border-color: #800080;
+}
+
+.certBubbleCard h2 {
+  margin-top: 0;
+  color: #800080;
+}
+
+.certBubbleCard a {
+  color: #800080;
+  text-decoration: none;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.certBubbleCard a:hover {
+  text-decoration: underline;
+}
+
+.valid {
+  color: #228B22;
+  font-weight: bold;
+}
+
+.expired {
+  color: #B22222;
+  font-weight: bold;
+}https://coursera.org/share/884882b8801ce6bf32af1798a056eda5

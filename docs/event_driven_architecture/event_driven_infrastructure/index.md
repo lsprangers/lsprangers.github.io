@@ -1,3 +1,13 @@
+---
+layout: technical
+title: Event Driven Infrastructure
+category: Event Driven Infrastructure
+difficulty: Advanced
+description: Discussions around Event Driven Architecture
+show_back_link: true
+---
+
+
 # Event Driven Software
 This is around real time event loops, coroutines, finite-state machines, and real time operating systems (RTOS) that use priority based preemptive primitives, rate monotonic scheduling, and other design patterns to create long running event based programs
 

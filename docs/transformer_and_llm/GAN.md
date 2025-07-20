@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: GAN
-category: NN and LLM
+category: Transformers and LLMs
 difficulty: Advanced
 description: Discussions around GAN!
 show_back_link: true
