@@ -108,6 +108,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [LayerNorm](https://h2o.ai/wiki/layer-normalization/)
 - [Another persons blog - AmitNess](https://amitness.com)
 - [TRYEXCEPT - ML Systems Design Interviews](https://www.youtube.com/@TryExcept-10110)
+- [Succinct data structures](https://blog.startifact.com/posts/succinct/)
 ---
 
 ### Why This?

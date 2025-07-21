@@ -34,4 +34,5 @@ class Solution:
             symbol_count = floor(num / int(amount))
             final_str += symbol * symbol_count
             num = num - (int(amount) * symbol_count)
-        return final_str```
+        return final_str
+```

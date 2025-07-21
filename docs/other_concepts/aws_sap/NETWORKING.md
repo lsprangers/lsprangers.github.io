@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Networking
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Networking
 Networking is mostly around connecting networks that are in cloud and on prem, and then configuring those networks for our services!
 

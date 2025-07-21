@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Caching
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Caching
 
 ## CloudFront

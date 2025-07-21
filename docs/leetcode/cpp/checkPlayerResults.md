@@ -40,4 +40,5 @@ public:
         vector<vector<int>> results = {all_wins, one_loss};
         return(results);
     }
-};```
+};
+```

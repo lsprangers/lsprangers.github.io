@@ -38,4 +38,5 @@ class Solution:
         # Following the dfs, you can see that when we coming back to node 0, if there are some apples in the tree,
         # We added an extra 2 to the result, so we need to -2 here.
         # In case there is no apples in this tree, dfs will return 0, but we can't return -2, so just return 0
-        return max(dfs(0,-1)-2, 0)```
+        return max(dfs(0,-1)-2, 0)
+```

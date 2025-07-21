@@ -26,4 +26,5 @@ class Solution:
                 if num > nums[idx - 1] and num > nums[idx + 1]:
                     return(idx)
         
-        return(-1)```
+        return(-1)
+```

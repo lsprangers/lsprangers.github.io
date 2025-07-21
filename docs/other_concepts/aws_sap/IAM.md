@@ -1,3 +1,11 @@
+---
+layout: technical
+title: IAM
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## IAM
 
 **Identity and Access Management (IAM)** allows us to define users and roles over resources via **Effects**, **Actions**, and **Resources**.

@@ -21,4 +21,5 @@ class Solution:
             if i > current_end:
                 countt += 1     # we will need a new dart
                 current_end = j # and there will be a new end to compare all else to
-        return countt```
+        return countt
+```

@@ -47,4 +47,5 @@ public:
     bool is_valid(int row, int col) {
         return(0 <= row && row < n_rows && 0 <= col && col < n_cols && seen.find({row, col}) == seen.end() && our_grid[row][col] == 1);
     }
-};```
+};
+```

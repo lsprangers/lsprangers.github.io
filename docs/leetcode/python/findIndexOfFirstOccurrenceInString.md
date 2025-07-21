@@ -17,4 +17,5 @@ class Solution:
             if right <= len(haystack) and haystack[left : right] == needle:
                 return(hIdx)
         
-        return(-1)```
+        return(-1)
+```

@@ -28,4 +28,5 @@ class Solution:
                     return False
             if not is_ok and len(first) > len(second):
                 return False
-        return True```
+        return True
+```

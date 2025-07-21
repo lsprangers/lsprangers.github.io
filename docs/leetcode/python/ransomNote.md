@@ -18,4 +18,5 @@ class Solution:
             
             magCounter[letter] -= 1
         
-        return(True)```
+        return(True)
+```

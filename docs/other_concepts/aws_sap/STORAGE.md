@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Storage
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Storage
 
 ## EBS Volumes

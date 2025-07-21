@@ -23,4 +23,5 @@ public:
         }
         return(max(1, 1-minn));
     }
-};```
+};
+```

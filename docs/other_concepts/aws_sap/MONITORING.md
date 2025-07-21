@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Monitoring
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Monitoring
 Most is done via CloudWatch
 

@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Compute and Load Balancing
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## High Level Solutions Architecture
 What usually happens in AWS?
 

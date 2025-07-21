@@ -44,4 +44,5 @@ class Solution:
         for roman, val in converter.items():
             num += s.count(roman) * val
             s.replace(roman, '')
-        return num```
+        return num
+```

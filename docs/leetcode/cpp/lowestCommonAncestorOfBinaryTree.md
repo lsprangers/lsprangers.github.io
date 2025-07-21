@@ -44,4 +44,5 @@ public:
         return(mid + right + left > 0);
 
     }
-};```
+};
+```

@@ -51,4 +51,5 @@ class Solution:
                         star_count += 1
             
         # O(n)? Space too
-        return("".join(resp))```
+        return("".join(resp))
+```

@@ -31,4 +31,5 @@ public:
         tmp.insert( tmp.end(), digits.begin(), digits.end() );
         return(tmp);
     }
-};```
+};
+```

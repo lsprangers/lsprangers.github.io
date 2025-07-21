@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Data Engineering
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Data Engineering
 
 ## Kinesis

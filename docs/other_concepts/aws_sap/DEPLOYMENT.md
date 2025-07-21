@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Deployment and Instance Management
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Deployment and Instance Management
 This section is all around how to deploy and manage code, applications, and machines
 

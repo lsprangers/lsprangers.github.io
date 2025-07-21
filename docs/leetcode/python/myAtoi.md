@@ -44,4 +44,5 @@ class Solution:
             res = -2**31
         if res > (2**31) - 1:
             res = (2**31) - 1
-        return res```
+        return res
+```

@@ -22,4 +22,5 @@ public:
         }
         return(t.size() - t_left);
     }
-};```
+};
+```

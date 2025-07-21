@@ -45,4 +45,5 @@ class Solution:
         # O(logn) for heappush
         heapq.heappush(self.vals, node.val)
         self.dfs(node.left)
-        self.dfs(node.right)```
+        self.dfs(node.right)
+```

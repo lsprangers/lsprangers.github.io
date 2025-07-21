@@ -22,4 +22,5 @@ class Solution:
                 res += 1
             else:
                 break
-        return res```
+        return res
+```

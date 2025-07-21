@@ -30,4 +30,5 @@ public:
         }
         return((double)resp / (double)k);
     }
-};```
+};
+```

@@ -13,4 +13,5 @@ class Solution:
         for sl in s:
             if sl in t:
                 t = t.replace(sl, "", 1)
-        return t```
+        return t
+```

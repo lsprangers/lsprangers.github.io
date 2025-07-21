@@ -26,4 +26,5 @@ class Solution:
         resp = 0
         for i in range(1, n-1):
             resp = max(resp, (leftMax[i] - nums[i]) * rightMax[i])
-        return(resp)```
+        return(resp)
+```

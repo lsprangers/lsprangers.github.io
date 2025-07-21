@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Security
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Security
 
 ## CloudTrail

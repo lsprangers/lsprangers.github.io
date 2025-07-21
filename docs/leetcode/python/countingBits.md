@@ -28,4 +28,5 @@ class Solution:
         while n > 0:
             n &= (n - 1)  # Clears the least significant set bit
             count += 1
-        return count```
+        return count
+```

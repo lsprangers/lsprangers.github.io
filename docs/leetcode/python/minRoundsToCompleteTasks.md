@@ -21,4 +21,5 @@ class Solution:
             if freq == 1:
                 return -1
             res += ceil(freq/3)
-        return res```
+        return res
+```

@@ -34,4 +34,5 @@ public:
         return((double) mSum / count);
         
     }
-};```
+};
+```

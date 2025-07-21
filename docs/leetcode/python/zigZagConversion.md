@@ -28,4 +28,5 @@ class Solution:
         for r in strdict:
             res += "".join(strdict[r])
         
-        return res```
+        return res
+```

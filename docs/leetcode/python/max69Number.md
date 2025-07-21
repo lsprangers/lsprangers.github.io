@@ -15,4 +15,5 @@ class Solution:
             if(numChar == "6"):
                 numList[idx] = "9"
                 break
-        return(int("".join(numList)))```
+        return(int("".join(numList)))
+```

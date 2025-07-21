@@ -28,4 +28,5 @@ class Solution:
             res.extend(left)
             res.extend(right)
         
-        return res```
+        return res
+```

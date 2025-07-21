@@ -21,4 +21,5 @@ class Solution:
         nodes = len(graph)
         paths = []
         depthh(0, [0])
-        return paths```
+        return paths
+```

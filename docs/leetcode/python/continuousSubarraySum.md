@@ -41,4 +41,5 @@ class Solution:
                 if pfxMap[mod][-1] - pfxMap[mod][0] > 1:
                     return(True)
 
-        return(False)```
+        return(False)
+```

@@ -16,4 +16,5 @@ class Solution:
         # gets us the frequency of each number quickly
         freqs = Counter(nums)
 
-        return(all([freq % 2 == 0 for freq in freqs.values()]))```
+        return(all([freq % 2 == 0 for freq in freqs.values()]))
+```

@@ -66,4 +66,5 @@ class Solution:
             and col > -1
             and col < self.n_cols
             and (row, col) not in self.seen
-        )```
+        )
+```

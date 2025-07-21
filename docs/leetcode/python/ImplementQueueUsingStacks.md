@@ -63,4 +63,5 @@ class MyQueue:
 # obj.push(x)
 # param_2 = obj.pop()
 # param_3 = obj.peek()
-# param_4 = obj.empty()```
+# param_4 = obj.empty()
+```

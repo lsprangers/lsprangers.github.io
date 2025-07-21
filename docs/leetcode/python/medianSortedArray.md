@@ -16,4 +16,5 @@ class Solution:
         if len(self.ara) % 2 == 0:
             return(self.ara[(len(self.ara)//2) - 1] + self.ara[(len(self.ara)//2)]) / 2
         else:
-            return(self.ara[(len(self.ara)//2)])```
+            return(self.ara[(len(self.ara)//2)])
+```

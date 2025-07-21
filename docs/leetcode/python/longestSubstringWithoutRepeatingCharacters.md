@@ -27,4 +27,5 @@ class Solution:
             right += 1
             curr = max(curr, right - left)
         
-        return(curr)```
+        return(curr)
+```

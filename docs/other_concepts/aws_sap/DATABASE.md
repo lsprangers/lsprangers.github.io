@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Data Engineering
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Databases
 This whole fuckin section is going to be on serverless Dynamo I bet
 

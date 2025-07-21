@@ -54,4 +54,5 @@ public:
         return 0 <= row && row < n_rows && 0 <= col && col < n_cols && grid[row][col] == '1';
     }
 
-};```
+};
+```

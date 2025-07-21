@@ -39,4 +39,5 @@ public:
         int rightResponse = dfs(node->right);
         return (1 + min(leftResponse, rightResponse));
     }
-};```
+};
+```

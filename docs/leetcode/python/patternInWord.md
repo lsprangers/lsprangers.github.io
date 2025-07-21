@@ -24,4 +24,5 @@ class Solution:
                     return False
                 else:
                     matcher[charr] = sArr[idx]
-        return True```
+        return True
+```

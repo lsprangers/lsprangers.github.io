@@ -31,4 +31,5 @@ class Solution:
             right -= 1
         
         # O(n) again, space O(n) which can probably get reduced but Python strings suck
-        return("".join(resp))```
+        return("".join(resp))
+```

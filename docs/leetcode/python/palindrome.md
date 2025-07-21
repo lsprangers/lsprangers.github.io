@@ -29,4 +29,5 @@ def check_palindrome(s: str) -> bool:
 assert(check_palindrome('racecar') == True)
 assert(check_palindrome('racebar') == False)
 assert(check_palindrome('abcdcba') == True)
-assert(check_palindrome('bbbbbbb') == True)```
+assert(check_palindrome('bbbbbbb') == True)
+```

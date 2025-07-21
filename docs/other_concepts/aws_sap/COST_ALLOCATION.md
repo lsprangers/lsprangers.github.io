@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Cost Allocation
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Cost Allocation
 Basically just Tagging
 

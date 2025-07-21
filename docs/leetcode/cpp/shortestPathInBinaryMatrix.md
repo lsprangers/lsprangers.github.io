@@ -66,4 +66,5 @@ public:
     bool is_valid(int row, int col) {
         return(0 <= row && row < n_rows && 0 <= col && col < n_cols && this_grid[row][col] == 0);
     }
-};```
+};
+```

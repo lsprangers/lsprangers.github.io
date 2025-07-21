@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Service Communications
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
 ## Service Communications
 How different services can communicate with each other
 

@@ -32,4 +32,5 @@ public:
         // O(banned + message)
         return(false);
     }
-};```
+};
+```

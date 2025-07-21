@@ -63,4 +63,5 @@ class RandomizedSet:
 # obj = RandomizedSet()
 # param_1 = obj.insert(val)
 # param_2 = obj.remove(val)
-# param_3 = obj.getRandom()```
+# param_3 = obj.getRandom()
+```

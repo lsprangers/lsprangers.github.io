@@ -20,4 +20,5 @@ class Solution:
                 ones -= 1
                 res += 1
 
-        return res```
+        return res
+```
