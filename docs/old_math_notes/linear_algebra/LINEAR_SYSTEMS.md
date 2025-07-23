@@ -1,9 +1,8 @@
 ---
 layout: technical
 title: Linear Systems
-category: Old Math Notes
+category: Linear Algebra
 difficulty: Advanced
-description: Linear Algebra
 show_back_link: true
 ---
 

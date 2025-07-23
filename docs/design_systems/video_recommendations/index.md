@@ -38,6 +38,8 @@ Video recommendations will have 3 major components:
     - User-Item interactions must have all features created within the day
 
 ## Architecture
+The final architecture at the end:
+![My Final Architecure](./images/SysArchTemplate-My-VideoRecommendation.drawio.png)
 
 ### Data Collection
 

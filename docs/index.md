@@ -15,6 +15,15 @@ It's a structured dump of stuff I've pulled out of old word files and tweaked in
 
 ---
 
+## Highlights
+Some of the better displays on here:
+- [Pregel Graph Processing](/docs/other_concepts/graph_processing/PREGEL.md) and how I've used it in large analytics based product companies
+- [Video Recommendations](/docs/design_systems/video_recommendations/index.md) which showcases a specific example of what's talked about in [Generic Search Systems](/docs/design_systems/search_system/index.md)
+- [Spark Notes](/docs/other_concepts/SPARK.md)
+<!-- - [Delta Sharing Data Feeds](TODO) -->
+<!-- - [High Throughput Ads Experimentation System] -->
+- Outside of these it's mostly a dump of notes around DSA, Systems Design, Leetcode, and other junk
+
 ## Architecture and Systems Design Examples
 
 This section focuses on building specific systems, often inspired by technical interviews or real-world use cases. Examples include URL shorteners, YouTube Search, Top K Heavy Hitters, and more.
@@ -109,6 +118,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [Another persons blog - AmitNess](https://amitness.com)
 - [TRYEXCEPT - ML Systems Design Interviews](https://www.youtube.com/@TryExcept-10110)
 - [Succinct data structures](https://blog.startifact.com/posts/succinct/)
+- [Duke Stats 732 Paper on Choosing Priors](https://www2.stat.duke.edu/courses/Spring13/sta732.01/priors.pdf)
 ---
 
 ### Why This?

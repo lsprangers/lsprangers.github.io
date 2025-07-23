@@ -1,9 +1,9 @@
 ---
 layout: technical
 title: Determinants
-category: Old Math Notes
+category: Linear Algebra
 difficulty: Advanced
-description: Linear Algebra
+description: Discussions around Bayesian(s)
 show_back_link: true
 ---
 

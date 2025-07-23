@@ -265,6 +265,10 @@ The ***Edge Relaxation Property*** is the general property describing that altho
 #### Djikstra
 Djikstra's Algorithm can help solve the shortest path problem for graphs with ***non-negative weights***
 
+It solves the shortest path problem for a single Vertex, to all other Vertices
+
+We also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases we can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
+
 Djikstra's algorithm is greedy, and essentially starts from a central point `u` and expands outwards, continually getting the min from the seen vertices to find shortest path to other vertices, it uses a min-heap to continuously select the vertex with the smallest known distance
 
 We hold the state of our source vertex to each other vertex in the graph, and we hold "previous vertex" and length information in this table which will help us traverse recursively if we needed to rebuild the path. We can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex we need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since we need to store visited node info)
