@@ -131,6 +131,12 @@ const config = {
               {label: 'GitHub', href: 'https://github.com/lsprangers'},
             ],
           },
+          {
+            title: 'Disclaimer',
+            items: [
+              {label: 'This is all personal, and nothing to do with any company I\'ve ever worked for, or currently work for.'},
+            ],
+          },          
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Luke Sprangers`,
       },
