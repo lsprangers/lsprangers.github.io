@@ -102,7 +102,7 @@ class Solution:
 
 A segment tree is a Binary Tree where each node represents an interval, and each node would store one or more properties of an interval that'd be queried later on
 
-Most of the time it's segements / indexes of an array, and the total sum, count, or some aggregation over them, which allows us to find a certain aggregation over a range of data in potentially $O(log n)$ time
+Most of the time it's segements / indexes of an array, and the total sum, count, or some aggregation over them, which allows us to find a certain aggregation over a range of data in potentially $O(\log n)$ time
 
 ![LeetCode Segment Tree](./images/lc_segment_tree.png)
 

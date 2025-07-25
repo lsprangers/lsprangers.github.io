@@ -56,7 +56,7 @@ Vertical scaling equates to "make the compute larger" which reaches limitations 
 Horizontal scaling is usually the route taken where we take our database and split it up into subsets
 
 ### Durability
-Most of the time Durability is covered by [Tree Structures on Disk](./TREE_STRUCTURES_ON_DISK.md) so that we can still retrieve our data in $O(log n)$ from disk. This helps with durability and allowing us to put more of the overall KV Store onto a single node versus scaling out and trying to fit everything into RAM
+Most of the time Durability is covered by [Tree Structures on Disk](./TREE_STRUCTURES_ON_DISK.md) so that we can still retrieve our data in $O(\log n)$ from disk. This helps with durability and allowing us to put more of the overall KV Store onto a single node versus scaling out and trying to fit everything into RAM
 
 
 #### Sharding

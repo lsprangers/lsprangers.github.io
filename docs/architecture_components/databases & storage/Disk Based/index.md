@@ -46,7 +46,7 @@ Some open source databases use a B-Tree or LSM-Tree as their primary storage eng
     - Both are:
         - Durable
         - Consistent (I think)
-        - Relatively $O(log n)$ read    
+        - Relatively $O(\log n)$ read    
             - Tree lookups can degrade to $O(n)$ if we don't search on the primary sort key 
             - It would force us to do a full scan of the data until we find the key with a specific attribute, and any range queries are guaranteed $O(n)$
 

@@ -134,7 +134,7 @@ const config = {
           {
             title: 'Disclaimer',
             items: [
-              {label: 'This is all personal, and nothing to do with any company I\'ve ever worked for, or currently work for.', to: '/#'},
+              {label: 'This is all personal - This blog nothing to do with any company I\'ve ever worked for or currently work for.', to: '/#'},
             ],
           },          
         ],

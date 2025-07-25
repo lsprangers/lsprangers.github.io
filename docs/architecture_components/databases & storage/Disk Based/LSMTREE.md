@@ -53,11 +53,11 @@ description: Discussion around Disk Based Databases
 ### Implementation
 - MemTable
     - Can be any sort of container that supports sorting keys, and scanning retrieval
-        - Insert and search can both be $O(log n)$ with a simple Vector
+        - Insert and search can both be $O(\log n)$ with a simple Vector
         - RocksDB uses a Skip List which is a Linked List with multiple other links that you can use to skip
-        - Skip Lists still have, on average, $O(log n)$ search without O(n) insert which can happen with a Vector if it's full
+        - Skip Lists still have, on average, $O(\log n)$ search without O(n) insert which can happen with a Vector if it's full
         - Can't use a Hash Map because scans would be O(n)
-    - Since we write to MemTable in $O(log n)$ in RAM, and then write this to disk as SSTable later on, writes are fast
+    - Since we write to MemTable in $O(\log n)$ in RAM, and then write this to disk as SSTable later on, writes are fast
     - Still durable because of WAL
     - We remove need for random disk writes which is how B-Tree would handle it
 - WAL

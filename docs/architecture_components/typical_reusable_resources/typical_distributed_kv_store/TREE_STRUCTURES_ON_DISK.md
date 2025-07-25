@@ -3,7 +3,7 @@ Why do we need any of this?
 - Durability is important
 - Keeping an entire hash table in RAM is sometimes impossible, even if it's split amongst multiple machines
     - We could keep splitting and splitting and splitting, but if one of the machines goes down, we lose that data
-- If we wanted to write these hash tables to disk we could just write it in whatever order, but then lookup would be $O(n)$ full scans over all of our disks, which is very slow...so we want to sort things to make it $O(log n)$
+- If we wanted to write these hash tables to disk we could just write it in whatever order, but then lookup would be $O(n)$ full scans over all of our disks, which is very slow...so we want to sort things to make it $O(\log n)$
 - Another example is a Relational Database Index - like a hash index. They basically duplicate the entire columns data footprint (pointers only) so they're huge, and most databases ensure durability, so we can’t store in RAM
     - Need to use a different indexing structure 
         - Can split entire hash index into smaller segments of indexes

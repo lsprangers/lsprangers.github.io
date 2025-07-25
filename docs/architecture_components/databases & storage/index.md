@@ -19,9 +19,9 @@ There's no indexing, no schema formats specified, or anything like that - it's j
 ## Disk Based
 This relates to storing data on disk using mechanisms like [LSMTree](/docs/technical writing/architecture_components/databases & storage/Disk Based/LSMTREE.md), [BTree](/docs/technical writing/architecture_components/databases & storage/Disk Based/BTREE.md), or [Parquet Flat Files](/docs/technical writing/architecture_components/databases & storage/Disk Based/PARQUET.md)
 
-- B-Tree's are a hierarchical data structure typically used for indexes in relational databases for $O(log n)$ lookup
+- B-Tree's are a hierarchical data structure typically used for indexes in relational databases for $O(\log n)$ lookup
     - Other nuances like much higher read throughput, but lower write throughput (a write has to go to disk)
-- LSMTree's are another hierarchical data structure typically used for looking up data in K:V databases in $O(log n)$ time
+- LSMTree's are another hierarchical data structure typically used for looking up data in K:V databases in $O(\log n)$ time
     - Other nuances like much higher write throughput (write to in-memory without touching disk), and lower read throughput (going to disk based on indexes-of-indexes)
 - Parquet is a flat file structure used for massive parallel processing engines
     - It was enhanced by the Delta Format
