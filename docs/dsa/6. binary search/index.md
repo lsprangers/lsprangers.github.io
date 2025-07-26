@@ -21,7 +21,7 @@ Why is it $\log(n)$? Mostly because if there are $n$ elements, and we are consta
 $\log(n) = x \rarr 2^x = n$ 
 
 I guess that's just repeating the same thing twice - here's a photo:
-![Binary Search](/static/img/bsearch.png)
+![Binary Search](/img/bsearch.png)
 
 ### Typical Problem Statements
 Some will outright say "find this value in a sorted list" which makes things easy, most won't
