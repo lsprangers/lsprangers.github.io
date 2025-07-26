@@ -7,7 +7,7 @@ description: A collection of technical notes, implementations, and concepts
 
 # 📚 Tech Notes
 
-This KB is a collection of notes, implementations, and concepts I've gathered over time. 
+Why this? I had this all in word docs when I was going through interviews, so figured I'd put it in here somewhere
 
 It's a mix of **Data Structures and Algorithms (DSA)**, **System Design**, **Machine Learning concepts**, and more. 
 
@@ -54,7 +54,6 @@ This section contains:
 ## Other Concepts
 
 This section includes generic concepts that don't fit into DSA or System Design, such as:
-- Embeddings.
 - Parallel Training Designs.
 - Pregel Graph Traversals.
 
@@ -73,7 +72,7 @@ A collection of generic implementations, including:
 
 ## Leetcode
 
-This is a dump of **Leetcode problems** and comments, organized for easy reference.
+This is a dump of LC problems and comments
 
 ---
 
@@ -120,12 +119,3 @@ These are some of the resources I frequently use and reference throughout this r
 - [Succinct data structures](https://blog.startifact.com/posts/succinct/)
 - [Duke Stats 732 Paper on Choosing Priors](https://www2.stat.duke.edu/courses/Spring13/sta732.01/priors.pdf)
 ---
-
-### Why This?
-
-This repo is meant to be a **reference hub** for anyone interested in:
-- Learning **DSA** and **System Design**.
-- Exploring **Machine Learning concepts** like embeddings and attention mechanisms.
-- Understanding **real-world system implementations**.
-
-Feel free to explore, contribute, or use it as a learning resource!
