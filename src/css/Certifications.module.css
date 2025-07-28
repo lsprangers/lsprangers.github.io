@@ -13,7 +13,7 @@
   padding: 2rem 2.5rem;
   min-width: 260px;
   max-width: 350px;
-  text-align: center;
+  text-align: left;
   transition: transform 0.2s, box-shadow 0.2s;
   border: 2px solid #e0d7ec;
   margin-bottom: 1.5rem;
