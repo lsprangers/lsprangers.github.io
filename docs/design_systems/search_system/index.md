@@ -70,6 +70,7 @@ An Example from Nvidia
 ## History
 Over time recommendation / search systems have gone through a lot of changes 
 - At first we used inverted indexes for text based lookups of documents which would allow things like webpage lookup on google
+  - You can setup next letter prediction based on the [Trie Implementation](/docs/leetcode/common_structs/trie.py), and most of your iPhone's next word / letter prediction are based on Trie's and Word Embeddings
 - Most of this stayed with token-based matching using more advanced methods like n-grams, maybe using distance metrics like Levenshtein, or even some minimal ranking with TF-IDF based methods
     - The takeaway here was that we were always comparing text-to-text
     - These systems had ***high precision, but low recall***...if a word matches char for chat, it matches! But finding the matches that didn't 100% overlap became an issue
