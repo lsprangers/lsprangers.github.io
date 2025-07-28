@@ -1,19 +1,3 @@
----
-title: searchSuggestionSystem
-category: Leetcode Solutions
-difficulty: Advanced
-show_back_link: true
----
-
-# searchSuggestionSystem
-
-Most of the implementation here is done via the [Trie Implementation](/code/trie.py), which makes all of this a very simple loop!
-
-The other recommended setup is to:
-- Sort strings
-- For every character, binary search for closest, take `[closest + 1: closest + 4]` next 3!
-
-```python
 class TrieNode:
     def __init__(self):
         self.links = [None] * 26
@@ -63,7 +47,7 @@ class Trie:
                 return(False)
             node = node.get_char(char)
         return(node.is_end)
-
+    
     def top_k_with_prefix(self, prefix: str, k: int) -> list:
         def dfs(node, path, results):
             if node.is_end and len(results) < k:
@@ -83,19 +67,4 @@ class Trie:
         results = []
         dfs(node, list(prefix), results)
         return results
-
-
-class Solution:
-    def suggestedProducts(self, products: List[str], searchWord: str) -> List[List[str]]:
-        trie = Trie()
-        for product in products:
-            trie.insert(product)
-        
-        resp = []
-        currSearch = []
-        for c in searchWord:
-            currSearch.append(c)
-            resp.append(trie.top_k_with_prefix(currSearch, 3))
-        
-        return(resp)
-```
+    

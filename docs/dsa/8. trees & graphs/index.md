@@ -163,7 +163,7 @@ $V$ is the number of Vertices, and $E$ is the number of edges
     - ***Path Compression:*** So that root / parent identification will be updated as we traverse down a graph
     - ***Union by Rank:*** So that our tree's don't become unbalanced over time
 - For the time complexities below, $\alpha(n)$ is the *Inverse Achermann Function*, which "grows slowly and is effectively constant for all practical inputs"
-- An [Implementation](docs/leetcode/common_structs/optimized_unionfind.cpp) in C++ can be reviewed for actual runtime info
+- An [Implementation](/code/optimized_unionfind.cpp) in C++ can be reviewed for actual runtime info
 
 | Operation        | Average Complexity |
 |------------------|--------------------|
