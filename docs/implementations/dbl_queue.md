@@ -1,3 +1,13 @@
+---
+title: Double Ended Queue
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# Double Ended Queue
+
+```python
 import sys
 from dataclasses import dataclass
 from typing import Optional 
@@ -198,3 +208,4 @@ if __name__ == "__main__":
     # assert(deq.to_array == [1, 2, 3, 8, 9, 10])     
     
     # print(deq)  
+```

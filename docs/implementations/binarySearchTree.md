@@ -1,3 +1,13 @@
+---
+title: Binary Search Tree
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# Binary Search Tree
+
+```python
 from dataclasses import dataclass
 from typing import Optional
 
@@ -65,4 +75,4 @@ if node:
     print(f"Found node with value: {node.val}")
 else:
     print("Value not found")
-        
+```

@@ -1,3 +1,14 @@
+---
+title: Optimized UnionFind
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# Optimized UnionFind
+
+```cpp
+
 // To close it out all, just add parent, root, and rank vectors
 // Initial state:
 // Elements: 0, 1, 2, 3, 4
@@ -175,3 +186,4 @@ private:
     vector<int> rank;
     int count;
 }
+```

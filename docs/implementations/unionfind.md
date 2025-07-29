@@ -1,3 +1,13 @@
+---
+title: UnionFind
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# UnionFind
+
+```python
 class UnionFind:
     def __init__(self, size):
         self.root = [i for i in range(size)]
@@ -43,3 +53,4 @@ uf.union(1, 2)
 uf.union(2, 3)
 print(uf.connected(1, 3))  # Output: True
 print(uf.connected(1, 4))  # Output: False
+```

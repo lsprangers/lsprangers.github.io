@@ -1,13 +1,20 @@
+---
+title: KV Store With Transactions
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
 
-# - This is a quick demonstration of doing a KV Store with transactions.
-# - The goal is to have a KV Store that supports transactions, and that
-#    transactions are atomic and can be rolled back.
-# - Our requirements are listed below, and our desires are that 
-#    set, get, start_transaction, commit_transaction, rollback_transaction are all O(1) operations
+# KV Store With Transactions
+- This is a quick demonstration of doing a KV Store with transactions.
+- The goal is to have a KV Store that supports transactions, and that
+   transactions are atomic and can be rolled back.
+- Our requirements are listed below, and our desires are that 
+   set, get, start_transaction, commit_transaction, rollback_transaction are all O(1) operations
 
 
 
-
+```python
 from collections import deque
 from typing import Union
 from dataclasses import dataclass
@@ -195,3 +202,4 @@ if __name__ == "__main__":
     assert(test_store.get_latest_transaction_id() == 3)
     
     print("All tests pass :-)")
+```

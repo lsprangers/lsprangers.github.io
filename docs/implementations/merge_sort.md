@@ -1,3 +1,13 @@
+---
+title: Merge Sort
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# Merge Sort
+
+```python
 # 0, 1, 2, 3, 4
 # mid = 0 + (4 - 0) // 2 == 2
 # low = 0, high = 2,
@@ -86,3 +96,4 @@ if __name__ == "__main__":
     test = mergeSort(arr)
     assert(test.sort(0, len(arr) - 1) == [])   
     print(test.sort(0, len(arr) - 1))         
+```

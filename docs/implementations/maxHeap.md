@@ -1,4 +1,13 @@
+---
+title: Max Heap
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
 
+# Max Heap
+
+```python
 class maxHeap:
     def __init__(self, heap_list = []):
         self.heap_list = heap_list
@@ -90,3 +99,4 @@ heap.insert(60)
 print(heap.heap_list)
 heap.deleteNode(50)
 print(heap.heap_list)
+```

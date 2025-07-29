@@ -1,3 +1,13 @@
+---
+title: Trie
+category: Implementations
+difficulty: Advanced
+show_back_link: true
+---
+
+# Trie
+
+```python
 class TrieNode:
     def __init__(self):
         self.links = [None] * 26
@@ -67,4 +77,4 @@ class Trie:
         results = []
         dfs(node, list(prefix), results)
         return results
-    
+```

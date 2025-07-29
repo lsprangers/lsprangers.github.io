@@ -19,6 +19,8 @@ In this scenario we chose to create a distributed, sharded KV store with node ra
 
 Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
 
+Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/implementations/kv_store_with_transactions.md)
+
 ### Isolation Levels
 Before going into other areas, the [isolation levels](./ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems
 
