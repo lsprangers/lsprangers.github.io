@@ -156,6 +156,11 @@ $V$ is the number of Vertices, and $E$ is the number of edges
 |------------------|--------------------|--------------------|
 | Traverse         | $O(V + E)$         | $O(V)$             |
 
+### Maze
+Maze's are a special kind of graph where you essentially have a connected 2-D diagram
+
+Most common examples are [Finding The Nearest Exit](/docs/leetcode/python/nearestExitFromEntranceInMaze.md) or something similar, where you will use Breadth First Search to traverse outwards checking over the course of a structure
+
 ### UnionFind / Disjoint Set union
 - Union Find is a data structure that allows us to find a representation of clusters in a disconnected graph
   - It allows us to find connectivity of 2 nodes, i.e. if they're in the same component, in $O(1)$ time
