@@ -7,7 +7,7 @@ show_back_link: true
 
 # editDistance
 
-This is literally a pull of [Levenshtein Distance](/docs/implementations/levenshtein.md)
+This is literally a pull of [Levenshtein Distance](/docs/dsa/implementations/levenshtein.md)
 
 ```python
 class Solution:

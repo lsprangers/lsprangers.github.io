@@ -6,13 +6,15 @@ layout: default
 ## Systems Design
 Most of this section is around prepping for interview Sys Design questions
 
-![Search System](/img/SysArchTemplate-ECommerce%20Search%20System.drawio.png)
-
----
 This section is around using the below architecture components and implementations to build out high level systems design - common to what is seen in interviews:
 - [Architecture components](/docs/architecture_components/index.md): Which are examples of production grade components for messaging, event based architecture, communication protocols, database storage, and other items
-    - [Typical reusable resources](/docs/architecture_components/typical_reusable_resources/index.md): Which are examples of these architecture components built from ground up
-<!-- - [Implementations](/docs/implementations/index.md) -->
+- [Typical reusable resources](/docs/architecture_components/typical_reusable_resources/index.md): Which are examples of these architecture components built from ground up
+    - Under here are:
+        - In memory implementations
+        - Distributed implementations
+            - In memory node + some manager and scaling
+
+![Search System](/img/SysArchTemplate-ECommerce%20Search%20System.drawio.png)
 
 ---
 Some of the better examples so far:

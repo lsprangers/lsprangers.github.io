@@ -7,7 +7,7 @@ show_back_link: true
 
 # searchSuggestionSystem
 
-Most of the implementation here is done via the [Trie Implementation](/docs/implementations/trie.md), which makes all of this a very simple loop!
+Most of the implementation here is done via the [Trie Implementation](/docs/dsa/implementations/trie.md), which makes all of this a very simple loop!
 
 The other recommended setup is to:
 - Sort strings

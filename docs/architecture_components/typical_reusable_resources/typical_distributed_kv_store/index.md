@@ -11,7 +11,7 @@ Basically an API over a hash map
 
 There are some other things we can do in terms of indexing, sharding, consistency, and replication that causes differences between different systems
 
-### High Level Implementation
+### Implementations
 In this scenario we chose to create a distributed, sharded KV store with node ranges based on consistent hashing, and replication done via RAFT
 - Each "node" in the system is actually a RAFT cluster with one leader and multiple replicas
 - The nodes are considered fault tolerant, replicated, and consistent
@@ -19,7 +19,8 @@ In this scenario we chose to create a distributed, sharded KV store with node ra
 
 Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
 
-Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/implementations/kv_store_with_transactions.md)
+#### In Memory Implementation
+Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/dsa/implementations/kv_store_with_transactions.md)
 
 ### Isolation Levels
 Before going into other areas, the [isolation levels](./ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems

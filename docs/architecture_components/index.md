@@ -10,8 +10,11 @@ A lot of the times the Components we refer to here are going to be abstract infr
 
 AWS is the most famous example of platforming in this way, and a large majority of their solutions are resuable components that they deploy to be highly available, durable, and scalable
 
-# [Typical Components](/docs/architecture_components/typical_reusable_resources/)
-These are going to be examples that we build out from scratch - such as the architecture to build out a queue from scratch using only "up" VM's in a VPC
+# [Typical reusable resources](/docs/architecture_components/typical_reusable_resources/index.md)
+- Are examples of architecture components built from ground up
+    - In memory implementations
+    - Distributed implementations
+        - In memory node + some manager and scaling
 
 This will not be an exhaustive exercise, but it's helpful to see how all of this works because it allows you to understand configurations of cloud resources much better. A great example is marking a message as "seen" in a distributed queue, and how that relates to exactly once, at most once, or at least once semantics, and how that can be built into a typical queue system
 

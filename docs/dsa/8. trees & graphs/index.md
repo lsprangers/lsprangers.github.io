@@ -168,7 +168,7 @@ Most common examples are [Finding The Nearest Exit](/docs/leetcode/python/neares
     - ***Path Compression:*** So that root / parent identification will be updated as we traverse down a graph
     - ***Union by Rank:*** So that our tree's don't become unbalanced over time
 - For the time complexities below, $\alpha(n)$ is the *Inverse Achermann Function*, which "grows slowly and is effectively constant for all practical inputs"
-- An [Implementation](/docs/implementations/optimized_unionfind.md) in C++ can be reviewed for actual runtime info
+- An [Implementation](/docs/dsa/implementations/optimized_unionfind.md) in C++ can be reviewed for actual runtime info
 
 | Operation        | Average Complexity |
 |------------------|--------------------|

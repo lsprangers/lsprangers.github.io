@@ -17,6 +17,10 @@ It's a structured dump of stuff I've pulled out of old word files and tweaked in
 
 ## Highlights
 Some of the better displays on here:
+- [Typical reusable resources](/docs/architecture_components/typical_reusable_resources/index.md) which are examples of architecture components built from ground up
+  - In memory implementations
+  - Distributed implementations
+      - In memory node + some manager and scaling
 - [Pregel Graph Processing](/docs/other_concepts/graph_processing/PREGEL.md) and how I've used it in large analytics based product companies
 - [Video Recommendations](/docs/design_systems/video_recommendations/index.md) which showcases a specific example of what's talked about in [Generic Search Systems](/docs/design_systems/search_system/index.md)
 - [Spark Notes](/docs/other_concepts/SPARK.md)
