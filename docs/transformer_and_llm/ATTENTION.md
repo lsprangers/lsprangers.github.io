@@ -18,6 +18,106 @@ How is this done? Attention mechanisms in our DNN models. There are multiple for
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
+### RNN Attention
+Things first started off with RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
+
+This paper discusses how most architectures of the time have a 2 pronged setup:
+- An encoder to take the source sentence into a fixed length vector
+   - In most scenario's there's an encoder-per-language
+- A decoder to take that fixed length vector, and output a translated sentence
+   - There's also typically a decoder-per-language as well
+- Therefore, for every language there's an encoder-decoder pair which is jointly trained to maximize the probability of correct translation
+---
+
+- Why is this bad?
+   - Requires every translation problem to be "squished" into the same fixed-length vector
+   - Examples cited of how the performance of this encoder-decoder architecture deteriorates rapidly as the length of input sentence increases
+---
+- Proposal in this paper:
+   - "We introduce an extension of the encoder-decoder model which learns to align and translate jointly"
+      - This means it sets up (aligns) and decodes (translates) on the fly over the entire sentence, and not just all at once
+   - "Each time the proposed model generates a word in a translation, it (soft-)searches for a set of positions in a source sentence where the most relevant information is concentrated
+      - This means it uses some sort of comparison (later seen as attention) to figure out what words are most relevant in the translation
+   - The model then predicts a target word based on the context vectors associated with these source positions and all previously generated target words
+      - The model predicst the next word based on attention of this word and input sentence + previously generated words
+      - This was a breakthrough in attention, but apparently was proposed here earlier!
+- Altogether, this architecture looks to break away from encoding the entire input into one single vector by encoding the input into a sequence of vectors which it uses adaptively while decoding
+
+![RNN Attention](/img/rnn_attention.png)
+
+- The bottom portion is an encoder which receives source sentence as input
+- The top part is a decoder, which outputs the translated sentence
+
+#### Encoder RNN Attention
+- ***Input***: A sequence of vectors $\bold{x} = (x_1, ..., x_n)$
+   - ***Hidden States / Recurrence Function***: $h_t = f(x_t, h_{t-1})$
+      - $f$ is some non-linear function
+      - This will take the current input word, and the output of the last recurrence
+      - It is formalized that $h_t \in \mathbb{R^n}$ is the hidden state at time $t$
+- ***Context Vector***: $c = q(\{h_1, ..., h_{T_x}\})$ 
+   - Where $\hbar = \{h_1, ..., h_{T_x}\}$ `h-bar` is the set of recurrence functions
+   - $q$ is some non-linear function
+   - Basically, the context vector is a function over the set of hiddden states
+      - Hidden states $h_2 = f(x_2, h_1)$, and $h_3 = f(x_3, h_2) == f(x_3, f(x_2, h_1))$
+      - The set of these is fed into a non-linear function $q(\hbar)$
+
+#### Decoder RNN Attention
+Decoder is often trained to predict the next word $\hat{y_t}$ given the context vector $c$ and all the previously predicted words $\{\hat{y_1}, ..., \hat{y_{t-1}} \}$
+
+Our translation can be defined as $\bold{y} = (y_1, ... y_{T_n})$ which is just the sequence of words output so far!
+
+It does this by defining a probability distribution over the translation output word $\bold{y}$ by decomposing the joint probability. 
+
+$p(\bold{y}) = \prod_{t=1}^{T} p(y_t \mid \{y_1, \ldots, y_{t-1}\}, c)$
+
+*Since our $\bold{y}$ is just our entire word sequence, the probability we're solving for is "the probability that this is the sequence of words given our context vector"*
+
+So we're just choosing the next most likely word so that the probability of seeing all these words in a sequence is highest
+
+The sequence "Hi, what's your", if we looked over all potential next words, would most likely have the highest predicted outcome of "Hi, what's your name"
+
+Each of these conditional probabilities is typically modeled with a non-linear function $g$ such that 
+
+We also define a specific hidden state formula: $s_t = f(s_{i-1}, y_{i-1}, c_i)$ where the hidden state is based on last hidden state, last output word, and context at that state
+
+$g(y_{t-1}, s_t, c) = p(y_t \mid \{y_1, \ldots, y_{t-1}\}$
+
+![RNN Attention](/img/rnn_attention.png)
+
+
+#### Learning To Align And Translate
+The rest of the architecture proposes using a bi-directional RNN as an encoder, and then a decoder that emulates searching the source sentence during translation
+
+Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words squished into 1, 1 word expanded to 2, or 2 non-adjacent words that are used in outputting 1 
+
+***Realistically, and Seq2Seq task that isn't isomorphic would benefit from this structure***
+
+Below we can see the parameters for:
+- $y_{t-1}$ is the last output word
+- $s_{t-1}$ is the hidden state at that time
+- The $h_i$ components which are functions of ***previous words and hidden states in the encoder***
+   - That this encoder is forwards and backwards
+- Not explicitly shown is the $c = q(\{h_1, ..., h_{T_x}\})$ context vector, where $c_i$ is $c$ up to some point
+   - These $h_i$ in here are called ***annotations*** to which an encoder maps the input sentence
+   - Each $h_i$ contains information about the entire sentence ***with a strong focus on i-th word***
+   - $c_i$ is then a weighted sum of these annotations
+   - $c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_j$
+      - Where $\alpha_{ij}$ is the weight of $h_i$ to each annotation $h_j$ and is a similarity metric between the two computed as:
+      - $\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^{T_x} \exp(e_{ik})}$
+      - And $e_{ij} = a(s_{i-1}, h_j)$ is an alignment model which scores how well the inputs around $j$ and $i$ match
+   - All of this will be the basis of [Self-Attention](#self-attention) in the future, and for this you can just read this as the context vector $c_i$ is based on the similarity of an input annotation with the rest of the annotations
+- In the paper they even mention *"this implements a mechanism of attention in the decoder"*
+- In the encoder, the only major trick is doing bi-directional hidden states and then concatenating them
+   - This productes the annotations themselves
+   - $h_j = [\overrightarrow{h_j}, \overleftarrow{h_j}]$
+   - These annotations are then fed through the energy, alpha weight, and context vectors before being used in the decoder
+![RNN Attention](/img/rnn_attention.png)
+
+## Transformer Attention
+The above RNN discussion is useful, as it shows how we can utilize the building blocks of forward and backwards passes, and even achieve attention mechnisms using basic building blocks
+
+The rest of the discussion is around Attention blocks in Transformer Architectures, primarily using a similar encoder-decoder structure "on steroids"
+
 ### Encoding Blocks
 The main layer we focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 

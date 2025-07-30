@@ -113,6 +113,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [Jay Alammar Illustrated]
   - [Transformer](https://jalammar.github.io/illustrated-transformer/)
   - [GPT2](https://jalammar.github.io/illustrated-gpt2/#part-2-illustrated-self-attention)
+  - [SebastianRaschka](https://sebastianraschka.com/blog/2023/llm-reading-list.html)
 - [LayerNorm](https://h2o.ai/wiki/layer-normalization/)
 - [Another persons blog - AmitNess](https://amitness.com)
 - [TRYEXCEPT - ML Systems Design Interviews](https://www.youtube.com/@TryExcept-10110)

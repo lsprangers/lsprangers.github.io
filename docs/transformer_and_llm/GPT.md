@@ -21,6 +21,9 @@ In [Embeddings](./EMBEDDINGS.md) BERT was discussed to show how we can "attend t
 The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](./ATTENTION.md#self-attention) to help us generate the next words in our SoftMax output layer
 
 ### History
+[Generative Pre-Training](https://gwern.net/doc/www/s3-us-west-2.amazonaws.com/d73fdc5ffa8627bce44dcda2fc012da638ffb158.pdf) as a paper came out in 2018, and basically did away with the encoder in [BERT](/docs/transformer_and_llm/BERT.md)
+
+
 GPT-2 was trained on a 40GB dataset known as WebText by OpenAI
 
 The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6.5GB, showing the difference in overall parameter sizes
