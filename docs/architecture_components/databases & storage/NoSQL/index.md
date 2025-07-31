@@ -11,4 +11,4 @@ Basically taking away schemas, indexes, and transactions in favor of massively s
 
 This doesn't begin to cover everything, as NoSQL can be Document, Wide Column, Graph, K:V, setc. (Not Only SQL), but in most peoples day-to-day NoSQL refers to K:V storage of some sorts
 
-Some small implementations done for KV Stores such as [KV Store With Transactions](/docs/dsa/implementations/kv_store_with_transactions.md)
+Some small implementations done for KV Stores such as [KV Store With Transactions](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/kv_store_with_transactions.md)

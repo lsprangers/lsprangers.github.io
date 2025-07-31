@@ -1,5 +1,5 @@
 ---
-title: KV Store With Transactions
+title: In Memory KV Store With Transactions
 category: Implementations
 difficulty: Advanced
 show_back_link: true
