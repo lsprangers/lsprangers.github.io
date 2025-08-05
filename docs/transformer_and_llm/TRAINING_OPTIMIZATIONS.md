@@ -10,7 +10,7 @@ show_back_link: true
 ## Training Optimizations
 There's a few papers that come up on training, and by proxy inference, optimizations for Transformer models
 
-The paper [A Survey Of Efficienct Transformers](/static/arxiv_papers/Efficient%20Transformers%20MarkedUp.pdf) talks about ways to reduce the computational and memory costs associated with Transformers
+The paper [A Survey Of Efficienct Transformers](/arxiv_papers/Efficient%20Transformers%20MarkedUp.pdf) talks about ways to reduce the computational and memory costs associated with Transformers
 
 Some key reasons:
 - Embedded devices are subject to strict memory and compute limits
