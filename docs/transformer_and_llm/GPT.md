@@ -23,7 +23,6 @@ The first good comparison I can think of is to a really good auto-complete where
 ### History
 [Generative Pre-Training](https://gwern.net/doc/www/s3-us-west-2.amazonaws.com/d73fdc5ffa8627bce44dcda2fc012da638ffb158.pdf) as a paper came out in 2018, and basically did away with the encoder in [BERT](/docs/transformer_and_llm/BERT.md)
 
-
 GPT-2 was trained on a 40GB dataset known as WebText by OpenAI
 
 The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6.5GB, showing the difference in overall parameter sizes
@@ -31,6 +30,8 @@ The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6
 The number of decoder blocks + context size is one of the distinguishing factors in GPT models as well
 
 ![GPT Sizes](./images/gpt_sizes.png)
+
+One of the most notable aspects of GPT models is their emergent properties. Emergent properties refer to the abilities and skills that a model develops due to its next-word prediction pretraining. Even though these models were only taught to predict the next word, the pretrained models are capable of text summarization, translation, question answering, classification, and more.
 
 ### Pseudo Architecture
 

@@ -42,6 +42,15 @@ The reason this is "fast" is that in $O(\log(n))$ time we can propose capacity v
 ## Typical Patterns And Pitfalls
 There are some typical patterns pitfalls that annoyingly come up in almost every review, and using them correctly is very important!
 
+The main questions to ask yourself:
+- What is the search space?
+- What does check(mid) mean?
+- What is the goal (min valid, max valid, exact match)?
+    - This will alter what we return
+- When is mid good/bad? Adjust low/high accordingly
+    - This will alter our `low = ` and `high =` updates
+- Do you return low, high, or mid?
+
 | Goal / Pattern                              | `low` Update    | `high` Update    | Loop Condition      | Return              | Notes                            |
 | ------------------------------------------- | --------------- | ---------------- | ------------------- | ------------------- | -------------------------------- |
 | **Search on value / exact match**           | `low = mid + 1` | `high = mid - 1` | `while low <= high` | index or -1         | Classic binary search            |
@@ -51,7 +60,11 @@ There are some typical patterns pitfalls that annoyingly come up in almost every
 | **Maximize the largest valid value**        | `low = mid + 1` |                  | `while low < high`  | `high` or `low - 1` | Depends on what `check()` means  |
 
 
-***Classic Binary Search***
+### Classic Binary Search
+This will find the first exact match, and only returns `mid` if it finds it
+
+`mid + 1` because we just checked mid, and we know it's not involved, `mid - 1` because of the same logic
+
 ```python
 while low <= high:
     mid = (low + high) // 2
@@ -63,7 +76,34 @@ while low <= high:
         high = mid - 1
 ```
 
-***Lower Bound (First Valid X)***
+#### Example 1: Even Number of Elements
+
+Array: [2, 4, 6, 8, 10, 12]  
+Target: 8
+
+| Step | low | high | mid | arr[mid] | Comparison | Action               |
+|------|-----|------|-----|----------|------------|----------------------|
+| 1    | 0   | 5    | 2   | 6        | 6 < 8      | low = mid + 1 (=3)   |
+| 2    | 3   | 5    | 4   | 10       | 10 > 8     | high = mid - 1 (=3)  |
+| 3    | 3   | 3    | 3   | 8        | 8 == 8     | return mid (=3)      |
+
+
+#### Example 2: Odd Number of Elements
+
+Array: [1, 3, 5, 7, 9]  
+Target: 5
+
+| Step | low | high | mid | arr[mid] | Comparison | Action           |
+|------|-----|------|-----|----------|------------|------------------|
+| 1    | 0   | 4    | 2   | 5        | 5 == 5     | return mid (=2)  |
+
+
+
+### Lower Bound (First Valid X)
+For lower bound we strive to find the first element that satisfies some condition like $\leq$ target or $\ge$ target
+
+In these ones, we now must figure out which condition to not decrement, such as `high = mid`, because in this scenario `mid` may have the correct answer at some point, and we need to reduce search space to left to see if there's another one beforehand
+
 ```python
 while low < high:
     mid = (low + high) // 2
@@ -74,7 +114,60 @@ while low < high:
 return low
 ```
 
-***Upper Bound (Last Valid X)***
+#### Example: Find First Element $\ge$ Target
+
+Array: [1, 3, 5, 7, 9, 11]  
+Target: 6  
+Goal: Find the first index where arr[i] $\ge$ 6
+
+| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 6? | Action             |
+|------|-----|------|-----|----------|---------------|--------------------|
+| 1    | 0   | 5    | 2   | 5        | No            | low = mid + 1 (=3) |
+| 2    | 3   | 5    | 4   | 9        | Yes           | high = mid (=4)    |
+| 3    | 3   | 4    | 3   | 7        | Yes           | high = mid (=3)    |
+| 4    | 3   | 3    | -   | -        | -             | End, return low=3  |
+
+Result: Returns index 3 (arr[3]=7), which is the first element $\ge$ 6.
+
+---
+
+#### Edge Case: All Elements Less Than Target
+
+Array: [1, 2, 3, 4, 5]  
+Target: 10  
+Goal: Find the first index where arr[i] $\ge$ 10
+
+| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 10? | Action             |
+|------|-----|------|-----|----------|----------------|--------------------|
+| 1    | 0   | 4    | 2   | 3        | No             | low = mid + 1 (=3) |
+| 2    | 3   | 4    | 3   | 4        | No             | low = mid + 1 (=4) |
+| 3    | 4   | 4    | 4   | 5        | No             | low = mid + 1 (=5) |
+| 4    | 5   | 4    | -   | -        | -              | End, return low=5  |
+
+Result: Returns index 5 (out of bounds), meaning no element $\ge$ 10 exists.
+
+---
+
+#### Edge Case: First Element Satisfies Condition
+
+Array: [2, 3, 4, 5, 6]  
+Target: 2  
+Goal: Find the first index where arr[i] $\ge$ 2
+
+| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 2? | Action             |
+|------|-----|------|-----|----------|---------------|--------------------|
+| 1    | 0   | 4    | 2   | 4        | Yes           | high = mid (=2)    |
+| 2    | 0   | 2    | 1   | 3        | Yes           | high = mid (=1)    |
+| 3    | 0   | 1    | 0   | 2        | Yes           | high = mid (=0)    |
+| 4    | 0   | 0    | -   | -        | -             | End, return low=0  |
+
+Result: Returns index 0 (arr[0]=2), which is the first element $\ge$ 2.
+
+### Upper Bound (Last Valid X)
+This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario we set `low = mid` and `high = mid - 1` 
+
+This is because there can be multiple `mid` that satisfy the result, but we want to find the last one so we keep shrinking / dragging search space to the right
+
 ```python
 while low < high:
     mid = (low + high + 1) // 2  # Bias right
@@ -85,7 +178,9 @@ while low < high:
 return low
 ```
 
-***Search On Answer***
+### Search On Answer
+Search On Answer problems usually mean changing the search space, and then finding the [Lower Bound](#lower-bound-first-valid-x) or [Upper Bound](#upper-bound-last-valid-x) based on problem statement
+
 ```python
 low = max(weights)
 high = sum(weights)
@@ -112,6 +207,40 @@ For any BS problem:
 The discussion in [Capacity To Ship Packages](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md) showcases the need to rigorously define answer spaces in the correct way
 
 If we are checking potential answers outside of this space, they may return false positives / negatives that would ruin our entire check!
+
+## ATypical
+There are some weird ones thrown in as well, especially rotating lists, a weird search space, or "guessing" at a condition
+
+### Rotating Lists
+Problem Statement:
+Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array `nums = [0,1,2,4,5,6,7]` might become:
+
+    `[4,5,6,7,0,1,2]` if it was rotated 4 times.
+    `[0,1,2,4,5,6,7]` if it was rotated 7 times.
+
+Notice that rotating an array `[a[0], a[1], a[2], ..., a[n-1]]` 1 time results in the array `[a[n-1], a[0], a[1], a[2], ..., a[n-2]]`
+
+In these scenarios, the `condition(mid)` function needs to change to figure out if we should go left or right
+
+If an array isn't sorted, then we know for sure last element at end $\geq$ first element at 0
+
+However, if an array is rotated, then the last element would be smaller than the first element - seeing this pattern we can realize there's a place, an ***Inflection Point*** where we can figure out where the real start was
+
+Therefore, what we need to search for is an index $i : i > i + 1$ which would correspond to the old start and end
+
+![Inflection Point](/img/inflection_point.png)
+
+Therefore, `check` becomes:
+```
+mid = low + high // 2
+if check(mid):
+    return(mid)
+elif mid > first element of array:
+    search to the right
+else:
+    search to the left
+```
+because if we find the number 6, which is above the first element 4, we know our inflection point is still to the right of us
 
 ## Structures
 Lists and Tree's are typically the data structures that we see with Binary Search

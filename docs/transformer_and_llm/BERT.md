@@ -30,6 +30,8 @@ BERT training has a similar setup to Word2Vec where we use a certain context siz
 
 BERT itself is...useless? Meaning the model out of the box doesn't have an exact perfect use case (outside of word / sentence embeddings) and for most successful NLP projects it needs to have a final layer trained (this is false too, a lot of good sentence embedding can be done OOTB)
 
+There are other BERT adjacent models as well, such as Robustly Optimized BERT (RoBERTa) which uses larger batch sizes, more training input, and removes the next sentence prediction task to reduce overall size of models
+
 Most companies don't actually use BERT out of the box, most companies will fine-tune on top of it and then distill it to lower memory and inference footprint
 | Use Case | Head on Top of BERT |
 | --------- | --------- |

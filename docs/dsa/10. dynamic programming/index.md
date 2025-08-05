@@ -13,6 +13,15 @@ When a question asks us to minimize, maximize, or find the number of ways to do 
 
 In many programming languages, iteration is faster than recursion. Therefore, we often want to convert a top-down memoization approach into a bottom-up dynamic programming one (some people go directly to bottom-up, but most people find it easier to come up with a recursive top-down approach first and then convert it; either way is fine).
 
+What you need in a Dynamic Programming problem:
+- A function / array that represents the answer to the problem from a given state
+    - This is typically called `dp` in any problem
+- A function / relation to transition between states
+    - Getting from `dp[i]` to `dp[i + 1]` or vice versa
+    - This is typically the hardest part to find in any DP problem
+- A base case!
+    - Starting at `dp[0]` (front) or `dp[len(input)]` (back) is typicaly the easiest to start with
+
 ### Memoization Vs Top-Down
 
 
@@ -42,3 +51,6 @@ Substrings must be ***contiguous***, but since subsequences aren't there are tim
 | c | 0 | 1 | **2** | 2 | 2 |
 | d | 0 | 1 | 2 | 2 | 2 |
 | e | 0 | 1 | 2 | 2 | **3** | 
+
+
+[The Longest Increasing Subsequence](/docs/leetcode/python/longestIncreasingSubsequence%20(LIS).md) is another good problem showcasing subsequences and `dp` recurrence relations. In this there's even [a way to use binary search to make it $O(N \dot \log(N))$](/docs/leetcode/python/longestIncreasingSubsequence%20(LIS).md#binary-search)

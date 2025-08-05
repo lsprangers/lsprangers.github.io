@@ -123,4 +123,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [TRYEXCEPT - ML Systems Design Interviews](https://www.youtube.com/@TryExcept-10110)
 - [Succinct data structures](https://blog.startifact.com/posts/succinct/)
 - [Duke Stats 732 Paper on Choosing Priors](https://www2.stat.duke.edu/courses/Spring13/sta732.01/priors.pdf)
+- [Sebastian Raschka Blog](https://magazine.sebastianraschka.com/p/understanding-encoder-and-decoder)
 ---

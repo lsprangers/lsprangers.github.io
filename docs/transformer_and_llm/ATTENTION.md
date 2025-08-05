@@ -118,6 +118,8 @@ The above RNN discussion is useful, as it shows how we can utilize the building 
 
 The rest of the discussion is around Attention blocks in Transformer Architectures, primarily using a similar encoder-decoder structure "on steroids"
 
+![Even Better Transformer Diagram](/img/better_transformer_arch_diagram.png)
+
 ### Encoding Blocks
 The main layer we focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
