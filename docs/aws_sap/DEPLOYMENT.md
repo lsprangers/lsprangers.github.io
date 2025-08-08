@@ -194,3 +194,26 @@ This section is all around how to deploy and manage code, applications, and mach
 - You register your application components, their locations, attributes, and health to AWS CloudMap
 - Acts as a ZooKeeper-esque service discovery mechanism and helper
 - Integrations with Health Checking to stop sending traffic to unhealthy endpoints
+
+## Workspaces
+- Managed, secure, cloud desktop
+    - Connect to virtual desktop from laptop, and that virtual desktop connected to corporate data center or cloud
+- Great to eliminate management of on-premise VDI's
+- integrated with MS Active Directory
+- Pricing on-demand or monthly
+- Secure, encrypted network isolation
+- Cross region redirection
+    - Allows us to redirect users via Managed Microsoft AD for failover
+    - Healthcheck and failover for high availability
+    - User data is region specific though
+
+### Workspace Application Manager
+- Dep and manage applications as virtualized app containers
+- Provision at scale, and keepa pp updates using WAM
+- Windows Updates
+    - By default workspaces are configured to install software updates
+    - Workspaces with Windows has Windows Updates turned on
+    - Full control if you want to turn it off
+    - Define maintenance windows
+        - Always on (`00h00 to 04h00`)
+        - Autostop would run this once a month

@@ -9,7 +9,7 @@ show_back_link: true
 ## Machine Learning
 
 ### Rekognition
-Helps us to do segmentation, object detection, and OCR in images and videos
+Helps us to do segmentation, ***object detection***, and OCR in images and videos
 
 In general helps us to place bounding boxes and label them
 
@@ -26,7 +26,7 @@ Use Cases:
 - Pathing (like sports game analysis)
 
 ### Transcribe
-Automatically convert speech to text
+Automatically convert ***speech to text***
 
 Uses Automatic Speeech Recognition (ASR), and lets us automatically remove PII with automatic language identification
 
@@ -38,7 +38,7 @@ Use cases:
 ### Polly
 Does the opposite of Transcribe!
 
-Polly takes text and turns it into lifelike speech. Allows us to create applications that can talk
+***Text to Speech***. Allows us to create applications that can talk
 
 - *Lexicons* help us to altar what text should be read as compared to what it's typed as
 - *Speech markup language* allows us to style the kind of speaking that comes out
@@ -55,19 +55,21 @@ Polly takes text and turns it into lifelike speech. Allows us to create applicat
     - Using the *Newscaster* speaking style
 
 ### Translate
-Allows us to do natural and accurate language translation
+Allows us to do natural and accurate language ***translation***
 
 - Localize content such as websites and applications
 - Also does for international users, and allows us to easily translate large volumes of text efficiently
 
 ### Lex
-Same thing that powers Amazon Alexa 
+Same thing that powers Amazon Alexa - helps to understand ***intent***
 
 Automatic speech recognition that allows us to convert speech into text
 
 - Automated Speech Recognition to convert speech to text
 - Natural language understanding to recognize intent of text, callers
 - Integrates with ***Amazon Connect***
+    - Amazon connect is for cloud-based virtual contact center
+    - Connect will accept calls and stream into Lex, it will understand intent and invoke lambda, this will schedule something in CRM
     - Receive calls, create contact flows, and help establish cloud based customer contact center
     - Can integrate with other CRM systems or AWS Services
     - No upfront payments, and 80% cheaper than traditional contact center solutions
@@ -135,3 +137,7 @@ Extract text, handwriting, and other data from any scanned documents using AI an
 
 - Results given back as `data.json` file
 - Read and process any type of document (PDF, images, etc)
+
+### Alexa For Business
+- Use ALexa to help employees be more productive in meeting rooms and their desks
+- Measure and increase utilization of meeting rooms in workspace

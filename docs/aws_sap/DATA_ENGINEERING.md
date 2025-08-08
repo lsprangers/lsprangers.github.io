@@ -89,6 +89,19 @@ show_back_link: true
         - If multiple consumers try to read frmo same Kinesis Data Streams shard, they compete and both are apart of same throughput calculation
             - Meaning they basically act as one consumer
 
+### Kinesis Video Streams
+It is a specific instantiation of Kinesis Data Streams
+
+- One video stream per streaming device (producer)
+    - Security cameras, body cameras, smartphones
+- Underlying data stored in S3, but ***we do not have access to it***
+- ***Cannot output stream data to S3***
+- Consumers:
+    - EC2 instances for real time analysis or in batch
+    - Can leveerage Kinesis Video stream parser library
+    - ***Integrate with AWS Rekognition for facial detection***
+        - Producers $\rarr$ Rekognition $\rarr$ Kinesis Data Stream $\rarr$ Kinesis Data Firehose / Analytics
+
 ## Kinesis Data Firehose
 - Basically a connector and mover 
 - Stores data in target destinations
