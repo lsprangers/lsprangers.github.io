@@ -47,3 +47,20 @@ A ***Hash Function $H(x)$*** of something is a function that turns an object fro
 
 ![Bucket with multiple entries](./images/hash_bucket.png)
 
+### Examples
+
+#### Counting and Sliding Windows
+<!-- [3Sum](/docs/leetcode/python) -->
+These are scenarios where we slide through an array and check some sub-array logic, and during the sliding we will add values to a hashmap somewhere
+
+A good example is [Subarray Sum](/docs/dsa/1.%20arrays%20&%20strings/index.md#subarray-sum--k)
+
+## Sets
+Sets are similar to Hash Tables, where they map keys to integers, but sets don't actually map keys to anything
+
+They simply represent if something is already in the set or not, `my_set.add(1)` will hash `1` and place it into the set, so if two items hash to the same value they'll be viewed as similar in the set
+
+## Bloom Filter
+Bloom Filters are sets / hashes, and they represent items that are currently in the set. If two values `a` and `b` hash to the same value, we'll say they are both in the set
+
+A bloom filter is used to check if an item is already in the set, if it returns true ***it may be wrong***, but if it returns false we know for sure the item is not in the set

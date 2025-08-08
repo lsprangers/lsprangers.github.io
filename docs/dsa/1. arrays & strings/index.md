@@ -144,12 +144,12 @@ def isSubsequence(self, s: str, t: str) -> bool:
     - First valid subarray
     - Last valid subarray
     - The below function uses `curr += nums[right]` and `curr -= nums[left]` which is random access so it's $O(1)$
-```
+```python
 function fn(nums, k):
     left = 0
     curr = 0
     answer = 0
-    for (int right = 0; right < nums.length; right++):
+    for right in range(len(nums)):
         curr += nums[right]
         while (curr > k):
             curr -= nums[left]
@@ -159,10 +159,10 @@ function fn(nums, k):
 
     return answer
 ```
-```
+```python
 function fn(arr):
     left = 0
-    for (int right = 0; right < arr.length; right++):
+    for right in range(len(arr)):
         Do some logic to "add" element at arr[right] to window
 
         while WINDOW_IS_INVALID:
@@ -172,7 +172,8 @@ function fn(arr):
         Do some logic to update the answer
 ```
 - This can be useful in examples where we're allowed to do an action once, like flip a bit from 0 to 1, but we still want to find the largest subarray
-```
+
+```python
 def find_length(s):
     # curr is the current number of zeros in the window
     left = curr = ans = 0 
@@ -188,7 +189,25 @@ def find_length(s):
     return ans
 ```
 
-#### Number of SubArrays
+#### Number of Subarrays
+Off the bat, the number of subarrays in an array of length $N$ is $\sum_{i=1}^{i=n}{i} = (N * (N+1)) / 2$ 
+
+- The first element can start $N$ subarrays
+    - 1 subarray from $a_0$ to $a_{n-1}$
+    - 1 subarray from $a_1$ to $a_{n-1}$
+    - ...
+    - 1 subarray from $a_{n-1}$ to $a_{n-1}$
+    - $n$ total subarrays
+- The second element can start $N - 1$ subarrays
+    - 1 subarray from $a_0$ to $a_{n-2}$
+    - 1 subarray from $a_1$ to $a_{n-2}$
+    - ...
+    - 1 subarray from $a_{n-2}$ to $a_{n-2}$
+    - $n-1$ total subarrays
+- One subarray containing $a_0$
+- Therefore, total number of subarrays is $n + (n-1) + ... + 1$
+
+--- 
 - During a sliding window, the number of subarrays between indexes right and left is `right - left + 1`
     - Between left and right there are a number of possible subarrays
     - `[left, right]`
@@ -264,8 +283,10 @@ There are even [tree path prefix](/docs/dsa/8.%20trees%20&%20graphs/index.md#pre
 
 #### Subarray Sum = k
 Mostly goes off the fact that given a Prefix Sum / Cumulative Sum, at any point 
-$cSum[index_j] - cSum[index_i] = \sum_{k=i}^{j} x_k$
-which just means we can find some target $t$ by using a hashmap
+$cSum[index_j] - cSum[index_i] = \sum_{k=i + 1}^{j} x_k$  (inclusive of $j$, exclusive of $i$) which just means we can find some target $t$ by using a hashmap
+
+$cSum[j] - cSum[i] = x_{i+1} + x_{i+2} + ... + x_j$
+
 ```
 # nums =    [1, 2, 4, -2], t = 4
 # pfxSum =  [1, 3, 7, 5]
@@ -290,4 +311,20 @@ for num in nums[1:]:
             
 
 return(resp)
+```
+
+#### Kadane
+Kadane's algorithm is used to find the maximum sum of a contiguous subarray
+
+If it's all positive then we'd just take the entire array, if there are negatives we'd maybe include them
+
+```python
+nums = [1, 3, 4, 1, 2, 5]
+max_so_far = -float("inf")
+current_max = nums[0]
+for num in nums[1:]:
+    current_max = max(num, current_max + num)
+    max_so_far = max(max_so_far, current_max)
+
+return(max_so_far)
 ```
