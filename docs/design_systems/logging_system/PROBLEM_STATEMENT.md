@@ -5,14 +5,13 @@ category: Design Systems
 difficulty: Advanced
 ---
 
-# Code Challenge: Audit Log API
+## Code Challenge: Audit Log API
 ***This was on a Reddit thread and I just grabbed it to try***
 https://www.reddit.com/r/ExperiencedDevs/comments/1lp7kn6/is_this_takehome_assignment_reasonable/
 
 This is a full blown audit log solution you could sell to clients and host managed infra for
 
 ## Objective
-
 Develop a comprehensive audit logging API system that tracks and manages user actions across different applications. This system should be designed to handle high-volume logging, provide search and filtering capabilities, and ensure data integrity and security.
 
 ## Requirements:
