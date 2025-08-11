@@ -53,4 +53,4 @@ Substrings must be ***contiguous***, but since subsequences aren't there are tim
 | e | 0 | 1 | 2 | 2 | **3** | 
 
 
-[The Longest Increasing Subsequence](/docs/leetcode/python/longestIncreasingSubsequence%20(LIS).md) is another good problem showcasing subsequences and `dp` recurrence relations. In this there's even [a way to use binary search to make it $O(N \dot \log(N))$](/docs/leetcode/python/longestIncreasingSubsequence%20(LIS).md#binary-search)
+[The Longest Increasing Subsequence](/docs/leetcode/python/longestIncreasingSubsequence.md) is another good problem showcasing subsequences and `dp` recurrence relations. In this there's even [a way to use binary search to make it $O(N \dot \log(N))$](/docs/leetcode/python/longestIncreasingSubsequence.md#binary-search)

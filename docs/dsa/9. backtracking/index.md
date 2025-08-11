@@ -51,5 +51,47 @@ Then we'd get to backtrack(3, [1, 3, 7]) becuase we are in a loop of for i in ar
 Lastly that'd pop off, it would return, and we'd get into backtrack(2, [1, 5]) -> backtrack(3, [1, 5, 7])
 ```
 
+### Indexes
+Using indexes is an easy way to loop through all permutations of some size $k$
+
+A good example where this fails is [Maximum Score Subsequence Size K](/docs/leetcode/python/maximumSubsequenceScore.md) where we go through all ${n \choose k} = {{n!} \over {k!} \cdot {(n-k)!}}$ possibilities and get a TLE exception
+
+```python
+def problem(self, arr: List[int], size: int):
+    prep()
+    resp = []
+
+    def backtrack(curr, start):
+        if len(curr) == size and tuple(curr) not in seen:
+            resp.append(curr[:]) # copy of curr
+            return
+            
+        for i in range(start, len(arr)):
+            curr += [i]
+            backtrack(curr, i + 1)
+            curr.pop()
+        
+        return
+    
+    backtrack([], 0)
+    return(resp)
+```
+
+OR - like the pros do, just use `itertools`
+
+```python
+def problem(self, arr: List[int], size: int):
+    prep()
+    resp = []
+
+    # list of every combination
+    combos = list(itertools.combinations(range(len(arr)), size))
+    # list of every permutation
+    permus = list(itertools.permutations(range(len(arr)), size))    
+    return(resp)
+```
+
+Which utilizes the `other_idx` and popping to recursively go through every possible permutation
+
 ### Permutations vs Combinations
 ### Trie
