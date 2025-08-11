@@ -51,13 +51,12 @@ The main questions to ask yourself:
     - This will alter our `low = ` and `high =` updates
 - Do you return low, high, or mid?
 
-| Goal / Pattern                              | `low` Update    | `high` Update    | Loop Condition      | Return              | Notes                            |
-| ------------------------------------------- | --------------- | ---------------- | ------------------- | ------------------- | -------------------------------- |
-| **Search on value / exact match**           | `low = mid + 1` | `high = mid - 1` | `while low <= high` | index or -1         | Classic binary search            |
-| **Find first `x` such that condition(x)** | `high = mid`    |                  | `while low < high`  | `low`               | Lower bound                      |
-| **Find last `x` such that condition(x)**  | `low = mid + 1` |                  | `while low < high`  | `low - 1`           | Upper bound (post-process `-1`)  |
-| **Minimize the smallest valid value**       | `high = mid`    |                  | `while low < high`  | `low`               | e.g., Ship packages, Split array |
-| **Maximize the largest valid value**        | `low = mid + 1` |                  | `while low < high`  | `high` or `low - 1` | Depends on what `check()` means  |
+| Goal / Pattern                              | `mid` Calc                          | `low` Update                       | `high` Update                      | Loop Condition      | Return  | Notes                                                                 |
+| ------------------------------------------- | ------------------------------------ | ------------------------------------ | ------------------------------------ | ------------------- | ------- | --------------------------------------------------------------------- |
+| **Search on value / exact match**           | `(low + high) // 2`                  | `low = mid + 1`                      | `high = mid - 1`                     | `while low <= high` | index or -1 | Classic binary search                                                 |
+| **Find first `x` such that condition(x)**   | `(low + high) // 2` (**bias left**)  | `low = mid + 1` if false             | `high = mid` if true                 | `while low < high`  | `low`   | **Lower bound** - shrink right side when mid is valid                 |
+| **Find last `x` such that condition(x)**    | `(low + high + 1) // 2` (**bias right**) | `low = mid` if true                  | `high = mid - 1` if false            | `while low < high`  | `low`   | **Upper bound** - shrink left side when mid is invalid; bias prevents infinite loop |
+
 
 
 ### Classic Binary Search
@@ -168,6 +167,8 @@ This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so i
 
 This is because there can be multiple `mid` that satisfy the result, but we want to find the last one so we keep shrinking / dragging search space to the right
 
+mid calculation being `low + high + 1` also ***prevents an infinite loop, and is vital***
+
 ```python
 while low < high:
     mid = (low + high + 1) // 2  # Bias right
@@ -241,6 +242,15 @@ else:
     search to the left
 ```
 because if we find the number 6, which is above the first element 4, we know our inflection point is still to the right of us
+
+### Find A Rate
+There are some specific problems like [KoKo Eating Bananas](/docs/leetcode/python/kokoEatingBananas.md) and Elves on Package Line where you basically need to find a rate of something, and then check if that rate suffices
+
+Koko's eating rate, maybe it's 3 bananas-per-hour, and if that works then we'd look if a higher rate would suffice like 10-per-hour, etc...
+
+Usually this would mean the rate finding is $O(\log R)$ where $R$ is the rate search space, and then there'd be an input array of size $N$ that we must check through. The check function is typically $O(N)$ so in total it's $(O\log R \cdot N)$ versus $O(R \cdot N)$
+
+Otherwise, you just continuously check the rate instead of "smart searching" using binary search
 
 ## Structures
 Lists and Tree's are typically the data structures that we see with Binary Search
