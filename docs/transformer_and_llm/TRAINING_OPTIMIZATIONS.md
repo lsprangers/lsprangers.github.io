@@ -44,3 +44,4 @@ The main crux focused on is the [Self-Attention](/docs/transformer_and_llm/ATTEN
 - ***Down Sampling*** is about reducing the resolution of sequences
 - ***Sparse Models and Conditional Computation***
     - Sparse activation of a subset of parameters to generally improve FLOPs ratio
+

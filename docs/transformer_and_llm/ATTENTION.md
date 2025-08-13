@@ -18,6 +18,8 @@ How is this done? Attention mechanisms in our DNN models. There are multiple for
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
+![Bert, GPT, BART](![alt text](/img/bert_gpt_bart.png))
+
 ### RNN Attention
 Things first started off with RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
 
@@ -398,6 +400,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
    - Generates the output sequence token by token using:
      - Self Attention: Captures relationships within the output sequence.
      - Encoder-Decoder Attention: Incorporates information from the input sequence.
+     - Auto-Regressive Decoder: Tokens are predicted auto-regressively, meaning words can only condition on leftward context while generating
 
 3. **Final Output**:
    - The decoder's output is passed through a linear layer and softmax to produce the next token.

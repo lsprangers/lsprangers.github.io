@@ -38,7 +38,7 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
 - ***Input***:
     - We embed our initial words and use positional encoding as well
 - ***Decoder Only***:
-    - Uses [Masked Self Attention](./ATTENTION.md#masked-self-attention)
+    - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention)
     - ***Auto Regressive***:
         - The way these models actually work is that after each token is produced, that token is added to the sequence of inputs. And that new sequence becomes the input to the model in its next step.
         - This means that we don't encode everything from before and after, we can use the prompt as input and then each generated word is also included in the future generation

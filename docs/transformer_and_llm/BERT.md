@@ -16,17 +16,17 @@ BERT is technically an ***Encoder Only Model*** even though it has a decoder sta
 
 ![GPT, BERT, and Others](./images/gpt_bert_others.png)
 
-Therefore, if we look into [Attention](./ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](./ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
+Therefore, if we look into [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
 BERT doesn't generate text, but it produces token embeddings that are great for Classification, Sentence Similarity, Sentiment Analysis, and NER / Token Level Tasks
 
-***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](./ATTENTION.md#attention) respectively
+***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) respectively
 
 ***Transfer Learning*** is the idea that the semi-supervised training of of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers tacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
 
 BERT training has a similar setup to Word2Vec where we use a certain context size to help us model a specific word, but the embeddings can't necessarily be saved because the output layer (embedding) depdends on the hidden layers...therefore we need to pass a word through with context to get an embedding
 
-***Bidirectionality*** is the big buzz word throughout this paper, and the paper mentioned OpenAI's GPT models multiple times discussing how they only have unidirectional architecture in the [Attention](./ATTENTION.md#attention) layers which ultimately restricts it's abilities in some downstream tasks like sentence classification and question answering
+***Bidirectionality*** is the big buzz word throughout this paper, and the paper mentioned OpenAI's GPT models multiple times discussing how they only have unidirectional architecture in the [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) layers which ultimately restricts it's abilities in some downstream tasks like sentence classification and question answering
 
 BERT itself is...useless? Meaning the model out of the box doesn't have an exact perfect use case (outside of word / sentence embeddings) and for most successful NLP projects it needs to have a final layer trained (this is false too, a lot of good sentence embedding can be done OOTB)
 
@@ -68,7 +68,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - $S_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
         - In our inference time examples for embeddings most people just fill it with `0's` or `1's` depending on which sentence it's apart of
 
-- Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](./ATTENTION.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
+- Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
   - I used to believe BERT also uses Bahdanau attention, but that's in encoder-decoder architectures, where decoder computes attention over encoder outputs to select relevant context for each generated token
   - ***BERT IS NOT A DECODER*** - there's no secondary sentence like output / target to attend over! We simply just attend to our input WordPiece embeddings
   - Other transformers like TP, BART, and some GPT models do have cross-attention which is similar to Bahdanau
@@ -87,7 +87,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
             - It should have all of hte info of the sentence, and would be the feature input to our classification layer
     - `[SEP]` marks the separation of two sentences
         - We utilize this with a *learned embedding vector* to update embeddings whether they're in sentence A or B
-            - This is just another piece of [Attention](./ATTENTION.md#attention), except here the attended to portion is sentence placement, which would affect our tokens vector by updating it with sentence A or B context
+            - This is just another piece of [Attention](/docs/transformer_and_llm/ATTENTION.md#attention), except here the attended to portion is sentence placement, which would affect our tokens vector by updating it with sentence A or B context
 - Our input representation is created by summing the token, segment, and positional embeddings - $SUM(T_i, S_i, P_i)$
     - Basically it's a representation of our token's actual word embedding, it's sentence, and it's position in the sentence
     - TODO: `[CLS]` token is just at the front - I thought this wold be at the end? Why would we use the final hidden layer of the first token?
