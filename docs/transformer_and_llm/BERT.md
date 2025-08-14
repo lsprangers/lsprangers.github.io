@@ -8,13 +8,13 @@ show_back_link: true
 ---
 
 ## BERT
-BERT (Bidirectional Encoder Representations from Transformers) goes a step beyond [Word2Vec](./EMBEDDINGS.md#word2vec) as it is an all around ***language representation model*** that can provide contextual word and sentence embeddings for specific supervised tasks
+BERT (Bidirectional Encoder Representations from Transformers) goes a step beyond [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) as it is an all around ***language representation model*** that can provide contextual word and sentence embeddings for specific supervised tasks
 
 BERT is technically an ***Encoder Only Model*** even though it has a decoder stack, the Attention is All You Need Paper references Encoder-Decoder, which BART is, but BERT is Encoder only
 
 ***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for BERT! Encoder only helps us with transfer learning for a variety of contextual embedding use cases
 
-![GPT, BERT, and Others](./images/gpt_bert_others.png)
+![GPT, BERT, and Others](/docs/transformer_and_llm/images/gpt_bert_others.png)
 
 Therefore, if we look into [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
@@ -70,10 +70,12 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 
 - Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
   - I used to believe BERT also uses Bahdanau attention, but that's in encoder-decoder architectures, where decoder computes attention over encoder outputs to select relevant context for each generated token
-  - ***BERT IS NOT A DECODER*** - there's no secondary sentence like output / target to attend over! We simply just attend to our input WordPiece embeddings
+  - ***BERT HAS NO DECODER*** - there's no secondary sentence like output / target to attend over! We simply just attend to our input WordPiece embeddings
   - Other transformers like TP, BART, and some GPT models do have cross-attention which is similar to Bahdanau
 - BERT uses bi-directional self-attenion, while other models like GPT use constrained left-to-right self-attention
-    - Left-to-right attention means for any token / word $w_i$ it can only attent to (get attention /context from) words to the left i.e. $w_{0, i-1}$
+    - Constraind left-to-right attention means for any token / word $w_i$ it can only attend to (get attention /context from) words to the left i.e. $w_{0, i-1}$
+
+##### Input Sequence
 - The input token sequence can be either a single sentence or a pair of sentences, which allows for MLM and NSP tasks mentioned above
 - ***WordPiece Embeddings are used with a 30k vocab size to represent the input sequence words as numeric embeddings***
     - This is an initial part of how BERT and Word2Vec are similar
@@ -92,12 +94,12 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - Basically it's a representation of our token's actual word embedding, it's sentence, and it's position in the sentence
     - TODO: `[CLS]` token is just at the front - I thought this wold be at the end? Why would we use the final hidden layer of the first token?
     - Even though `[CLS]` is at the front of a sentence, it's still a useful token to use for the final hidden layer as it will contain all of the information for the rest of the sentence - since BERT is bidirectional using the start or ending word should be equivalent
-- ![Input Representation](./images/input_representation.png)
+- ![Input Representation](/docs/transformer_and_llm/images/input_representation.png)
 
 #### Masked Language Modeling Architecture
 - ***Training Objective:*** to predict the masked word via `MAX(softmax_score)`!
 - Also known as ***Cloze*** task in historic literature
-- The reason bi-directional MLM is so powerful is because it allows our models to go beyond "concatenating left-to-right and right-to-left" and to actually use this inforamtion to update information
+- The reason bi-directional MLM is so powerful is because it allows our models to go beyond "concatenating left-to-right and right-to-left" and to actually use this information to update information
 - For MLM tasks we basically need to set things up so that any word can't "see itself" and is able to use the contextual positions of all other words
 - After running the sentence through for each masked word, the final hidden state is sent through an output softmax layer to predict the masked word
 - 15% of words are masked in each sentence at random

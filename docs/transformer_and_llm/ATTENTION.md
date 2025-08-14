@@ -18,7 +18,7 @@ How is this done? Attention mechanisms in our DNN models. There are multiple for
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
-![Bert, GPT, BART](![alt text](/img/bert_gpt_bart.png))
+![Bert, GPT, BART](/img/bert_gpt_bart.png)
 
 ### RNN Attention
 Things first started off with RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)

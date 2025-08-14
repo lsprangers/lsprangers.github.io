@@ -12,13 +12,13 @@ GPT-2 was one of the first, and most notable GPT models!
 
 GPT models are ***Decoder Only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input
 
-In [Embeddings](./EMBEDDINGS.md) BERT was discussed to show how we can "attend to" embeddings, and the Self Attention encoder portion was a way to contextualize ***an entire sentence, before and after a word***, but GPT isn't "allowed" to do that
+In [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) BERT was discussed to show how we can "attend to" embeddings, and the Self Attention encoder portion was a way to contextualize ***an entire sentence, before and after a word***, but GPT isn't "allowed" to do that
 
-***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for GPT! GPT is used for things like next word prediction, auto-complete, etc...
+***Use Case***: Original Encoder-Decoder Transformers like BART were great for *machine translation*, but that isn't the use case for GPT! GPT is used for things like next word prediction, auto-complete, etc...
 
-![GPT, BERT, and Others](./images/gpt_bert_others.png)
+![GPT, BERT, and Others](/docs/transformer_and_llm/images/gpt_bert_others.png)
 
-The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](./ATTENTION.md#self-attention) to help us generate the next words in our SoftMax output layer
+The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) to help us generate the next words in our SoftMax output layer
 
 ### History
 [Generative Pre-Training](https://gwern.net/doc/www/s3-us-west-2.amazonaws.com/d73fdc5ffa8627bce44dcda2fc012da638ffb158.pdf) as a paper came out in 2018, and basically did away with the encoder in [BERT](/docs/transformer_and_llm/BERT.md)
@@ -36,15 +36,18 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
 ### Pseudo Architecture
 
 - ***Input***:
-    - We embed our initial words and use positional encoding as well
+    - The [section on BERTs input sequence](/docs/transformer_and_llm/BERT.md#input-sequence) basically describes what the input would be here as well
+        - We embed our initial words, similar to BERT it uses WordPiece Embeddings
+        - Positional encoding is also used
 - ***Decoder Only***:
-    - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention)
+    - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention) which allows for constrained left-to-right self attention
+        - Allows us to use newly generated words throughout our next prediction
     - ***Auto Regressive***:
         - The way these models actually work is that after each token is produced, that token is added to the sequence of inputs. And that new sequence becomes the input to the model in its next step.
         - This means that we don't encode everything from before and after, we can use the prompt as input and then each generated word is also included in the future generation
         - ![AutoRegressive](./images/auto_regressive_generation.png)    
 - ***Output***:
-    - Compare our output, attended to, embedding with our vocabulary list to create probability distribution over all words
+    - Compare our output embedding, which has been attended to, with our vocabulary list to create probability distribution over all words
     - Use the `top_k` parameter and select words from the resulting sample set for our output generated word
 
 ### Architecture
