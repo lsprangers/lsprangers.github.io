@@ -125,4 +125,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [Succinct data structures](https://blog.startifact.com/posts/succinct/)
 - [Duke Stats 732 Paper on Choosing Priors](https://www2.stat.duke.edu/courses/Spring13/sta732.01/priors.pdf)
 - [Sebastian Raschka LLM Reading List](https://sebastianraschka.com/blog/2023/llm-reading-list.html)
+- [Encord - Contrastive Learning](https://encord.com/blog/guide-to-contrastive-learning/)
+- [MinHash](https://spotintelligence.com/2023/01/02/minhash/)
+- [MinHash + LSH](https://www.pinecone.io/learn/series/faiss/locality-sensitive-hashing/)
 ---

@@ -16,7 +16,7 @@ In [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) BERT was discussed to s
 
 ***Use Case***: Original Encoder-Decoder Transformers like BART were great for *machine translation*, but that isn't the use case for GPT! GPT is used for things like next word prediction, auto-complete, etc...
 
-![GPT, BERT, and Others](/docs/transformer_and_llm/images/gpt_bert_others.png)
+![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
 The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) to help us generate the next words in our SoftMax output layer
 

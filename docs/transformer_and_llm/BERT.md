@@ -14,7 +14,7 @@ BERT is technically an ***Encoder Only Model*** even though it has a decoder sta
 
 ***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for BERT! Encoder only helps us with transfer learning for a variety of contextual embedding use cases
 
-![GPT, BERT, and Others](/docs/transformer_and_llm/images/gpt_bert_others.png)
+![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
 Therefore, if we look into [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
@@ -23,6 +23,8 @@ BERT doesn't generate text, but it produces token embeddings that are great for 
 ***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) respectively
 
 ***Transfer Learning*** is the idea that the semi-supervised training of of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers tacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
+
+After learning more about it, BERT is a specific case of [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) and most of the discussion around that learning style can be applied here - self supervised, generalized embeddings, with transfer learning and evaluation as core target in downstream tasks
 
 BERT training has a similar setup to Word2Vec where we use a certain context size to help us model a specific word, but the embeddings can't necessarily be saved because the output layer (embedding) depdends on the hidden layers...therefore we need to pass a word through with context to get an embedding
 
@@ -94,7 +96,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - Basically it's a representation of our token's actual word embedding, it's sentence, and it's position in the sentence
     - TODO: `[CLS]` token is just at the front - I thought this wold be at the end? Why would we use the final hidden layer of the first token?
     - Even though `[CLS]` is at the front of a sentence, it's still a useful token to use for the final hidden layer as it will contain all of the information for the rest of the sentence - since BERT is bidirectional using the start or ending word should be equivalent
-- ![Input Representation](/docs/transformer_and_llm/images/input_representation.png)
+- ![Input Representation](./images/input_representation.png)
 
 #### Masked Language Modeling Architecture
 - ***Training Objective:*** to predict the masked word via `MAX(softmax_score)`!

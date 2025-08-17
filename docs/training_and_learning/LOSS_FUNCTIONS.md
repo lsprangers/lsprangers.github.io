@@ -58,7 +58,9 @@ Why do we use these output formulas? We want them to be "nice" for derivates and
 Loss functions are the entire heart of model training and tuning 
 
 ### Cross Entropy
-Cross Entropy is a loss function commonly used for **classification tasks**. It measures the difference between the true probability distribution (ground truth) and the predicted probability distribution (output of the model). It is particularly effective when the output of the model is a probability distribution (e.g., from a softmax layer).
+Cross Entropy is a loss function commonly used for **classification tasks**. It measures the difference between the true probability distribution (ground truth) and the predicted probability distribution (output of the model)
+
+It is particularly effective when the output of the model is a probability distribution (e.g., from a softmax layer)
 
 #### Formula
 $
@@ -140,9 +142,13 @@ Where:
    - Use **KL Divergence** if the ground truth is a probability distribution over items.
 
 ### InfoNCE Loss
-InfoNCE loss, or Information Noise-Contrastive Estimation loss is used in ***self-supervised learning*** to train models to learn meaningful representations by distinguishing between positive and negative sample pairs
+InfoNCE loss, or Information Noise-Contrastive Estimation loss is used in ***self-supervised learning***, particularly [Constrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) to train models to learn meaningful representations by distinguishing between positive and negative sample pairs
+
+During self-supervised contrastive learning we take an input data point and augment it with multiple functions to create multiple positive pairs, and then we can compare those with other samples which act as negative pairs
 
 It does this by giving low loss to similar pairs - i.e. by maximizing the similarity between positive pairs, and minimizing the similarity between negative pairs
+
+The key idea / intuition is to treat the learning problem as a binary classifier, where the similarity between instances is measured using a probabilistic approach - similar to [Softmax](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax)
 
 #### Formal Definition
 Given a set $X = \{x_1, x_2, ..., x_N\}$ of $N$ random samples containing one positive sample from $p(x_{t+k} | c_t)$ and $N-1$ negative samples from the 'proposal' distribution $p(x_{t+k})$, we optimize:
