@@ -12,16 +12,18 @@ Attention is what separates static embeddings from dynamic embeddings - they all
 
 Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results
 
-We need to remember that the embedding for "bank" *is always the same Embedding in the Metric Space* in these scenario's, but by attending to it with Attention, we can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its Metric Space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
+We need to remember that the embedding for "bank" *is always the same embedding in the metric space* in these scenario's, but by attending to it with Attention, we can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
 
-How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention including Self Attention, Encoder-Decoder Attention, and Bahdanau Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
+How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention - most useful / used are Self Attention, Encoder-Decoder Attention, and Masked Self Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
-![Bert, GPT, BART](/img/bert_gpt_bart.png)
+Below shows an example of how an embedding like creature would change based on surrounding context
+<!-- ![Bert, GPT, BART](/img/bert_gpt_bart.png) -->
+![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
 
-### RNN Attention
-Things first started off with RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
+### Bahdanau RNN Attention
+Things first started off with Bahdanau Style RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
 
 This paper discusses how most architectures of the time have a 2 pronged setup:
 - An encoder to take the source sentence into a fixed length vector
@@ -52,7 +54,7 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
 
 #### Encoder RNN Attention
 - ***Input***: A sequence of vectors $\bold{x} = (x_1, ..., x_n)$
-   - ***Hidden States / Recurrence Function***: $h_t = f(x_t, h_{t-1})$
+   - ***Encoder Hidden States***: $h_t = f(x_t, h_{t-1})$
       - $f$ is some non-linear function
       - This will take the current input word, and the output of the last recurrence
       - It is formalized that $h_t \in \mathbb{R^n}$ is the hidden state at time $t$
@@ -63,6 +65,7 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
       - Hidden states $h_2 = f(x_2, h_1)$, and $h_3 = f(x_3, h_2) == f(x_3, f(x_2, h_1))$
       - The set of these is fed into a non-linear function $q(\hbar)$
 
+![RNN Encoder GIF](/img/RNNEncoderSetup.gif)
 #### Decoder RNN Attention
 Decoder is often trained to predict the next word $\hat{y_t}$ given the context vector $c$ and all the previously predicted words $\{\hat{y_1}, ..., \hat{y_{t-1}} \}$
 
@@ -80,11 +83,12 @@ The sequence "Hi, what's your", if we looked over all potential next words, woul
 
 Each of these conditional probabilities is typically modeled with a non-linear function $g$ such that 
 
-We also define a specific hidden state formula: $s_t = f(s_{i-1}, y_{i-1}, c_i)$ where the hidden state is based on last hidden state, last output word, and context at that state
+***Decoder hidden state formula***: $s_t = f(s_{i-1}, y_{i-1}, c_i)$  based on
+   - $s_{i-1}$ the last hidden state
+   - $y_{i-1}$ the last output word
+   - $c_i$ the context at that state
 
 $g(y_{t-1}, s_t, c) = p(y_t \mid \{y_1, \ldots, y_{t-1}\}$
-
-![RNN Attention](/img/rnn_attention.png)
 
 
 #### Learning To Align And Translate
@@ -95,9 +99,9 @@ Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words sq
 ***Realistically, and Seq2Seq task that isn't isomorphic would benefit from this structure***
 
 Below we can see the parameters for:
+- $h_i$ is the encoder hidden state / ***annotations*** which are functions of ***previous words and hidden states in the encoder***
 - $y_{t-1}$ is the last output word
-- $s_{t-1}$ is the hidden state at that time
-- The $h_i$ components which are functions of ***previous words and hidden states in the encoder***
+- $s_{t-1}$ is the decoder hidden state at that time
    - That this encoder is forwards and backwards
 - Not explicitly shown is the $c = q(\{h_1, ..., h_{T_x}\})$ context vector, where $c_i$ is $c$ up to some point
    - These $h_i$ in here are called ***annotations*** to which an encoder maps the input sentence

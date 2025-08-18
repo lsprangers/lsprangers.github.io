@@ -6,8 +6,14 @@ Getting manim to work here was great for GIFs!
 - `brew install --cask mactex`
 - `brew instal ffmpeg`
 
-Running manim:
+Activate env:
 ```
+conda activate my-manim-environment
+```
+
+Run manim:
+```
+manim -pql manim/rnn_attention_demo.py RNNSeq2SeqAttention
 ```
 
 Converting to GIF:
