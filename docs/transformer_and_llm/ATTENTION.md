@@ -343,12 +343,14 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
        - Allows each token in the output sequence to attend to previously generated tokens in the sequence (auto-regressive behavior)
        - Future tokens are masked to prevent the model from "cheating" by looking ahead
        - So self-attention only happens from words on the left, not all Keys
-       - ***Query***: Special Start Token
-       - **Key** and **Values**: All already generated words to the Left
+       - ***Query***: Current token's embedding
+       - **Key** and **Values**: All already generated words to the left
+         - Similar to self-attention except we ignore all to the right
      - **Encoder-Decoder Attention Layer**:
        - Attends to the encoder's output (contextual embeddings) to incorporate information from the input sequence
        - **Query**: Comes from the decoder's self-attention output
-       - **Key** and **Values**: Come from the encoder's output
+         - i.e. it's the decoder's current representation of a token after masked self-attention
+       - **Key** and **Values**: Encoder's output for each input token
      - **Feed Forward Layer**:
        - Applies a fully connected feed-forward network to each token independently
 - **Architecture**:
@@ -358,20 +360,19 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
         - **Encoder-Decoder Attention Layer**: Incorporates information from the encoder's output
         - **Feed Forward Layer**: Processes each token independently
 - **Example**:
-   - Third word in the decoder output, meaning the first two have already been generated
+   - Input sentence has 5 words in total
+      - Remember, the encoder put out 5 total vectors, one for each input word
+   - Let's walk through the third word in the decoder output, meaning the first two have already been generated
    - ***Decoder Self Attention***
       - **Input**: The embeddings for the first, second, and third generated tokens so far
-         - For the third position, it uses a special start-of-sequence token or the previously generated tokens as input
-         - It does not have the embedding for the third word yet—because it hasn’t generated it!
+         - The query is the input embedding (same one fed to encoder) for the 3rd word
+         - K,V are the input embedding (same one fed to encoder) for the 1st and 2nd words so far
       - **Masking**: The self-attention is masked so the third position can only "see" the first, second, and third tokens (not future tokens)
-      - **Q, K, V**:
-         - For the third position, the query is the embedding of the third word
-         - The keys and values are the embeddings of the first, second, and third tokens
       - **What happens**: The third token attends to itself and all previous tokens (but not future ones), using their embeddings as keys and values
    - ***Encoder Decoder Cross Attention***
       - **Input**: The output of the decoder’s self-attention for the third token (now a context-aware vector), and the encoder’s output for all input tokens
       - **Q, K, V**:
-         - The query is the third word's vector (after self-attention and residual/LayerNorm)
+         - The query is the third word's attended to vector (after self-attention and residual/LayerNorm)
          - The keys and values are the encoder’s output vectors for each input token (these are fixed for the whole output sequence)
       - **What happens**: The third token’s representation attends to all positions in the input sequence, using the encoder’s outputs as keys and values  
 3. **Final Decoder Output**:
@@ -408,3 +409,23 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
 4. **Training**:
    - The model is trained using [cross-entropy loss](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) and [KL divergence](/docs/training_and_learning/LOSS_FUNCTIONS.md#kl-divergence), with each token in the output sequence contributing to the loss.
 ![EncoderDecoder Output](./images/encoder_decoder_output.png)
+
+## Vision Transformers (ViT)
+In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training
+
+All changes are relatively minor:
+- ***Input***:
+   - *Text*: Input is a sequence of tokens
+   - *Vision*: Input is an image split into fixed size patches `16x16` 
+      - Each patch gets flattened and linearly projected to form a "patch embedding" similar to static word embeddings
+      - `[CLS]` token used for classification tasks
+- ***Positional Encoding***:
+   - *Text*: Added to token embeddings to encode word order
+   - *Vision*: Added to patch embeddings to encode spatial information of each patch in the image
+- ***Objective***:
+   - *Text*: Predict the next word (causal), fill in the blank, or generate a sequence (translation / summarization)
+   - *Vision*: Usually image classification, or can also be segmentation, detection, or masked patch prediction (fill in the blank) 
+- ***Architecture***: Basically the same without any major overhauls
+- ***Self Supervision***:
+   - *Text*: Fill in the blank, next sentence prediction
+   - *Vision*: Fill in the blank (patch), or pixel reconstruction which aims to recreate the original image from corrupted or downsampled versions

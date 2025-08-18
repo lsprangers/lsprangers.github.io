@@ -128,4 +128,6 @@ These are some of the resources I frequently use and reference throughout this r
 - [Encord - Contrastive Learning](https://encord.com/blog/guide-to-contrastive-learning/)
 - [MinHash](https://spotintelligence.com/2023/01/02/minhash/)
 - [MinHash + LSH](https://www.pinecone.io/learn/series/faiss/locality-sensitive-hashing/)
+- [Google Two Tower AI Blog](https://cloud.google.com/blog/products/ai-machine-learning/scaling-deep-retrieval-tensorflow-two-towers-architecture)
+- [Multi Model Blog](https://slds-lmu.github.io/seminar_multimodal_dl/c02-00-multimodal.html)
 ---

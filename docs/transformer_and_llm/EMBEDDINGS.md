@@ -334,3 +334,85 @@ The main point of all of this is that Embeddings equate to &rarr; topological pr
 One-hot encoding, kindof, preserves topolological properties, but all of the vectors end up being orthogonal to each other so we can't say category1 + category2 = 0.5category3...they're orthogonal! Typically we need to map these from OHE metric space to a lower dimensional metric space to get those properties out of it
 
 ![Yuan Meng Example](./images/yuan_meng_example.png)
+
+## Dual Encoder
+Much of the discussion below this point stems from [this Multimodal Blog](https://slds-lmu.github.io/seminar_multimodal_dl/c02-00-multimodal.html)
+
+Dual encoders have a number of different use cases and interpretations - there's using multiple encoders that end up in similar embedding spaces so we can do comparisons - this is helpful in RAG or query-document comparisons
+
+There are other encoder architectures that focus on different modalities so that we can compare text to images to audio
+
+At the end of the day, all of these architectures are designed so we can do dot-product similarity searches in an embedding space
+
+### Query Document Retrieval
+A dual encoder consists of two separate neural networks that encode two different sets of data into their respective embeddings
+
+For example:
+- RAG $\rarr$ Uses a query encoder and a document encoder
+- Question Answer $\rarr$ Uses a question encoder and an answer encoder
+- There are other comparisons like caption and image, audio and language classification, or image to OCR
+
+At the end of all of these, the two inputs are transformed into embedding space(s) which allow us to do similarity searches to find ANN's
+
+
+#### Two Tower Architecture
+During training in something like Question-Answer, you would encode each of them separately and then train to maximize the similarity between the two, and minimize the similarity between others
+
+This can utilize a [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) approach if there's a way to create augmentions, or if we use n-pair loss, or simply using Cross-Entropy Loss over entire dataset can work too
+
+In examples online it mostly utilizes Cross-Entropy Loss over entire answer dataset
+
+***Two Towers is useful so we can pre-compute candidates and do fast ANN lookup during inference***. It also helps solve some modality issues, but that's also covered later in [Fusion](#introduction-to-fusion)
+
+During ***Inference and Serving***, all we have to do is calculate embedding for an incoming query and it allows us to quickly find ANN neighbors in an index and return the top K to the client. All document embeddings can be pre-computed, so we only have 1/2 of compute need during inference
+-  Run a batch prediction job with a trained candidate tower to precompute embedding vectors for all candidates, attach NVIDIA GPU to accelerate computation
+-  Compress precomputed candidate embeddings to an ANN index optimized for low-latency retrieval; deploy index to an endpoint for serving
+-  Deploy trained query tower to an endpoint for converting queries to embeddings in real time, attach NVIDIA GPU to accelerate computation
+
+Google came up with a novel compression algorithm that allows for better relevance, and faster speed, of retrievals which is known as [ScaNN](https://github.com/google-research/google-research/tree/master/scann). This service is then fully managed by Google Vertex AI Matching Engine
+- Distributed search tree for hierarchically organizing the embedding space. Each level of this tree is a clustering of the nodes at the next level down, where the final leaf-level is a clustering of our candidate embedding vectors
+- Asymmetric hashing (AH) for fast dot product approximation algorithm used to score similarity between a query vector and the search tree nodes
+
+These architectures also allow us to address cold start problems since we can put through user features or generic default features to pull popular candidates
+
+
+### Multimodal Retrieval
+Multimodal retrieval can be viewed as a specific implementation of [Two Tower](#two-tower-architecture), where towers have different modalities - one may be a text query, and the candidates may be audio tracks
+
+We can also use [Fusion](#introduction-to-fusion) in our towers here so that whether it's a text or audio input we can use it and compare to image candidates for ANN lookup
+
+#### Image2Text
+This model focuses on image captioning or overall providing descriptive text for given images
+
+It was one of the initial approaches to multi modality focusing on NLP and CV architectures that were combined into a shared embedding space
+
+Microsofts Common Objects in Context (MS COCO) was a foundational dataset for this - it focuses on detecting non-iconic views, detecting semantic relationships between objects, and determining the precise localization of objects. It contained 91 common object categories with 328,000 images and 2.5 Million instance labels
+
+Some Transformer architectures were used where the transformer consists of an encoder with a stack of self-attention and feed-forward layers, and a decoder which uses (masked) self-attention on words and cross-attention over the output of the last encoder layer
+
+Ultimately it's a way for us to use Vision Transformers and Lanugage Encoders in the same model - one of the more useful examples was the Meshed-Memory Transformer for Image Captioning. The input was a photo with bounding boxes, and the image would get chunked out into a sequence and encoded with full self-attention. At the end each encoding layer output is fed into each decoder layer in a mesh-style relationship between the two layers
+
+![Meshed-Memory Transformer for Image Captioning Transformer Architecture](/img/meshed_memory_transformer_image_captioning.png)
+
+
+
+#### CLIP
+Contrastive Language Image Pretraining (CLIP) is a transformer like architecture that jointly pre-trains a text encoder and an image encoder at the same time using [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) 
+
+The contrastive goal is to correctly predict which natural language text pertains to which image inside a certain batch - this turned out to be more efficient than training on captions of images
+
+
+
+### Introduction to Fusion
+Fusion involves combining multiple modalities into single models / architectures to aid in [multimodal retrieval](#multimodal-retrieval) 
+
+It allows us to bypass model-per-modality - while this sounds like it can rid of two towers that's beside the point. ***Two Towers is useful so we can pre-compute candidates and do fast ANN lookup during inference***
+
+How to integrate multiple modalities? On one side of the spectrum, textual elements and visual ones are learned separately and then “combined” afterwards (left), whereas on the other side, the learning of textual and visual features takes place simultaneously/jointly (right)
+
+![Fusion Spectrum](/img/fusion_spectrum.png)
+
+The ultimate goal, that seems to have been achieved, is to move away from model-per-modality and focus on robust foundational models that can incorporate all types of modalities while allowing them to attend to each other
+
+Some of the earliest movers were Data2Vec, Flamingo, and Vilbert - Data2Vec, for example, was to predict latent representations of full input data based on a masked view of the input in a self distillation step. We can see the parallels here between Transformers, Contrastive Learning, and Multimodality
+

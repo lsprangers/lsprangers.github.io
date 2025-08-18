@@ -14,6 +14,9 @@ Allows us to compare a users string query to a large corpus of documents
 
 ![A Simple Inverted Index Architecture](images/simple_inverted_index.png)
 
+Inverted Indexes are great because there's no training, you can generate large pools using n-grams, and it can be distributed for fast lookup
+
+They are typically high precision and ***low recall though, and often miss candidate pairs due to missing context or inexact matches***
 
 ### Discussion
 This architecture does allow for batch and online (fast) processing of documents, but there are pieces missing
