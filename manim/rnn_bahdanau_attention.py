@@ -86,7 +86,11 @@ class EncoderSetup(Scene):
         for i in range(5):
             up_arrow = Arrow(rnns[i].get_top(), hs[i].get_bottom(), buff=0.1)
             forward_up_arrows.add(up_arrow)
-            up_label = MathTex(rf"\overrightarrow{{h_{{{i}}}}} = f(x_{{{i}}}, h_{{{i-1}}})", font_size=18)
+            if i == 0:
+                hidden_state = '[START]'
+            else:
+                hidden_state = rf'h_{{{i-1}}}'
+            up_label = MathTex(rf"\overrightarrow{{h_{{{i}}}}} = f(x_{{{i}}}, {hidden_state})", font_size=18)
             up_label.next_to(up_arrow, RIGHT, buff=0.1)
             forward_up_labels.add(up_label)
 
@@ -103,7 +107,11 @@ class EncoderSetup(Scene):
         for i in range(4,-1,-1):
             up_arrow = Arrow(rnns[i].get_top(), hs[i].get_bottom(), buff=0.1)
             backward_up_arrows.add(up_arrow)
-            up_label = MathTex(rf"\overleftarrow{{h_{{{i}}}}} = f(x_{{{i}}}, h_{{{i+1}}})", font_size=18)
+            if i == 4:
+                hidden_state = '[START]'
+            else:
+                hidden_state = rf'h_{{{i+1}}}'
+            up_label = MathTex(rf"\overleftarrow{{h_{{{i}}}}} = f(x_{{{i}}}, {hidden_state})", font_size=18)
             up_label.next_to(up_arrow, LEFT, buff=0.1)
             backward_up_labels.add(up_label)
 

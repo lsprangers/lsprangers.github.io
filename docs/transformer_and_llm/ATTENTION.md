@@ -66,6 +66,7 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
       - The set of these is fed into a non-linear function $q(\hbar)$
 
 ![RNN Encoder GIF](/img/RNNEncoderSetup.gif)
+
 #### Decoder RNN Attention
 Decoder is often trained to predict the next word $\hat{y_t}$ given the context vector $c$ and all the previously predicted words $\{\hat{y_1}, ..., \hat{y_{t-1}} \}$
 
@@ -376,7 +377,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
    - ***Encoder Decoder Cross Attention***
       - **Input**: The output of the decoder’s self-attention for the third token (now a context-aware vector), and the encoder’s output for all input tokens
       - **Q, K, V**:
-         - The query is the third word's attended to vector (after self-attention and residual/LayerNorm)
+         - The query is the third word's attended to vector (after self-attention and residual/LayerNorm in decoder)
          - The keys and values are the encoder’s output vectors for each input token (these are fixed for the whole output sequence)
       - **What happens**: The third token’s representation attends to all positions in the input sequence, using the encoder’s outputs as keys and values  
 3. **Final Decoder Output**:
