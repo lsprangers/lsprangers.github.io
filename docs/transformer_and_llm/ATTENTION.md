@@ -16,11 +16,69 @@ We need to remember that the embedding for "bank" *is always the same embedding 
 
 How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention - most useful / used are Self Attention, Encoder-Decoder Attention, and Masked Self Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
 
+In the days before Attention, there would be Encoders that take input sentence and write it to a fixed size embedding layer, and then a separately trained Decoder that would take the embedding and output a new sentence - this architecture for Seq2Seq tasks is fine for short sequences, but degrades with longer sequences you try to "stuff into" a fixed size embedding layer 
+
+Therefore, Attention helps us to remove this fixed size constraint between encoders and decoders
+
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
 
 Below shows an example of how an embedding like creature would change based on surrounding context
 <!-- ![Bert, GPT, BART](/img/bert_gpt_bart.png) -->
 ![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
+
+### Keys, Queries, and Values Intuition
+Lots of the excerpts here are from the [D2L AI Blog on Attention](https://d2l.ai/chapter_attention-mechanisms-and-transformers/queries-keys-values.html)
+
+Consider a K:V database, it may have tuples such as `('Luke', 'Sprangers'), ('Donald', 'Duck'), ('Jeff', 'Bezos'), ..., ('Puke', 'Skywalker')` with first and last names - if we wanted to ***query*** the database, we'd simply query based on a key like `Database.get('Luke')` and it would return `Sprangers`
+
+If we allow for approximate matches, we might get `['Sprangers', 'Skywalker']` 
+
+Therefore, our Queries and our Keys have a relationship! They can be exact, or they can be similar (Luke and Puke are similar), and based on those similarities, we may or may not want to return a Value
+
+What if we wanted to return a portion of the Value, based on how similar our Query was to our Key? Luke and Luke are 1:1, so we fully return Sprangers, but Luke and Puke are slightly different, so what if we returned something like `intersect / total` * Value, or 75% of the Value?
+
+Luke and Puke have $3/4$ letters as the same, so we can return $3/4$ of Skywalker!
+
+This is the exact idea of Attention - $Attention(\bold{q}, D) = \sum_{i = 1}^{m} \alpha(\bold{q}, \bold{k_i}) \cdot \bold{v_i}$
+
+This attention can be read as "for every key / value pair $i$, compare the key and the value with $\alpha$, and based on how similar they are return that much of the value. The total sum of all those values is the value we will return"
+
+Therefore, we can mimic an exact lookup if we define our $\alpha$ as a Kronecker Delta:
+$
+\delta_{ij} = \begin{cases}
+1, & \text{if } q = k_i,\\
+0, & \text{if } q \neq k_i
+\end{cases}
+$
+
+This means we'll return the list of all values that match `Luke`, which is just 1
+
+Another example would be if 
+```
+D = [
+   ([1, 0], 4), 
+   ([1, 1], 6), 
+   ([0, 1], 6)
+]
+```
+
+And our Query is `[0.5, 0]` - if we compare that to all of our Keys, we'd see `distance([0.5, 0] - [1, 0]) = 0.5` and `distance([0.5, 0] - [1, 1]) = - 0.5` so we would have `0.5 * 4 + -0.5 * 6 = -1` would be our answer!
+
+So these comparisons of Queries and Keys results in some weight, and typically we will compare our Query to every Key, and the resulting set we will stuff through a Softmax function to get weights that sum to 1
+
+$
+\alpha(\bold{q}, \bold{k_i}) = {a(\bold{q}, \bold{k_i}) \over \sum_{j}a(\bold{q}, \bold{k_j})}
+$
+
+To ensure weights are non-negative, we can use exponentiation
+
+$\alpha(\bold{q}, \bold{k_i}) = \frac{\exp(a(\bold{q}, \bold{k_i}))}{\sum_{j=1}\exp(a(\bold{q}, \bold{k_j}))}$
+
+This is exactly what will come through in most attention calculations!
+
+It is differentiable, and its gradient never vanishes! These are very desirable properties
+
+![Attention Image](/img/attention_image.png)
 
 ### Bahdanau RNN Attention
 Things first started off with Bahdanau Style RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
@@ -167,6 +225,22 @@ The rest of the discussion is around Attention blocks in Transformer Architectur
 
 ![Even Better Transformer Diagram](/img/better_transformer_arch_diagram.png)
 
+### Key, Query, and Value Matrices
+This setup allows us to create a paradigm of:
+- **Queries (Q)**:
+   - Represents the word being attended to / comapred to
+   - Used to calculate attention scores with all Keys
+- **Key (K)**:
+   - Represents the context words being compared to the Query
+   - Used to compute the relevance of each context word to the Query
+- **Value (V)**:
+   - Another representation of the context words, but separate and different from Keys
+      - Although the same input context words are multiplied by 2 different K, V matrices, which results in 2 different Key and Value vectors for same context word
+   - It basically is a representation of each "word" so at the end, a scored `SUM()` of all words is over values!
+   - Weighted by the attention scores to produce the final output
+
+These matrices are learned during training and updated via backpropagation
+
 ### Encoding Blocks
 The main layer we focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
@@ -185,22 +259,6 @@ Self Attention is a mechanism that uses context words (**Keys**) to update the e
 Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning.
 
 ![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
-
-#### Key, Query, and Value Matrices
-
-- **Query (Q)**:
-   - Represents the word being attended to
-   - Used to calculate attention scores with all Keys
-- **Key (K)**:
-   - Represents the context words being compared to the Query
-   - Used to compute the relevance of each context word to the Query
-- **Value (V)**:
-   - Another representation of the context words, but separate and different from Keys
-      - Although the same input context words are multiplied by 2 different K, V matrices, which results in 2 different Key and Value vectors for same context word
-   - It basically is a representation of each "word" so at the end, a scored `SUM()` of all words is over values!
-   - Weighted by the attention scores to produce the final output
-
-These matrices are learned during training and updated via backpropagation
 
 #### How Self Attention Works
 TLDR;
