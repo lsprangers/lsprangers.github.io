@@ -57,13 +57,16 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
    - ***Encoder Hidden States***: $h_t = f(x_t, h_{t-1})$
       - $f$ is some non-linear function
       - This will take the current input word, and the output of the last recurrence
-      - It is formalized that $h_t \in \mathbb{R^n}$ is the hidden state at time $t$
-- ***Context Vector***: $c = q(\{h_1, ..., h_{T_x}\})$ 
-   - Where $\hbar = \{h_1, ..., h_{T_x}\}$ `h-bar` is the set of recurrence functions
-   - $q$ is some non-linear function
-   - Basically, the context vector is a function over the set of hiddden states
-      - Hidden states $h_2 = f(x_2, h_1)$, and $h_3 = f(x_3, h_2) == f(x_3, f(x_2, h_1))$
-      - The set of these is fed into a non-linear function $q(\hbar)$
+      - These are bi-directional
+         - $\overrightarrow{h_2} = f(x_2, h_1)$
+         - $\overleftarrow{h_2} = f(x_2, h_3)$
+         - $h_2 = [\overrightarrow{h_2} \frown \overleftarrow{h_2}]$
+            - Concatenation!
+      - It is formalized that $h_t \in \mathbb{R^{d_h}}$ is the hidden state of the encoder at time $t$
+         - $d_h$ is the dimensionality of our encoder hidden state
+- These $h_i = [\overrightarrow{h_i} \frown \overleftarrow{h_i}] \space \forall i \in [1, . . ., T_x]$ 
+   - They live entirely in the encoder block
+   - They are fixed once the input is encoded
 
 ![RNN Encoder GIF](/img/RNNEncoderSetup.gif)
 
@@ -84,40 +87,77 @@ The sequence "Hi, what's your", if we looked over all potential next words, woul
 
 Each of these conditional probabilities is typically modeled with a non-linear function $g$ such that 
 
-***Decoder hidden state formula***: $s_t = f(s_{i-1}, y_{i-1}, c_i)$  based on
-   - $s_{i-1}$ the last hidden state
-   - $y_{i-1}$ the last output word
-   - $c_i$ the context at that state
-
-$g(y_{t-1}, s_t, c) = p(y_t \mid \{y_1, \ldots, y_{t-1}\}$
+So, ***at each time step $t$*** the decoder combines:
+- ***Decoder hidden state formula***: $s_t = f(s_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$  based on
+   - $s_{t-1}$ the last hidden state
+      - Dimension $d_s$
+   - $y_{t-1}$ the last output word
+   - $c_t$ the context at that state
+      - $c_t = \sum_{i=1}^{T_x} \alpha_{ti}h_i$
+      - Where $\alpha_{ti}$ is the weight of $h_t$ compared to each annotation $h_i$ and is a similarity metric between the two
 
 
 #### Learning To Align And Translate
 The rest of the architecture proposes using a bi-directional RNN as an encoder, and then a decoder that emulates searching the source sentence during translation
 
+The "searching" is done by comparing the decoders last hidden state $\bold{s}_{t-1}$ to each encoder hidden state $h_i \space \forall i \in [1,...,T_x]$ in our alignment model, and then creating a distribution of weights (softmax) to create a context vector. This context vector, the previous hidden state, and the previous hidden word help us to compute the next word!
+
+**P.S. the alignment model here is very similar to self-attention in the future
+
 Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words squished into 1, 1 word expanded to 2, or 2 non-adjacent words that are used in outputting 1 
 
-***Realistically, and Seq2Seq task that isn't isomorphic would benefit from this structure***
+***Realistically, any Seq2Seq task that isn't isomorphic would benefit from this structure***
 
-Below we can see the parameters for:
-- $h_i$ is the encoder hidden state / ***annotations*** which are functions of ***previous words and hidden states in the encoder***
-- $y_{t-1}$ is the last output word
-- $s_{t-1}$ is the decoder hidden state at that time
-   - That this encoder is forwards and backwards
-- Not explicitly shown is the $c = q(\{h_1, ..., h_{T_x}\})$ context vector, where $c_i$ is $c$ up to some point
-   - These $h_i$ in here are called ***annotations*** to which an encoder maps the input sentence
-   - Each $h_i$ contains information about the entire sentence ***with a strong focus on i-th word***
-   - $c_i$ is then a weighted sum of these annotations
-   - $c_i = \sum_{j=1}^{T_x} \alpha_{ij}h_j$
-      - Where $\alpha_{ij}$ is the weight of $h_i$ to each annotation $h_j$ and is a similarity metric between the two computed as:
-      - $\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^{T_x} \exp(e_{ik})}$
-      - And $e_{ij} = a(s_{i-1}, h_j)$ is an alignment model which scores how well the inputs around $j$ and $i$ match
+#### Summary
+- ***Encoder***
+   - $h_i \in \mathbb{R^{d_h}}$ is the encoder hidden state / annotations
+      - $\overrightarrow{h_2} = f(x_2, h_1)$
+      - $\overleftarrow{h_2} = f(x_2, h_3)$
+      - $h_2 = [\overrightarrow{h_2} \frown \overleftarrow{h_2}]$ 
+         - Concatenation!  
+- ***Decoder***
+   - For each step $t$, we need to come up with a context vector $\bold{c}_t$
+   - $e_{ti} = a(s_{t-1}, h_i)$ is an alignment model which scores similarities between decoder hidden state at $t-1$ and all encoder states, where each one is denoted at some time $i$
+      - $a(\cdot)$ is a small feed-forward NN
+      - $e_{ti} = {\bold{v}^T} \cdot \tanh({W_s} \bold{s}_{t-1} + {W_h}{\bold{h}_i})$
+         - $W_s \in \mathbb{R^{d_a \times d_s}}$
+         - $W_h \in \mathbb{R^{d_a \times d_h}}$
+         - $\bold{v} \in \mathbb{R^{d_a}}$
+         - What does this mean?
+            - ${W_s} \bold{s}_{t-1}$ is a weighted version of our decoder hidden state at $t-1$
+            - ${W_h}{\bold{h}_i}$ is a weighted version of our encoder hidden state at time $i$
+            - Therefore, $\tanh(\cdot) \in [-1, 1]$ acts as an activation function which helps us to score how close the decoder hidden state at $t-1$ and our current encoder hidden state at $i$ are
+   - Normalize with softmax to get attention weights $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$
+      - $e_{tk}$ will be the attention score of $t$ to all other states
+         - If there are 5 words in the input, and we're at $t = 3$, this will score how well $s_2$ is to $h_3$ compared to all other annotations $h_{[1, 2, 4, 5]}$
+      - This will convert scores into a probability distribution
+      - Since our attention model helps to compute scores across encoder hidden states to a decoder hidden state, taking the softmax here will then give us the ***relative weight of each encoder hidden state to a decoder hidden state***
+   - Form the context vector $\bold{c}_t$ as the weighted sum of these annotations
+      - $\bold{c}_t = \sum_{i=1}^{T_x} \alpha_{ti} \cdot h_i$
+         - Where $\alpha_{ti}$ is the weight of $h_t$ compared to each annotation $h_i$ and is a similarity metric between the two
+   - $s_t = f(s_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$ is the decoder hidden state
+      - $y_{t-1}$ is the last output word from decoder
+   - To bring it all out:
+      - $s_t = f(s_{t-1}, y_{t-1}, \sum_{i=1}^{T_x} (\frac{\exp(a(s_{t-1}, h_i))}{\sum_{k=1}^{T_x} \exp(a(s_{t-1}, h_k))}) \cdot h_i$ )
+         - Our query is $s_{t-1}$, and our keys / values are $h_i$
+         - Our attention score is based on $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$ which is multiplied by $h_i$ to attend to it
    - All of this will be the basis of [Self-Attention](#self-attention) in the future, and for this you can just read this as the context vector $c_i$ is based on the similarity of an input annotation with the rest of the annotations
+
+
+[D2L AI Code Implementation In PyTorch](https://d2l.ai/chapter_attention-mechanisms-and-transformers/bahdanau-attention.html)
+
+![RNN Decoder GIF](/img/RNNDecoderSetup.gif)
+---
+
+Intuition
 - In the paper they even mention *"this implements a mechanism of attention in the decoder"*
 - In the encoder, the only major trick is doing bi-directional hidden states and then concatenating them
    - This productes the annotations themselves
-   - $h_j = [\overrightarrow{h_j}, \overleftarrow{h_j}]$
-   - These annotations are then fed through the energy, alpha weight, and context vectors before being used in the decoder
+   - $h_i = [\overrightarrow{h_i}, \overleftarrow{h_i}]$
+   - These annotations are then fed through the alignment, alpha weight, and context vectors before being used in the decoder with the last output word and hidden state
+      - This context vector allows us to "attend to" the last output word and last hidden state
+      - What's missing from transformers? We decide to drag along this hidden weight the entire time, and in Transformers we just re-compute context vector for each vector
+
 ![RNN Attention](/img/rnn_attention.png)
 
 ## Transformer Attention
