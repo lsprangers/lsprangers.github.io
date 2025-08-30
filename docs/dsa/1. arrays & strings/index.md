@@ -144,6 +144,8 @@ def isSubsequence(self, s: str, t: str) -> bool:
     - First valid subarray
     - Last valid subarray
     - The below function uses `curr += nums[right]` and `curr -= nums[left]` which is random access so it's $O(1)$
+    - That being said, there are some sliding window problems that need more advanced data structures in the middle for checks
+        - [Sliding Window Maximum](/docs/leetcode/python/slidingWindowMaximum.md) problem is a good example, where we need an entire monotonic deque in the middle with while loops and `checks()` to update during the window, but ultimately the sliding window is the same
 ```python
 function fn(nums, k):
     left = 0

@@ -89,7 +89,7 @@ These are just papers I've read marked up with highlighter - my old iPad died an
 
 These are some of the resources I frequently use and reference throughout this repo:
 
-- [Leetcode](https://leetcode.com): Great for DSA and Systems Design problems.
+- [Leetcode](https://leetcode.com): Great for DSA and Systems Design problems. I probably used this the most.
   - [Segment Tree](https://leetcode.com/articles/a-recursive-approach-to-segment-trees-range-sum-queries-lazy-propagation/)
 - [3Blue1Brown](https://www.3blue1brown.com/): Amazing visual explanations for Linear Algebra, Probability, and Deep Neural Networks.
   - Highly recommend the [Attention](https://www.youtube.com/watch?v=eMlx5fFNoYc&vl=en) video for understanding Transformers.
