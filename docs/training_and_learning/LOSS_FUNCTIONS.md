@@ -57,6 +57,23 @@ Why do we use these output formulas? We want them to be "nice" for derivates and
 ## Loss Functions
 Loss functions are the entire heart of model training and tuning 
 
+### Log-Likelihood / Negative Log-Likelihood
+Log-likelihood is a foundational concept in statistical modeling and machine learning. It measures how probable the observed data is under a given model and set of parameters. In practice, we often use the **negative log-likelihood (NLL)** as a loss function, since minimizing NLL is equivalent to maximizing the likelihood of the data.
+
+#### Formula
+$
+\mathcal{L}_{\text{NLL}} = -\sum_{i} \log p(y_i | x_i, \theta)
+$
+Where:
+- $p(y_i | x_i, \theta)$ is the probability assigned by the model to the true label $y_i$ given input $x_i$ and parameters $\theta$.
+
+#### Use Cases
+- **Likelihood Estimators**: Maximum Likelihood Estimation (MLE) uses log-likelihood to find the best model parameters.
+- **Bayesian Outputs**: In Bayesian models, the likelihood is combined with a prior to form the posterior; log-likelihood is central to Bayesian inference and model comparison.
+- **General ML Topics**: Log-likelihood is the basis for many loss functions (e.g., cross-entropy for classification, Gaussian NLL for regression) and is used in probabilistic models, generative models, and unsupervised learning.
+
+<!-- For more on how log-likelihood connects to Bayesian inference and likelihood-based estimators, see [Bayesian Methods](/docs/training_and_learning/BAYESIAN_METHODS.md) and [Maximum Likelihood Estimation](/docs/training_and_learning/MAXIMUM_LIKELIHOOD.md). -->
+
 ### Cross Entropy
 Cross Entropy is a loss function commonly used for **classification tasks**. It measures the difference between the true probability distribution (ground truth) and the predicted probability distribution (output of the model)
 
@@ -87,6 +104,9 @@ Where:
 ### L2 Loss
 TODO: L2
 ---
+
+### Log Likelihood
+
 
 ### KL Divergence
 KL Divergence (Kullback-Leibler Divergence) is a measure of how one probability distribution $ q $ (predicted) diverges from a second probability distribution $ p $ (true). It is often used in tasks where the true labels are **probability distributions** rather than one-hot encoded labels.

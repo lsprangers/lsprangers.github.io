@@ -8,6 +8,8 @@ show_back_link: true
 ## Candidate Generation
 The reason candidate generation is so useful, is because it typically allows us to reduce our search space from the entire corpus, typically petabytes in size, to a searchable susbscape of typically hundreds or thousands of items
 
+***Overall it's goal is to reduce the search space while still keeping all true positives***
+
 It's also done relatively quickly, ideally in a way where we can index / lookup a matrix or user history in a relatively fast fashion, on services that have been updated in the background by our web servers. Basically, we are hoping that as users use our service their item and user history have been being updated and sent to our search systems in real-time, and when we need this information our architecture is setup to be real-time responsive
 
 In Candidate Generation, ***Queries are Users and we compare them to Items***
@@ -67,6 +69,8 @@ This is similar to factorizing a `User x Item` matrix, and then doing a dot prod
 - If we have a binary set of features, then the Dot product over them is basically a count of the number of similar features!
     - If we have a range of numeric values then our Embedding similarity metrics will help us calculate the score between items based on similar dimensions
 
+For content based filtering, common evaluation metrics are based on similarities of items, such as Cosine distance of item vectors
+
 | Pros | Cons |
 |------|------|
 | Don't need user information for items| |
@@ -74,6 +78,8 @@ This is similar to factorizing a `User x Item` matrix, and then doing a dot prod
 
 ### User-Item Collaborative Filtering 
 Collaborative Filtering allows us to use Users and Items *at the same time!*. It recommends items to user A based on the preferences / history of similar user B
+
+In collaborative filtering, prediction and classification metrics like precision and recall are more common versus straight similarity metrics
 
 #### Idea Behind Collaborative Filtering
 - Desire is to predict user preferences based on previous history
