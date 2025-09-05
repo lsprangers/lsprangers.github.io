@@ -48,9 +48,14 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - ***Public Subnets*** have a route table that sends `0.0.0.0/0` traffic to IGW
     - This is the "most broad rule", so if nothing "more specific" is defined in the route table then all instances are public and internet enabled
     - If route table has more specific rules, then some of the VM's may not be internet enabled
+- ***Elastic IP (EIP)***
+    - An AWS resources in it of itself
+    - Allows for static IP addresses that can be associated with EC2 instances
+    - Typically used for instances that need a fixed public IP
+        - If you launch an instance in a public subnet, you can just auto-assign it an IP address but it will not be fixed / static
 - ***NAT Instance***
     - EC2 instance you deploy in a public subnet
-    - Edit route in privtate subnet to route `0.0.0.0/0` to nAT instance
+    - Edit route in private subnet to route `0.0.0.0/0` to NAT instance
     - Not resilient to failure, it's a single EC2
     - Must disable Source/Destination check (EC2) setting
     - NAT instance should get elastic IP so public internet knows who it's talking to / allow whitelist
@@ -69,6 +74,19 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - Stateless
         - Return traffic must be explicitly allowed by rules
         - Helpful to quickly and cheaply block specific IP addresses
+- ***Dynamic Host Configuration Protocol (DHCP)***
+    - Automatically assigns IP addresses to instances in a VPC
+    - Centralized IP configuration or IP protocol, instead of manually doing it ourselves
+    - DHCP options set can be configured for VPC
+    - VPC's are associated with DHCP option sets
+        - DHCP option sets are a collection of settings that can be applied to instances in a VPC
+    - Options:
+        - Domain name (suffix in DNS lookup)
+        - Domain name servers describe what actual servers we'll be using for DNS - typically this stays to the default of AmazonProvidedDNS
+        - NTP servers for keeping time in sync on instances
+    - Can't alter a DHCP option set after it's been created, need to create new one and associate it with the VPC
+    - Why would anyone do this?
+        - IP address suffixes and DNS servers allow us to route traffic / identify instances that are apart of different services
 - ***Security Groups***
     - Applied at *instance level*
     - Stateful
@@ -101,12 +119,18 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 
 ### VPC Peering
 - Connect 2 VPC's privately using AWS backbone network
+    - Can be across regions, across accounts, etc
+    - Entire goal is to allow services to communicate via ***private IP addresses***
 - Make them behave as if they were the same network
 - Must not have overlapping CIDR
 - ***Not transitive***
     - $A \leftrightarrow B \ \& \ B \leftrightarrow C$ $\neq A \leftrightarrow C$
     - Must create peer between $A \leftrightarrow C$
 - Must update route tables ***in each VPC subnet*** to ensure instances can communicate
+    - Once $A$ and $B$ have setup peering, the route table for A needs to include a route to B's CIDR block and the method for getting there would be the peering connection
+    - $A$ routing table:
+        - Destination: $B$ CIDR
+        - Target: Peering connection
 - VPC Peering can work inter-region and cross-account
 - Can reference security group of a peered VPC (cross-account)
 - Longest prefix match
@@ -123,6 +147,9 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
         - This means if we have private VPCs, let's say 5, and then one central VPC with a NAT Gateway and an IGW
             - If the NGW is peered to the IGW, and our private subnets are peered each to the NGW, that doesn't mean we can access the IGW from the instances
             - This is definition of "edge to edge routing" and it's not allowed, we'd need to connect each instance to IGW itself
+- Side note - typical `ping <IP>` ICMP protocols don't work over VPC peering connections
+    - This is because security groups and network ACL's block this by default, you can set it up to work
+    - To test out connectivity, use TCP-based tools like `telnet` or `nc` (netcat)
 
 ### Transit Gateway
 - Everything above becomes complicated, there are directed relationships and edge-to-edge considerations
@@ -133,6 +160,15 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - Transit Gateways allow for hub-and-spoke (star) connection model
 - Regional resource
     - Can peer Transit Gateways themselves across regions
+    - One TGW in each region, and then peer all of those together
+    - Attach each resource to a TGW via TGW Attachment
+- **Similar to VPC Peering, you must update route tables:**
+    - Destination: Some other Subnet CIDR
+    - Target: TGW Attachment
+- Because of having to update route tables, there's still a ton of work on updating each connected resource in the network mesh, but we do not have to manually accept and deny each of the peering requests anymore
+    - It's still much smaller than peering all of them
+    - If there are $N$ VPC's, then we would need ${N \cdot (N-1)} \over 2$ peering connections (fully completed graph), versus just connecting each of the $N$, once, to the TGW
+        - We would still need to update all route tables, but this is typically more scalable and easier to accomplish
 - Share cross account via Resource Access Manager (RAM)
 - Route tables allow us to limit which VPC's can talk to each other
 - Works with Direct Connect, VPN Connections

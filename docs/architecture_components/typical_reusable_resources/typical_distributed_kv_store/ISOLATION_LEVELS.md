@@ -49,5 +49,9 @@ There's a spectrum below, from strictest to least strict, in performant availabi
 - **Read Committed**: Prevents dirty reads.
 - **Repeatable Read**: Prevents dirty and non-repeatable reads but allows phantom reads.
 - **Serializable**: Prevents dirty, non-repeatable, and phantom reads; highest isolation level.
-- **Snapshot Isolation**: Prevents dirty, non-repeatable, and phantom reads; allows higher concurrency.
+- **Snapshot Isolation**: Prevents dirty, non-repeatable, and phantom reads; allows higher concurrency
+    - In systems like MongoDB this is done by taking entire copies / snapshots of data, and allowing transactions to act on that data
+    - Therefore, if transaction1 is reading and updating rows `[1, 3, 5, 7]` and transaction2 updates `[1, 5]`, transaction1 will not see the changes made by transaction2 until transaction1 completes
+    - If multiple transactions affect the same rows, let's say both transaction1 and transaction2 read `row1.attribute = a` and transaction1 changes it to `row1.attribute = b`, and transaction2 changes it to `row1.attribute = c`. Whichever one commits first will succeed, and anything after would fail
+        - This is known as ***first-committer-wins***
 - **Linearizability**: Strong consistency, global order of operations.
