@@ -1,9 +1,9 @@
 ---
 layout: technical
 title: Attention
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
-description: Discussions around the Attention mechanism in Transformers and LLMs
+description: Discussions around the Attention mechanism in NLP, CV, and Transformers
 show_back_link: true
 ---
 
@@ -162,7 +162,7 @@ The "searching" is done by comparing the decoders last hidden state $\bold{s}_{t
 
 **P.S. the alignment model here is very similar to self-attention in the future
 
-Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words squished into 1, 1 word expanded to 2, or 2 non-adjacent words that are used in outputting 1 
+Since sentences aren't exactly isomoprhic (one-to-one and onto), there may be 2 words squished into 1, 1 word expanded to 2, or 2 non-adjacent words that are used in outputting 1 
 
 ***Realistically, any Seq2Seq task that isn't isomorphic would benefit from this structure***
 
@@ -188,9 +188,11 @@ Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words sq
    - Normalize with softmax to get attention weights $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$
       - $e_{tk}$ will be the attention score of $t$ to all other states
          - If there are 5 words in the input, and we're at $t = 3$, this will score how well $s_2$ is to $h_3$ compared to all other annotations $h_{[1, 2, 4, 5]}$
+         - Another blog mentioned how attention scores $e_t$ are computed by "scalarly combining the hidden states of the decoder with all of the hidden states of the encoder"
+            - $e_t = [({h_d}^t)\cdot{h_e}^1, ... , ({h_d}^t)\cdot{h_e}^N]$
       - This will convert scores into a probability distribution
       - Since our attention model helps to compute scores across encoder hidden states to a decoder hidden state, taking the softmax here will then give us the ***relative weight of each encoder hidden state to a decoder hidden state***
-   - Form the context vector $\bold{c}_t$ as the weighted sum of these annotations
+   - Form the context vector, AKA attention output, $\bold{c}_t$ as the weighted sum of these annotations
       - $\bold{c}_t = \sum_{i=1}^{T_x} \alpha_{ti} \cdot h_i$
          - Where $\alpha_{ti}$ is the weight of $h_t$ compared to each annotation $h_i$ and is a similarity metric between the two
    - $s_t = f(s_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$ is the decoder hidden state
@@ -200,7 +202,6 @@ Since sentences aren't isomoprhic (one-to-one and onto), there may be 2 words sq
          - Our query is $s_{t-1}$, and our keys / values are $h_i$
          - Our attention score is based on $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$ which is multiplied by $h_i$ to attend to it
    - All of this will be the basis of [Self-Attention](#self-attention) in the future, and for this you can just read this as the context vector $c_i$ is based on the similarity of an input annotation with the rest of the annotations
-
 
 [D2L AI Code Implementation In PyTorch](https://d2l.ai/chapter_attention-mechanisms-and-transformers/bahdanau-attention.html)
 
@@ -216,16 +217,34 @@ Intuition
       - This context vector allows us to "attend to" the last output word and last hidden state
       - What's missing from transformers? We decide to drag along this hidden weight the entire time, and in Transformers we just re-compute context vector for each vector
 
+$\text{max}_{\theta} {1 \over N} \sum_{n = 1}^{N} \log p_{\theta}(y_n | x_n)$
+
+Where the best probability is usually found using beam search - at each step of the decoder we keep track of the $k$ most probable partial translations (hypotheses)
+
+![RNN Loss Objective](/img/rnn_loss_objective.png)
+
 ![RNN Attention](/img/rnn_attention.png)
 
 ## Transformer Attention
 The above RNN discussion is useful, as it shows how we can utilize the building blocks of forward and backwards passes, and even achieve attention mechnisms using basic building blocks
+
+However, RNN's eventually fail with long term dependencies - the sentence "he was near the large stadium with Sarah and was named Cam", we would need to keep track of every word between "he" and "Cam" to have the word "he" have any sort of effect on Cam. A direct consequence of this is the inability to train in parallel on GPU's because future hidden states cannot be computed in full before past hidden states have completed.
+
+Attention also helps to alleviate the bottleneck problem, where all context is "shoved" into a singular vector. Attention allows all encoded infromation to help influence the context and decoding during each step, and helps to alleviate the vanishing gradient problem from long sentences that end up multiplying multiple numbers $\lt$ 1.0 throughout numerous steps. 
 
 The rest of the discussion is around Attention blocks in Transformer Architectures, primarily using a similar encoder-decoder structure "on steroids"
 
 ![Even Better Transformer Diagram](/img/better_transformer_arch_diagram.png)
 
 ### Key, Query, and Value Matrices
+Self-Attention and K,Q,V go hand in hand - the intuition for K,Q,V can be seen from an approximate hash table:
+- To lookup a value, queries are compared against keys in a table
+- In the Hash Table below, there's exactly one K:V pair for any Q
+   - In contrast for self attention, each K is matched to varying degrees to each Q
+   - Thus a sum of values weighted by K-Q match is returned over the V's
+
+![K,Q,V Intuition](/img/kqv_intuition.png)
+
 This setup allows us to create a paradigm of:
 - **Queries (Q)**:
    - Represents the word being attended to / comapred to
@@ -247,6 +266,12 @@ The main layer we focus on in our Encoding blocks is Self Attention, but alongsi
 #### Self Attention
 Self Attention allows words in a single sentence / document to attend to each other to update word embeddings in itself. It's most commonly used when we want a sentence's word embeddings to be updated by other words in the same sentence, but there's nothing stopping us from using it over an entire document.
 
+Self attention also achieves context / word interaction comparisons in $O(1)$ instead of $O(n)$ like recurrence / RNN's would - this is a significant achievement which allows for:
+- Parallel processing of corpora
+   - To be specific, all word representations per layer can be computed in parallel
+- Bidirectional comparisons
+- $O(1)$ maximum interaction distance (direct calculation)
+
 It was born out of the example of desiring a different embedding outcome of the word bank in:
 - The river bank was dirty
 - I went to the bank to deposit money
@@ -254,6 +279,17 @@ It was born out of the example of desiring a different embedding outcome of the 
 Via Self Attention, the word "bank" in the two sentences above would be different, because the other words in the sentence "attended to" it
 
 Self Attention is a mechanism that uses context words (**Keys**) to update the embedding of a current word (**Query**). It allows embeddings to dynamically adjust based on their surrounding context.
+
+Lastly, there are still limitations to Attention, and Attention is not "all you need" at the end of the day!
+- It is simply a weighted average, so non-linearities are impossible without further non-linear activation functions inside of neural net
+- Bidirectionality may not always be desired (this is covered more in [Masked Self Attention](#masked-self-attention))
+- Self Attention by itself does not keep word position, and so it's essentially a bag-of-words once again
+
+All of the above are solved via the Transformer Architecture itself outside of Self Attention! This is why rtansformer encoder and decoder architecture consists of multiple layers of self attention with a feed forward network and positional encodings!
+- Residual connections pass "raw" embeddings directly through next layers which helps to prevent forgetting or misrepresenting information
+- Layer normalization helps to relieve parameters of given layer shifting because of layers beneath it
+   - This ultimately reduces uninformative variation and normalizes each layer to mean zero and standard deviation of one
+- Scaling down the dot product helps to stop the dot product from taking on extreme, unbounded values because of this variance scaling
 
 #### Example
 Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning.

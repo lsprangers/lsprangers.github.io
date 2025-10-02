@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: GPT Training Architecture
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
 description: Discussions around Loss Functions in NN's
 show_back_link: true

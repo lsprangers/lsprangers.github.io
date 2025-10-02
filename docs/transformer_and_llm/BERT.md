@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: BERT & BART
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
 description: Discussions around Transformers
 show_back_link: true
@@ -198,3 +198,18 @@ Most companies don't actually use BERT out of the box, most companies will fine-
                 - We also wrap the dot product in a softmax, and only calculate this over the words inside of the passage, not our entire vocab
             - Same thing for end
     - *Output:* Objective is to find $i, j : j >= i$ meaning we just want to find the right indexes in the passage that answer the question
+
+## So Why Does BERT Work
+The results of transformer-based models clearly show that they deliver successful results. However, it is less clear why. 
+
+The thought process goes - since BERT is small (relatively), and BERT has attention weights that can directly identify relationships, we can use it to analyze transformers and why they work.
+
+BERT representations are hierarchical rather than linear, and they include information about parts of speech, syntactic chunks, and roles. This mostly means that output vectors of BERT capture multiple levels of linguistic information, rather than just a flat out sequential context. 
+- Each layer of BERT encodes different "types" of information, lower layers tend to capture more basic features, and higher layers capture more abstract, global, and semantic features like relationships
+- Therefore, as you "move up" the layers, the representations become more complex and hierarchical!
+    - Word $\rarr$ Phrases $\rarr$ Clauses $\rarr$ Sentences
+- Altogether it differes from linear models which just focus on immediate neighborhoods, long term averages, or linear interpretations "if you increased the $x_1$ parameter in a linear regression, the output's expected average in the long run increases by $w_1$"
+- Where does BERT struggle?
+    - On assumed information - it cannot store assumptions in weights and biases anywhere
+    - On inferences - "people walk into houses" and "houses are big" doesn't mean BERT would spit out "houses are bigger than people"
+- BERT brings contextual attention and "attends to" vectors and words inside of sentences, it's not magic, it's attentive!

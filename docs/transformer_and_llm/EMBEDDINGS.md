@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Embeddings
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
 description: Discussions around Embeddings used throughout multiple design systems
 show_back_link: true
@@ -22,9 +22,28 @@ Embeddings are dense vector representations of objects - typically we use them f
 - etc...
 
 
-### Categorical Features
+### Categorical Embeddings
+ML Models enjoy fixed length vectors as their input, and over time they look to create distributions over these input
+
+With a dictionary of words it's hard to think about the best way to set up these fixed length vectors, and the first attempt was One Hot Encoding where you'd simply have a sparse vector with 1's all around where your words were 
+
+![One Hot Encoding](/img/ohencoding.png)
+
+
 - ***One-Hot Encoding*** represents orthonormal basis of vectors, and typically is useful for categorical variables but becomes infeasible if we try to use it for text features
 - ***Label Encoding*** is similar to One-Hot Encoding, except we use an incremental ID for each of the categories
+
+#### Pitfalls
+Common pitfalls associated with these categorical embeddings is that:
+- They create humongous vector spaces of orthogonally independent vectors
+    - Essentially each vector is a different basis vector at this point
+    - This eventually results in the common ***curse of dimensionality*** issue 
+- Having these sparse, orthogonal vectors means we cannot generalize easily
+    - There's no good way to generally compare words for similarities, as you cannot comapare `[1,0]` to `[0,1]` in a general fashion over millions of vectors
+
+Therefore, these sorts of categorical embeddings can be made better by use of dense embeddings over a smaller overall dimensional space (i.e. less dimensions, with more information "squished" into each dimension)
+
+From this, word embeddings ultimately moved towards dense representations of floating point numbers, known as [Text Embeddings](#text-embeddings) where the dimensionality of embeddings is typically much smaller than the number of words in the dictionary which allows for space reduction, information gain, and geometric comparisons
 
 ### Numeric Features
 - This depends on the distribution of the data
@@ -47,11 +66,21 @@ Embeddings are dense vector representations of objects - typically we use them f
 ## Text Embeddings
 Text Embeddings are one of the harder things to figure out, but there are some standards nowadays
 
+Text embeddings can be seen as a static form of transfer learning, where models will create static word embeddings and over time anyone can re-use these via a lookup object for any word - the word "bank" in terms of river bank, or financial institution, will have the same embedding here
+
 - Training Word2Vec and BERT both involved semi self-supervised training where they take online corpus as input and basically use contextual words $w_{i-k,i+k}$ to try and create an embedding for a current word $w_i$
 - [Word2Vec](#word2vec) was one of the original ideas for text embeddings - it essentially acts as an autoencoder to create ***static embeddings*** for each word in a dictionary
 - [BERT](./BERT.md#bert) on the other hand, through [attention](./ATTENTION.md#attention), can create ***contextual*** embeddings for words, sentences, and entire documents
 - [GPT](#gpt-3) is an autoregressive transformer model in the same transformer "family" as [BERT](./BERT.md#bert), but it is ***unidirectional*** where BERT is ***bidirectional*** (which is constantly repeated in the paper)
     - GPT is good for text-to-text tasks like question answering, but like BERT we can pull from the middle hidden layers during it's self-attention steps to find word embeddings
+
+***Word Embeddings*** made it possible and allowed developers to encode words as dense vectors that capture underlying semantic content - `King - Man + Woman = Queen`. Similar words were embedded close to each other in lower dimensional feature spaces, and allowed for geometrical operations.
+
+![Embedding Space Example](/img/word_embedding_space_example.png)
+
+These examples have even been shown to hold across languages, where youc can map One $\rarr$ Uno - this ultimately showed 90% precision across words, and showcases that some languages may have an isomoprhic (one-to-one and onto) topological mapping for some % of their words. Other languages like English $\rarr$ Vietnamese has a much lower overlap, showcasing a relatively small one-to-one correspondence because the concept of a word and meanings of them are vastly different in the 2 languages.
+
+![Language Embedding Mapping](/img/language_embedding_mapping.png)
 
 ### Word2Vec
 As we said above Word2Vec is essentially a static lookup of words to embeddings, and so ***Word2Vec is an embedding model***

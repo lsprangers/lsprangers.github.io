@@ -458,6 +458,15 @@ It's just running a serverless function - it integrates with almost everything
     - IP addresses - can work, but they must be private IP's
 - ALB can route to multiple target groups
 
+#### ALBs Registering To Route53
+- When you create an ALB in AWS it is assigned a DNS name by AWS
+    - Typically something like `my-alb-12346.region.alb.amazonaws.com`
+- To make this a custom domain, like `myapp.example.com`, you'd need to create a Route53 DNS record that maps your domain to the ALB DNS name
+    - Alias or CNAME
+- Mapping must be created by you, it's not automatic
+- If the actual VM (underlying instance) hosting the ALB goes down and a new one spins up, the DNS name for the ALB (e.g., my-alb-123456.region.elb.amazonaws.com) does NOT change. AWS automatically manages the underlying infrastructure for high availability and will update the IP addresses behind the scenes, but the DNS name remains the same
+    - This ensures your clients and Route 53 records continue to work without any changes needed on your end
+
 ### NLB
 - Layer 4 
 - Forward TCP and UDP traffic to instances

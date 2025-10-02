@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: GPT(s)
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
 description: Discussions around GPT LLMs
 show_back_link: true
@@ -30,6 +30,8 @@ The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6
 The number of decoder blocks + context size is one of the distinguishing factors in GPT models as well
 
 ![GPT Sizes](./images/gpt_sizes.png)
+
+While the largest T5 model has 11 billion parameters, GPT-3 has 175 billion parameters. Moreover, the training data set contains around 500 billion tokens of text, while the average young american child hears around 6 million words per year.
 
 One of the most notable aspects of GPT models is their emergent properties. Emergent properties refer to the abilities and skills that a model develops due to its next-word prediction pretraining. Even though these models were only taught to predict the next word, the pretrained models are capable of text summarization, translation, question answering, classification, and more.
 

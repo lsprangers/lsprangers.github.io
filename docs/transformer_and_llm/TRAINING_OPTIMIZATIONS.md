@@ -1,7 +1,7 @@
 ---
 layout: technical
 title: Transformer Training Optimizations
-category: Transformers and LLMs
+category: NLP, CV, and Transformers
 difficulty: Advanced
 description: Discussions around Loss Functions in NN's
 show_back_link: true

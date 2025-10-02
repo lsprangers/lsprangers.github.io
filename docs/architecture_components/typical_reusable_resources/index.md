@@ -6,5 +6,5 @@ difficulty: Advanced
 description: Architecting Distributed Components
 ---
 
-# Typical Reusable Resources
+## Typical Reusable Resources
 Foo

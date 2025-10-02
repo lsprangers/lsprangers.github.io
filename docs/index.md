@@ -130,5 +130,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [MinHash + LSH](https://www.pinecone.io/learn/series/faiss/locality-sensitive-hashing/)
 - [Google Two Tower AI Blog](https://cloud.google.com/blog/products/ai-machine-learning/scaling-deep-retrieval-tensorflow-two-towers-architecture)
 - [Multi Model Blog](https://slds-lmu.github.io/seminar_multimodal_dl/c02-00-multimodal.html)
+  - [NLP + CV](https://slds-lmu.github.io/seminar_multimodal_dl/c01-00-intro-modalities.html#c01-01-sota-nlp)
 - [Vinija Jain Blog](https://vinija.ai/)
+- [Cloudflare Load Balancing](https://developers.cloudflare.com/reference-architecture/architectures/load-balancing/)
 ---
