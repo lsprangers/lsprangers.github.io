@@ -11,6 +11,17 @@ This is stated in main references page, but a majority of this is from [Cloudfla
 
 Cloudflare is essentially one of the largest network / network solutions providers in the world - some crazy statistics like "Cloudflare operates within ~50 ms of ~95% of the world’s Internet-connected population" and "It is one of the largest global networks, with data centers spanning over 330 cities and interconnection with over 13,000 network peers."
 
+Cloudflare LB's can handle:
+- Load balancing
+- Proxying
+- DDoS protection
+- Some DNS capabilities
+- CDN / Caching
+- Bot management
+- WAF
+- Health monitoring / pinging (TCP, UDP, ICMP, SMTP, HTTP(S), LDAP)
+- etc..
+
 ### Vocabulary
 - *Endpoint*: A service or piece of hardware that intercepts and processes incoming public or private traffic
     - Load balancing can be used for more than just web servers, and it can come in many forms specifically multiple software, and even hardware, solutions
@@ -62,8 +73,8 @@ This again has factors of geo-location, where services may go up and down during
 
 ### Types of Traffic Management
 There are two layers for load balancing for global apps 
-- **Global Traffic Management (GTM)** aka Global Server Load Balancing (GSLB)
-- **Private Network Load Balancing*** aka Server Load Balancing (SLB)
+- **Global Traffic Management (GTM)** aka Global Server Load Balancing (GSLB) routes traffic from world to the correct region / data center
+- **Private Network Load Balancing*** aka Server Load Balancing (SLB) routes traffic within a region / data center
 
 #### Global Traffic Management
 Typically responsible for routing requests, generally from the internet, to proper region or data center
@@ -72,3 +83,20 @@ Most of these load balancers operate at / alongside DNS layer which allows them 
 - Resolve a DNS request to an IP address based on geo / physical location
     - i.e. to send requetss to the geographically closest web server to serve the request
 - Provide the IP of the endpoint or service closest to the client, so it can connect
+- Proxy traffic
+- Perform HTTP inspections
+    - Alter HTTP / L7 parameters / headers inter-region
+
+Altogether, these global load balancers are meant to route traffic to specific regions / data centers for further load balancing
+
+#### Private Network Load Balancing
+PNLB steers traffic within a data center or geographic location - these load balancers will route traffic efficiently to specific web app endpoints for processing
+
+Can be responsible for:
+- Load balancing
+- SSL / TLS offloading
+- Content switching
+- Other app delivery functions
+
+GTM load balancer sends traffic to Europe data center, and inside of there the LTM LB will route to actual servers for processing
+![Global vs Local Private Load Balancing](/img/gtm_vs_ltm_lb.png)

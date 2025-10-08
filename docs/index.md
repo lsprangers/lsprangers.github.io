@@ -133,4 +133,7 @@ These are some of the resources I frequently use and reference throughout this r
   - [NLP + CV](https://slds-lmu.github.io/seminar_multimodal_dl/c01-00-intro-modalities.html#c01-01-sota-nlp)
 - [Vinija Jain Blog](https://vinija.ai/)
 - [Cloudflare Load Balancing](https://developers.cloudflare.com/reference-architecture/architectures/load-balancing/)
+- [Dario Amodei's Blog](https://www.darioamodei.com)
+- [The Urgency of Interpretability](https://www.darioamodei.com/post/the-urgency-of-interpretability)
+- [Cristophm Interpretability Blog](https://christophm.github.io/interpretable-ml-book/overview.html)
 ---

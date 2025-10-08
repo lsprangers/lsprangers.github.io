@@ -48,6 +48,12 @@ The core architecture of typical frontend is comprised of:
     - Potentially cache's, K:V stores, or other useful components
 - [CDN's](/docs/architecture_components/typical_reusable_resources/typical_cdn/index.md) can potentially be used as edge-cache's to completely avoid going to web server for static content, but this can be considered a separate component
 
+
+![LB Tier Example](/img/lb_tier_example.png)
+- R1​ indicates request 1 coming through one of the ECMP routers (tier-1 LBs).
+- ECMP routers forward R1R1​​ to any of the three available tier-2 LBs using a round-robin algorithm. Tier-2 LBs take a hash of the source IP address (IPsIPs​) and forward the packet to the next tier of LBs.
+- Tier-3, upon receiving the packet, offloads TLS and reads the HTTP(S) data. By observing the requested URL, it forwards the request to the server handling requests for `document`.
+
 ### DNS
 DNS (Domain Name Systems) help us to resolve `myexample.app.com` into some IP address `10.0.0.1`
 
@@ -69,6 +75,63 @@ In the context of "frontend" they can be thought of as used to route client requ
         - Login service
         - Cart service
     - These services must all engage with each other 
+- Layer 4 (L4) is load balancing using transport protocols like TCP / UDP
+    - Help to ensure that the same TCP / YDP communication is forwarded to same back-end server
+- Layer 7 (L7) load balancers are based on data of app layer protocols like HTTP headers, URLs, cookies, and other app specfic data (even userId)
+    - Can also handle TLS offloading, rate limiting, HTTP routing, header rewriting, and many other features
+
+#### Tiers
+![LB Tiers](/img/lb_tiers.png)
+
+- Tier 0 and 1
+    - If DNS can be considered, then Equal Cost Multi Path (ECMP) routers are the tier-1 LB's 
+    - Most of these operate using some sort of round-robin algorithm for distributing traffic equally
+    - Tier-1 LB's will balance the load across different paaths to higher tiers of LB's
+- Tier 2
+    - Typically L4 LB's which ensure that **for any connection, all incoming packjets are forwarded to the same Tier-3 LB**
+    - To achieve this, consistent hashing and other state based algorithms may be used
+    - Without tier-2 LB's there can be erroneous forwarding decisions in case of failures or scaling of LB's
+- Tier 3
+    - Typically L7 LB's that provide app layer routing to actual web app endpoints
+    - These will also provide health checks / monitoring of backend servers at the HTTP level
+        - Some extra features typically include TCP-congestion control protocols, Path Maximum Transmission Unit (MTU), TLS offloading, etc
+    - Ultimately, this layer helps to **enable scalability by evenly distributing requests among the set of healthy back-end servers and provides high availability by monitoring the health of servers directly**
+
+#### Static vs Dynamic
+- Static algorithms don't consider the changing state of endpoint servers
+    - Task assignment is carried out based on existing knowledge about servers configuration
+    - These are never very complex algorithms, and they're implemented in a single router or commodity machine that accepts all incoming requests
+- Dynamic algorithms do consider the current or recent state of servers
+    - Dynamic algorithms maintain state by communicating with the server(s) themselves
+    - State maintenance makes design much more complicated, but ultimately enables more complex and robust load balancing patterns
+
+#### Stateful vs Stateless
+State may be maintained to hold session infromation about different clients that interact with the hosting server
+
+If session information is not keot in a separate lower layer (database, cache, etc...), then load balancers are used to keep the session information
+
+- Stateful load balancing involves maintaining state of the sessions established between clients and hosting servers
+    - Stateful LB's incorporate state info into their algorithms to perform load balancing
+    - Allows for "sticky" sessions
+    - Holds a mapping of incoming clients to hosting servers
+    - LB's share state with each other to make forwarding decisions
+- Stateless load balancing maintains no state, and is therefore faster and more lightweight
+    - Uses [Consistent Hashing](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/SHARDING.md#circular--consistent-hashing) to make forwarding decisionss
+    - As new servers join or exit ring, stateless LB's may not be enough to route a request to the correct app server, so a small amount of local state may be required with Consistent Hashing
+
+#### Global vs Local
+- Global Server Load Balancing (GSLB) involves distribution of traffic across regions / data centers
+    - A client in USA being routed to `us-east`, `us-central`, or `us-west` is an example
+    - This focuses on routing a request to the nearest data center that can handle requests
+        - It also ensures efficiency + high availability - in the case a data center goes down, we'd prefer our GSLB routes request to the next nearest data center
+        - Each LLB layer within a dtta center will maintain a control plane connection with GSLB to ensure LLB's are still healthy and data center is available
+    - DNS provides some level of GSLB as it can respond to DNS queries with multiple IP Addresses
+        - However, DNS is not consistent and different users get a different ordered list of IP's returned from DNS query
+        - Therefore, different users visit different servers to entertain their requests - **therefore, DNS is a load balancer in itself!**
+            - DNS can act as a round-robin load balancer
+- Local / Private Load Balancing (LLB) involves load balancing achieved within a data center / region
+    - This focuses on improving efficiency + availability of our servers / sergices
+    - LLB's typicall use a VIP (static IP) so all client requests can easily be routed to the same LLB for sticky sessions
 
 ## AWS EKS + LB Example
 

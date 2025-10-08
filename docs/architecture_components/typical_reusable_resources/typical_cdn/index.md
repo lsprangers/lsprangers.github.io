@@ -7,6 +7,7 @@ description: Architecting a CDN Solution
 ---
 
 ## Distributed CDN
+CDN's are highly integrated and coupled with [Frontend Services](/docs/architecture_components/typical_reusable_resources/typical_frontend/index.md) such as [DNS, Load Balancers, and Routers](/docs/architecture_components/typical_reusable_resources/typical_frontend/index.md#load-balancers)
 - ***Proxy Server*** - Is a server that sits between a client and an origin server
     - Could be a load balancer
     - Could simply be a traffic migration server
