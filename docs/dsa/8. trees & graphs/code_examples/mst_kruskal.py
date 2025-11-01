@@ -21,7 +21,7 @@ def kruskal_mst(vertices, edges):
             mst.append((u, v, weight))
             total_weight += weight
 
-            # Stop if we have V - 1 edges in the MST
+            # Stop if you have V - 1 edges in the MST
             if len(mst) == vertices - 1:
                 break
 

@@ -36,7 +36,7 @@ The actual assumptions are:
     - If this is violated then the estimated confidence intervals of the feature weights are invalid
 - **Homoscedasticity**: Essentially just constant variance - specifically asks the variance of the error term is assumed to be constant over the entire featur space
     - This is usually violated in practice
-    - If we try to predict housing prices, the variance in errors for multi-million dollar homes will be larger than the variance for typical $500k homes
+    - If you try to predict housing prices, the variance in errors for multi-million dollar homes will be larger than the variance for typical $500k homes
         - The variance for larger homes could be hundreds of thousands of dollars, where-as the variance for $500k typical homes may be tens of thousands
         - Errors are not based on range of predicted value, they are strictly constant
 - **Independence**: It's assumed that each instance (features and target) are independent of any other instances
@@ -48,11 +48,11 @@ $\bold{\hat{\beta}} = \arg\min_{\beta_0, \ldots, \beta_p} \sum_{i=1}^n \left( y^
 
 #### Linear Regression Interpretability
 These linear equations mentioned above have an easy-to-understand interpretation at a weight level
-- For numeric features: We can directly say "an increase in $x_n$ will cause a $\beta_n$ shift in the output target, all other things similar" which gives us a direct cause and effect for our input and outputs
-- For binary features: The $\beta_n$ is basically all or nothing so if we do not include it, then the target doesn't deviate from the average for that feature
+- For numeric features: you can directly say "an increase in $x_n$ will cause a $\beta_n$ shift in the output target, all other things similar" which gives us a direct cause and effect for our input and outputs
+- For binary features: The $\beta_n$ is basically all or nothing so if you do not include it, then the target doesn't deviate from the average for that feature
 - For categorical variables: Typically you just one-hot-encode things, set one specific category as reference, and interpret them as reference vs other for all categories
 
-These estimated weights, $\beta_n$, come with confidence intervals, which basically are ranges for the weight estimate that covers the "true" weight with a certain confidence. Meaning a 95% confidence interval for a weight of 2 means the true value could range from 1 - 3. The interpretation is "If we repeated the estimation 100 times with newly sampled data, the confidence interval would include the true weight 95 / 100 times, given that the linear regression model is the correct model for the data", where correctness depends on whether the relationships in data meet all of the underlying linear regression assumptions
+These estimated weights, $\beta_n$, come with confidence intervals, which basically are ranges for the weight estimate that covers the "true" weight with a certain confidence. Meaning a 95% confidence interval for a weight of 2 means the true value could range from 1 - 3. The interpretation is "If you repeated the estimation 100 times with newly sampled data, the confidence interval would include the true weight 95 / 100 times, given that the linear regression model is the correct model for the data", where correctness depends on whether the relationships in data meet all of the underlying linear regression assumptions
 
 $\bold{R^2}$ will tell us how much of the total variance of target outcome is explained by the model. 0 means if doesn't explain anything at all, and 1 means the variance is perfectly explained - if it's negative that means SSE $\gt$ SST and that a model doesn't capture the trend of data, and fits worse than using the mean of the target as a predictions:
 $R^2 = 1 - {{SSE} \over {SST}}$
@@ -63,11 +63,11 @@ $SSE = \sum_{i=1}^{n} (y^{(i)} - \hat{y}^{(i)})^2$
 $\bold{SST}$ is the squared sum of data variance, which is the total variance of the target outcome:
 $SSE = \sum_{i=1}^{n} (y^{(i)} - \bar{y})^2$
 
-Lastly, the importance of a feature in a linear regression model can be measured by the absolute value of it's t-statistic, which is the estimated weight scaled with its standard error. The importance of a feature increases with increasing weight, i.e. the more variace the estimated weight has (the less certain we are about it), the less "important" the feature is:
+Lastly, the importance of a feature in a linear regression model can be measured by the absolute value of it's t-statistic, which is the estimated weight scaled with its standard error. The importance of a feature increases with increasing weight, i.e. the more variace the estimated weight has (the less certain you are about it), the less "important" the feature is:
 $\bold{t_{\hat{\beta}_j}} = \hat{{\beta}_j \over {SE({\beta}_j)}    }$
 
 #### Sparse Linear Models
-What if we have models with hundreds of thousands of features? Interpretability goes downhill, and ultimately our model becomes a jumbled mess of data. In scenarios like this we can introduce sparsity (= a few features) into linear models directly
+What if you have models with hundreds of thousands of features? Interpretability goes downhill, and ultimately our model becomes a jumbled mess of data. In scenarios like this you can introduce sparsity (= a few features) into linear models directly
 
 ##### Lasso
 Lasso is an automatic way to introduce sparsity into linear regression models - Lasso stands for "Least Absolute Shrinkage and Selection Operation" and so when it's applied to a linear regression model it will perform feature selection and regularization of selected feature weights
@@ -75,7 +75,7 @@ Lasso is an automatic way to introduce sparsity into linear regression models - 
 In typical linear regression, our weights look to solve:
 $\min_{\beta}({1 \over n} \sum_{i=1}^n (y^{(i)} - \bold{x}^{(i)T} \bold{\beta})^2)$
 
-In Lasso we add a new term:
+In Lasso you add a new term:
 $\min_{\beta}({1 \over n} \sum_{i=1}^n (y^{(i)} - \bold{x}^{(i)T} \bold{\beta})^2 + \lambda||\bold{\beta}||_1)$
 
 Where $||\bold{\beta}||_1$ is the L1-norm of the feature vector, which will ultimately penalize large weights. Since L1 is used, most of the weights receive an estimate of 0, and others are shrunk. $\lambda$ is the regularization parameter and is manually tweaked with cross-validation data - the larger the $\lambda$ the more weights become 0. 
@@ -83,8 +83,8 @@ Where $||\bold{\beta}||_1$ is the L1-norm of the feature vector, which will ulti
 ### Logistic Regression
 Logistic regression models the probabilities for classification problems with two possible outcomes - it's essentially an extension of linear regression model for class outcomes
 
-#### Why Cant We Use Linear
-Why can't we just use linear regression for classification? In the case of two classes, 0 or 1, a linear model doesn't output probabilities, but it treats the classes as numbers (0 and 1) and fits the best hyperplane that minimizes the distances between the points and the hyperplane. In laymen terms, it simply interpolates between the points, and it's not able to be interpreted as probabilities - i.e. the **interpretation of the model would be incorrect**. There's no meaningful threshold to use as one or the other, and the problems become even worse with multiple classes - the higher the value of a feature with a positive weight, the more it contributes to the prediction of a class with a higher number, even if classes that heppen to get a similar number are no closer than the first and last classes.
+#### Why Cant you Use Linear
+Why can't you just use linear regression for classification? In the case of two classes, 0 or 1, a linear model doesn't output probabilities, but it treats the classes as numbers (0 and 1) and fits the best hyperplane that minimizes the distances between the points and the hyperplane. In laymen terms, it simply interpolates between the points, and it's not able to be interpreted as probabilities - i.e. the **interpretation of the model would be incorrect**. There's no meaningful threshold to use as one or the other, and the problems become even worse with multiple classes - the higher the value of a feature with a positive weight, the more it contributes to the prediction of a class with a higher number, even if classes that heppen to get a similar number are no closer than the first and last classes.
 
 ![Linear Model Bad Probabilities](/img/linear_model_bad_probabilities.png)
 
@@ -95,13 +95,13 @@ $\text{logistic}(\bold{z}) = { 1 \over {1 + \text{exp}(-\bold{z})}}$
 
 ![Logistic Graph](/img/logistic_graph.png)
 
-In Linear Regression we have:
+In Linear Regression you have:
 $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \epsilon$
 
-In Logistic Regression we have:
+In Logistic Regression you have:
 $P(Y^{(i)} = 1) = \text{logistic}(\bold{x}^{(i)T}\bold{\beta}) = {1 \over {1 + \text{exp}(-(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p))}}$
 
-The main difference above is we take the linear portion and insert it into an exponential function - if we decode the equation we get:
+The main difference above is you take the linear portion and insert it into an exponential function - if you decode the equation you get:
 - If $\text{exp}(-(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p))$ comes out to be 0, then our logistic model is $1 \over 1$
     - Therefore, the smaller the $\text{exp}(...)$ portion is, the closer our model is to 1
 - The $\text{exp}(...)$ portion is 
@@ -120,7 +120,7 @@ $\ln({P(Y = 1) \over 1 - P(Y = 1}) = \ln({P(Y = 1) \over P(Y = 0}) = \beta_0 + \
 
 $\ln({P(Y = 1) \over P(Y = 0})$ is known as the **odds** which is the probability of an event divided by probability of no event and wrappd in a logarithm, therefore called "log odds" 
 
-Altogether logistic regression is a linear model for the log odds, if we interpret the log odds as our output $\hat{y}$
+Altogether logistic regression is a linear model for the log odds, if you interpret the log odds as our output $\hat{y}$
 
 ${P(Y = 1) \over 1 - P(Y = 1} = \text{odds} = \text{exp}(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p)$ 
 
@@ -128,7 +128,7 @@ ${P(Y = 1) \over 1 - P(Y = 1} = \text{odds} = \text{exp}(\beta_0 + \beta_1 x_1 +
 
 ${\text{odds}_{x_{j}+1} \over \text{odds}_{x_{j}}} = {\text{exp}(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \bold{\beta_{j} x_{j}+1} ... + \beta_p x_p) \over \text{exp}(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \bold{\beta_j x_j} ... + \beta_p x_p)} $
 
-Then, we can cancel a bunch of crap because ${\text{exp}(A) \over \text{exp}(B)} = \text{exp}(A-B)$
+Then, you can cancel a bunch of crap because ${\text{exp}(A) \over \text{exp}(B)} = \text{exp}(A-B)$
 
 Sooooo
 ${\text{odds}_{x_{j}+1} \over \text{odds}_{x_{j}}} = \text{exp}(\beta_{j} (x_{j}+1) - \beta_{j} x_{j}) = \text{exp}(\beta_{j})$

@@ -20,7 +20,7 @@ It all starts with Driver and Executors in a Cluster - a Driver is the cluster m
 
 ![Spark Cluster](./images/spark_cluster.png)
 
-This is nice, because it basically allows us to horizontally scale as much as we need for our distributed datasets...and a majority of working with Spark comes down to setting up your data to be as parallel as possible, and for writing proper logic that utilizes programs running on different nodes
+This is nice, because it basically allows us to horizontally scale as much as you need for our distributed datasets...and a majority of working with Spark comes down to setting up your data to be as parallel as possible, and for writing proper logic that utilizes programs running on different nodes
 
 #### Spark Driver
 This program sits on one node, and is responsible for:
@@ -50,7 +50,7 @@ Dataframe & RDD are lower-level abstractions for sequential, tabular data
 - **RDD**:
     - A Resilient Distributed Dataset (RDD) is defined as an immutable distributed collection of elements of your data, partitioned across nodes in your cluster that can be operated in parallel with a low-level API that offers transformations and actions
         - To parse this out, an RDD is the collection of elements of data (rows), and it is typically split up among the different Nodes in a Cluster to provide parallel processing
-        - The Transformations and Actions are apart of the [Logical Operations](#logic-and-operations) we can perform on our data
+        - The Transformations and Actions are apart of the [Logical Operations](#logic-and-operations) you can perform on our data
         - These objets are immutable, and running operations over them produces new RDD's: $f(RDD_1) = RDD_2$
     - A lower-level abstraction for distributed data
     - Logical Operations done via functional programming without higher level SDK's
@@ -65,7 +65,7 @@ Dataframe & RDD are lower-level abstractions for sequential, tabular data
     - Superior to RDDs in performance due to query optimizations
     - Both Dataframes and Datasets are built on top of the Catalyst Optimizer for better logical and physical query plans
         - Dataframes have more info in them than RDD’s so Query Optimizer can better perform
-        - ***Predicate Pushdown*** also helps - which allows us to evaluate the predicate/commands at storage level, so we don’t have to read in unnecessary data points and evaluate them
+        - ***Predicate Pushdown*** also helps - which allows us to evaluate the predicate/commands at storage level, so you don’t have to read in unnecessary data points and evaluate them
 - **Dataset**:
     - Combines the benefits of DataFrames and RDDs, and allows for functional programming, high level API's from domain specific languages, and optional schemas
     - Can be Typed or Untyped
@@ -82,22 +82,22 @@ The two main types are Transformations and Actions, and at a high level Transfor
     - **Narrow Transformations**:
     - Operate on a single partition (e.g., `map`, `filter`)
     - Do not require shuffles
-    - We can chain together multiple narrow transformations on the same Node across the same Executors
+    - you can chain together multiple narrow transformations on the same Node across the same Executors
     - **Wide Transformations**:
     - Require data from multiple partitions (e.g., `groupBy`, `join`)
     - Trigger shuffles and create new Stages
 - **Action**: Concrete operations (e.g., `count`, `join`) that triggers computation across Executors and Shuffles across Nodes
-    - We can't possibly know the results, so we need to run this in a Stage (set of Tasks) and get results before going any further
+    - you can't possibly know the results, so you need to run this in a Stage (set of Tasks) and get results before going any further
 
 
 #### Work Steps
-Work Steps here refers to the different ways we group together [Logical Operations](#logic-and-operations) and [Networking and Data Transfers](#networking-and-nodes) - they basically describe how compute and I/O work together across our Cluster to come up with a result
+Work Steps here refers to the different ways you group together [Logical Operations](#logic-and-operations) and [Networking and Data Transfers](#networking-and-nodes) - they basically describe how compute and I/O work together across our Cluster to come up with a result
 
 - **Task**:
     - A single operation performed on a single partition of an RDD
     - Executed as a single thread on an executor
     - The number of tasks in a stage equals the number of partitions in the RDD
-        - If a dataset has 2 partitions, and we run a `.filter()` Transformation on it, that will trigger 2 Tasks in a single Stage
+        - If a dataset has 2 partitions, and you run a `.filter()` Transformation on it, that will trigger 2 Tasks in a single Stage
     - Tasks are directly related to number of Partitions and Executors
         - If there are 200 partitions and 100 Executors, each Executor gets 2 Partitions
         - If each Executor has 2 `executor-cores`, then all 200 Tasks are ran in parallel
@@ -176,7 +176,7 @@ TODO: More on heap and on machine in RAM, disk + spill, and efficient caching
 
 #### Cluster Setup
 - **Nodes**: 6 nodes, each with 16 cores and 64GB memory
-    - Typically we want to leave 7% memory and 1 vCPU for background processes
+    - Typically you want to leave 7% memory and 1 vCPU for background processes
 - **Executor Configuration**:
   - `num-executors`: 17 means 3 executors per node, 1 reserved for the application manager)
   - `executor-cores`: 5 (15 vCPUs per node ÷ 3 executors per node)
@@ -211,8 +211,8 @@ The 5 S's of Spark are:
   - Repartition data to balance workloads
   - Use salting techniques to distribute keys evenly
     - Splitting up the portion for `user1` into `user1_1`, `user1_2`, etc. to spread out the data
-    - When this is done we need to tweak our joins and aggregations to account for salted keys
-        - `groupByKey` would need to be adjusted to `groupByKey(salted_key)` and we would need to aggregate the results after
+    - When this is done you need to tweak our joins and aggregations to account for salted keys
+        - `groupByKey` would need to be adjusted to `groupByKey(salted_key)` and you would need to aggregate the results after
 
 ### 3. Storage
 - **Definition**: Inefficient file setup or file sizes that hinder parallelization
@@ -233,8 +233,8 @@ The 5 S's of Spark are:
 
 #### 3.1 File Formats
 - ***Parquet*** has stats
-	- If we partition correctly, then we can use data skipping to skip over some files because we know of the partitions
-	- If we partition by CityID, and we have a where CityID = 1, we can skip every other file
+	- If you partition correctly, then you can use data skipping to skip over some files because you know of the partitions
+	- If you partition by CityID, and you have a where CityID = 1, you can skip every other file
 - Don’t collect stats on long strings
 - Use parquet instead of CSV
 	- CSV doesn’t collect stats
@@ -243,7 +243,7 @@ The 5 S's of Spark are:
 	- Faster for aggregation (uses stats better)
 	- For read/writes parquet & delta are similar
 - LocalTableScan in the query details means that the JSON stats covered the query instead of actually opening the file
-	- Kinda similar to OLAP cube where we compute a lot of stuff at write time and write it to JSON 
+	- Kinda similar to OLAP cube where you compute a lot of stuff at write time and write it to JSON 
 - ZOrder is for sorting the rows in parquet/delta
 	- Can’t do it freestanding
 	- Apart of Optimize function
@@ -251,10 +251,10 @@ The 5 S's of Spark are:
 		- Can add in ZOrder to also sort the rows
 	- Good for needle in the haystack
 	- Most effective with indexes that feature high-cardinality 
-	- ZOrder is a way to optimize/index partitioned files, where we can also optimize by ordered by partitions and metadata statistics
-	- Typically scan less files, and get less false positives, when using columns in where clause that we Z-Ordered
+	- ZOrder is a way to optimize/index partitioned files, where you can also optimize by ordered by partitions and metadata statistics
+	- Typically scan less files, and get less false positives, when using columns in where clause that you Z-Ordered
 - High cardinality $\rightarrow$ Z Order && Low cardinality $\rightarrow$ Partition
-	- We want ~2GB of files if we partition for each of them to be used best by cores
+	- you want ~2GB of files if you partition for each of them to be used best by cores
 
 #### 3.2 Delta Deep Dive
 TODO - metadata, storage, column families, row families, skipping, etc...
@@ -274,9 +274,9 @@ TODO - metadata, storage, column families, row families, skipping, etc...
 ### 5. Serialization
 - **Definition**: The process of encoding and decoding data into binary formats, which is resource-intensive
     - This can happen during:
-        - Shuffles when we send data over the network
-        - Spill when we need to write binary data to disk
-        - Storage when we need to write Delta data to disk
+        - Shuffles when you send data over the network
+        - Spill when you need to write binary data to disk
+        - Storage when you need to write Delta data to disk
 - **Strategies**:
   - Use efficient serialization formats like Parquet or Delta Lake
   - Avoid collecting unnecessary stats on long strings
@@ -287,11 +287,11 @@ TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, wil
 ![Spark on Kubernetes](./images/spark_kubernetes_generic.png)
 
 ## Spark Streaming
-Our [Streaming sub-document](STREAM_PROCESSING.md) goes into more detail on the concepts and architectures of streaming, but here we will focus on Spark Streaming
+Our [Streaming sub-document](STREAM_PROCESSING.md) goes into more detail on the concepts and architectures of streaming, but here you will focus on Spark Streaming
 
 Spark Streaming allows for resilient, durable, and highly available streaming pipelines - common sources and sinks include TCP Sockets /  Network I/O / File Descriptors, [Kafka Brokers](/docs/architecture_components/messaging/Kafka%20Broker/index.md), [Queue's](/docs/architecture_components/typical_reusable_resources/typical_distributed_queue/index.md), [PubSub](/docs/architecture_components/messaging/PubSub/index.md), and [Blob Storage](/docs/architecture_components/typical_reusable_resources/typical_blob_storage/index.md)
 
-With Spark Streaming we can treat these incoming messages as [RDDs or Datasets](#data-storage-structures) and run our typical functional programming or other high-level API's over it
+With Spark Streaming you can treat these incoming messages as [RDDs or Datasets](#data-storage-structures) and run our typical functional programming or other high-level API's over it
 
 The hardest questions to solve are running long-standing aggregations such as distinct counts, Top K, or tumbling window aggregations (## users in last 5 minutes)
 
@@ -300,7 +300,7 @@ Spark Streaming allows us to re-use all of the goodness baked into Spark for thi
 
 ### Differences from Batch
 ![Spark Streaming Architecture](./images/spark_streaming.png)
-The main difference between Spark Streaming and Spark Batch is how we continuously get RDD data in our source
+The main difference between Spark Streaming and Spark Batch is how you continuously get RDD data in our source
 
 Micro-batches sometimes get brought up when considering performance, but given that most Streaming services have some sort of computation window micro-batches are fairly aligned to this. There's a chance that micro-batches cause some slight delay versus sending each record independently, but the benefits of re-using Dataset and RDD API's and syncing with the Batch Engine outweigh the costs.
 
@@ -327,7 +327,7 @@ The Kubernetes architecture is similar to [Batch on Kubernetes](#kubernetes-arch
 ![DStream Example](./images/dstream.png)
 
 ##### File Streams
-[File Stream DStreams](https://spark.apache.org/docs/latest/streaming-programming-guide.html#file-streams) are useful when we want to monitor a stream of file changes under a directory, and this can also be linked to directory like structures compatible with HDFS such as S3
+[File Stream DStreams](https://spark.apache.org/docs/latest/streaming-programming-guide.html#file-streams) are useful when you want to monitor a stream of file changes under a directory, and this can also be linked to directory like structures compatible with HDFS such as S3
 
 Any new file ***updated or created*** under the specified directory will get picked up, but the more files in a directory the harder it is to process and check for updates
 
@@ -347,7 +347,7 @@ In the example below, there are 3 units in the window (***window length***), and
 
 #### DStream Joins
 - There are 2 main types of DStream joins:
-  - DStream $\le$ > DStream: If we have 2 streams, `(K, X)` and `(K, Y)`, we can join them together to get `(K, (X, Y))`
+  - DStream $\le$ > DStream: If you have 2 streams, `(K, X)` and `(K, Y)`, you can join them together to get `(K, (X, Y))`
     - This is done by using the `join()` function on the DStreams
     - This is useful for combining related data from different sources
   - DStream $\le$ > Dataset: Similar to DStream $\le$ > DStream, except it will join a static Dataset for each DStream, and then return a new DStream
@@ -355,7 +355,7 @@ In the example below, there are 3 units in the window (***window length***), and
 #### Outputs
 Outputs should go to a specific location like Files, Databases, Message Broker, or Network I/O
 
-Our output function will run for each RDD DStream, and we should be careful to create resources only once (like connections), and sending them to each worker to be re-used, and not doing this for every single DStream
+Our output function will run for each RDD DStream, and you should be careful to create resources only once (like connections), and sending them to each worker to be re-used, and not doing this for every single DStream
 ```
 dstream.foreachRDD { rdd =>
   rdd.foreachPartition { partitionOfRecords =>
@@ -371,10 +371,10 @@ dstream.foreachRDD { rdd =>
 Spark Streaming has many workers, each running on different computes potentially on different machine types - there are many things that could go wrong, and so Spark needs to be Fault Tolerant and Durable
 
 - ***Metadata Checkpointing*** helps our Driver and Application to be Fault Tolerant by writing state and processes to disk
-- ***Data Checkpointing*** helps our *stateful, cross-windowed, business logic* so that if something fails mid-batch we can start from the beginning and not outright fail
+- ***Data Checkpointing*** helps our *stateful, cross-windowed, business logic* so that if something fails mid-batch you can start from the beginning and not outright fail
   - Stateful means over multiple RDD's / us having to keep state of the world of RDD's. ***Stateful operations happen over multiple RDD's in a DStream*** when one operation depends on operations of previous batches
-  - If we need `count(distinct)` over all RDDs in a DStream, and an operations fails midstream, we need it to be able to pick back up because the historic RDDs that we already processed would be lost
-  - Checkpointing is costly, writing all of these RDD's to disk takes time and is prone to throughput issues especially if we are writing to cloud storage like S3 every second (interval)
+  - If you need `count(distinct)` over all RDDs in a DStream, and an operations fails midstream, you need it to be able to pick back up because the historic RDDs that you already processed would be lost
+  - Checkpointing is costly, writing all of these RDD's to disk takes time and is prone to throughput issues especially if you are writing to cloud storage like S3 every second (interval)
   - Can mark certain variables as `volatile` which means they won't be kept track of on disk statefully
 
 ### Streaming Application Deployment

@@ -62,7 +62,7 @@ show_back_link: true
     - Can restrict who can access origin and distributions
         - Allow and Block lsit
     - Can help with copyright laws as well
-    - Comes in as a header as well if we want to track
+    - Comes in as a header as well if you want to track
 - Signed URLs
     - Allows us to block every single public access request on CloudFront
     - Forces a client to use a pre-signed URL to access CloudFront, and an app server would generate the pre-signed URL if authenticated to
@@ -72,7 +72,7 @@ show_back_link: true
 
 ### Pricing and Performance
 - Pricing is done by where the CF Origin server sits
-- If we have all regions, it's the best performance, but costs the most
+- If you have all regions, it's the best performance, but costs the most
     - Price Class 100 is least expensive regions covered, and so is the least expensive
     - Price Class 200 is most regions but excludes the most expensive ones
     - Price Class All means all regions, best performance
@@ -120,10 +120,10 @@ show_back_link: true
     - Implement request filtering before reaching app server
     - Auth:
         - Doing Auth on CF means there's just validating JWT token locally somehow
-        - Lambda Auth means we can use 3rd party tools like Incognito or Okta IdP
+        - Lambda Auth means you can use 3rd party tools like Incognito or Okta IdP
         - ![Auth at Edge](./images/auth_at_edge.png)
     - Content Filtering:
-        - We can also use Lambda to do content filtering based on headers. If Chrome browser on laptop trying to GET image we can return larger image than if an iPhone is trying to
+        - you can also use Lambda to do content filtering based on headers. If Chrome browser on laptop trying to GET image you can return larger image than if an iPhone is trying to
         - Comes from `User-Agent` header
         - Deals with a GET to S3 so only Lambda, no CF
     - Global Serverless App:
@@ -216,11 +216,11 @@ show_back_link: true
 ## Questions
 - Q: You have deployed the same SSL certificate onto your CloudFront and ALB. You would like to ensure you get a high ratio of cache hit but also don't want to break SSL. What do you recommend? 
     - Explanation: Forward the host header because it allows you to maintain the integrity of SSL conncetions while caching content effectively, Preserving the host header ensures that requests are routed correctly. 
-    - Break SSL here refers to breaking integrity of secure cnxn b/t client and backend ALB if we incorrectly handle headers
+    - Break SSL here refers to breaking integrity of secure cnxn b/t client and backend ALB if you incorrectly handle headers
         - The `Host` header is needed to be passed through CloudFront so that the ALB can use this information
-        - `Host` header tells backend ALB what domain the client originally requested, if SSL cert tied to `www.example.com` then the ALB needs to verify request for that website, if CF doesn't forward header we can't use that
+        - `Host` header tells backend ALB what domain the client originally requested, if SSL cert tied to `www.example.com` then the ALB needs to verify request for that website, if CF doesn't forward header you can't use that
         - Why does this hurt caching? If our `cache-key` that CF uses to calculate whether to return cached content or not includes the `Host` header, then CF may not get a cache hit if 2 people request the same content
-            - Basically if I request from `www.example.com` and get the content, and someone else did as well to get the exact same content, ideally CF handles this, but since we need SSL and to forward `Host` incase of a miss, CF would calculate these 2 requests as different
+            - Basically if I request from `www.example.com` and get the content, and someone else did as well to get the exact same content, ideally CF handles this, but since you need SSL and to forward `Host` incase of a miss, CF would calculate these 2 requests as different
 - Q: You would like to ensure your ALB is only accessible through a CloudFront distribution so that you can protect the content accessible to your users. What do you recommend?
     - Make ALB Private, and create CF VPC Origins to attach to ALB and create CF signed URLs
     - Private ALB can't be reached by CF, so need VPC Origins 

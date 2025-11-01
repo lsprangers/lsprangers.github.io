@@ -1,17 +1,17 @@
 ## Data Structure and Implementation
-Why do we need any of this?
+Why do you need any of this?
 - Durability is important
 - Keeping an entire hash table in RAM is sometimes impossible, even if it's split amongst multiple machines
-    - We could keep splitting and splitting and splitting, but if one of the machines goes down, we lose that data
-- If we wanted to write these hash tables to disk we could just write it in whatever order, but then lookup would be $O(n)$ full scans over all of our disks, which is very slow...so we want to sort things to make it $O(\log n)$
-- Another example is a Relational Database Index - like a hash index. They basically duplicate the entire columns data footprint (pointers only) so they're huge, and most databases ensure durability, so we can’t store in RAM
+    - you could keep splitting and splitting and splitting, but if one of the machines goes down, you lose that data
+- If you wanted to write these hash tables to disk you could just write it in whatever order, but then lookup would be $O(n)$ full scans over all of our disks, which is very slow...so you want to sort things to make it $O(\log n)$
+- Another example is a Relational Database Index - like a hash index. They basically duplicate the entire columns data footprint (pointers only) so they're huge, and most databases ensure durability, so you can’t store in RAM
     - Need to use a different indexing structure 
         - Can split entire hash index into smaller segments of indexes
         - Store these indexes on disk
-        - Retrieve only the indexes and keys we need from disk into memory
+        - Retrieve only the indexes and keys you need from disk into memory
         - How to find indexes? Iterate over them all?
-        - This is bad – we can use a B-Tree structure so that retrieval is O(log(n))
-    - Ultimately this is cascading indexes, where we store larger ranges on disk and recursively use binary search over all of the cascading indexes to find keys/memory locations
+        - This is bad – you can use a B-Tree structure so that retrieval is O(log(n))
+    - Ultimately this is cascading indexes, where you store larger ranges on disk and recursively use binary search over all of the cascading indexes to find keys/memory locations
     - This looks like a tree data structure
     - This data structure is known as  B-Tree Data Structure
         - Self-balancing tree data structure
@@ -19,10 +19,10 @@ Why do we need any of this?
         - Allows searches, insertions, and deletions in log time 
         - B-Tree helps to break down data into fixed-size blocks called pages where each page is usually several KB
         - Page contains data or references to data
-        - One page is designated as root, and then we cascade down
-- Between writing Distributed KV Stores to disk, or using a Hash Index in a relational database, and many other examples we don't list here, there are reasons to use Tree Structures on Disk
+        - One page is designated as root, and then you cascade down
+- Between writing Distributed KV Stores to disk, or using a Hash Index in a relational database, and many other examples you don't list here, there are reasons to use Tree Structures on Disk
 
-So long story short, ***disk writes of sorted data are useful in multiple scenarios, and the first place we see them is Distributed KV Stores***
+So long story short, ***disk writes of sorted data are useful in multiple scenarios, and the first place you see them is Distributed KV Stores***
 
 The two most common are B+ Trees, and LSMTree's
 

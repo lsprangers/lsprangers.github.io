@@ -22,7 +22,7 @@ class Solution:
         res = [0] * n
         
         def dfs(cur_node):
-            # keep res as a nonlocal variable - we want it to be te same
+            # keep res as a nonlocal variable - you want it to be te same
             #   across recursive calls
             nonlocal res 
 

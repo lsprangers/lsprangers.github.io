@@ -110,7 +110,7 @@ The results backend stores state of tasks running
 
 You can use Mongo, SQLAlchemy + DJango, Redis, or even use RPC to send things back to the broker to go back to the consumer / producer
 
-From above, we can then call something like
+From above, you can then call something like
 ```python
 result.ready() # True or False
 ```
@@ -149,13 +149,13 @@ task_annotations = {
 #### Examples
 
 ##### I/O Bound Task
-Let's say we have a setup where we have an API request that comes in, like for a user registration, and the API needs to call a `handle()` function that:
+Let's say you have a setup where you have an API request that comes in, like for a user registration, and the API needs to call a `handle()` function that:
 - Creates a new user
 - Creates their profile and setting configuration
 - Queue's a welcome email in SQS
 - And finally, after ensuring all of these are done, returns a response to the user
 
-In this scenario, we can have a lightweight FastAPI in front that accepts new requests and calls a `task.handle()` function that does everything
+In this scenario, you can have a lightweight FastAPI in front that accepts new requests and calls a `task.handle()` function that does everything
 
 The actual workers themselves would be I/O bound, and running on the Celery worker pool, so how does everything look?
 

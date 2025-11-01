@@ -9,7 +9,7 @@ show_back_link: true
 
 
 ## A/B Testing 
-- During A/B testing we will send users to, typically 2, different UI's, AI models, pricing structures, etc... and collect data to find effects
+- During A/B testing you will send users to, typically 2, different UI's, AI models, pricing structures, etc... and collect data to find effects
 
 These online systems are often tied to feature flags, and use canary or rollout testing on a few random, or non-random, user groups while collecting large amounts of click data
 
@@ -21,22 +21,22 @@ In this setup, the Frequentist approach would have:
 - Compute p-value: the probability of seeing the observed effect (or more extreme) under $H_0$
 - If p-value < $\alpha$ (e.g., 0.05), reject $H_0$
 - ***Limitations***:
-    - We can't quantify how large the effects are, or how uncertain we are
-    - We can simply say "yes we think there's a significant difference"
+    - you can't quantify how large the effects are, or how uncertain you are
+    - you can simply say "yes you think there's a significant difference"
 
 ### Bayesian A/B Testing
 - Assign priors to conversion rates of each group (e.g., Beta distributions)
 - Use observed data to compute posterior distributions
     - For computing posterior distributions we'd need a feedback and update mechanism
-    - TODO: We will create a ML Sys Design video around this
+    - TODO: you will create a ML Sys Design video around this
 - Compute:
     - Posterior probability that variant B is better than A
     - Expected loss (e.g., how bad a wrong decision could be)
-- With this approach we are able to interpret the chance that variant B is "better than" variant A
-    - We can utilize [Causal Inference](#casual-inference) to understand the effects of variants on users
+- With this approach you are able to interpret the chance that variant B is "better than" variant A
+    - you can utilize [Causal Inference](#casual-inference) to understand the effects of variants on users
 
 ### Casual Inference
-Correlation isn't causation - we want to directly measure what happens if we change X, or variants, on our user base
+Correlation isn't causation - you want to directly measure what happens if you change X, or variants, on our user base
 
 Causal Inference helps us to estimate model impact and personalization
 

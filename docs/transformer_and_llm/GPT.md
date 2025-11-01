@@ -12,7 +12,7 @@ GPT-2 was one of the first, and most notable GPT models!
 
 GPT models are ***Decoder Only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input
 
-In [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) BERT was discussed to show how we can "attend to" embeddings, and the Self Attention encoder portion was a way to contextualize ***an entire sentence, before and after a word***, but GPT isn't "allowed" to do that
+In [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) BERT was discussed to show how you can "attend to" embeddings, and the Self Attention encoder portion was a way to contextualize ***an entire sentence, before and after a word***, but GPT isn't "allowed" to do that
 
 ***Use Case***: Original Encoder-Decoder Transformers like BART were great for *machine translation*, but that isn't the use case for GPT! GPT is used for things like next word prediction, auto-complete, etc...
 
@@ -39,14 +39,14 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
 
 - ***Input***:
     - The [section on BERTs input sequence](/docs/transformer_and_llm/BERT.md#input-sequence) basically describes what the input would be here as well
-        - We embed our initial words, similar to BERT it uses WordPiece Embeddings
+        - you embed our initial words, similar to BERT it uses WordPiece Embeddings
         - Positional encoding is also used
 - ***Decoder Only***:
     - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention) which allows for constrained left-to-right self attention
         - Allows us to use newly generated words throughout our next prediction
     - ***Auto Regressive***:
         - The way these models actually work is that after each token is produced, that token is added to the sequence of inputs. And that new sequence becomes the input to the model in its next step.
-        - This means that we don't encode everything from before and after, we can use the prompt as input and then each generated word is also included in the future generation
+        - This means that you don't encode everything from before and after, you can use the prompt as input and then each generated word is also included in the future generation
         - ![AutoRegressive](./images/auto_regressive_generation.png)    
 - ***Output***:
     - Compare our output embedding, which has been attended to, with our vocabulary list to create probability distribution over all words
@@ -55,15 +55,15 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
 ### Architecture
 
 #### Input
-Since we still need a numeric representation of our text we need to embed the input
+Since you still need a numeric representation of our text you need to embed the input
 
 Most of these models will use WordPiece embeddings to expand their dictionary beyond singular words
 
 Tokenize our sentence input into Word Pieces
     - Will have some words get split into tokens like `embeddings -> [em, ###bed, ###ding, ###s]`
-    - Allows us to still embed words we may not have seen before
+    - Allows us to still embed words you may not have seen before
 
-We also include [Positional Encoding](./ATTENTION.md#positional-encoding)
+you also include [Positional Encoding](./ATTENTION.md#positional-encoding)
 
 **The very first word generated will get the special start token `<s>` along with the prompt
 
@@ -75,16 +75,16 @@ Unlike the Decoder Block in Encoder-Decoder, the Decoder blocks in Decoder-Only 
 ![Transformer Decoder Only Block](./images/decoder_only_block.png)
 
 #### Logits Output
-After an embedding has gone through Masked Self Attention, and the Decoder(s) have output an attended to representation of the next word to generate, we must compare that to the known vocabulary we have
+After an embedding has gone through Masked Self Attention, and the Decoder(s) have output an attended to representation of the next word to generate, you must compare that to the known vocabulary you have
 
-In this step we multiple our embedded output vector by our vocabulary, and then get a numeric probability for each potential output word
+In this step you multiple our embedded output vector by our vocabulary, and then get a numeric probability for each potential output word
 
 ![Output Choice](./images/decoder_output_choice.png)
 
 ##### Output Parameters
 - ***Top-K***: Choosing a set of words to sample from for our final output
-    - If `k=1` then we just choose the output word with the highest probability
-    - Typically `k` is set to something larger, such as `k=40`, and then we use the probability of thta word as the sampling distribution
+    - If `k=1` then you just choose the output word with the highest probability
+    - Typically `k` is set to something larger, such as `k=40`, and then you use the probability of thta word as the sampling distribution
         - i.e. if there's 1 word with 60% chance and 39 other words with 1% chance, we'll still most likely choose the 60% word, but there's always potential randomness with the other 39!
 
 #### Completed!

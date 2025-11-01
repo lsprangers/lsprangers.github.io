@@ -32,11 +32,11 @@ Allow us to log SDK, CLI, or Console calls / actions from IAM Users or IAM Roles
     - These events also appear in Cloudtrail - usually a best practice to route these event types to Event Bridge or SNS to notify via email or something more than just logging
 
 ### Common Architectures
-- ***S3 + Athena***: We can send them to AWS S3 or Cloudwatch Logs for further processing
+- ***S3 + Athena***: you can send them to AWS S3 or Cloudwatch Logs for further processing
     - Logs stored for 90 days in CloudTrail
     - Log to S3 for long term retention
         - Some use Athena to query over S3
-- ***EventBridge***: Since all API's go through CloudTrail, we can filter and route specific ones to EventBridge
+- ***EventBridge***: Since all API's go through CloudTrail, you can filter and route specific ones to EventBridge
     - CloudTrail filter send to EventBridge
     - Event Bridge to
         - Lambda for processing
@@ -60,18 +60,18 @@ Allow us to log SDK, CLI, or Console calls / actions from IAM Users or IAM Roles
         - S3 objcet lock to stop deletion
         - SSE KMS encryption
         - SHA-256 Hashing for integrity validation!
-        - Blah blah blah, that's why we can use S3 and not straight to Lambda / SQS
+        - Blah blah blah, that's why you can use S3 and not straight to Lambda / SQS
 - Can have a "Central Security Account" that has these central S3's, and then each LOB Member account can send CloudTrail logs there
     - Useful for central cyber / tech groups, and then 
         - Need cross-account S3 bucket policy
     - Can create cross-account IAM role in central account so Member accounts can assume this role to read
 
 #### Cloudwatch Logs to Notification System
-- We can stream CloudTrail directly to Cloudwatch Logs
-- From here we can use Metric Filters, which has structured window filtering languages to create new filters
-    - If a metric threshold is passed, we can setoff a Cloudwatch Alarm and send the message to SNS
+- you can stream CloudTrail directly to Cloudwatch Logs
+- From here you can use Metric Filters, which has structured window filtering languages to create new filters
+    - If a metric threshold is passed, you can setoff a Cloudwatch Alarm and send the message to SNS
     - This essentially allows us to create a Notification and Alerting system on AWS
-- From SNS we could also pipe alarms to Opsgenie, Pagerduty, etc...
+- From SNS you could also pipe alarms to Opsgenie, Pagerduty, etc...
 
 #### Organizational Trail
 - Management account can create a CloudTrail Trail over all Member accounts!
@@ -82,7 +82,7 @@ Allow us to log SDK, CLI, or Console calls / actions from IAM Users or IAM Roles
 - Cloudwatch, in worst case, takes 15 minutes to deliver an event
 - EventBridge can be triggered for any API call
 - Cloudwatch logs get events streamed to it from CloudTrail, and metric filter is a streaming tumbling window
-- Events are delivered to S3 every 5 minutes, but with this we get durability, integrity, and many other features for ensuring data protection
+- Events are delivered to S3 every 5 minutes, but with this you get durability, integrity, and many other features for ensuring data protection
 
 ## KMS
 AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encryption in general*** across services and resources
@@ -95,11 +95,11 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
 - Asymmetric: Public (encrypt) and private (decrypt)
     - Can download public key, and usually you'd do so to send out to other users who can't access AWS
         - Internal users who can call KMS would just call the API to encrypt data with a specific key!
-    - Usually used by users / apps outside of AWS that can't call AWS KMS API to encrypt data, so they'd download public key and encrypt data to send back to AWS account and then we can decrypt
+    - Usually used by users / apps outside of AWS that can't call AWS KMS API to encrypt data, so they'd download public key and encrypt data to send back to AWS account and then you can decrypt
 - Types:
     - ***Customer Managed Keys***: Keys you directly create and use via KMS API
         - Can do rotation, key policy, and CloudTrail auditing
-    - ***AWS Managed Keys***: Used by AWS services like S3, EBS, Redshift, etc whenever we say we want things encrypted at rest or in transit
+    - ***AWS Managed Keys***: Used by AWS services like S3, EBS, Redshift, etc whenever you say you want things encrypted at rest or in transit
         - Managed by AWS fully
         - Keys rotated once a year
         - Key Policy is viewable, and audit trail in CloudTrail
@@ -111,7 +111,7 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
         - What?
 - Key Source
     - AWS KMS hosted, where KMS takes care of everything
-    - ***Exteral***: Where we create keys and use sources outside of KMS, and we import it into KMS
+    - ***Exteral***: Where you create keys and use sources outside of KMS, and you import it into KMS
     - ***CloudHSM***: Run CloudHSM and cryptographic operations directly on clusters in your own VPC. When someone calls KMS, it uses your high availability clusters (across regions / AZ's) to do cryptographic calculations
 - KMS is multi-region, but it just copies the keys over physically
     - AKA KMS Multi-Region Keys
@@ -163,10 +163,10 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
 ## RDS Security
 - RDS has multiple layers of security, encryption, and auth
 - KMS encryption at rest for underlying EBS volumes / snapshots
-    - Basically means for the actual block storage for a live RDS, or for snapshot data, we can encrypt it at rest via KMS
+    - Basically means for the actual block storage for a live RDS, or for snapshot data, you can encrypt it at rest via KMS
 - Transparent Data Encryption (TDE) for Oracle and SQL Server
     - Apparently important to remember that TDE can only be done for managed database providers (Oracle, Microsoft)
-- IAM Authentication for MySQL, MariaDB, and Postgres (basically the ope source ones). Therefore, we can do user authentication for the open source databases
+- IAM Authentication for MySQL, MariaDB, and Postgres (basically the ope source ones). Therefore, you can do user authentication for the open source databases
 - SSL encryption to RDS is possible for all databases
 - All ***Authorization*** still happens in RDS no matter what - Authentication has many avenues, but Authorization is all apart of Database users and groups
 - Can copy unencrypted RDS snapshot to an encrypted one
@@ -269,20 +269,20 @@ Secure communication begins using Symmetric Encryption
     - Since data is encrypted with HTTPS, attacker can't read or modify data
 - Use a DNS with DNSSEC compliance
     - Domain Name System Security Extensions (DNSSEC) adds more layers of security to DNS by ensuring the responses are authentic
-    - There's a second attack vector, even with HTTPS, where a DNS entry is forged / fake and we still use SSL to try to reach `goodwebsite.com` and DNS ends up routing us to the incorrect bad one and it's still valid with the CA
+    - There's a second attack vector, even with HTTPS, where a DNS entry is forged / fake and you still use SSL to try to reach `goodwebsite.com` and DNS ends up routing us to the incorrect bad one and it's still valid with the CA
         - This is known as ***DNS Spoofing***
     - Can bypass this by using a DNS Resolver thats DNSSEC compliant, and Amazon Route 53 is DNSSEC compliant, and even has KMS out of the box encryption for DNS queries
 
 #### SSL on Load Balancer Architecture
 - Using ALB:
     - Setup ALB with SSL Cert(s) and for any incoming HTTPS request the ALB can do SSL handshake and then ALB sends HTTP data to auto-scaled target group of ECS tasks
-- Maybe we want to use SSL directly onto an EC2 instance
+- Maybe you want to use SSL directly onto an EC2 instance
     - TCP to NLB, and route requests to EC2 instance level
     - HTTPS from NLB to EC2
         - Can setup user scripts on EC2 so that at boot time it retrieves SSL Certs from SSM Parameter Store, where Certs are protected by IAM permissions
     - This is risky
         - Storing certs on EC2's, those EC2s exposed to internet, IAM roels for getting plaintext SSL certs, etc...
-    - We can have the exact same architecture, except we replace SSM Parameter store with CloudHSM, and we use CloudHSM to do SSL offloading
+    - you can have the exact same architecture, except you replace SSM Parameter store with CloudHSM, and you use CloudHSM to do SSL offloading
         - SSL PK never leavs HSM device
         - CPU on EC2 doesn't get used to do decryption
         - Must setup a Cryptographic User (CU) on the CloudHSM device
@@ -334,7 +334,7 @@ Secure communication begins using Symmetric Encryption
         - If for some reason the S3 bucket was made public, then GET requests would fail unless the user had KMS authorization as well
         - `s3:putObject` also would require `KMS` authorizations as well for the role the user assumes
 - `SSE-C` encrypts S3 objects with our own keys, and encryption is done server-side
-- Client side is when we encrypt and decrypt data client side
+- Client side is when you encrypt and decrypt data client side
 - Any data in Glacier is AES-256 encrypted with keys under AWS control
 
 ### Encryption in Transit
@@ -383,18 +383,18 @@ Secure communication begins using Symmetric Encryption
         - TTL is usually 1 hour
         - Users inherit permissions of whoever signed it
 - VPC Endpoint Gateway for S3
-    - When a VPC has an Interet Gateway, and we use the public internet to access a public S3 endpoint
+    - When a VPC has an Interet Gateway, and you use the public internet to access a public S3 endpoint
         - For this you'd put a bucket policy on for `AWS:SourceIp` and you'd use the IGW IP
-    - Instead of a public subet, we can use VPC Endpoint Gateway
+    - Instead of a public subet, you can use VPC Endpoint Gateway
         - This allows our subnet to stay private
         - All traffic remains on AWS network, and stays private
-        - Then we can directly go to S3 Endpoint
+        - Then you can directly go to S3 Endpoint
         - Can have bucket policies on `AWS:SourceVPCE` for VPC Endpoint, or `AWS:SourceVPC` for all resources under that VPC
 - S3 Object Locks
     - S3 Object Lock is Write Once Read Many (WORM)
-    - Can do same thing for Glacier Vault Lock (i.e. have WORM) and then we lock the policy for future edits
+    - Can do same thing for Glacier Vault Lock (i.e. have WORM) and then you lock the policy for future edits
 - S3 Access Points
-    - If we have tons of directories and objects in one S3 bucket, we can create crazy policies, or we can use Access Poiints
+    - If you have tons of directories and objects in one S3 bucket, you can create crazy policies, or you can use Access Poiints
     - Access Points grant Read/Write access to different directories across buckets
         - Pushes policy from S3, to another resource, i.e. Access Points
         - These Access Points are granted to different User Groups
@@ -474,7 +474,7 @@ Secure communication begins using Symmetric Encryption
             - Only limited by Kinesis SLA's
     - Architecture with CloudFront
         - Can setup WebACL's in front of CloudFront
-        - On CloudFront we can create a custom HTTP Header
+        - On CloudFront you can create a custom HTTP Header
             -`X-Origin-Verify:xxxxxx` where `xxxx` is a secret string
         - ALB behind CloudFront in front of EC2 Web Apps
         - WAF Firewall on our ALB for headers to filter down to only those headers from CLoudFront with the secret string
@@ -490,22 +490,22 @@ Secure communication begins using Symmetric Encryption
         - AWS Route53 Resolver DNS Firewall
         - Policies created at regional level
         - Rules are automatically applied to new resources as they're created
-    - We'd define all of our rules in WAF, Shield, etc... and then we can use AWS Firewall Manager with AWS WAF to automtate these rules over all new resources
+    - We'd define all of our rules in WAF, Shield, etc... and then you can use AWS Firewall Manager with AWS WAF to automtate these rules over all new resources
 - Example: Blocking an IP address
     - First line of defense is Network ACL on our VPC Subnet
     - Security group on EC2 could also deny it
     - EC2 instance could run firewall software
     - Could have an N/ALB in a public subnet, and EC2 in a private subnet
         - EC2 SG can restrict it's security group to only that N/ALB
-        - Then we can manage security at N/ALB level
+        - Then you can manage security at N/ALB level
             - Can use Network ACL here still at public subet level
         - ALB's, and ALB only, can do IP address filtering via WAF before sending to EC2
-    - We could also have CloudFront before Network ACL
-        - Can have AWS WAF at CloudFront level, and it won't matter if we have a Network ACL or not since WAF takes care of it
+    - you could also have CloudFront before Network ACL
+        - Can have AWS WAF at CloudFront level, and it won't matter if you have a Network ACL or not since WAF takes care of it
         - Could do IP restriction, GeoFiltering restriction, etc...
 ### Amazon Inspector allows us to run automated security assessments
     - EC2
-        - Using AWS Systems Manager (AWS SSM) agent, we can analyze network and OS level vulnerabilities
+        - Using AWS Systems Manager (AWS SSM) agent, you can analyze network and OS level vulnerabilities
         - Only for *running* EC2 instances
     - ECR Container Images
         - Assessment of container images as they're pushed
@@ -533,7 +533,7 @@ Secure communication begins using Symmetric Encryption
         - Can triggooer an Event to EventBridge if the rule isn't compliant
             - Destination can be SNS
         - Rules can have automations via SSM Automations
-            - If a resource isn't compliant, we can trigger auto-remediation
+            - If a resource isn't compliant, you can trigger auto-remediation
 ### AWS Managed Logs
     - Logs that can be produced by AWS Services
     - Load Balancer Access Logs can go 
@@ -567,7 +567,7 @@ Secure communication begins using Symmetric Encryption
         - The Org Mgmt account needs to delegate the specific member account
 ### IAM Conditions
     - AWS allows conditional logic in IAM policies
-    - `aws:SourceIP` would mean we can condition that an IP address is or is not in / apart of a certain CIDR range
+    - `aws:SourceIP` would mean you can condition that an IP address is or is not in / apart of a certain CIDR range
         - Can have `Effect: Deny` for `Action:*` on `Resource: *` based on Conditions
     - `aws:RequestedRegion` allows us to allow or deny access to services in other specified regions
     - `ec2:ResourceTag` could allow us to start instances only if they have a specific tag
@@ -576,7 +576,7 @@ Secure communication begins using Symmetric Encryption
     - Resource policies
         - `aws:PrincipalOrgID` can help us to ensure S3 actions aren't able ot be done unless the Principal Org ID is from our Org account, bascially allows any member account to perform the actions
 - Connecting to EC2 via SSH
-    - When we allow SSH on an EC2, what happens is that when a User tries to connect it will hit a EC2 Instance Connect API
+    - When you allow SSH on an EC2, what happens is that when a User tries to connect it will hit a EC2 Instance Connect API
         - This API will 
             - Upload a private key to the EC2
             - Respond to user with a public key
@@ -585,6 +585,6 @@ Secure communication begins using Symmetric Encryption
 ### AWS Security Hub
     - Yet Another Dashboard for security and compliance
     - Allows us to do this over multiple accounts
-    - Then aggregates info from basically every single other service we listed above
+    - Then aggregates info from basically every single other service you listed above
     - Issues and Findings to EventBridge
     - *AWS Detective* can help us figure out RCA / cause of these findings

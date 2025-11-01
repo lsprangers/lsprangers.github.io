@@ -13,9 +13,9 @@ class Solution:
         # min is 1 because there's a chance only eat 1 banana per hour, but
         #   there's enough hours to eat everything
         # max is max(piles):
-        #   - If there were only 1 piles we could use sum(piles), 
+        #   - If there were only 1 piles you could use sum(piles), 
         #       but has to stop at each hour and not eat more
-        #   - Therefore, max(piles) ensures we eat every banana at each hour
+        #   - Therefore, max(piles) ensures you eat every banana at each hour
         low = 1
         high = max(piles)
         

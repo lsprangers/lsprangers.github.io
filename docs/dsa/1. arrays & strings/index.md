@@ -8,7 +8,7 @@ show_back_link: true
 ---
 
 ## Arrays and Strings
-*Most of the time Strings are created as arrays, so useful to lump them together. Creating new strings from scratch is typically an O(n) operation, so we use lists to store things and create one at the end
+*Most of the time Strings are created as arrays, so useful to lump them together. Creating new strings from scratch is typically an O(n) operation, so you use lists to store things and create one at the end
 
 ## Time Complexities
 ***This is for storing arrays as contiguous set of items in memory, and not as a Linked List***
@@ -22,20 +22,20 @@ show_back_link: true
 |Random Access          | $O(1)$    | $O(1)$  |
 |Check if Element Exists| $O(n)$    | $O(n)$  |
 
-- The insert / delete in the middle is O(n) because we typically have to shift all elements in the array to a new storage location either +1 or -1, which means we would loop over all the elements and shift
-    - Insert or pop from end means we just remove that last storage location, and wouldn't be affected by size of the array
+- The insert / delete in the middle is O(n) because you typically have to shift all elements in the array to a new storage location either +1 or -1, which means you would loop over all the elements and shift
+    - Insert or pop from end means you just remove that last storage location, and wouldn't be affected by size of the array
 
 ## Common Algorithms
 
 ### Two Pointers
-- Typically useful when we have two pointers, left and right, and we either increment or decrement them based on some criteria
+- Typically useful when you have two pointers, left and right, and you either increment or decrement them based on some criteria
     - Allows us to do things like Palindrome or Two Sum (sorted array) in $O(n)$ time and $O(1)$ space
     - Left and Right can be:
         - front and back
         - front and front
         - Arr1 and Arr2
             - Meaning left points at Arr1 front or back, and right points at Arr2 front or back
-    - The commonality is that we can perform calculations in $O(n)$ time and $O(1)$ space
+    - The commonality is that you can perform calculations in $O(n)$ time and $O(1)$ space
 
 
 ```
@@ -123,8 +123,8 @@ def isSubsequence(self, s: str, t: str) -> bool:
 
 ### Sliding Window / Subarray
 - A Subarray is a contiguous section of the array
-- Subarray problems are usually solved with a variation of [Two Pointers](#two-pointers), where the left is front and right = left, and then we move along the axis checking if the definition for the subarray is true or not
-- If we simply checked each subarray using brute force double loop we'd have
+- Subarray problems are usually solved with a variation of [Two Pointers](#two-pointers), where the left is front and right = left, and then you move along the axis checking if the definition for the subarray is true or not
+- If you simply checked each subarray using brute force double loop we'd have
     - n arrays of size 1
     - n - 1 arrays of size 2
     - n - 2 arrays of size 3
@@ -145,7 +145,7 @@ def isSubsequence(self, s: str, t: str) -> bool:
     - Last valid subarray
     - The below function uses `curr += nums[right]` and `curr -= nums[left]` which is random access so it's $O(1)$
     - That being said, there are some sliding window problems that need more advanced data structures in the middle for checks
-        - [Sliding Window Maximum](/docs/leetcode/python/slidingWindowMaximum.md) problem is a good example, where we need an entire monotonic deque in the middle with while loops and `checks()` to update during the window, but ultimately the sliding window is the same
+        - [Sliding Window Maximum](/docs/leetcode/python/slidingWindowMaximum.md) problem is a good example, where you need an entire monotonic deque in the middle with while loops and `checks()` to update during the window, but ultimately the sliding window is the same
 ```python
 function fn(nums, k):
     left = 0
@@ -173,7 +173,7 @@ function fn(arr):
 
         Do some logic to update the answer
 ```
-- This can be useful in examples where we're allowed to do an action once, like flip a bit from 0 to 1, but we still want to find the largest subarray
+- This can be useful in examples where we're allowed to do an action once, like flip a bit from 0 to 1, but you still want to find the largest subarray
 
 ```python
 def find_length(s):
@@ -216,7 +216,7 @@ Off the bat, the number of subarrays in an array of length $N$ is $\sum_{i=1}^{i
     - `[left + 1, right]`
     - ...
     - `[right - 1, right]`
-    - From here we see there are `right - left + 1` arrays that ***end at right***
+    - From here you see there are `right - left + 1` arrays that ***end at right***
 ```
 def numSubarrayProductLessThanK(self, nums: List[int], k: int) -> int:
     # Handle edge cases where k is 0 or 1 (no subarrays possible)
@@ -243,7 +243,7 @@ def numSubarrayProductLessThanK(self, nums: List[int], k: int) -> int:
 ``` 
 
 #### Fixed Window Size K
-- In this situation we just build out K, and then add in `Arr[i]` and remove `Arr[i - k]`
+- In this situation you just build out K, and then add in `Arr[i]` and remove `Arr[i - k]`
 ```
 function fn(arr, k):
     curr = some data to track the window
@@ -265,7 +265,7 @@ function fn(arr, k):
 - A prefix sum array allows us to get the ***sum of subarrays*** throughout a problem
 - Typically this is done by building an array that holds the cumulative sum up to a certain point, and then doing `pfxSum[right] - pfxSum[left - 1]` or `pfxSum[right] - pfxSum[left] + nums[left]` which would get us the sum between [left, right] inclusive
 - It costs $O(n)$ to build, and then access is random so it's $O(1)$ to find sum of subarray gives it's 2 indexes
-- The Prefix Sum also comes up in [Tree Traversal](/docs/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) because we can use it during a tree traversal technique to find things like 
+- The Prefix Sum also comes up in [Tree Traversal](/docs/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) because you can use it during a tree traversal technique to find things like 
     - *Total number of paths that sum to X*
     - *Total number of paths less than or equal to X*
     - etc
@@ -285,7 +285,7 @@ There are even [tree path prefix](/docs/dsa/8.%20trees%20&%20graphs/index.md#pre
 
 #### Subarray Sum = k
 Mostly goes off the fact that given a Prefix Sum / Cumulative Sum, at any point 
-$cSum[index_j] - cSum[index_i] = \sum_{k=i + 1}^{j} x_k$  (inclusive of $j$, exclusive of $i$) which just means we can find some target $t$ by using a hashmap
+$cSum[index_j] - cSum[index_i] = \sum_{k=i + 1}^{j} x_k$  (inclusive of $j$, exclusive of $i$) which just means you can find some target $t$ by using a hashmap
 
 $cSum[j] - cSum[i] = x_{i+1} + x_{i+2} + ... + x_j$
 

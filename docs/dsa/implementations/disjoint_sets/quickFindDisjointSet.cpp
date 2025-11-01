@@ -1,4 +1,4 @@
-// In quickFind we store the root node itself instead of the parent node
+// In quickFind you store the root node itself instead of the parent node
 //  therefore, the find() operation is O(1) 
 //  but the union() operation is O(n)
 
@@ -11,9 +11,9 @@
 // Example:
 // parent   = [0, 0, 0, 1, 1, 2, 2]
 // root     = [0, 0, 0, 0, 0, 0, 0]
-// So we see here that root just has 0's
+// So you see here that root just has 0's
 
-// If we have a tree like this:
+// If you have a tree like this:
 //    0
 //    |    
 //    1      2
@@ -24,13 +24,13 @@
 // parent   = [0, 0, 2, 1, 1, 2, 2]
 // root     = [0, 0, 2, 0, 0, 2, 2]
 
-// Then we see our find() is still O(1), but we'd need an 
+// Then you see our find() is still O(1), but we'd need an 
 // extra step to do union()
 
 // Example:
 // parent   = [0, 0, 0, 1, 1, 2, 2]
 // root     = [0, 0, 2, 0, 0, 2, 2]
-// After this, we need to update 5 and 6 to have
+// After this, you need to update 5 and 6 to have
 //  root[5] = 0 and root[6] = 0
 
 #include <vector>;

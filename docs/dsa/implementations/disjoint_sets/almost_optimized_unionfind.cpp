@@ -1,10 +1,10 @@
 // In the previous 2 versions, there was a bunch of O(n) operations in the worst case
 // These can always be fixed by balancing tree's out 
 
-// So we use a rank[] vector to store the height of the tree which'll ensure
+// So you use a rank[] vector to store the height of the tree which'll ensure
 //   there's no worst-case O(n)
 
-// If we have a tree like this:
+// If you have a tree like this:
 //    0
 //    |    
 //    1      2
@@ -15,7 +15,7 @@
 // root     = [0, 0, 2, 1, 1, 2, 2]
 // rank     = [1, 2, 1, 2, 2, 2, 2]
 
-// If we connect 2 to 0, we'd have:
+// If you connect 2 to 0, we'd have:
 //      0000
 //     /    \
 //    1      2
@@ -42,7 +42,7 @@ public:
         }
     }
 
-    // If we have a tree like this:
+    // If you have a tree like this:
     //    0
     //    |    
     //    1      2

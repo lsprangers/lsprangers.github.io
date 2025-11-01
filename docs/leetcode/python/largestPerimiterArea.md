@@ -15,9 +15,9 @@ class Solution:
         nums.sort()
         # start from largest
         for idx in range(len(nums) - 3, -1, -1):
-            # if we found a valid triangle
+            # if you found a valid triangle
             if nums[idx] + nums[idx + 1] > nums[idx + 2]:
-                # it must be the answer because we greedily sorted
+                # it must be the answer because you greedily sorted
                 return(nums[idx] + nums[idx + 1] + nums[idx + 2])
         
         return(0)

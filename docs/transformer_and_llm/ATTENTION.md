@@ -12,7 +12,7 @@ Attention is what separates static embeddings from dynamic embeddings - they all
 
 Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results
 
-We need to remember that the embedding for "bank" *is always the same embedding in the metric space* in these scenario's, but by attending to it with Attention, we can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
+you need to remember that the embedding for "bank" *is always the same embedding in the metric space* in these scenario's, but by attending to it with Attention, you can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
 
 How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention - most useful / used are Self Attention, Encoder-Decoder Attention, and Masked Self Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
 
@@ -20,7 +20,7 @@ In the days before Attention, there would be Encoders that take input sentence a
 
 Therefore, Attention helps us to remove this fixed size constraint between encoders and decoders
 
-All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why we need to "bring along the model" during inference...otherwise we can't use the Attention!
+All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why you need to "bring along the model" during inference...otherwise you can't use the Attention!
 
 Below shows an example of how an embedding like creature would change based on surrounding context
 <!-- ![Bert, GPT, BART](/img/bert_gpt_bart.png) -->
@@ -29,21 +29,21 @@ Below shows an example of how an embedding like creature would change based on s
 ### Keys, Queries, and Values Intuition
 Lots of the excerpts here are from the [D2L AI Blog on Attention](https://d2l.ai/chapter_attention-mechanisms-and-transformers/queries-keys-values.html)
 
-Consider a K:V database, it may have tuples such as `('Luke', 'Sprangers'), ('Donald', 'Duck'), ('Jeff', 'Bezos'), ..., ('Puke', 'Skywalker')` with first and last names - if we wanted to ***query*** the database, we'd simply query based on a key like `Database.get('Luke')` and it would return `Sprangers`
+Consider a K:V database, it may have tuples such as `('Luke', 'Sprangers'), ('Donald', 'Duck'), ('Jeff', 'Bezos'), ..., ('Puke', 'Skywalker')` with first and last names - if you wanted to ***query*** the database, we'd simply query based on a key like `Database.get('Luke')` and it would return `Sprangers`
 
-If we allow for approximate matches, we might get `['Sprangers', 'Skywalker']` 
+If you allow for approximate matches, you might get `['Sprangers', 'Skywalker']` 
 
-Therefore, our Queries and our Keys have a relationship! They can be exact, or they can be similar (Luke and Puke are similar), and based on those similarities, we may or may not want to return a Value
+Therefore, our Queries and our Keys have a relationship! They can be exact, or they can be similar (Luke and Puke are similar), and based on those similarities, you may or may not want to return a Value
 
-What if we wanted to return a portion of the Value, based on how similar our Query was to our Key? Luke and Luke are 1:1, so we fully return Sprangers, but Luke and Puke are slightly different, so what if we returned something like `intersect / total` * Value, or 75% of the Value?
+What if you wanted to return a portion of the Value, based on how similar our Query was to our Key? Luke and Luke are 1:1, so you fully return Sprangers, but Luke and Puke are slightly different, so what if you returned something like `intersect / total` * Value, or 75% of the Value?
 
-Luke and Puke have $3/4$ letters as the same, so we can return $3/4$ of Skywalker!
+Luke and Puke have $3/4$ letters as the same, so you can return $3/4$ of Skywalker!
 
 This is the exact idea of Attention - $Attention(\bold{q}, D) = \sum_{i = 1}^{m} \alpha(\bold{q}, \bold{k_i}) \cdot \bold{v_i}$
 
-This attention can be read as "for every key / value pair $i$, compare the key and the value with $\alpha$, and based on how similar they are return that much of the value. The total sum of all those values is the value we will return"
+This attention can be read as "for every key / value pair $i$, compare the key and the value with $\alpha$, and based on how similar they are return that much of the value. The total sum of all those values is the value you will return"
 
-Therefore, we can mimic an exact lookup if we define our $\alpha$ as a Kronecker Delta:
+Therefore, you can mimic an exact lookup if you define our $\alpha$ as a Kronecker Delta:
 $
 \delta_{ij} = \begin{cases}
 1, & \text{if } q = k_i,\\
@@ -62,15 +62,15 @@ D = [
 ]
 ```
 
-And our Query is `[0.5, 0]` - if we compare that to all of our Keys, we'd see `distance([0.5, 0] - [1, 0]) = 0.5` and `distance([0.5, 0] - [1, 1]) = - 0.5` so we would have `0.5 * 4 + -0.5 * 6 = -1` would be our answer!
+And our Query is `[0.5, 0]` - if you compare that to all of our Keys, we'd see `distance([0.5, 0] - [1, 0]) = 0.5` and `distance([0.5, 0] - [1, 1]) = - 0.5` so you would have `0.5 * 4 + -0.5 * 6 = -1` would be our answer!
 
-So these comparisons of Queries and Keys results in some weight, and typically we will compare our Query to every Key, and the resulting set we will stuff through a Softmax function to get weights that sum to 1
+So these comparisons of Queries and Keys results in some weight, and typically you will compare our Query to every Key, and the resulting set you will stuff through a Softmax function to get weights that sum to 1
 
 $
 \alpha(\bold{q}, \bold{k_i}) = {a(\bold{q}, \bold{k_i}) \over \sum_{j}a(\bold{q}, \bold{k_j})}
 $
 
-To ensure weights are non-negative, we can use exponentiation
+To ensure weights are non-negative, you can use exponentiation
 
 $\alpha(\bold{q}, \bold{k_i}) = \frac{\exp(a(\bold{q}, \bold{k_i}))}{\sum_{j=1}\exp(a(\bold{q}, \bold{k_j}))}$
 
@@ -96,7 +96,7 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
    - Examples cited of how the performance of this encoder-decoder architecture deteriorates rapidly as the length of input sentence increases
 ---
 - Proposal in this paper:
-   - "We introduce an extension of the encoder-decoder model which learns to align and translate jointly"
+   - "you introduce an extension of the encoder-decoder model which learns to align and translate jointly"
       - This means it sets up (aligns) and decodes (translates) on the fly over the entire sentence, and not just all at once
    - "Each time the proposed model generates a word in a translation, it (soft-)searches for a set of positions in a source sentence where the most relevant information is concentrated
       - This means it uses some sort of comparison (later seen as attention) to figure out what words are most relevant in the translation
@@ -141,7 +141,7 @@ $p(\bold{y}) = \prod_{t=1}^{T} p(y_t \mid \{y_1, \ldots, y_{t-1}\}, c)$
 
 So we're just choosing the next most likely word so that the probability of seeing all these words in a sequence is highest
 
-The sequence "Hi, what's your", if we looked over all potential next words, would most likely have the highest predicted outcome of "Hi, what's your name"
+The sequence "Hi, what's your", if you looked over all potential next words, would most likely have the highest predicted outcome of "Hi, what's your name"
 
 Each of these conditional probabilities is typically modeled with a non-linear function $g$ such that 
 
@@ -174,7 +174,7 @@ Since sentences aren't exactly isomoprhic (one-to-one and onto), there may be 2 
       - $h_2 = [\overrightarrow{h_2} \frown \overleftarrow{h_2}]$ 
          - Concatenation!  
 - ***Decoder***
-   - For each step $t$, we need to come up with a context vector $\bold{c}_t$
+   - For each step $t$, you need to come up with a context vector $\bold{c}_t$
    - $e_{ti} = a(s_{t-1}, h_i)$ is an alignment model which scores similarities between decoder hidden state at $t-1$ and all encoder states, where each one is denoted at some time $i$
       - $a(\cdot)$ is a small feed-forward NN
       - $e_{ti} = {\bold{v}^T} \cdot \tanh({W_s} \bold{s}_{t-1} + {W_h}{\bold{h}_i})$
@@ -215,20 +215,20 @@ Intuition
    - $h_i = [\overrightarrow{h_i}, \overleftarrow{h_i}]$
    - These annotations are then fed through the alignment, alpha weight, and context vectors before being used in the decoder with the last output word and hidden state
       - This context vector allows us to "attend to" the last output word and last hidden state
-      - What's missing from transformers? We decide to drag along this hidden weight the entire time, and in Transformers we just re-compute context vector for each vector
+      - What's missing from transformers? you decide to drag along this hidden weight the entire time, and in Transformers you just re-compute context vector for each vector
 
 $\text{max}_{\theta} {1 \over N} \sum_{n = 1}^{N} \log p_{\theta}(y_n | x_n)$
 
-Where the best probability is usually found using beam search - at each step of the decoder we keep track of the $k$ most probable partial translations (hypotheses)
+Where the best probability is usually found using beam search - at each step of the decoder you keep track of the $k$ most probable partial translations (hypotheses)
 
 ![RNN Loss Objective](/img/rnn_loss_objective.png)
 
 ![RNN Attention](/img/rnn_attention.png)
 
 ## Transformer Attention
-The above RNN discussion is useful, as it shows how we can utilize the building blocks of forward and backwards passes, and even achieve attention mechnisms using basic building blocks
+The above RNN discussion is useful, as it shows how you can utilize the building blocks of forward and backwards passes, and even achieve attention mechnisms using basic building blocks
 
-However, RNN's eventually fail with long term dependencies - the sentence "he was near the large stadium with Sarah and was named Cam", we would need to keep track of every word between "he" and "Cam" to have the word "he" have any sort of effect on Cam. A direct consequence of this is the inability to train in parallel on GPU's because future hidden states cannot be computed in full before past hidden states have completed.
+However, RNN's eventually fail with long term dependencies - the sentence "he was near the large stadium with Sarah and was named Cam", you would need to keep track of every word between "he" and "Cam" to have the word "he" have any sort of effect on Cam. A direct consequence of this is the inability to train in parallel on GPU's because future hidden states cannot be computed in full before past hidden states have completed.
 
 Attention also helps to alleviate the bottleneck problem, where all context is "shoved" into a singular vector. Attention allows all encoded infromation to help influence the context and decoding during each step, and helps to alleviate the vanishing gradient problem from long sentences that end up multiplying multiple numbers $\lt$ 1.0 throughout numerous steps. 
 
@@ -261,10 +261,10 @@ This setup allows us to create a paradigm of:
 These matrices are learned during training and updated via backpropagation
 
 ### Encoding Blocks
-The main layer we focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
+The main layer you focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
 #### Self Attention
-Self Attention allows words in a single sentence / document to attend to each other to update word embeddings in itself. It's most commonly used when we want a sentence's word embeddings to be updated by other words in the same sentence, but there's nothing stopping us from using it over an entire document.
+Self Attention allows words in a single sentence / document to attend to each other to update word embeddings in itself. It's most commonly used when you want a sentence's word embeddings to be updated by other words in the same sentence, but there's nothing stopping us from using it over an entire document.
 
 Self attention also achieves context / word interaction comparisons in $O(1)$ instead of $O(n)$ like recurrence / RNN's would - this is a significant achievement which allows for:
 - Parallel processing of corpora
@@ -300,15 +300,15 @@ Consider the phrase "fluffy blue creature." The embedding for "creature" is upda
 TLDR;
 - The Query vector $Q_i$ represents the current word
 - The Key vector is an embedding representing every other word $K_j \forall  \left\{j \neq i\right\} $
-    - We multiply the Query by every Key to find out how "similar", or "attended to" each Query should be by each Key $Q_i \cdot K_j$
-- Then we softmax it to find the percentage each Key should have on the Query
-- Finally we multiply that softmaxed representation by the Value vector, which is the input embedding multipled by Value matrix, and ultimately allow each Key context word to attend to our Query by some percentage
-- At the end, we sum together all of the resulting value vectors, and ***this resulting SUM of weighted value vectors is our attended to output embedding***
+    - you multiply the Query by every Key to find out how "similar", or "attended to" each Query should be by each Key $Q_i \cdot K_j$
+- Then you softmax it to find the percentage each Key should have on the Query
+- Finally you multiply that softmaxed representation by the Value vector, which is the input embedding multipled by Value matrix, and ultimately allow each Key context word to attend to our Query by some percentage
+- At the end, you sum together all of the resulting value vectors, and ***this resulting SUM of weighted value vectors is our attended to output embedding***
 
 - In the below example:
    - The dark blue vector from the left is the Query
    - The light blue vector on top are the Keys
-   - We multiple them together + softmax
+   - you multiple them together + softmax
    - Multiply the result of that by each Value vector on the bottom
 
 ![SelfAttention](./images/self_attention.png)
@@ -335,7 +335,7 @@ In depth mathematical explanation below
     - As the size of the input embedding grows, so does the average size of the dot product that produces the weights 
         - Remember dot product is a scalar value
         - Grows by a factor of $\sqrt{d_k}$ where k = num dimensions
-        - Therefore, we can counteract this by normalizing is via $\sqrt{d_k}$ as the denominator 
+        - Therefore, you can counteract this by normalizing is via $\sqrt{d_k}$ as the denominator 
    - **Step 3**: Apply softmax to convert scores into probabilities:
      $
      \text{Attention Weight}_{ij} = \text{softmax}(\text{Scaled Score}_{ij})
@@ -364,7 +364,7 @@ In depth mathematical explanation below
 - Positional encodings are vectors added to each input embedding, allowing the model to distinguish between words based on their positions in the sequence
 - **Why is ***sinusoidal*** relevant and useful?**
    - Allows Transformer to learn relative positions via linear functions (e.g., $\text PE_{pos+k}$​ can be derived from $\text PE_{pos}$)
-   - We all know neural nets like linear functions! So it's helpful in ensuring a relationship that's understandable 
+   - you all know neural nets like linear functions! So it's helpful in ensuring a relationship that's understandable 
 ![Positional Encoding](./images/positional_encoding.png)
 
 #### Residual Connections and Normalization
@@ -372,7 +372,7 @@ In depth mathematical explanation below
 - Each encoder layer includes a **residual connection** and **normalization layers** to stabilize training and improve gradient flow
 - This happens after both Self Attention Layer and Feed Forward Layer in the "Add and Normalize" bubble
 - Add the residual (the original input for that sublayer) to the output of the sublayer
-   - In the case of Self Attention layer, we add the output of Self Attention to the original input word (non-attended to word)
+   - In the case of Self Attention layer, you add the output of Self Attention to the original input word (non-attended to word)
 - Apply LayerNorm to the result
    - This just means normalize all actual numeric values over the words embedding
 - **If the diagram shows a block over the whole sentence, it just means the operation is applied to all words, but always independently for each word
@@ -384,7 +384,7 @@ In depth mathematical explanation below
 #### Summary of Self Attention Encoding
 
 1. **Input Embedings**:
-   - We take our input words, process them, and retrieve static embeddings
+   - you take our input words, process them, and retrieve static embeddings
    - This only happens in the first encoding layer
 
 2. **Positional Encoding**:
@@ -406,7 +406,7 @@ In depth mathematical explanation below
    3.5 **Feed Forward Layer**:
       - Each position’s output from the self-attention layer is passed through a fully connected feed-forward neural network (the same network is applied independently to each position)
       - Essentially just gives model another chance to find and model more transformations / features, while also potentially allowing different dimensionalities to be stacked together
-         - If we have 10 words in our input, we want to ensure the final output is the same dimensionality as the input
+         - If you have 10 words in our input, you want to ensure the final output is the same dimensionality as the input
          - I don't know if this is exactly necessary
 
 4 **Multi-Head Attention**:
@@ -418,9 +418,9 @@ This diagram below shows one single encoding block using Self Attention
 ![Self Attention Encoding](./images/summary_self_attention_encoding.png)
 
 #### Masked Self Attention
-- In Masked Self Attention, it's the same process as Self Attention except we mask a certain number of words so that the $ Q \cdot K $ results in 0 effectively removing it from attention scoring
-    - In BERT training we mask a number of words inside of the sentence
-    - In GPT2 training we mask all future words (right hand of sentence from any word)
+- In Masked Self Attention, it's the same process as Self Attention except you mask a certain number of words so that the $ Q \cdot K $ results in 0 effectively removing it from attention scoring
+    - In BERT training you mask a number of words inside of the sentence
+    - In GPT2 training you mask all future words (right hand of sentence from any word)
    
 ![Masked Self Attention](./images/masked_self_attention.png)
 
@@ -429,9 +429,9 @@ This diagram below shows one single encoding block using Self Attention
 - The size of the $ Q \cdot K $ matrix grows quadratically with the context size ($ n^2 $), making it computationally expensive for long sequences.
 - To address this, masking is used to prevent future words from influencing current words during training (e.g., in autoregressive tasks).
 - Context size
-    - Size of Q * K matrix at the end is the square of the context size, since we need to use all of the Q * K vectors, and…it’s a matrix! So it’s n*n = n^2 so it’s very hard to scale
-    - It does help that we mask ½ the examples because we don’t want future words to alter our current word and have it cheat
-        - Since for an entire sentence during training for each word we try to predict the next, so if there are 5 words there’s 1, 2, 3, 4, 5 training examples and not just 1
+    - Size of Q * K matrix at the end is the square of the context size, since you need to use all of the Q * K vectors, and…it’s a matrix! So it’s n*n = n^2 so it’s very hard to scale
+    - It does help that you mask ½ the examples because you don’t want future words to alter our current word and have it cheat
+        - Since for an entire sentence during training for each word you try to predict the next, so if there are 5 words there’s 1, 2, 3, 4, 5 training examples and not just 1
         - Don’t want 4 and 5 to interfere with training 1, 2, 3
  
 ### Encoder-Decoder Attention
@@ -443,7 +443,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
 ![Encoder To Decoder Summary](./images/encoder_to_decoder.png)
 
 1. **Encoder**:
-   - The Encoder Portion is completely described by what we wrote above in [Summary of Self Attention Encoding](#summary-of-self-attention-encoding)
+   - The Encoder Portion is completely described by what you wrote above in [Summary of Self Attention Encoding](#summary-of-self-attention-encoding)
    - TLDR;
       - The encoder processes the input sequence and generates a sequence of **hidden states** that represent the context of the input
       - Each encoder block consists of:
@@ -484,7 +484,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
        - So self-attention only happens from words on the left, not all Keys
        - ***Query***: Current token's embedding
        - **Key** and **Values**: All already generated words to the left
-         - Similar to self-attention except we ignore all to the right
+         - Similar to self-attention except you ignore all to the right
      - **Encoder-Decoder Attention Layer**:
        - Attends to the encoder's output (contextual embeddings) to incorporate information from the input sequence
        - **Query**: Comes from the decoder's self-attention output

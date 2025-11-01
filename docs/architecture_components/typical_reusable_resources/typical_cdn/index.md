@@ -13,9 +13,9 @@ CDN's are highly integrated and coupled with [Frontend Services](/docs/architect
     - Could simply be a traffic migration server
     - Could also be a cache / static content server
 - A ***Content Delivery Network (CDN)*** is a group of geographically distributed proxy servers
-    - We place these at the network edge, as close as possible to end users, to ensure that content is delivered as fast as possible to clients
+    - you place these at the network edge, as close as possible to end users, to ensure that content is delivered as fast as possible to clients
     - CDN's mostly get split into serving static vs dynamic data
-        - TLDR; We replicate data / logic to these edge servers async, and they are used to serve content faster to users
+        - TLDR; you replicate data / logic to these edge servers async, and they are used to serve content faster to users
 - What will it store?
     - Can store a lot of static content
     - Can store dynamic JS, along with static data
@@ -42,13 +42,13 @@ CDN's are highly integrated and coupled with [Frontend Services](/docs/architect
 - Dynamic / rapid changing content is better served by Pull CDN where the changed data can be re-found and served, and Push CDN is better for static content like company logo's and old news articles
 - Dynamic Content Caching Optimizations
     - Dynamic content can be generated at proxy servers by running static scripts with updated data
-    - For example, if there is weather information we include in an app we can run the weather scripts on the Proxy Servers and generate that data locally vs on Origin Servers
-    - Edge Side Includes (ESI) helps us when a majority of the HTML code we are serving hasn't changed, except for a small part, we can only calculate that new small part
+    - For example, if there is weather information you include in an app you can run the weather scripts on the Proxy Servers and generate that data locally vs on Origin Servers
+    - Edge Side Includes (ESI) helps us when a majority of the HTML code you are serving hasn't changed, except for a small part, you can only calculate that new small part
     - Dynamic Adaptive Streaming over HTTP (DASH) allows us to fetch different portions of video at different resolutions to serve video
     - Distributing data to the huge number of Proxy Servers from the Origin Server can place a large burden on the Origin Server
-        - We use a Tree Structure for Data Distribution where each of the edge Proxy Servers are apart of hierarchies across a tree, and they can all send the new data to each other
+        - you use a Tree Structure for Data Distribution where each of the edge Proxy Servers are apart of hierarchies across a tree, and they can all send the new data to each other
         -  ![CDN Tree](./images/cdn_tree.png)
-    - DNS Redirect is when a DNS server returns another URI instead of an IP - we can use this to specify Proxy Servers when a client requests it
+    - DNS Redirect is when a DNS server returns another URI instead of an IP - you can use this to specify Proxy Servers when a client requests it
         - Depending on Network Distance + Load on Proxy Servers the DNS redirect will choose a specific Proxy to send client to
         -  ![CDN DNS](./images/cdn_dns.png)
 
@@ -61,7 +61,7 @@ CDN's are highly integrated and coupled with [Frontend Services](/docs/architect
 #### Content Consistency
 - Always a risk that data on CDN Proxy Servers will be inconsistent with Origin Servers
 - Pull CDN's will do periodic polling - this is unnecessary bandwidth on Origin Servers
-- Time To Live (TTL) is a better option than periodic polling, because we can set the TTL of very static content to be longer
+- Time To Live (TTL) is a better option than periodic polling, because you can set the TTL of very static content to be longer
 - Leases also work well because they are a promise to the Proxies that if the data should change anytime before the Lease is up, the Origin will notify Proxies
 
 ##### Cache Invalidation

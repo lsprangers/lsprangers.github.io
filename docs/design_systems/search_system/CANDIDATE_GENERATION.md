@@ -10,12 +10,12 @@ The reason candidate generation is so useful, is because it typically allows us 
 
 ***Overall it's goal is to reduce the search space while still keeping all true positives***
 
-It's also done relatively quickly, ideally in a way where we can index / lookup a matrix or user history in a relatively fast fashion, on services that have been updated in the background by our web servers. Basically, we are hoping that as users use our service their item and user history have been being updated and sent to our search systems in real-time, and when we need this information our architecture is setup to be real-time responsive
+It's also done relatively quickly, ideally in a way where you can index / lookup a matrix or user history in a relatively fast fashion, on services that have been updated in the background by our web servers. Basically, you are hoping that as users use our service their item and user history have been being updated and sent to our search systems in real-time, and when you need this information our architecture is setup to be real-time responsive
 
-In Candidate Generation, ***Queries are Users and we compare them to Items***
+In Candidate Generation, ***Queries are Users and you compare them to Items***
 
 ### User-Item Matrices
-Our [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) concept paper discusses this in detail, but for all of our systems we generally have 2 key components - queries (users) and items
+Our [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) concept paper discusses this in detail, but for all of our systems you generally have 2 key components - queries (users) and items
 
 Over time users engage with items (which might be other users!), and this is a scorable numeric metric - they either rank them (movies), watch them (Youtube video watch time), read them (Newspaper post read through length), or engage with them (check another users page)
 
@@ -30,7 +30,7 @@ M = \begin{pmatrix}
     110 & 46 & \cdots & 38
 \end{pmatrix}
 $$
-Or maybe we can make it percentage of video watched through (it would be some [numeric feature standardization](/docs/transformer_and_llm/EMBEDDINGS.md#numeric-features)) which would bring each number into the standardized range of $[0, 1]$
+Or maybe you can make it percentage of video watched through (it would be some [numeric feature standardization](/docs/transformer_and_llm/EMBEDDINGS.md#numeric-features)) which would bring each number into the standardized range of $[0, 1]$
 $$
 M = \begin{pmatrix}
     .9 & .2 & \cdots & .1 \\
@@ -40,34 +40,34 @@ M = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-With this setup we have now projected our Users and Items into an Embedding Space $E \in \real^v$ where $v$ defines the total number of videos in our corpus. Since $v$ is probably humongous, we need to somehow filter this down
+With this setup you have now projected our Users and Items into an Embedding Space $E \in \real^v$ where $v$ defines the total number of videos in our corpus. Since $v$ is probably humongous, you need to somehow filter this down
 
-The usual idea is to split this into two separate matrices $U \in \mathbb{R}^{v'},\ I \in \mathbb{R}^{v'}$ where $v' \leq v$ to ultimately reduce the total size of our search space while preserving information - this is [Matrix Factorization](#matrix-factorization) which we will see later!
+The usual idea is to split this into two separate matrices $U \in \mathbb{R}^{v'},\ I \in \mathbb{R}^{v'}$ where $v' \leq v$ to ultimately reduce the total size of our search space while preserving information - this is [Matrix Factorization](#matrix-factorization) which you will see later!
 
 ### Similarity
-If we want to find similar users, we have a search function $S: E \times E \rightarrow \real$ where $S(q, x)$ has a query $q$ and compares it to each other embedding $x$ in our embedding space to find similar vectors $x$, which may be Users or Items. This allows us some flexibility in "find similar users / items to user Q" and then we can use [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann) to find the Top K nearest vectors
+If you want to find similar users, you have a search function $S: E \times E \rightarrow \real$ where $S(q, x)$ has a query $q$ and compares it to each other embedding $x$ in our embedding space to find similar vectors $x$, which may be Users or Items. This allows us some flexibility in "find similar users / items to user Q" and then you can use [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann) to find the Top K nearest vectors
 
-Our [Vector Similarity Scoring](/docs/transformer_and_llm/EMBEDDINGS.md#vector-similarities) can be anything from Cosine to Dot products, but for this example if we normalize all of the vectors down to $[0, 1]$ we should be able to use either. 
+Our [Vector Similarity Scoring](/docs/transformer_and_llm/EMBEDDINGS.md#vector-similarities) can be anything from Cosine to Dot products, but for this example if you normalize all of the vectors down to $[0, 1]$ you should be able to use either. 
 
 In any other example, a popular video tends to coincide with larger norms, and so our recommendation would probably favor those videos with the Dot product
 
 ## Filtering and Factorization
 Filtering leverages the idea that users who have agreed in the past will agree in the future, based on user similarity or item similarity
 
-In either way we can use embedding matrices for Queries (Users) $U$ or Items $I$, or a combination of them. Similarity between items is calculated using metrics such as cosine similarity, Pearson correlation, or Jaccard index
+In either way you can use embedding matrices for Queries (Users) $U$ or Items $I$, or a combination of them. Similarity between items is calculated using metrics such as cosine similarity, Pearson correlation, or Jaccard index
 
 To find recommendations, you compare the query (User embedding) to all Item embeddings using similarity metrics (e.g., dot product, cosine similarity), which will ultimately give you the top Items for a User
 
-This example from Google shows how if we have $m$ Playlists who have $n$ songs we can use this co-occurrence matrix, factorize it, and then find similar Playlists. Factorizing these into $k$ dimensions allows us to find the ***Top-K Latent Features*** of each playlist, and ultimately to compare it to other playlists using geometric vector distance. 
+This example from Google shows how if you have $m$ Playlists who have $n$ songs you can use this co-occurrence matrix, factorize it, and then find similar Playlists. Factorizing these into $k$ dimensions allows us to find the ***Top-K Latent Features*** of each playlist, and ultimately to compare it to other playlists using geometric vector distance. 
 
-This is similar to factorizing a `User x Item` matrix, and then doing a dot product with $n$ items to find what ones would be useful to User. It's a bit odd because we're saying we can compare Track Embeddings to Playlist Embeddings, but ultimately we're calculating the interaction score / goodness score of adding a new Track to a Playlist
+This is similar to factorizing a `User x Item` matrix, and then doing a dot product with $n$ items to find what ones would be useful to User. It's a bit odd because we're saying you can compare Track Embeddings to Playlist Embeddings, but ultimately we're calculating the interaction score / goodness score of adding a new Track to a Playlist
 ![Google Songs](./images/google_songs.png)
 
 ### Item Content Filtering 
 - Recommends items to a user based on the similarity between items
-- If each of our items has some generic features that describe it, similar to our User-Item matrices we can just host all of these features in a matrix and consider it our ***Item Embeddings***
-- If we have a binary set of features, then the Dot product over them is basically a count of the number of similar features!
-    - If we have a range of numeric values then our Embedding similarity metrics will help us calculate the score between items based on similar dimensions
+- If each of our items has some generic features that describe it, similar to our User-Item matrices you can just host all of these features in a matrix and consider it our ***Item Embeddings***
+- If you have a binary set of features, then the Dot product over them is basically a count of the number of similar features!
+    - If you have a range of numeric values then our Embedding similarity metrics will help us calculate the score between items based on similar dimensions
 
 For content based filtering, common evaluation metrics are based on similarities of items, such as Cosine distance of item vectors
 
@@ -86,11 +86,11 @@ In collaborative filtering, prediction and classification metrics like precision
 - Set of users $U$
 - Set of items $I$ that are to be recommended to $U$
 - Learn a function, $f(U_i)$ based on the user’s past interaction data $i$ which predicts the likeliness of item $I$ to $U$
-    - Essentially we pull all user interactions, and we start to find users who have interacted in the same way with past items
-        - Compare $f(U_j)$ to $f(U_k)$, and then if they are similar for some historic items, we can assume that $U_k$ and $U_j$ might have the same preferences
-        - If that's the case and $U_k$ enjoyed an item that $U_i$ hasn't seen yet, we should offer it to user $U_i$
+    - Essentially you pull all user interactions, and you start to find users who have interacted in the same way with past items
+        - Compare $f(U_j)$ to $f(U_k)$, and then if they are similar for some historic items, you can assume that $U_k$ and $U_j$ might have the same preferences
+        - If that's the case and $U_k$ enjoyed an item that $U_i$ hasn't seen yet, you should offer it to user $U_i$
     - How is this done?
-        - We need to be able to find *K Nearest Neighbors* i.e. (K nearest Users!) of a user which could be based on:
+        - you need to be able to find *K Nearest Neighbors* i.e. (K nearest Users!) of a user which could be based on:
             - User-Item relations:
                 - Item rankings
                 - Item usages
@@ -100,7 +100,7 @@ In collaborative filtering, prediction and classification metrics like precision
                 - User location
                 - User demographic
                 - etc...
-        - Once we have some sort of way to categorize these users, we can start to rank nearest neighbors
+        - Once you have some sort of way to categorize these users, you can start to rank nearest neighbors
 
 | Pros | Cons |
 |------|------|
@@ -140,14 +140,14 @@ TLDR;
 ##### End Goal
 After "doing something" with our input here, we'd like to be able to ***predict which items a user will like / interact with next***
 
-Our end goal is to "fill in" the User-Item interactions that currently do not exist, i.e. we want to assign values to all $M_{ui}$ that do not exist
+Our end goal is to "fill in" the User-Item interactions that currently do not exist, i.e. you want to assign values to all $M_{ui}$ that do not exist
 
 #### Collaborative Filtering Algorithm
 The actual algorithm would just involve taking that matrix and doing Cosine, Jaccard, or basic dot product similarity between the rows to get similar users, and then retrieving the Top K entries in $i$ that were not in $j$ to find all of the new recommendations for $j$
 
-In the table below we see that ***User 1*** is our Query, or the User we'd like to create recommendations for, and our current scope is $K=1$ top 2 recommendations
+In the table below you see that ***User 1*** is our Query, or the User we'd like to create recommendations for, and our current scope is $K=1$ top 2 recommendations
 
-The 2 most similar are Users 2, and 5, (which we could find with a Vector Similarity metric), and that User 1 has not interacted with Item B, which both other similar users have ranked as Good=1, so we can recommend Item B to User 1
+The 2 most similar are Users 2, and 5, (which you could find with a Vector Similarity metric), and that User 1 has not interacted with Item B, which both other similar users have ranked as Good=1, so you can recommend Item B to User 1
 
 | User   | Item A | Item B | Item C | Item D | Item E | Item F |
 |--------|--------|--------|--------|--------|--------|--------|
@@ -206,11 +206,11 @@ function calculate_similarity(user_vector1, user_vector2):
 ### Matrix Factorization
 Matrix factorization is a technique used in recommender systems to decompose a large matrix into smaller matrices. This technique is particularly useful for collaborative filtering, where the goal is to predict user preferences for items based on past interactions.
 
-For the above discussion on [Collaborative Filtering](#user-item-collaborative-filtering), we noticed one of the Cons was that this was a gigantic matrix and it's difficult to actually run the collaborative filtering algorithm to find similar users...we need a way to get past this
+For the above discussion on [Collaborative Filtering](#user-item-collaborative-filtering), you noticed one of the Cons was that this was a gigantic matrix and it's difficult to actually run the collaborative filtering algorithm to find similar users...you need a way to get past this
 
-This was brought up before in the [User-Item Matrices](#user-item-matrices) section above how ideally we can reduce our gigantic matrix into $U \in \mathbb{R}^{v'},\ I \in \mathbb{R}^{v'}$ where $v' \leq v$. This would allow us to compare 2 rows in a much more efficient manner by using dot product of 2 vectors (row and col)
+This was brought up before in the [User-Item Matrices](#user-item-matrices) section above how ideally you can reduce our gigantic matrix into $U \in \mathbb{R}^{v'},\ I \in \mathbb{R}^{v'}$ where $v' \leq v$. This would allow us to compare 2 rows in a much more efficient manner by using dot product of 2 vectors (row and col)
 
-***At the end of the day all we want are EMBEDDINGS that allow us to compute User-Item overlap before we go to Ranking!!!***
+***At the end of the day all you want are EMBEDDINGS that allow us to compute User-Item overlap before you go to Ranking!!!***
 ___
 
 
@@ -222,7 +222,7 @@ ___
         - **Item Matrix (V)**: $V_{iv'}$ Represents latent features of items.
         - Both of these matrices are based on the dimensions of $M_{ui}$ that get turned into $U_{uv'}$ and $V_{iv'}$
     - The embeddings learned from decomposing $M$ gives us two new matrices, where the dot product $U_{uv'} \cdot I_{iv'}^T$ gives us ***an approximation*** of $M$
-        - To break this down, it means we can have 2 smaller matrices that we can pick and choose row / column pairs from to get the original matrix, which helps us to speed up queries and reduce memory footprint
+        - To break this down, it means you can have 2 smaller matrices that you can pick and choose row / column pairs from to get the original matrix, which helps us to speed up queries and reduce memory footprint
     - The product of these two matrices approximates the original matrix.
 
 2. **Latent Features**:
@@ -244,24 +244,24 @@ Where:
 - $ V $ is the item matrix with dimensions $ n \times v' $ (where $ n $ is the number of items and $ v' $ is the number of latent features).
 
 ##### First thoughts
-We need an objective function: $\min_{U \in \mathbb M^{u \times v'},\ I \in \mathbb R^{i \times v'}} \sum_{(i, j) \in \text{obs}} (A_{ij} - \langle U_{i}, V_{j} \rangle)^2.$
+you need an objective function: $\min_{U \in \mathbb M^{u \times v'},\ I \in \mathbb R^{i \times v'}} \sum_{(i, j) \in \text{obs}} (A_{ij} - \langle U_{i}, V_{j} \rangle)^2.$
 
 
-- The first thought we should have is minimizing the differences between $M - (U \cdot V)$ which intuitively means "ensure that $U \cdot V$ is as close to $M$ as possible"
+- The first thought you should have is minimizing the differences between $M - (U \cdot V)$ which intuitively means "ensure that $U \cdot V$ is as close to $M$ as possible"
     - There are some general issues with this:
-        - We can only sum / observe values that are 1...meaning all of our unobserved values are lost
+        - you can only sum / observe values that are 1...meaning all of our unobserved values are lost
             - This will lead to a model that can't really "learn" and just see's "good" results since it will be minimal loss
-        - We could treat the unobserved values as 0 to combat this, but that leads to a gigantic sparse matrix
-- So we know we need to hold the unobserved observations and learn against them, but we know that's a gigantic matrix that we need to somehow solve for
+        - you could treat the unobserved values as 0 to combat this, but that leads to a gigantic sparse matrix
+- So you know you need to hold the unobserved observations and learn against them, but you know that's a gigantic matrix that you need to somehow solve for
 
-Below we will get into different objective functions, but a good visualization from Google Docs
-- Observed only means we only focus on user-item interactions that have occurred
+Below you will get into different objective functions, but a good visualization from Google Docs
+- Observed only means you only focus on user-item interactions that have occurred
 - Weighted will allow us to utilize unseen user-item interactions, weighted to a certain degree $w_0$
-- SVD at the end is how we actually compute "differences" for our objective functions
+- SVD at the end is how you actually compute "differences" for our objective functions
 ![Matrix Factorization Objectives](./images/matrix_factorization_objectives.png)
 
 ##### Singular Value Decomposition (SVD)
-Singular Value Decomposition, as shown above, is a way to solve for the 2 types of objective functions we setup - regardless of if we use Weighted or Only Observed
+Singular Value Decomposition, as shown above, is a way to solve for the 2 types of objective functions you setup - regardless of if you use Weighted or Only Observed
 
 It is mentioned that this is rarely used because the input matrices are so sparse, and that it ultimately isn't worth it most of the time. A more reliable and stable method is Weighted Matrix Factorization
 
@@ -269,7 +269,7 @@ It is mentioned that this is rarely used because the input matrices are so spars
 - *Weighted Matrix Factorization (WMF)* breaks things up between observed and unobserved observations
     - This is helpful because the unobserved observations can be in the range of millions - for all the videos on YouTube, any user probably watches ~100 but there are millions of unobserved ones
     - Therefore, WMF allows us to introduce a new hyperparameter, $w_0$, that helps us to weight those unobserved observations and to reduce the computational complexity of it
-    - This is useful because it helps us to decompose the objective function into 2 specific sums that are easy to compute over sparse matrices - ultimately the calculation of this matrix is how we create our underlying $U$ and $V$ matrices from $M$
+    - This is useful because it helps us to decompose the objective function into 2 specific sums that are easy to compute over sparse matrices - ultimately the calculation of this matrix is how you create our underlying $U$ and $V$ matrices from $M$
 
 In the below equation there's a regularization portion not discussed in the Google Docs - it's a useful tool during training time
 $$
@@ -287,10 +287,10 @@ Where:
     - Another way this is done is by weighting $w_{i,j}$ carefully, and disregarding the regularization parameter entirely
 
 Solving for this equation:
-- We can use [Stochastic Gradient Descent (SGD)](/docs/training_and_learning/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/training_and_learning/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
+- you can use [Stochastic Gradient Descent (SGD)](/docs/training_and_learning/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/training_and_learning/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
     - SGD is more generic, but is battle tested and true
     - WALS is more specific and helpful for this specific objective
-    - WALS is most likely the ideal function since both matrices we solve for are quadratic
+    - WALS is most likely the ideal function since both matrices you solve for are quadratic
         - Each stage can be solved as a linear system, which allows us to distribute the computation across nodes and ultimately converge on finalized matrices $U$ and $V$
 
 | Pros | Cons |
@@ -304,9 +304,9 @@ Solving for this equation:
     - For a new item or new user with limited interactions, one single iteration of WALS should give us a useful embedding by holding the other category fixed and finding the closest other item given any interactions
 
 ### Updating Filtering and Factorization Models
-Incrementally updating these models would be beneficial for new User-Item interactions $m_{ij}$ that we haven't seen before, it would be ideal if we can update our latent matrices $U_i$ and $I_j$ without having to rerun the entire re-training method
+Incrementally updating these models would be beneficial for new User-Item interactions $m_{ij}$ that you haven't seen before, it would be ideal if you can update our latent matrices $U_i$ and $I_j$ without having to rerun the entire re-training method
 
-Most of the time in practice we would simply re-train the model every night after we've seen new interactions because retraining isn't that costly
+Most of the time in practice you would simply re-train the model every night after we've seen new interactions because retraining isn't that costly
 
 That being said, there are methods to incrementally update these models:
     - Fold In
@@ -317,30 +317,30 @@ That being said, there are methods to incrementally update these models:
     - Using side features
     - Cold start
     - "Freshness" and bypassing "popular only" items via Dot product
-- Pretty much everything is the same for creating / fetching the user-item embeddings, but we can also add in other features such as generic user embeddings, user metadata and categorical features, and other account information that might be relevant
-- [A Softmax Layer](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax) will allow us to do multi-class classification, where we basically predict the probability of usage over an entire corpus / corpus subset of videos
+- Pretty much everything is the same for creating / fetching the user-item embeddings, but you can also add in other features such as generic user embeddings, user metadata and categorical features, and other account information that might be relevant
+- [A Softmax Layer](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax) will allow us to do multi-class classification, where you basically predict the probability of usage over an entire corpus / corpus subset of videos
     - The softmax layer would need to be trained over the entire corpus since any of the videos have a potential to be included in this (sub)set
-    - Since our output is a probability distribution that's comparable to truth (all 0's and a 1) we can use [cross-entropy loss function](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy)
-- We could also add in other hidden layers and non-linear (ReLU) layers, or anything else, to capture non-linear relationships
-- We could also change the entire hidden layers to remove the matrix factorization phase, and use the hidden layers as a way to map user features into a projected embedding layer
+    - Since our output is a probability distribution that's comparable to truth (all 0's and a 1) you can use [cross-entropy loss function](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy)
+- you could also add in other hidden layers and non-linear (ReLU) layers, or anything else, to capture non-linear relationships
+- you could also change the entire hidden layers to remove the matrix factorization phase, and use the hidden layers as a way to map user features into a projected embedding layer
 
-DNN allows us to reduce latency during serving time by decoupling Query Embedding and Item Embedding creation, but we are still using DNN instead of Matrix lookup so overall it might be slower. We can pre-compute Candidates (Items), and then store them in a Vector Type Database for quick lookup
+DNN allows us to reduce latency during serving time by decoupling Query Embedding and Item Embedding creation, but you are still using DNN instead of Matrix lookup so overall it might be slower. you can pre-compute Candidates (Items), and then store them in a Vector Type Database for quick lookup
 
 Here's an example of architecture from Google's Blog
 ![Two Towers Example from Google](./images/google_twotowers.png)
 
 ### Two Towers
-Two Towers will also generate embeddings for users and items, similar to Matrix Factorization, except in this scenario there's one tower for Queries (Users), and one tower for Items. If we ran Two Towers for the same Factorization problem above about Playlist and Tracks it'd look like this
+Two Towers will also generate embeddings for users and items, similar to Matrix Factorization, except in this scenario there's one tower for Queries (Users), and one tower for Items. If you ran Two Towers for the same Factorization problem above about Playlist and Tracks it'd look like this
 ![TT Songs](./images/twotowers_songs.png)
 
-The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/transformer_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where we compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
+The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/transformer_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where you compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
 
-This will allow us to bypass the cold start problem, and the static embedding problem, but increases our latency as we need to use another DNN call in our Ranking service
+This will allow us to bypass the cold start problem, and the static embedding problem, but increases our latency as you need to use another DNN call in our Ranking service
 
 ### Multi Tasks Learning
-The tasks of this model are important, if we strictly focus on "probability of engaging" we might end up recommending click-bait videos, or if we do "time spent watching" it might recommend videos that try to get the user to keep watching long into the videos
+The tasks of this model are important, if you strictly focus on "probability of engaging" you might end up recommending click-bait videos, or if you do "time spent watching" it might recommend videos that try to get the user to keep watching long into the videos
 
-Ultimately we want to use simple tasks to find relevant content for the users, and we could use multi-task learning to do so
+Ultimately you want to use simple tasks to find relevant content for the users, and you could use multi-task learning to do so
 
 TODO: Describe multi-task learning outputs and model weight updates using `./other_concepts/MULTITASK_LEARNING.md`
     

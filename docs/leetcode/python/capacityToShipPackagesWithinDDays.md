@@ -36,7 +36,7 @@ The rest of the `shipWithinDays` is just a classical binary search problem, but 
 
 - If you start with `low = 0` instead of `low = max(weights)` then you are ***expanding the answer space*** and you'll get the wrong answer
     - The answer space, at maximum, ranges from `[max_weight, all_weight]`
-    - For example, if we have `capacity = 3` and one of our weights is `4`, we will hit an edge case in the `check()` portion `current_load + weight > capacity:` and we'll get incorrect results
+    - For example, if you have `capacity = 3` and one of our weights is `4`, you will hit an edge case in the `check()` portion `current_load + weight > capacity:` and we'll get incorrect results
 - Imagine weights = `[5, 8, 2]`
     - If you test capacity = 0, no weight can ever be shipped
     - If you test capacity = 4, same — it’s invalid

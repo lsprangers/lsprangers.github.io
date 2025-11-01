@@ -27,8 +27,8 @@ description: Discussion around Disk Based Databases
     - If node goes down, WAL can be used to re-create MemTable
     - Once MemTable is full and written to disk, corresponding WAL is deleted
 - ***SSTable***
-    - When a MemTable is flushed to disk, we take that Sorted Run and store it on disk as an SSTable
-        - i.e. when we want to write MemTable to disk, we store it as an SSTable
+    - When a MemTable is flushed to disk, you take that Sorted Run and store it on disk as an SSTable
+        - i.e. when you want to write MemTable to disk, you store it as an SSTable
     - SSTables are organized into levels with max capacities of powers
         - 10MB, 100MB, etc...
         - Whenever any level reaches capacity, it's Compacted into next level
@@ -57,9 +57,9 @@ description: Discussion around Disk Based Databases
         - RocksDB uses a Skip List which is a Linked List with multiple other links that you can use to skip
         - Skip Lists still have, on average, $O(\log n)$ search without O(n) insert which can happen with a Vector if it's full
         - Can't use a Hash Map because scans would be O(n)
-    - Since we write to MemTable in $O(\log n)$ in RAM, and then write this to disk as SSTable later on, writes are fast
+    - Since you write to MemTable in $O(\log n)$ in RAM, and then write this to disk as SSTable later on, writes are fast
     - Still durable because of WAL
-    - We remove need for random disk writes which is how B-Tree would handle it
+    - you remove need for random disk writes which is how B-Tree would handle it
 - WAL
     - On disk backup for MemTable
     - Just an append only log of transactions
@@ -69,11 +69,11 @@ description: Discussion around Disk Based Databases
     - Buffered I/O
         - Disks can't keep up with request needs
         - Portions of disk are brought into memory, changes happen in memory, and occasionally the memory is written back to disk via OS 
-        - We write data to a buffer that's eventually flushed to disk
+        - you write data to a buffer that's eventually flushed to disk
         - "Thousands of times faster as synchronous disk writes via Unbuffered I/O"
 - SSTable
-    - When a MemTable is flushed to disk, we take that Sorted Run and store it on disk as an SSTable
-    - i.e. when we want to write MemTable to disk, we store it as an SSTable
+    - When a MemTable is flushed to disk, you take that Sorted Run and store it on disk as an SSTable
+    - i.e. when you want to write MemTable to disk, you store it as an SSTable
     - SSTables are organized into levels with max capacities of powers
         - 10MB, 100MB, etc...
         - Whenever any level reaches capacity, it's Compacted into next level

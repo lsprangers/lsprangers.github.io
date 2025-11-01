@@ -18,7 +18,7 @@ class Solution:
         # 3x1 = 1
         # 1x3 = 1
         # 2x3 = (1x3) + (2x2) = 3
-        # Basically for any new cell, we just add together the two
+        # Basically for any new cell, you just add together the two
         #    routes from above or left since robot can only move 
         #    in those 2 directions
 

@@ -19,7 +19,7 @@ def prim_mst(vertices, graph):
         heapq.heappush(min_heap, (weight, 0, neighbor))  # (weight, from, to)
 
     # Process the priority queue
-    # This will start with smallest weighted edge that we found from 0
+    # This will start with smallest weighted edge that you found from 0
     while min_heap:
         weight, u, v = heapq.heappop(min_heap)
 

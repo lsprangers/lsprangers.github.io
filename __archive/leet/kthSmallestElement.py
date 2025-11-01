@@ -12,10 +12,10 @@ class Solution:
         self.vals = []
     
     def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
-        # we have to traverse to know how many elements
+        # you have to traverse to know how many elements
 
         # O(n) to go through all
-        # For each dfs we are doing O(log n) heappush work
+        # For each dfs you are doing O(log n) heappush work
         # Runtime == O(n logn)
         self.dfs(root)
 

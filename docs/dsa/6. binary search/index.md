@@ -13,11 +13,11 @@ $O(\log n)$ lookup on sorted array!
 
 The entirety of binary search is around being able to find something in $O(\log n)$ time because our data structure is sorted in some way - whether it's a Tree, a List, or the number line (integers)
 
-At each step of the way we shrink the search space by half because we know the data structure is sorted in some way - if we were looking for a word in the dictionary that starts with D and we randomly flipped to the letters N, we'd look to the left
+At each step of the way you shrink the search space by half because you know the data structure is sorted in some way - if you were looking for a word in the dictionary that starts with D and you randomly flipped to the letters N, we'd look to the left
 
 Most of the time, BSearch is "faster" because it will beat out $O(n^2)$
 
-Why is it $\log(n)$? Mostly because if there are $n$ elements, and we are constantly splitting it in half, we'll do at most $\log(n)$ searches
+Why is it $\log(n)$? Mostly because if there are $n$ elements, and you are constantly splitting it in half, we'll do at most $\log(n)$ searches
 $\log(n) = x \rarr 2^x = n$ 
 
 I guess that's just repeating the same thing twice - here's a photo:
@@ -37,7 +37,7 @@ Most of these solutions will involve a `check()` function, where you will propos
 
 For the capacity to ship packages problem, the `check()` function revolves around checking if the weight capacity can cover the shipping requirements - the `check()` funciton itself runs in $O(n)$ time so it seems slow, but ultimately it's still fast compared to other routes
 
-The reason this is "fast" is that in $O(\log(n))$ time we can propose capacity values, and then for each of them it takes $O(n)$ time to check so the overall solution is $O(n \cdot \log(n))$. This is faster than iterating from 1 to 2 to 3... capacity which would result in $O(n^2)$
+The reason this is "fast" is that in $O(\log(n))$ time you can propose capacity values, and then for each of them it takes $O(n)$ time to check so the overall solution is $O(n \cdot \log(n))$. This is faster than iterating from 1 to 2 to 3... capacity which would result in $O(n^2)$
 
 ## Typical Patterns And Pitfalls
 There are some typical patterns pitfalls that annoyingly come up in almost every review, and using them correctly is very important!
@@ -46,7 +46,7 @@ The main questions to ask yourself:
 - What is the search space?
 - What does check(mid) mean?
 - What is the goal (min valid, max valid, exact match)?
-    - This will alter what we return
+    - This will alter what you return
 - When is mid good/bad? Adjust low/high accordingly
     - This will alter our `low = ` and `high =` updates
 - Do you return low, high, or mid?
@@ -62,7 +62,7 @@ The main questions to ask yourself:
 ### Classic Binary Search
 This will find the first exact match, and only returns `mid` if it finds it
 
-`mid + 1` because we just checked mid, and we know it's not involved, `mid - 1` because of the same logic
+`mid + 1` because you just checked mid, and you know it's not involved, `mid - 1` because of the same logic
 
 ```python
 while low <= high:
@@ -99,9 +99,9 @@ Target: 5
 
 
 ### Lower Bound (First Valid X)
-For lower bound we strive to find the first element that satisfies some condition like $\leq$ target or $\ge$ target
+For lower bound you strive to find the first element that satisfies some condition like $\leq$ target or $\ge$ target
 
-In these ones, we now must figure out which condition to not decrement, such as `high = mid`, because in this scenario `mid` may have the correct answer at some point, and we need to reduce search space to left to see if there's another one beforehand
+In these ones, you now must figure out which condition to not decrement, such as `high = mid`, because in this scenario `mid` may have the correct answer at some point, and you need to reduce search space to left to see if there's another one beforehand
 
 ```python
 while low < high:
@@ -163,9 +163,9 @@ Goal: Find the first index where arr[i] $\ge$ 2
 Result: Returns index 0 (arr[0]=2), which is the first element $\ge$ 2.
 
 ### Upper Bound (Last Valid X)
-This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario we set `low = mid` and `high = mid - 1` 
+This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario you set `low = mid` and `high = mid - 1` 
 
-This is because there can be multiple `mid` that satisfy the result, but we want to find the last one so we keep shrinking / dragging search space to the right
+This is because there can be multiple `mid` that satisfy the result, but you want to find the last one so you keep shrinking / dragging search space to the right
 
 mid calculation being `low + high + 1` also ***prevents an infinite loop, and is vital***
 
@@ -207,7 +207,7 @@ For any BS problem:
 ### Answer Space
 The discussion in [Capacity To Ship Packages](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md) showcases the need to rigorously define answer spaces in the correct way
 
-If we are checking potential answers outside of this space, they may return false positives / negatives that would ruin our entire check!
+If you are checking potential answers outside of this space, they may return false positives / negatives that would ruin our entire check!
 
 ## ATypical
 There are some weird ones thrown in as well, especially rotating lists, a weird search space, or "guessing" at a condition
@@ -221,13 +221,13 @@ Suppose an array of length n sorted in ascending order is rotated between 1 and 
 
 Notice that rotating an array `[a[0], a[1], a[2], ..., a[n-1]]` 1 time results in the array `[a[n-1], a[0], a[1], a[2], ..., a[n-2]]`
 
-In these scenarios, the `condition(mid)` function needs to change to figure out if we should go left or right
+In these scenarios, the `condition(mid)` function needs to change to figure out if you should go left or right
 
-If an array isn't sorted, then we know for sure last element at end $\geq$ first element at 0
+If an array isn't sorted, then you know for sure last element at end $\geq$ first element at 0
 
-However, if an array is rotated, then the last element would be smaller than the first element - seeing this pattern we can realize there's a place, an ***Inflection Point*** where we can figure out where the real start was
+However, if an array is rotated, then the last element would be smaller than the first element - seeing this pattern you can realize there's a place, an ***Inflection Point*** where you can figure out where the real start was
 
-Therefore, what we need to search for is an index $i : i > i + 1$ which would correspond to the old start and end
+Therefore, what you need to search for is an index $i : i > i + 1$ which would correspond to the old start and end
 
 ![Inflection Point](/img/inflection_point.png)
 
@@ -241,19 +241,19 @@ elif mid > first element of array:
 else:
     search to the left
 ```
-because if we find the number 6, which is above the first element 4, we know our inflection point is still to the right of us
+because if you find the number 6, which is above the first element 4, you know our inflection point is still to the right of us
 
 ### Find A Rate
 There are some specific problems like [KoKo Eating Bananas](/docs/leetcode/python/kokoEatingBananas.md) and Elves on Package Line where you basically need to find a rate of something, and then check if that rate suffices
 
 Koko's eating rate, maybe it's 3 bananas-per-hour, and if that works then we'd look if a higher rate would suffice like 10-per-hour, etc...
 
-Usually this would mean the rate finding is $O(\log R)$ where $R$ is the rate search space, and then there'd be an input array of size $N$ that we must check through. The check function is typically $O(N)$ so in total it's $(O\log R \cdot N)$ versus $O(R \cdot N)$
+Usually this would mean the rate finding is $O(\log R)$ where $R$ is the rate search space, and then there'd be an input array of size $N$ that you must check through. The check function is typically $O(N)$ so in total it's $(O\log R \cdot N)$ versus $O(R \cdot N)$
 
 Otherwise, you just continuously check the rate instead of "smart searching" using binary search
 
 ## Structures
-Lists and Tree's are typically the data structures that we see with Binary Search
+Lists and Tree's are typically the data structures that you see with Binary Search
 
 ### Lists
 There's some gotchas for list, mostly around defining high and low, and different $\le$ vs $\leq$, but altogether the pseudocode is pretty easy

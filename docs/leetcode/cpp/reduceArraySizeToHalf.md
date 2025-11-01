@@ -18,7 +18,7 @@ public:
     bool operator()(vector<int> below, vector<int> above)
     {
         // This puts vector with largest second column, first
-        // So if the heap is at { {1, 2}, {1, 4}} and we 
+        // So if the heap is at { {1, 2}, {1, 4}} and you 
         //  add in {2, 3} it is { {2, 3}, {1, 2}, {1, 4}}
         //  and at that point {2,3}[1] > {1,2}[1] so false
         //  is returned, and the 2 things are swapped

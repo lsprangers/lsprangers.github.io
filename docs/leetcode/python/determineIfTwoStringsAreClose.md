@@ -16,8 +16,8 @@ Two strings are considered close if you can attain one from the other using the 
 
 
 This one's screwy:
-- Operation1 equates to "must have the same letters in the strings" b/c we can't get to an unknown character in str2 if it's not in str1
-- Operation2 equates to frequency counts because we can swap any existing frequencies, but we can't generate new characters if they don't exist
+- Operation1 equates to "must have the same letters in the strings" b/c you can't get to an unknown character in str2 if it's not in str1
+- Operation2 equates to frequency counts because you can swap any existing frequencies, but you can't generate new characters if they don't exist
 
 ```python
 class Solution:

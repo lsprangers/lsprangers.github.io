@@ -12,7 +12,7 @@ class Solution:
                 idx_so_far = idx
 
             # Whenever the sub-array up to "here" is negative, it 
-            #   can't contribute anything, so we move on
+            #   can't contribute anything, so you move on
             #   and start new sub-array
             if max_here < 0:
                 idx_start = idx + 1

@@ -19,10 +19,10 @@ This is a very high level overview of some of the most common protocols used in 
 - **Asynchronous:** Client can continue without waiting for server response
     - Communication occurs without waiting for a response. The sender sends a message and continues processing without waiting for the receiver to acknowledge receipt
 
-After that we start getting into weird next levels of things
+After that you start getting into weird next levels of things
 
 - **Long Polling:** Client repeatedly requests, server - holds connection until data is available
-    - This is a form of pulling, but instead of repeatedly pulling (polling) the server from the client, we request a pull once and then the server holds the connection until it sends data
+    - This is a form of pulling, but instead of repeatedly pulling (polling) the server from the client, you request a pull once and then the server holds the connection until it sends data
 - **SSE:** Server pushes updates to client over a single - HTTP connection
     - This is a form of push where the client registers a place it can accept connections to, and over time the server, ***in a one-way fashion***, sends data to the client
 - **Webhooks:** Both the client and the server open up a [Websocket](#websockets) to each other, and they are able to send data to each other in real time
@@ -77,7 +77,7 @@ There is nothing new about serializing something to unpack somewhere else
 gRPC is actually a superset of HTTP, and is built on top of HTTP/2. It uses Protocol Buffers (protobuf) for serialization, which is more efficient than JSON used in traditional HTTP APIs. gRPC also supports features like authentication, load balancing, and bidirectional streaming.
 
 ### Webhook
-Webhook means we setup a URL on the client side that can be called by server whenever it wants to gvive us some data - the server pushes to the client async
+Webhook means you setup a URL on the client side that can be called by server whenever it wants to gvive us some data - the server pushes to the client async
 
 ### WebSockets
 - **WebSockets**: A protocol that provides full-duplex communication channels over a single TCP connection - it's used for real-time applications where low latency is required

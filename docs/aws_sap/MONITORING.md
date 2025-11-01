@@ -20,7 +20,7 @@ Most is done via CloudWatch
 ### CloudWatch Alarms
 - Can trigger EC2 actions (reboot, terminate, stop, recover, etc)
 - Alarms typically go through EventBridge which can interact with even more AWS Services and includes filtering
-- Typical use case is to monitor critical instances, and if a status check fails we restart
+- Typical use case is to monitor critical instances, and if a status check fails you restart
     - Allows EC2 to keep public and private IP's
     - Can also interact with AutoScaling groups, SNS, SQS, or Lambda
 - Can also sent into EventBridge that can interact with Lambda, Step Functins, Kinesis, etc... 

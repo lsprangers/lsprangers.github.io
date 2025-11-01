@@ -8,7 +8,7 @@ show_back_link: true
 ---
 
 ## Folding
-If we only focus on the "positive" examples during training, and we don't introduce negatives for the model to "learn" / iterate over, then our model could be prone to Folding
+If you only focus on the "positive" examples during training, and you don't introduce negatives for the model to "learn" / iterate over, then our model could be prone to Folding
 
 Folding is what occurs when embeddings of different items end up close to each other in the metric space, even though they may be unrelated. When this occurs the embedding representations "look close" to each other, but in reality they should be separated. 
 
@@ -16,7 +16,7 @@ In the picture below the Green and Blue subspaces should be learned to be separa
 ![Folding Picture](./images/google_folding.png)
 
 ## Negative Sampling
-To combat [Folding](#folding) we know we must use negative samples, but instead of using every single negative example we should pick a sample of negatives! In this way we can randomly choose "bad" examples and feed them through as 0's.
+To combat [Folding](#folding) you know you must use negative samples, but instead of using every single negative example you should pick a sample of negatives! In this way you can randomly choose "bad" examples and feed them through as 0's.
 
 ## Stochastic Gradient Descent (SGD)
 Stochastic Gradient Descent updates the model parameters using a single training example at each iteration. This introduces noise into the optimization process, which can help escape local minima.

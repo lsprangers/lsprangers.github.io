@@ -30,7 +30,7 @@ There are multiple stages that are included for most of these things, and some o
         - Ranking
         - Maybe Re-Ranking
         - Final Serving
-    - Each of these stages focus on differnet areas and metrics - in Candidate Generation you'd want to focus on Recall and "for any potential match, we want to ensure we include it, and we may include bad matches" which equates to high recall and lower precision
+    - Each of these stages focus on differnet areas and metrics - in Candidate Generation you'd want to focus on Recall and "for any potential match, you want to ensure you include it, and you may include bad matches" which equates to high recall and lower precision
     - Afterwards, in steps like Ranking and Re-Ranking you whittle down the result set to increase Precision and include business rules
         - Ranking may just be a supervised model based on historic data, and Precision here may be different than with business rules that want to increase certain products during promotions
             - It's harder to keep seasonal product rotations in a validation set, so this may be evaluated differently
@@ -74,9 +74,9 @@ There are other more advanced metrics that involve ranking such as:
     - $Precision@k = {{(TP)@k} \over {(TP + FP)}@k}$
     - $Recall@k = {{(TP)@k} \over {TP + FN}}$
         - Notice Recall@k still has a denominator over the entire dataset, because Recall@k measures the completeness of the retrieved set relative to all existing relevant items
-        - Precision@k just asks "out of everything we recommended, what % is relevant" so it's denominator is at the k-subset level
+        - Precision@k just asks "out of everything you recommended, what % is relevant" so it's denominator is at the k-subset level
     - @k Metrics will score the above metrics up to a certain # of recommended items, $k$
-        - Some of this will utilize position in the ranking, and some won't - the idea being that we penalize systems if all of the desired recommendations are at the bottom of the final output list!
+        - Some of this will utilize position in the ranking, and some won't - the idea being that you penalize systems if all of the desired recommendations are at the bottom of the final output list!
         - The @k calculations will loop over $[1, 2, ... , k]$ and calculate precision and recall, thus including some sort of ordering penalization in the scores
             - If your results are stored in $[k - 3, k]$ instead of $[1, 2, 3]$, your scores will be worse, thus it includes ***some order***
             - These do not strictly enforce an item is at position $i$ is better than an item at position $i+1$, it simply ensures the items are in some list
@@ -143,25 +143,25 @@ There are other more advanced metrics that involve ranking such as:
         - nDCG considers relevance on a continuous scale
     - nDCG requires a list that includes the ranking information for each relevant item 
         - Idea is that items ranked higher should be more relevant, thereby contributing more significantly to overall quality of ranking
-    - To understand nDCG we need to understand:
+    - To understand nDCG you need to understand:
         - $\text{Discounted Cumulative Gain}_{p} = { \sum_{i=1}^{p} {\text{relevance}_{i} \over {\log_{2}(i + 1)}}}$
             - Discounting the Cumulative Gain calculation below means ***weighting each entry in the list based on its position in the list***
-                - If there's a highly relevant item in position $N$, and the rest from $[1, 2, ..., N-1]$ are basically irrelevant, we would not weight that differently from a list with the most relevant item in position 1
+                - If there's a highly relevant item in position $N$, and the rest from $[1, 2, ..., N-1]$ are basically irrelevant, you would not weight that differently from a list with the most relevant item in position 1
             - $i$ is the position of the item in the ranked list (starting at 1)                
             - The discount is the $1 \over {\log_{2}(i + 1)}$ portion
                 - $\log_{2}(i + 1)$ is the discounting factor
-                - As $i$ becomes larger, we reduce the overall weight of the relevance score
+                - As $i$ becomes larger, you reduce the overall weight of the relevance score
             - $p$ is the position in the ranked list where you want to calculate DCG up to
-                - If this is item $1$, $k$, or $N$ it doesn't matter, we can also do a sliding window and average if desired
+                - If this is item $1$, $k$, or $N$ it doesn't matter, you can also do a sliding window and average if desired
                     - This would be some metric like Mean-Discounted Cumulative Gain MDCG
             - $i$ is an output of the model (it's position in final ranking) and relevance is an output of labeling / user feedback - they are calculated at 2 different areas of the process
         - $\text{Cumulative Gain} = \sum_{i=1}^{N} \text{relevance}_{i}$
             - Sums the relevance scores of the top $k$ items in a ranking list
             - Helps to quantify the total relevance within the recommended list
-                - The main caveat, is we need to somehow get the relevance score for each item which is a major challenge
+                - The main caveat, is you need to somehow get the relevance score for each item which is a major challenge
                 - Typically, this is done with user feedback, ratings, implicit feedback like click through rates or video watch time (normalized)
             - There is a finite window size, $N$, so only the top-N are inclueded in the $\text{CG}$ calculation
-    - Once these are understood, we can dive deeper into $\text{nDCG}$
+    - Once these are understood, you can dive deeper into $\text{nDCG}$
         - $\text{nDCG}$ helps solve the problem of "different label scales gave different relevance scores to items"
             - This may be different labelers
             - Different label scales like video watch time or 5 star feedback
@@ -187,11 +187,11 @@ nDCG calculation process:
 - Compute $\text{IDCG}_{p} = { \sum_{i=1}^{v} {\text{relevance}_{i} \over {\log_{2}(i + 1)}}}$
     - ![IDCG](/img/idcg.png)
     - $\text{IDCG} = { {5 \over {\log_{2}(2)}} + {4 \over {\log_{2}(3)}} + {2 \over {\log_{2}(4)}} + {1 \over {\log_{2}(5)}} + {0 \over {\log_{2}(6)}} = 8.9543}$
-    - We see this is the "proper" ordering of the relevance list
+    - you see this is the "proper" ordering of the relevance list
 - $\text{nDCG} = {\text{DCG} \over \text{IDCG}} = {{6.1} \over {8.9}} = 0.68$
 
 #### Choosing Metrics
-There are many choices that we saw above!
+There are many choices that you saw above!
 
 Precision, Recall, Precision@k, Recall@k, FCP, MRR, ARHR, MAP, MAP@k, or nDCG
 
@@ -204,7 +204,7 @@ Some only make sense in the case of specific systems like RecSys, and others lik
     - Precision@k measures the proportion of relevant items in the top $k$ results
     - Recall@k measures the proportion of relevant items retrieved in the top $k$ among the entire universe of relevant items
     - These are typically useful when you're interested in systems binary performance up to a specific $k$ cutoff point
-        - They don't care about ordering, and they only focus on top $k$ so we may not get the full picture
+        - They don't care about ordering, and they only focus on top $k$ so you may not get the full picture
 - Fraction of Concordant Pairs (FCP)
     - Evaluates relative ordering of pairs
     - Useful in scenarios where relative ordering, without actual $i-j = \text{diff}$ is useful, is preferred and critical 
@@ -212,14 +212,14 @@ Some only make sense in the case of specific systems like RecSys, and others lik
 - Mean Reciprocal Rank (MRR)
     - Based on ranking of *first relevant item* in the list
     - It's useful for focusing on that one specific item that is of the upmost importance
-    - Can be useful when explicit relevance labels are missing and we have to rely on implicit signals such as a users choice among given list
+    - Can be useful when explicit relevance labels are missing and you have to rely on implicit signals such as a users choice among given list
     - Would be useful in things like Stack Overflow question answers or Search Engine results to see top ranked item
     - This metric fails to assess overall precision and accuracy of a recommended list
-    - Best case scenario for when we want to quickly retrieve the top item, and maybe others, and ensure it's in our list (Candidate Generation?)
+    - Best case scenario for when you want to quickly retrieve the top item, and maybe others, and ensure it's in our list (Candidate Generation?)
 - Average Reciprocal Hit Rate (ARHR) 
     - Extends MRR for all relevant items within the top $k$ positions
     - Averages out the reciprocal ranking, and so it does include relevance over the entire list
-    - Useful in scenario's similar to MRR where we want to quickly retrieve top items, but the $1 - k$ all matter to us
+    - Useful in scenario's similar to MRR where you want to quickly retrieve top items, but the $1 - k$ all matter to us
 - Mean Average Precision (MAP)
     - Calculates average precision across multiple queries
     - Designed for binary relevance, and for taking into account the ranking of all relevant items
@@ -231,14 +231,14 @@ Some only make sense in the case of specific systems like RecSys, and others lik
     - Can handle continuous or binary relevancy scales
         - However, with binary scales it may be more appropriate to use MAP
     - Also handles relative positions inside of the list
-    - Limitations are it's hard to find the actual "ideal" recommendation list, but ***in most ML Tasks there will be some form of similarity scores (embedding distance) between vectors, and we can use this to sort a list to find the "ideal" list***
+    - Limitations are it's hard to find the actual "ideal" recommendation list, but ***in most ML Tasks there will be some form of similarity scores (embedding distance) between vectors, and you can use this to sort a list to find the "ideal" list***
 
 
 ### Train, Test, Validation Sets
 A majority of the time the only way to get these metrics is by using source of truth sets - the most important being testing / validation sets
 
 - Training Set: Used to actually train the model and update model weights
-- Validation Set: Used throughout training or final model choice process, where we run a model over a holdout validation set to see enable us to choose the best model architecture
+- Validation Set: Used throughout training or final model choice process, where you run a model over a holdout validation set to see enable us to choose the best model architecture
 - Test Set: Running the final model over a dataset never seen before, and getting the final offline metrics
 
 #### Validation Sets
@@ -250,13 +250,13 @@ A common example I've been apart of is Entity Resolution, where you may have som
 
 In these scenario's, you'll require human analysts or something like AWS Mechanical Turk to go through a larger selection of your universe to help you get to a validation set
 
-Initially, bootstrapping a validation set might require $N^2$ total examples, but the main goal of having humans in the loop here is to reach $N \cdot K : K \lt N$ - basically we want to go from $ \cdot N$ to $N \cdot K$
+Initially, bootstrapping a validation set might require $N^2$ total examples, but the main goal of having humans in the loop here is to reach $N \cdot K : K \lt N$ - basically you want to go from $ \cdot N$ to $N \cdot K$
 
 ### Example
 Recommendation System examples
 
 #### Candidate Generation
-In [Candidate Generation](/docs/design_systems/search_system/CANDIDATE_GENERATION.md) we select a set of items from a gigantic pool that would be relevant for a particular user - usually CG focuses on high recall, and wants to find any possible relevant links without missing anything
+In [Candidate Generation](/docs/design_systems/search_system/CANDIDATE_GENERATION.md) you select a set of items from a gigantic pool that would be relevant for a particular user - usually CG focuses on high recall, and wants to find any possible relevant links without missing anything
 
 It tries to do this quickly, and typically won't use any large or complex models - ***overall it's goal is to reduce the search space while still keeping all true positives***
 
@@ -270,14 +270,14 @@ Therefore, it's crucial to evaluate this because it's the foundation of our enti
 ### Online Evaluation
 Online evaluation revolves around live evaluation of a system running in production and serving users
 
-Typically, a model is deployed and traffic is routed with some % split so we can perform [A/B Testing](/docs/design_systems/ab_testing/index.md) on it - there's a system design case study around how this works. Users would be assigned to one of $A, B, ... , N$ services based on hashing of `user_ID`
+Typically, a model is deployed and traffic is routed with some % split so you can perform [A/B Testing](/docs/design_systems/ab_testing/index.md) on it - there's a system design case study around how this works. Users would be assigned to one of $A, B, ... , N$ services based on hashing of `user_ID`
 
 The ultimate goal is to ensure the system works as intended in real world functions with respect to objective function and metrics
 
-So as users are sent to different services we record information relating to business needs like Click Through Rate (CTR), Page Views, Site Time (how long they stay on website), Video View Time, etc...
+So as users are sent to different services you record information relating to business needs like Click Through Rate (CTR), Page Views, Site Time (how long they stay on website), Video View Time, etc...
 
 A/B Testing can be used for any of the [Stages](#stages) listed above, and typically each one has separate metrics / business requirements 
 
 This all helps us to optimize hyperparameter configurations for params like regularization, learning rate, batch size, etc..While also allowing us to compare different functions for models like popularity based, personalized, diversity based, AND differnet objective functions like solving for optimal CTR, optimal time on site, or something different
 
-Sometimes, solving for new video views will mean pushing click-bait to the top of the users feed, and this would come through during A/B Testing and feedback - at this point we may want to change the objective function we're solving for
+Sometimes, solving for new video views will mean pushing click-bait to the top of the users feed, and this would come through during A/B Testing and feedback - at this point you may want to change the objective function we're solving for

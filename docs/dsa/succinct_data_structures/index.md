@@ -40,7 +40,7 @@ Rank / Select could be tracked with another "helper" data structure
     select  = [0, 5, 10, 11, 14]
 ```
 
-Then, for any letter, we can find:
+Then, for any letter, you can find:
 - What substring it's apart of via `rank(idx)`
 - Get the start of that substring, or any adjacent substrings via `select(rank(idx))`
 
@@ -51,16 +51,16 @@ Then, for any letter, we can find:
 
 
 - Q: Why is this compact? 
-    - A: For normal rank/select vectors we'd use a bit vector as long as the string, with just these small constant arrays (rank and select, not `s_split`) we don't need all of this extra data
+    - A: For normal rank/select vectors we'd use a bit vector as long as the string, with just these small constant arrays (rank and select, not `s_split`) you don't need all of this extra data
     - A common approach is to store rank samples every fixed number of bits, like every 64 bits, plus a smaller lookup table
-    - For a string that's 1MB long, or $1,024 * 1,024 \approx 1,000,000$ bytes, then we would need to store 
+    - For a string that's 1MB long, or $1,024 * 1,024 \approx 1,000,000$ bytes, then you would need to store 
     A common approach is to store rank samples every fixed number of bits (say, every 64 or 512 bits), plus smaller lookup tables for the bits in between.
         - For example, if you store a 32-bit integer (4 bytes) for every 256 bits (32 bytes) of the original bit vector:
         - $8,000,000$ bits / $256$ = $31,250$ samples
         - $31,250$ samples × $4$ bytes = $125,000$ bytes ≈ 122 KB
         - Add some extra for lookup tables and select structures, and you get ~128 KB.
     - This then gets into usage of sparse arrays for storage of rank / select
-        - In a dense vector we store a bit for every possible other bit
+        - In a dense vector you store a bit for every possible other bit
         - Most of these bits are 0 (sparse)!
         - Sparse rank / select data structures only store the positions of the set bits (1's) - not the entire thing
 
@@ -81,7 +81,7 @@ Let's you store text in a compact way with important query operations:
 #### Balanced Parentheses
 Using Rank / Select can help us with the following
 
-Programming languages and encodings typically have many hierarchies of parent / children. Here we desire to navigate tree's of these relationships in an efficient way
+Programming languages and encodings typically have many hierarchies of parent / children. Here you desire to navigate tree's of these relationships in an efficient way
 
 JSON, XML, AST's of function calls, etc... all have some relationship like this that we'd desire to query and work with
 

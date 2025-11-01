@@ -7,7 +7,7 @@ public:
             max_sub += n;
             max_all = max(max_all, max_sub);
             // If the subarray is negative there's no use for it
-            //      and so we reset it to 0
+            //      and so you reset it to 0
             max_sub = max(max_sub, 0);
         }
         return max_all;

@@ -9,14 +9,14 @@ show_back_link: true
 In this dynamic programming problem, you'd start filling up the list from the back to the front, and along the way you'd just need to find the last max value where the number was greater than your current number
 
 `[10,9,2,5,3,7,101,18]`
-- At number 7 we can choose either 101 or 18, our longest subsequence is then 2
+- At number 7 you can choose either 101 or 18, our longest subsequence is then 2
     - `dp = [1, 1, 1, 1, 1, 2, 1, 1]`
-- At spot 3 we can choose 7, 101, or 18
+- At spot 3 you can choose 7, 101, or 18
     - Max is at spot 7
     - `dp = [1, 1, 1, 1, 3, 2, 1, 1]`
 - 5 is same logic as 3
     - `dp = [1, 1, 1, 3, 3, 2, 1, 1]`
-- So on and so forth until we get back to the front, and then we just find the `max(dp)` which will give us our longst subsequence
+- So on and so forth until you get back to the front, and then you just find the `max(dp)` which will give us our longst subsequence
 ```python
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:
@@ -33,24 +33,24 @@ class Solution:
 ```
 
 ## Binary Search
-There's a way to improve this with binary search, which is completely screwed up - for this we need to realize there's a way to get the increasing subsequence intelligently
+There's a way to improve this with binary search, which is completely screwed up - for this you need to realize there's a way to get the increasing subsequence intelligently
 
 `nums = [8, 1, 6, 2, 3, 10]`
 - `sub = [8]`
 - `sub = [1]`
     - This is where the `while num > sub[i]:` comes in
-    - 1 is not greater than 8, so we replace 8 with 1
+    - 1 is not greater than 8, so you replace 8 with 1
 - `sub = [1, 6]`
 - `sub = [1, 2]`
-    - We see how this is greedy now, we will just take a smaller number for our subsequence if we can find it
+    - you see how this is greedy now, you will just take a smaller number for our subsequence if you can find it
 - `sub = [1, 2, 3]`
-    - If we kept 6, we couldn't have used 3
+    - If you kept 6, you couldn't have used 3
 - `sub = [1, 2, 3, 10]`
 - `resp = 4`
 
-This will perform a linear scan through the subsequence if we cannot immediately append the number, and when doing so ***replace the first number larger than our current number***
+This will perform a linear scan through the subsequence if you cannot immediately append the number, and when doing so ***replace the first number larger than our current number***
 
-This should be where we notice we can use binary search, instead of doing a linear scan to find the first lower bound value, we can use [Lower Bound First X Binary Search](/docs/dsa/6.%20binary%20search/index.md#lower-bound-first-valid-x)
+This should be where you notice you can use binary search, instead of doing a linear scan to find the first lower bound value, you can use [Lower Bound First X Binary Search](/docs/dsa/6.%20binary%20search/index.md#lower-bound-first-valid-x)
 ```python
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:

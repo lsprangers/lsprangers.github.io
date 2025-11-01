@@ -9,7 +9,7 @@ description: Discussion around Dynamo Databases Storage
 # DyanmoDB
 Dynamo DB is a serverless NoSQL Database for AWS, and is their defacto NoSQL solution
 
-We use partition keys / primary keys to help it scale out and shard data, similar to what we showed in our [Distributed KV Store](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md) 
+you use partition keys / primary keys to help it scale out and shard data, similar to what you showed in our [Distributed KV Store](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md) 
 
 Each value in this key-value database it simply an ***Item***, where the Item is usually a JSON object, and each Item can have many Attributes
 

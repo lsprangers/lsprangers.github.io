@@ -77,7 +77,7 @@ CodePipeline and GitHub have some integrations as well, usually use GitHub WebHo
     - Running marketing campaigns by sending marketing, bulk, or transactional SMS messages
 
 - How to use this compared to SNS vs SES?
-    - SNS and SES we must manage all end users and content
+    - SNS and SES you must manage all end users and content
     - Pinpoing allows us to do templating, delivery schedules, targeted segments, etc so it's just a specific implementation on top of these tools
 
 ### EC2 Image Builder

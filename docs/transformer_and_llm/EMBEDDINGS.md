@@ -8,13 +8,13 @@ show_back_link: true
 ---
 
 ## Embeddings
-Embeddings are dense vector representations of objects - typically we use them for Documents, Queries, Users, Context, or Items...but they can really be used to represent ***anything***
+Embeddings are dense vector representations of objects - typically you use them for Documents, Queries, Users, Context, or Items...but they can really be used to represent ***anything***
 
 ### History
 - In the past there have been many ways of creating embeddings
 - ***Encoders*** 
-    - ***One Hot Encoding***: When we would replace categorical variables with vectors of sparse 0's and a single 1 representing the category
-    - ***Binary Encoders***: Converts categorical variables into binary code - similar to One Hot Encoding, except we basically pick an ID that incrementally increases for new categories
+    - ***One Hot Encoding***: When you would replace categorical variables with vectors of sparse 0's and a single 1 representing the category
+    - ***Binary Encoders***: Converts categorical variables into binary code - similar to One Hot Encoding, except you basically pick an ID that incrementally increases for new categories
 - ***[Collaborative Filtering](#user-item-collaborative-filtering)*** is discussed later on
 - Word2Vec
 - Doc2Vec
@@ -30,15 +30,15 @@ With a dictionary of words it's hard to think about the best way to set up these
 ![One Hot Encoding](/img/ohencoding.png)
 
 
-- ***One-Hot Encoding*** represents orthonormal basis of vectors, and typically is useful for categorical variables but becomes infeasible if we try to use it for text features
-- ***Label Encoding*** is similar to One-Hot Encoding, except we use an incremental ID for each of the categories
+- ***One-Hot Encoding*** represents orthonormal basis of vectors, and typically is useful for categorical variables but becomes infeasible if you try to use it for text features
+- ***Label Encoding*** is similar to One-Hot Encoding, except you use an incremental ID for each of the categories
 
 #### Pitfalls
 Common pitfalls associated with these categorical embeddings is that:
 - They create humongous vector spaces of orthogonally independent vectors
     - Essentially each vector is a different basis vector at this point
     - This eventually results in the common ***curse of dimensionality*** issue 
-- Having these sparse, orthogonal vectors means we cannot generalize easily
+- Having these sparse, orthogonal vectors means you cannot generalize easily
     - There's no good way to generally compare words for similarities, as you cannot comapare `[1,0]` to `[0,1]` in a general fashion over millions of vectors
 
 Therefore, these sorts of categorical embeddings can be made better by use of dense embeddings over a smaller overall dimensional space (i.e. less dimensions, with more information "squished" into each dimension)
@@ -72,7 +72,7 @@ Text embeddings can be seen as a static form of transfer learning, where models 
 - [Word2Vec](#word2vec) was one of the original ideas for text embeddings - it essentially acts as an autoencoder to create ***static embeddings*** for each word in a dictionary
 - [BERT](./BERT.md#bert) on the other hand, through [attention](./ATTENTION.md#attention), can create ***contextual*** embeddings for words, sentences, and entire documents
 - [GPT](#gpt-3) is an autoregressive transformer model in the same transformer "family" as [BERT](./BERT.md#bert), but it is ***unidirectional*** where BERT is ***bidirectional*** (which is constantly repeated in the paper)
-    - GPT is good for text-to-text tasks like question answering, but like BERT we can pull from the middle hidden layers during it's self-attention steps to find word embeddings
+    - GPT is good for text-to-text tasks like question answering, but like BERT you can pull from the middle hidden layers during it's self-attention steps to find word embeddings
 
 ***Word Embeddings*** made it possible and allowed developers to encode words as dense vectors that capture underlying semantic content - `King - Man + Woman = Queen`. Similar words were embedded close to each other in lower dimensional feature spaces, and allowed for geometrical operations.
 
@@ -83,7 +83,7 @@ These examples have even been shown to hold across languages, where youc can map
 ![Language Embedding Mapping](/img/language_embedding_mapping.png)
 
 ### Word2Vec
-As we said above Word2Vec is essentially a static lookup of words to embeddings, and so ***Word2Vec is an embedding model***
+As you said above Word2Vec is essentially a static lookup of words to embeddings, and so ***Word2Vec is an embedding model***
 
 - Parameters:
     - $N$ is context window size (input size)
@@ -92,12 +92,12 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - $i$ is the current target word
 
 #### Training and Output
-- Word2Vec will use context words to help model a current word $w_i$ - this modeling is done without context (meaning position of other words is irrelevant) and we use words in the past and future
+- Word2Vec will use context words to help model a current word $w_i$ - this modeling is done without context (meaning position of other words is irrelevant) and you use words in the past and future
     - When everything is finished, the weights of the shallow network are the actual embeddings themselves!
     - There are 2 types of training tasks:
-        - ***Continuous Bag of Words*** where we use the context words $w_{i-N//2,i+N//2}$ as input and try to predict the current word $w_i$
-            - Basically we divide context window in half in front and behind current word
-        - ***Skip Gram*** is where we use the current word $w_i$ as input to predict each one of the context words $w_{i-N//2,i+N//2}$
+        - ***Continuous Bag of Words*** where you use the context words $w_{i-N//2,i+N//2}$ as input and try to predict the current word $w_i$
+            - Basically you divide context window in half in front and behind current word
+        - ***Skip Gram*** is where you use the current word $w_i$ as input to predict each one of the context words $w_{i-N//2,i+N//2}$
     - This allows us to have a static embedding representation of words
 - Take the final projection layer of size $V \times D$ and ***this is your word embedding matrix***
 
@@ -106,7 +106,7 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
     - Overall the Time Complexity will be around the order of $N \times D + D \times V$ which gets reduced to $N \times D + D \times log_2(V)$ with hierarchical softmax
         - First layer of $N \times D$ comes from taking $N$ local One-Hot Encoded Vectors, all of size $V$ and performing some calculations to get them to $N$ instances of size $D$ which is the size of our embedding
 - Optimizations to training 
-    - ***Negative Sampling*** where we pull a small number of negative examples along with the correct contextual examples
+    - ***Negative Sampling*** where you pull a small number of negative examples along with the correct contextual examples
     - ***Sub Sampling*** is similar to Negative Sampling TODO
     - ***Hierarchical Softmax*** TODO
         - Hierarchical Softmax allows us to only use $log_2(V)$ memory and somehow time complexity in the last layer? Idrk - TODO
@@ -131,33 +131,33 @@ As we said above Word2Vec is essentially a static lookup of words to embeddings,
 - The current word is sent through a `log-linear classifier` into a continuous projection layer, and then they projection layer is used to predict the best potential context words
     - ***This still! means there is no context involved, and that the surrounding words are simply predicted without specifying placement***
 - ***Training Objective:*** Predict some $C : C \leq N$ surrounding context words from the current word, and then pick, randomly, $C$ words from the $N$ context words
-    - Since more distant words *are most likely more unrelated* to the current word, we reduce computational complexity by sampling from those words less frequently
+    - Since more distant words *are most likely more unrelated* to the current word, you reduce computational complexity by sampling from those words less frequently
     - There's no other way to give less weight to other "far away" words other than sampling them less and updating weights less often based on them
 - ***Time Complexity:*** Would be $TC = C \times D + C \times D \times log_2(V) === C \times (D + D \times log_2(V))$ 
-    - For each of the $C$ words we need to take our input word $w_i$, do $D$ multiplcations to get it into projection layer, and then go from our projection layer into our sized $V$ vocabulary to try and predict $w_c$
+    - For each of the $C$ words you need to take our input word $w_i$, do $D$ multiplcations to get it into projection layer, and then go from our projection layer into our sized $V$ vocabulary to try and predict $w_c$
 - ![Skip-Gram Architecture](./images/skipgram.png)
 
 #### Evaluation of Model
 - In the past the main way to do this was to just show tables of words with their corresponding Top-K most similar other words, and intuitively check
 - In the Word2Vec Paper they checked over relationships such as *"What is the word that is similar to small in the same sense as bigger is to big"*
     - Ideally this would produce *smaller*
-- This can be done with algebraic operations! `vector(big) - vector(bigger) + vector(small)` would give us that sort of output, and then we just find the closest vector via Cosine Distance
+- This can be done with algebraic operations! `vector(big) - vector(bigger) + vector(small)` would give us that sort of output, and then you just find the closest vector via Cosine Distance
 - There are other relationships to test such as *France is to Paris as Germany is to Berlin*
 
 TODO: Is below correct? Semantic vs Syntactic...Semantic is "underlying meaning of words" and syntactic is "placement of word"?
 - ***Skip Gram performed better on semantic objectives***, which isn't surprising seeing as it's entirely focused on structuring a word to best represent what other words would be around it, so `America` and `United States` should be similar
-- ***Bag of Words performed better on syntactic objectives*** showing how the CBOW model is better at syntax modeling where we could alter the sentence *The quick brown fox jumped over the lazy river* to *Over the lazy river the quick brown fox had jumped*
+- ***Bag of Words performed better on syntactic objectives*** showing how the CBOW model is better at syntax modeling where you could alter the sentence *The quick brown fox jumped over the lazy river* to *Over the lazy river the quick brown fox had jumped*
 
 ### BERT
-[BERT](./BERT.md#bert) architecture, training, and fine tuning is descirbed in another page, but given all of that is read through we discuss below how to get useful embeddings out of BERT!
+[BERT](./BERT.md#bert) architecture, training, and fine tuning is descirbed in another page, but given all of that is read through you discuss below how to get useful embeddings out of BERT!
 
-Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it through multiple Encoders, and would send it through an output layer at the end - this output layer tyipcally isn't useful by itself for Word Embeddings, so we would need to go back through the hidden state values and aggregate these in some way to produce Word, Sentence, or Document embeddings
+Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it through multiple Encoders, and would send it through an output layer at the end - this output layer tyipcally isn't useful by itself for Word Embeddings, so you would need to go back through the hidden state values and aggregate these in some way to produce Word, Sentence, or Document embeddings
 
 #### BERT Word Embeddings
 - [Another reference link](https://mccormickml.com/2019/05/14/BERT-word-embeddings-tutorial/#history)
 - Most use cases of word embeddings can come straight out of a pre-trained core BERT model
-- We could send a single word through and it would most likely just be a representation of the WordPiece Embedding layer at the start
-- If we send multiple words through (a sentence) then we could try and reconstruct each individual words new embedding that was altered from the self-attention layers
+- you could send a single word through and it would most likely just be a representation of the WordPiece Embedding layer at the start
+- If you send multiple words through (a sentence) then you could try and reconstruct each individual words new embedding that was altered from the self-attention layers
     - `bank` in the sentence `the large and sandy river bank` will be attended to, and ultimately different, from `the countries central bank` because it's surrounding context words are different!
     - Typically you would send through the sentence and then pull back each $T_i$, or some mixture of $H_{a, b}$ hidden states, for each $w_i$ and that would represent your finalized word embedding that was attended to / altered from contextual self-attention!
 - ![BERT Word Embeddings](./images/bert_word_embed.png)
@@ -167,10 +167,10 @@ Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it 
 - Tokenize our sentence input into Word Pieces
     - Will have some words get split into tokens like `embeddings -> [em, ###bed, ###ding, ###s]`
 - Load the pre-trained BERT model
-    - Set the model to `eval()` mode since we do not want to go through updating the base models weights for inference time
+    - Set the model to `eval()` mode since you do not want to go through updating the base models weights for inference time
 - Get the token ID's for each of these tokens from the pre-trained BERT state file
 - Create a segement embedding (can just be repeated 0's and 1's of same size as token embeddings) which represent what sentence these tokens are apart of
-    - In this scenario to embed one sentence we will most likely just have all 0's in our segment embedding
+    - In this scenario to embed one sentence you will most likely just have all 0's in our segment embedding
 - Pass the token and segment tensors through the BERT model
 - It will output all of it's hidden layers - these include multiple dimensions:
     - The layer number (13 layers)
@@ -180,9 +180,9 @@ Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it 
     - The word / token number (22 tokens in our sentence)
     - The hidden unit / feature number (768 features)
 - Most people permute this output to get it in the order of `[# tokens, # layers, # features]`
-    - From this we have 13 separate vectors of size 768 for each token $w_i$
-- Once this is done we can just directly `SUM`, `CONCAT`, `AVG`, etc...some mixture of hidden layers together to get our final word embedding
-- TODO: Why do the hidden states represent the word embeddings? These don't get updated for our words right? If we model an entire corpus why would sending `0, 1000, 4500` through as a list of token ID's give us any sort of information? If I send through `0, 1001, 4500` are things that different even though I might be discussing a completely different word?
+    - From this you have 13 separate vectors of size 768 for each token $w_i$
+- Once this is done you can just directly `SUM`, `CONCAT`, `AVG`, etc...some mixture of hidden layers together to get our final word embedding
+- TODO: Why do the hidden states represent the word embeddings? These don't get updated for our words right? If you model an entire corpus why would sending `0, 1000, 4500` through as a list of token ID's give us any sort of information? If I send through `0, 1001, 4500` are things that different even though I might be discussing a completely different word?
 - TODO: What do the hidden layers of a BERT model represent? They're optimized parameters for language modeling...how does that relate to word embeddings?
 
 Why does this work?
@@ -195,8 +195,8 @@ Why does this work?
 - Taking the above example, the typical way to get sentence embeddings is to `SUM` or `AVG` the second to last hidden state for each token in the sentence to achieve a sentence embedding
 
 ## User Embeddings
-TODO: Outside of collab filtering, how do we get user embeddings?
-TLDR; How do we get meaningful representations of users?
+TODO: Outside of collab filtering, how do you get user embeddings?
+TLDR; How do you get meaningful representations of users?
 
 ## Embeddings vs Autoencoder vs Variational Autoencoder
 
@@ -297,7 +297,7 @@ Vector similarities are useful for comparing our final embeddings to others in s
 
 None of the below are actually useful in real life, as computing these for Top K is very inefficient - approximate Top K algorithms like Branch-and-Bound, Locality Sensitive Hashing, and FAISS clustering are used instead
 
-[We discuss all of that here](/docs/design_systems/search_system/index.md#knn)
+[you discuss all of that here](/docs/design_systems/search_system/index.md#knn)
 
 ### Quantization
 Quantization
@@ -325,7 +325,7 @@ $\text{cosine similarity}(A, B) = \frac{A \cdot B}{|A| |B|}$
 - Where
     - $( A \cdot B )$ is the dot product of vectors $( A )$ and $( B )$.
     - $( |A| )$ and $( |B| )$ are the magnitudes (or Euclidean norms) of vectors $( A )$ and $( B )$
-        - Therefore, magnitude has no effect on our measurement, and we only check angle between vectors
+        - Therefore, magnitude has no effect on our measurement, and you only check angle between vectors
 - Cosine similarity ranges from $[-1, 1]$ where:
     - 1 indicates they're overlapping and pointing in the exact same direction
     - 0 indicates they're fully orthonormal (right angle) with 0 overlap over any dimensions
@@ -337,7 +337,7 @@ The Dot product is similar to the Cosine product, except it doens't ignore the m
 
 $dot(a, b) = \sum_{i=1}^v a_ib_i = {|A| |B|}cosine(a,b)$ 
 
-Which basically means we just compare each item over each dimension. If $a, b$ are normalized then Dot is equivalent to Cosine
+Which basically means you just compare each item over each dimension. If $a, b$ are normalized then Dot is equivalent to Cosine
 
 ### Euclidean
 This is the typical distance in euclidean space
@@ -349,29 +349,29 @@ Here magnitude matters, and a smaller distance between vector end-points means a
 ## Topological Interpretations
 Most of this comes from [Yuan Meng Embeddings Post](https://www.yuan-meng.com/posts/ebr/)
 
-There we see discussions of how embeddings, topologically, can be considered a injective one-to-one mapping that preserves properties of both metric spaces
+There you see discussions of how embeddings, topologically, can be considered a injective one-to-one mapping that preserves properties of both metric spaces
 
-We can also see that from a ML lense, embeddings represent dense numeric features in n-dimensional space
+you can also see that from a ML lense, embeddings represent dense numeric features in n-dimensional space
 - Images can go to `3 colors x 256 pixels` dimension using photo represenation on disk (this is just how photos are stored)
 - Text can go from sentences to `256 dimension` vectors in Word2Vec or BERT
-- Text can go from address sentences to `[lat, long]` 2 dimensions - we cover this in [Address Embeddings](/docs/other_concepts/ADDRESS_EMBEDDING_GEOCODING.md)
+- Text can go from address sentences to `[lat, long]` 2 dimensions - you cover this in [Address Embeddings](/docs/other_concepts/ADDRESS_EMBEDDING_GEOCODING.md)
 
 The main point of all of this is that Embeddings equate to &rarr; topological properties are preserved - that's what allows the famous `King - man + woman = Queen` and `France is to Paris as Germany is to Berlin`
 
 ***A random list of numbers is a numeric representation, but they are not Embeddings***
 
-One-hot encoding, kindof, preserves topolological properties, but all of the vectors end up being orthogonal to each other so we can't say category1 + category2 = 0.5category3...they're orthogonal! Typically we need to map these from OHE metric space to a lower dimensional metric space to get those properties out of it
+One-hot encoding, kindof, preserves topolological properties, but all of the vectors end up being orthogonal to each other so you can't say category1 + category2 = 0.5category3...they're orthogonal! Typically you need to map these from OHE metric space to a lower dimensional metric space to get those properties out of it
 
 ![Yuan Meng Example](./images/yuan_meng_example.png)
 
 ## Dual Encoder
 Much of the discussion below this point stems from [this Multimodal Blog](https://slds-lmu.github.io/seminar_multimodal_dl/c02-00-multimodal.html)
 
-Dual encoders have a number of different use cases and interpretations - there's using multiple encoders that end up in similar embedding spaces so we can do comparisons - this is helpful in RAG or query-document comparisons
+Dual encoders have a number of different use cases and interpretations - there's using multiple encoders that end up in similar embedding spaces so you can do comparisons - this is helpful in RAG or query-document comparisons
 
-There are other encoder architectures that focus on different modalities so that we can compare text to images to audio
+There are other encoder architectures that focus on different modalities so that you can compare text to images to audio
 
-At the end of the day, all of these architectures are designed so we can do dot-product similarity searches in an embedding space
+At the end of the day, all of these architectures are designed so you can do dot-product similarity searches in an embedding space
 
 ### Query Document Retrieval
 A dual encoder consists of two separate neural networks that encode two different sets of data into their respective embeddings
@@ -387,13 +387,13 @@ At the end of all of these, the two inputs are transformed into embedding space(
 #### Two Tower Architecture
 During training in something like Question-Answer, you would encode each of them separately and then train to maximize the similarity between the two, and minimize the similarity between others
 
-This can utilize a [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) approach if there's a way to create augmentions, or if we use n-pair loss, or simply using Cross-Entropy Loss over entire dataset can work too
+This can utilize a [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) approach if there's a way to create augmentions, or if you use n-pair loss, or simply using Cross-Entropy Loss over entire dataset can work too
 
 In examples online it mostly utilizes Cross-Entropy Loss over entire answer dataset
 
-***Two Towers is useful so we can pre-compute candidates and do fast ANN lookup during inference***. It also helps solve some modality issues, but that's also covered later in [Fusion](#introduction-to-fusion)
+***Two Towers is useful so you can pre-compute candidates and do fast ANN lookup during inference***. It also helps solve some modality issues, but that's also covered later in [Fusion](#introduction-to-fusion)
 
-During ***Inference and Serving***, all we have to do is calculate embedding for an incoming query and it allows us to quickly find ANN neighbors in an index and return the top K to the client. All document embeddings can be pre-computed, so we only have 1/2 of compute need during inference
+During ***Inference and Serving***, all you have to do is calculate embedding for an incoming query and it allows us to quickly find ANN neighbors in an index and return the top K to the client. All document embeddings can be pre-computed, so you only have 1/2 of compute need during inference
 -  Run a batch prediction job with a trained candidate tower to precompute embedding vectors for all candidates, attach NVIDIA GPU to accelerate computation
 -  Compress precomputed candidate embeddings to an ANN index optimized for low-latency retrieval; deploy index to an endpoint for serving
 -  Deploy trained query tower to an endpoint for converting queries to embeddings in real time, attach NVIDIA GPU to accelerate computation
@@ -402,13 +402,13 @@ Google came up with a novel compression algorithm that allows for better relevan
 - Distributed search tree for hierarchically organizing the embedding space. Each level of this tree is a clustering of the nodes at the next level down, where the final leaf-level is a clustering of our candidate embedding vectors
 - Asymmetric hashing (AH) for fast dot product approximation algorithm used to score similarity between a query vector and the search tree nodes
 
-These architectures also allow us to address cold start problems since we can put through user features or generic default features to pull popular candidates
+These architectures also allow us to address cold start problems since you can put through user features or generic default features to pull popular candidates
 
 
 ### Multimodal Retrieval
 Multimodal retrieval can be viewed as a specific implementation of [Two Tower](#two-tower-architecture), where towers have different modalities - one may be a text query, and the candidates may be audio tracks
 
-We can also use [Fusion](#introduction-to-fusion) in our towers here so that whether it's a text or audio input we can use it and compare to image candidates for ANN lookup
+you can also use [Fusion](#introduction-to-fusion) in our towers here so that whether it's a text or audio input you can use it and compare to image candidates for ANN lookup
 
 #### Image2Text
 This model focuses on image captioning or overall providing descriptive text for given images
@@ -435,7 +435,7 @@ The contrastive goal is to correctly predict which natural language text pertain
 ### Introduction to Fusion
 Fusion involves combining multiple modalities into single models / architectures to aid in [multimodal retrieval](#multimodal-retrieval) 
 
-It allows us to bypass model-per-modality - while this sounds like it can rid of two towers that's beside the point. ***Two Towers is useful so we can pre-compute candidates and do fast ANN lookup during inference***
+It allows us to bypass model-per-modality - while this sounds like it can rid of two towers that's beside the point. ***Two Towers is useful so you can pre-compute candidates and do fast ANN lookup during inference***
 
 How to integrate multiple modalities? On one side of the spectrum, textual elements and visual ones are learned separately and then “combined” afterwards (left), whereas on the other side, the learning of textual and visual features takes place simultaneously/jointly (right)
 
@@ -443,5 +443,5 @@ How to integrate multiple modalities? On one side of the spectrum, textual eleme
 
 The ultimate goal, that seems to have been achieved, is to move away from model-per-modality and focus on robust foundational models that can incorporate all types of modalities while allowing them to attend to each other
 
-Some of the earliest movers were Data2Vec, Flamingo, and Vilbert - Data2Vec, for example, was to predict latent representations of full input data based on a masked view of the input in a self distillation step. We can see the parallels here between Transformers, Contrastive Learning, and Multimodality
+Some of the earliest movers were Data2Vec, Flamingo, and Vilbert - Data2Vec, for example, was to predict latent representations of full input data based on a masked view of the input in a self distillation step. you can see the parallels here between Transformers, Contrastive Learning, and Multimodality
 

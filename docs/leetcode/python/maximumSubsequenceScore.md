@@ -7,9 +7,9 @@ show_back_link: true
 
 # maximumSubsequenceScore
 
-The reason we can't use bactracking is that it'll find all ${n \choose k} = {{n!} \over {k!} \cdot {(n-k)!}}$
+The reason you can't use bactracking is that it'll find all ${n \choose k} = {{n!} \over {k!} \cdot {(n-k)!}}$
 
-The one major restriction here is if we choose some index $k$ for our `nums2` minimum, all we have to do is find the 2 largest values in `[0, k-1]`, so we can instead use a min-heap for this
+The one major restriction here is if you choose some index $k$ for our `nums2` minimum, all you have to do is find the 2 largest values in `[0, k-1]`, so you can instead use a min-heap for this
 
 ## TLE - Backtracking
 ```python
@@ -21,7 +21,7 @@ class Solution:
     def maxScore(self, nums1: List[int], nums2: List[int], k: int) -> int:
         # Solutions:
         #   - Permutations, and checking for each permutation of size
-        #       - TLE! We explore all (n choose k) which "explodes"
+        #       - TLE! you explore all (n choose k) which "explodes"
         #   - Maybe some weird DP problem, but state transition isn't clear
         #   - Some weird window problem, but lots of "ifs"
         #   - A greedy problem, but there are edge cases where it fails
@@ -59,7 +59,7 @@ class Solution:
     def maxScore(self, nums1: List[int], nums2: List[int], k: int) -> int:
         # Solutions:
         #   - Permutations, and checking for each permutation of size
-        #       - TLE! We explore all (n choose k) which "explodes"
+        #       - TLE! you explore all (n choose k) which "explodes"
         #   - Maybe some weird DP problem, but state transition isn't clear
         #   - Some weird window problem, but lots of "ifs"
         #   - A greedy problem, but there are edge cases where it fails

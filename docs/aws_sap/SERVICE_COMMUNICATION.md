@@ -99,9 +99,9 @@ To be honest idk why these are included in here
     - Can set `MaximumReceives` threshold which would place message, for later processing, into DLQ
     - Used for debugging
     - DLQ of FIFO is FIFO, of Standard is Standard
-    - Retention policy for DLQ we can set
+    - Retention policy for DLQ you can set
     - ***Redrive to Source***
-        - After manual inspection of messages the Redrive to Source Feature would allow us to update our Consumer and roll it out live, i.e. update ECS definition and redeploy it, and then once it is fixed and able to handle the message we can Redrive the DLQ to Source queue and the consumer would process it as a normal message
+        - After manual inspection of messages the Redrive to Source Feature would allow us to update our Consumer and roll it out live, i.e. update ECS definition and redeploy it, and then once it is fixed and able to handle the message you can Redrive the DLQ to Source queue and the consumer would process it as a normal message
         - Basically allows us to push DLQ back to Source after we've debugged it
     - ***Idempotency***
         - Timeouts and failures mean there's always a chance a message is double processed
@@ -174,7 +174,7 @@ To be honest idk why these are included in here
         - Broadcasting events, fan-out, notification systems.
 
 ## SNS
-- What if we want many receivers for 1 message?
+- What if you want many receivers for 1 message?
     - Many queue's where producer puts to all of them
 - SNS is a Pub/Sub solution that allows
     - Producer (Publisher) writes to topic
@@ -230,16 +230,16 @@ To be honest idk why these are included in here
     - Each SQS producer is a subscriber to that SNS topic
 - Allows multiple services to read from another service with delayed processing
     - Use Cases:
-        - This works well for S3 Events, because for the same combination of Event Type (ObjectCreate) and prefix (images/) we can only have 1 single S3 Event Rule
+        - This works well for S3 Events, because for the same combination of Event Type (ObjectCreate) and prefix (images/) you can only have 1 single S3 Event Rule
         - SNS to S3 via Kinesis Data Firehose
             - This one seems like overkill...
     - ***Example:***
         - Shipping Service is fast and means an update to our shipping database for a new order
         - Fraud Service is slow, depends on 3rd party risk provider API calls
         - Buying Service needs to relay a new purchase to both services
-        - If we only use SNS and make the 2 services subscribers, the Fraud service may become overwhelmed even though our Shipping Service is fine
-        - We can use a queue for each of them, but we don't want to force the Buying service to need to update it's application code every time there's another downstream service / worker
-        - Therefore, we can use ![FanOut pattern](./images/fanout_pattern.png)
+        - If you only use SNS and make the 2 services subscribers, the Fraud service may become overwhelmed even though our Shipping Service is fine
+        - you can use a queue for each of them, but you don't want to force the Buying service to need to update it's application code every time there's another downstream service / worker
+        - Therefore, you can use ![FanOut pattern](./images/fanout_pattern.png)
 - What this gives us:
     - Push once for producer
     - Fan out to multiple subscribers
@@ -268,7 +268,7 @@ To be honest idk why these are included in here
 - Only HTTP(S) supports custom policies
     - Don't want SNS to DOS attack your backend though
 - SNS Dead Letter Queue
-    - Messages that haven't been delivered will get discarded unless we specify a DLQ
+    - Messages that haven't been delivered will get discarded unless you specify a DLQ
     - DLQ are SQS queue's or FIFO queue's
     - DLQ are attached to a ***subscription, not a topic***
 
@@ -277,7 +277,7 @@ To be honest idk why these are included in here
     - Answer: Originally thought SQS FIFO because of this section, but 10k orders per second is too much for SQS FIFO
         - Even at max it is "3k messages / second with batching", so this doesn't work
         - Also at this scale it is probably something with streaming
-    - Answer was Kinesis Data Streams where we can order by `customer_id` by partitioning the input by `customer_id`
+    - Answer was Kinesis Data Streams where you can order by `customer_id` by partitioning the input by `customer_id`
         - Kinesis Data Streams:
             - ***IS NOT*** a processing engine, you do not write Flink style code on it
             - ***IS*** similar to Kafka where data is streamed in and durably held for consumers to pull on topics based on offsets

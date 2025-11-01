@@ -8,7 +8,7 @@ show_back_link: true
 ---
 
 ## Output Layers
-The final output layers of our models typically go hand-in-hand with the [Loss Functions](#loss-functions) that we use
+The final output layers of our models typically go hand-in-hand with the [Loss Functions](#loss-functions) that you use
 
 ### Regression
 Regression output layers are used when the task is to predict continuous values
@@ -26,7 +26,7 @@ Regression output layers are used when the task is to predict continuous values
 ### Classification
 Classification output layers are used when the task is to predict discrete labels or categories
 
-Why do we use these output formulas? We want them to be "nice" for derivates and not to have vanishing gradients. They're also fairly intuitive for each of the specific tasks they're used for.
+Why do you use these output formulas? you want them to be "nice" for derivates and not to have vanishing gradients. They're also fairly intuitive for each of the specific tasks they're used for.
 
 #### Sigmoid
 - **Usage**: Binary classification
@@ -39,6 +39,60 @@ Why do we use these output formulas? We want them to be "nice" for derivates and
 - **Formula**: $\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j} e^{x_j}}$
 
 ### Other Types
+
+#### Log Odds, Logit, Logistic, Etc
+Odds are just the probability of success over probability of failure
+$P \over {1 - P}$
+
+Probability and odds are just 2 ways of formalizing the way to view chances, and in some cases like Logistic Regression log-odds are used simply because it's easier than dragging around a bunch of exponentials and logs.
+
+Log-Odds has some useful properties that just make it a useful function similar to Sigmoid and ReLU
+
+##### Logs Refresher
+Logs are an alternative way to express exponents in terms of the **end-result** of applying an exponent to a number - therefore something like $\log_{20}(400)$ means "how many times do you need to multiple 20 by itself until you get 400"
+
+It just gives us the total number of operations needed, but it also takes a multiplicative thing (multiplying by yourself in an exponent) and turns it into additive.
+
+Outside of this, there are properties of logs that enable it to be used as a function that you can "undo" - i.e. if you have some numbers, convert to logs, and use below properties to transform it, you can then undo the log part and get to the expected outcome
+
+- Quotient rule: $\log({M \over N}) = \log(M) - \log(N)$
+- Product rule: $\log({M \cdot N}) = \log(M) + \log(N)$
+- Power rule: $\log({M^N}) = \N \cdot log(M)$
+
+##### Using Logs With Odds
+Logs help to get rid of the non-intuitive nature of odds - mostly around reciprocals, interpretation, and symmetry
+
+If the probability of success of an experiment $P$ is 40%, then 
+- Odds of success would be ${4 \over 6} = .667$
+- Odds of failing are ${6 \over 4} = 1.5$
+
+There isn't any good symmetry between the odds of success and failure, and increasing or decreasing $P$ isn't intiutively going to change the odds in a straightforward way
+
+Logs help to fix that:
+- $\log({4 \over 6}) = \log(4) - \log(6) = -.405$
+- $\log({6 \over 4}) = \log(6) - \log(4) = .405$
+
+Which shows how the symmetrical side of odds now
+
+##### Logit
+Logit formalizes what the log-odds look like for any conceivable set of odds - formally *Logit function maps the probability of an event $P$ to its log-odds*
+
+![Logit](/img/logit_function.png)
+
+The Logit function is the inverse of the standard Logistic Distributions Cumulative Distribution function, aka quantile function of standard logistic distribution
+
+- **Quantile Function**: Maps the probability values for a given distribution to the value of the random variable that would make the below statement true:
+  - The random variable falls at or below $y$ with probability $x$
+- **Cumulative Distribution Function**: The quantile function for any distribution is the inverse of the *Cumulative Distribution Function (CDF)* associated with the distribution. CDF's map the values of a random variable producing the distribution to the probability that makes the following statement below true:
+  - The random variable falls at or below $x$ with probability $y$
+- Therefore, quantile and CDF functions just give a way to view / interrogate a distribution in different ways
+  - Logistic Distribution is a CDF, and the logit is a quantile function
+
+##### Logistic Distributions
+Logistic distributions are good for approximating a process that grows exponentially, but is ultimately capped by some limiting reason. The values grow quickly at first and eventually reach a limit 
+
+![Logistic](/img/logistic_function.png)
+
 
 #### Softmax with Temperature
 - **Usage**: Multi-class classification with control over the confidence of predictions
@@ -58,7 +112,7 @@ Why do we use these output formulas? We want them to be "nice" for derivates and
 Loss functions are the entire heart of model training and tuning 
 
 ### Log-Likelihood / Negative Log-Likelihood
-Log-likelihood is a foundational concept in statistical modeling and machine learning. It measures how probable the observed data is under a given model and set of parameters. In practice, we often use the **negative log-likelihood (NLL)** as a loss function, since minimizing NLL is equivalent to maximizing the likelihood of the data.
+Log-likelihood is a foundational concept in statistical modeling and machine learning. It measures how probable the observed data is under a given model and set of parameters. In practice, you often use the **negative log-likelihood (NLL)** as a loss function, since minimizing NLL is equivalent to maximizing the likelihood of the data.
 
 #### Formula
 $
@@ -164,14 +218,14 @@ Where:
 ### InfoNCE Loss
 InfoNCE loss, or Information Noise-Contrastive Estimation loss is used in ***self-supervised learning***, particularly [Constrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) to train models to learn meaningful representations by distinguishing between positive and negative sample pairs
 
-During self-supervised contrastive learning we take an input data point and augment it with multiple functions to create multiple positive pairs, and then we can compare those with other samples which act as negative pairs
+During self-supervised contrastive learning you take an input data point and augment it with multiple functions to create multiple positive pairs, and then you can compare those with other samples which act as negative pairs
 
 It does this by giving low loss to similar pairs - i.e. by maximizing the similarity between positive pairs, and minimizing the similarity between negative pairs
 
 The key idea / intuition is to treat the learning problem as a binary classifier, where the similarity between instances is measured using a probabilistic approach - similar to [Softmax](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax)
 
 #### Formal Definition
-Given a set $X = \{x_1, x_2, ..., x_N\}$ of $N$ random samples containing one positive sample from $p(x_{t+k} | c_t)$ and $N-1$ negative samples from the 'proposal' distribution $p(x_{t+k})$, we optimize:
+Given a set $X = \{x_1, x_2, ..., x_N\}$ of $N$ random samples containing one positive sample from $p(x_{t+k} | c_t)$ and $N-1$ negative samples from the 'proposal' distribution $p(x_{t+k})$, you optimize:
 
 $
 \mathcal{L}_{\text{InfoNCE}} = -\mathbb{E} \left[ \log \frac{\exp(\text{sim}(z, z^+)/\tau)}{\exp(\text{sim}(z, z^+)/\tau) + \sum_{j=1}^{N-1} \exp(\text{sim}(z, z_j^-)/\tau)} \right]

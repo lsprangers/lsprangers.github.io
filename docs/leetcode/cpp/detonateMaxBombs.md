@@ -30,7 +30,7 @@ public:
         }
 
         int resp = 0;
-        // BFS O(n^2) because we don't restrict already visited between nodes
+        // BFS O(n^2) because you don't restrict already visited between nodes
         for(int bomb_idx = 0; bomb_idx < bombs.size(); bomb_idx++){
             resp = max(resp, bfs(bomb_idx));
         }

@@ -17,7 +17,7 @@ Interpretability is different from accuracy - a model can be accurate without be
 There is a difference between Classic ML Interpretability and Deep Learning (and LLM) Interpretability - Classical ML is *usually* more interpretable, whereas Deep Learning hasn't found a robust framework across large neural nets. 
 
 Typical Methods (mostly in Classical ML):
-- Interpretable by design: Means we train inherently interpretable models such as decision tree's
+- Interpretable by design: Means you train inherently interpretable models such as decision tree's
 - Post-hoc interpretable: Means using a specific interpretability method post training1
     - Model agnostic do not depend on input model
         - Model agnostic methods follow the **SIPA** principle:
@@ -73,7 +73,7 @@ Some typical neural network techniques:
 - **Learned Features**: What features did the neural network learn?
 - **Saliency Maps**: How did each pixel contribute to a particular prediction?
 - **Concepts**: Which concepts did the neural network learn?
-- **Adversarial Examples**: How can we fool the neural network?
+- **Adversarial Examples**: How can you fool the neural network?
 - **Influential Instances**: How influential was a training data point for a given prediction?
 
 
