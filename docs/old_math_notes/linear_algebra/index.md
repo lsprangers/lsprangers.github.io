@@ -58,9 +58,6 @@ Combining this with the [Probability and Statistics](/docs/old_math_notes/probab
     - $\bold{a} \cdot \bold{b} = \sum_{i} \bold{a}_i \cdot \bold{b}_i$
     - This **is** commutative
 - **Identity**: The identity matrix $\textit{I}$ is a square matrix with ones on the diagonal and zeros elsewhere
-    - $\textit{I}_{i, j} = \begin{cases} 1 & \text{if } i = j \\ 0 & \text{if } i \neq j \end{cases}$
-    - Identity matrix has the property that when multiplied by any compatible matrix $\textit{A}$, it returns $\textit{A}$
-    - $\textit{A} \cdot \textit{I} = \textit{A}$
 - **Inverse**: The inverse of a square matrix $\textit{A}$ is another matrix $\textit{A}^{-1}$ such that when multiplied together, they yield the identity matrix
     - $\textit{A}^{-1} \cdot \textit{A} = \textit{I}$
     - Not all matrices have inverses; a matrix must be square and have a non-zero determinant to have an inverse
@@ -95,19 +92,19 @@ In linear algebra the most common way of describing these are using ***basis vec
 Therefore, in the example above, the vector $[1, 2, 3]$ can be expressed as a linear combination of the basis vectors:
 $$[1, 2, 3] = 1 \cdot \hat{i} + 2 \cdot \hat{j} + 3 \cdot \hat{k}$$
 
-Vectors are just scalars that you use to multiply against these common basis vectors - so a good question is how many points in 2D space by using the basis vectors $\hat{i} \text{and} \hat{j}$? The answer is everything!
+Vectors are just scalars that you use to multiply against these common basis vectors - so a good question is: how many points in 2D space can you reach using the basis vectors $\hat{i}$ and $\hat{j}$? The answer is: every point in $\mathbb{R}^2$.
 
 ![VectorScalingDemo](/img/VectorScalingDemo.gif)
 
 You can even use different basis vectors, and there's an inherent relationship between them. For example, in 2D space, you can use $\hat{i}$ and $\hat{j}$ as our basis vectors, but you could also use any other pair of linearly independent vectors - the linear transformation to take either of those to $[1, 2]$ would still hold
 
-If both of our basis vectors end up pointing in the "same direction", they're said to be ***linearly dependent***. This would be something like if you had $\hat{i} [1, 0] \text{and} [2, 0]$ as our basis vectors, then the set of all possible vectors you could reach would only be on the x-axis. At this point you can no longer reach other points "upwards" or "downwards" in the 2D plane - our space is effectively reduced to a line. This is a key concept in linear algebra - the set of points you can reach using linear transformations from our basis vectors is known as the **span** of those vectors.
+If both of our basis vectors end up pointing in the "same direction", they're said to be ***linearly dependent***. This would be something like if you had $\hat{i} [1, 0]$ and $[2, 0]$ as our basis vectors, then the set of all possible vectors you could reach would only be on the x-axis. At this point you can no longer reach other points "upwards" or "downwards" in the 2D plane - our space is effectively reduced to a line. This is a key concept in linear algebra: the set of points you can reach using linear combinations of basis vectors is known as the **span** of those vectors.
 
-Using $\hat{i}$ \text{and} $\hat{j}$, you can reach any point in the 2D plane, as they are linearly independent. However, if you were to use $\hat{i} [1, 0] \text{and} [2, 0]$ as our basis vectors, they would be linearly dependent, and you could only reach points along the line defined by $\hat{i}$. In the former scenario our span is $\mathbb{R}^2$, while in the latter it is just $\mathbb{R}$
+Using $\hat{i}$ and $\hat{j}$, you can reach any point in the 2D plane, as they are linearly independent. However, if you were to use $\hat{i} [1, 0]$ and $[2, 0]$ as our basis vectors, they would be linearly dependent, and you could only reach points along the line defined by $\hat{i}$. In the former scenario our span is $\mathbb{R}^2$, while in the latter it is just $\mathbb{R}$.
 
 So a span is a set of points, specifically the set of all possible linear combinations of a given set of vectors, but vectors can be thought of as individual points - it's a helpful nuance 
 
-The same idea holds in all dimensions - if you have a 3D space, and our basis vectors relate to the 2D basis vectors, our span would be a 2D plane sitting in the 3D space that you can create from those basis vectors. If it's $\hat{i}$ \text{and} $\hat{j}$ it will be the 2D plane on the origin 
+The same idea holds in all dimensions: if you have a 3D space and two independent basis vectors, your span is a 2D plane sitting in the 3D space. If the basis is $\hat{i}$ and $\hat{j}$ it will be the standard $xy$-plane through the origin.
 
 ### Linear Transformations
 Linear Algebra helps us to manipulate matrices, and one of the most important topics / use cases of this are systems of linear transformations
@@ -126,7 +123,7 @@ So knowing this, if you have our output $\bold{v}$ and a Transformation $\textit
 
 This is useful because it allows us to understand how different transformations affect our vector space. Having a matrix $\textit{A}$ and a vector $x$, you can express the linear transformation as $\textit{A}x = b$, where $b$ is the output vector. Alongside that, you can also consider the inverse transformation, which would allow us to map the output vector $b$ back to the input vector $x$. In the grand scheme of things in the real world, the ***matrix represents linear combinations of weights*** and our output vector is our ***weighted sum of inputs / output***. In graphics, ML, analytics, etc you use the matrix as a weight representation constantly, and it's just a way to transform our input vectors
 
-Tracking the transformation of the basis vectors also allows us to track the output of any other vector in our system - if our basis is $\hat{i}$ \text{and} $\hat{j}$, and a random starting vector is $[2, 3]$, you can express it in terms of our basis as $2\hat{i} + 3\hat{j}$. Therefore, if you apply the transformation $\textit{A}$ to this metric space, you just have to track the effects on $\hat{i}$ \text{and} $\hat{j}$, and then you can apply those effects to our starting vector
+Tracking the transformation of the basis vectors also allows us to track the output of any other vector in our system. If our basis is $\hat{i}$ and $\hat{j}$, and a random starting vector is $[2, 3]$, you can express it in terms of our basis as $2\hat{i} + 3\hat{j}$. Therefore, if you apply the transformation $\textit{A}$ to this space, you just have to track the effects on $\hat{i}$ and $\hat{j}$, and then apply those effects to the starting vector.
 
 There's a way to ultimately tell what a matrix transformation is doing to space by looking at the **determinant** of the matrix, which helps to understand how much area or volume is being scaled by the transformation. Formally the determinant calculation is a bit more complex, but the intuition is that it gives you a scalar value that represents how much the transformation scales areas (in 2D) or volumes (in 3D). A determinant of 1 means the area/volume is preserved, greater than 1 means it's expanded, and less than 1 means it's contracted. A determinant of 0 indicates that the transformation collapses the space into a lower dimension (e.g., a plane to a line). Having a non-zero determinant is crucial for ensuring that the transformation is invertible, meaning you can reverse the transformation and recover the original vectors (because no information is lost)
 
@@ -181,8 +178,8 @@ Determinants also have signs for when there is an orientation flip, and a determ
 Given a $2 \times 2$ matrix:
 $$
 A = \begin{bmatrix}
-a & b \\
-c & d
+a \& b \\
+c \& d
 \end{bmatrix}
 $$
 
@@ -244,22 +241,22 @@ For a system of linear equations, and an output $\bold{b}$, there's either:
 - **Diagonal Matrix**: A matrix where all off-diagonal elements are zero. It's written as $\text{diag} (\bold{v})$ where $\bold{v}$ is a vector holding the scalar entries that represent the diagonal. It is represented as:
     $$
     D = \begin{bmatrix}
-    d_1 & 0 & \cdots & 0 \\
-    0 & d_2 & \cdots & 0 \\
-    \vdots & \vdots & \ddots & \vdots \\
-    0 & 0 & \cdots & d_n
-    \end{bmatrix}
+        d_1 \& 0 \& \cdots \& 0 \\
+        0 \& d_2 \& \cdots \& 0 \\
+        \vdots \& \vdots \& \ddots \& \vdots \\
+        0 \& 0 \& \cdots \& d_n
+        \end{bmatrix}
     $$ 
     - These matrices are useful because multiplying them by a vector $\bold{x}$ simply scales each component of $\bold{x}$ by the corresponding diagonal entry which is computationally efficient
     - The inverse is also computationally efficient to compute, as long as none of the diagonal entries are zero - it's simply the reciprocal of each diagonal entry
 - **Symmetric Matrix**: A square matrix that is equal to its transpose, i.e., $\textit{A} = \textit{A}^T$. This means that the elements are mirrored across the main diagonal:
     $$
     A = \begin{bmatrix}
-    a_{11} & a_{12} & \cdots & a_{1n} \\
-    a_{12} & a_{22} & \cdots & a_{2n} \\
-    \vdots & \vdots & \ddots & \vdots \\
-    a_{1n} & a_{2n} & \cdots & a_{nn}
-    \end{bmatrix}
+        a_{11} \& a_{12} \& \cdots \& a_{1n} \\
+        a_{12} \& a_{22} \& \cdots \& a_{2n} \\
+        \vdots \& \vdots \& \ddots \& \vdots \\
+        a_{1n} \& a_{2n} \& \cdots \& a_{nn}
+        \end{bmatrix}
     $$
     - These often come about from functions of two arguments where the order of the arguments doesn't matter, such as distance metrics or covariance matrices
 - **Orthogonal Matrix**: A square matrix $\textit{Q}$ whose columns (and rows) are orthonormal vectors. This means that $\textit{Q}^T \textit{Q} = \textit{Q} \textit{Q}^T = \textit{I}$, where $\textit{I}$ is the identity matrix
@@ -339,9 +336,7 @@ At the end of the day it's an extension of the concept of matrix inversion to a 
 
 ### Trace Operator
 The trace operator is the sum of all the diagonal entries of a matrix - it's a pretty simple operation:
-$$
-\text{tr}(\textit{A}) = \sum_{i} a_{ii}
-$$
+The trace is written inline as $\operatorname{tr}(\textit{A}) = \sum_i a_{ii}$.
 
 It's used in a few different algorithms, but nothing much more to discuss
 
