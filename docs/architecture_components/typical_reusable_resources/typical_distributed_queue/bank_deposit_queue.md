@@ -12,7 +12,7 @@ show_back_link: true
 ## Setup
 - balances: list of ints, 1-indexed
 - requests: list of tuples (action, timestamp, account_id, amount)
-- For a withdraw request, we need to process a cashback amount of 2% exactly 24 hours from the withdraw
+- For a withdraw request, you need to process a cashback amount of 2% exactly 24 hours from the withdraw
 - Timestamps are integer timestamps, may overlap
 
 

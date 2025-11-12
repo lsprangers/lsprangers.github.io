@@ -48,7 +48,7 @@ This section is all around how to deploy and manage code, applications, and mach
         - Instances newly created by ASG will automatically get automated deployment
     - Blue/Green deployment
         - New ASG is created for V2, and new launch templates are used 
-        - CHoose how long we keep old instances
+        - CHoose how long you keep old instances
         - Start routing traffic to V2
         - Requires ELB
         - CodeDeploy will slowly remove old instances and keep new ones
@@ -183,7 +183,7 @@ This section is all around how to deploy and manage code, applications, and mach
         - CloudTrail Log
         - CloudWatch Metrics
         - CloudFormation Stack info
-    - Across all these groups we can use Automation Runbooks via SSM Runbook Automations to resolve the incidents
+    - Across all these groups you can use Automation Runbooks via SSM Runbook Automations to resolve the incidents
     - EventBridge and CloudWatch Alarms can create OpsItem events
     
 ## AWS Cloud Map

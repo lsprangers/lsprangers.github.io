@@ -121,14 +121,14 @@ Basically, when a reader looks for data is uses a snapshot that was current when
 
 Writers create table metadata files optimistically, which means they assume the current version won't be changed before they write their commits. Once a writer has created an unpage, it commits it's known write by swapping tables metadata file pointer from the base to the new version
 
-So if the base snapshot / pointer is no longer current (another write has updated things in meantime), the writer must retry the update using the new current version - this is what we mean by serializable, sequential updates, but they may not be in the exact order each one was executed / committed. There are some well-defined conditions where you can change some metadata and retry, but ultimately you must retry the entire commit from new base pointer.
+So if the base snapshot / pointer is no longer current (another write has updated things in meantime), the writer must retry the update using the new current version - this is what you mean by serializable, sequential updates, but they may not be in the exact order each one was executed / committed. There are some well-defined conditions where you can change some metadata and retry, but ultimately you must retry the entire commit from new base pointer.
 
 Can alter the isolation level by altering the writer's write requirements - serializable isolation isn't strictly enforced. This showcases how a ***writers requirements***, which isn't bottlenecked in by central metadata handler, ***can determine isolation level of the entire system***
 
 #### Sequence Numbers
 Every successful commit receives a sequence number
 
-Therefore, we're able to tell the *relative* age of data and delete files. As a snapshot is created for a commit, it's optimistically assigned the next sequence number and is written to the snapshot's metadata. Basically, we can follow the sequence (serialized) chain of events that optimistically commit via their sequence numbers.
+Therefore, we're able to tell the *relative* age of data and delete files. As a snapshot is created for a commit, it's optimistically assigned the next sequence number and is written to the snapshot's metadata. Basically, you can follow the sequence (serialized) chain of events that optimistically commit via their sequence numbers.
 
 If a commit fails and has to be retried the sequence number is reassigned and written to a new snapshot metadata
 

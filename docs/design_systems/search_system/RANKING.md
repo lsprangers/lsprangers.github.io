@@ -8,9 +8,9 @@ show_back_link: true
 ## Ranking
 Ranking queries to items is a fairly large part of a search system, otherwise you're just returning a big list of documents when some might be much more relevant to user
 
-Ranking is typically the second stage of a recommender system, and sometimes it's ***online*** meaning a new ranking calculations per query, ***offline*** where we can calculate results and look them up per query, or somewhere inbetween 
+Ranking is typically the second stage of a recommender system, and sometimes it's ***online*** meaning a new ranking calculations per query, ***offline*** where you can calculate results and look them up per query, or somewhere inbetween 
 
-Ranking is typically used for experiments, explainable results, or something different that we want to calculate specifically on each Item that might be more resource intensive than Candidate Generation methods, and other systems will combine everything into one single API call and bypass the different layers
+Ranking is typically used for experiments, explainable results, or something different that you want to calculate specifically on each Item that might be more resource intensive than Candidate Generation methods, and other systems will combine everything into one single API call and bypass the different layers
 
 - Ranking methods can take features of queries, documents, and their interactions as input to predict a relevance score for each document
   - Features might include:
@@ -32,10 +32,10 @@ Ranking is typically used for experiments, explainable results, or something dif
 ----
 
 ### Count Based Heuristics
-One of the most common ranking / scoring methodologies is using the uniqueness of a word based on specific counts (heuristics) - the word "and" is not very unique, and if it shows up in a document we won't really care. Another word like "aardvark" is fairly unique and not used that often, so it would be more unique
+One of the most common ranking / scoring methodologies is using the uniqueness of a word based on specific counts (heuristics) - the word "and" is not very unique, and if it shows up in a document you won't really care. Another word like "aardvark" is fairly unique and not used that often, so it would be more unique
 
 #### TF-IDF
-TF-IDF means Term Frequency Inverse Document Frequency, and it's a fairly simple scoring mechanism for computing the uniqueness of a Term (word) across Documents. Most of the calculations are done offline, and for a query we use our lookup table to find Documents.
+TF-IDF means Term Frequency Inverse Document Frequency, and it's a fairly simple scoring mechanism for computing the uniqueness of a Term (word) across Documents. Most of the calculations are done offline, and for a query you use our lookup table to find Documents.
 
 - **TF (Term Frequency)**: The count of a term in a specific document.
 - **IDF (Inverse Document Frequency)**: The logarithm of the total number of documents divided by the number of documents that contain the term.
@@ -78,14 +78,14 @@ $text{BM25}(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1
 #### Bayesian Proba
 - A Bayesian Approach in Statistics is a way of using Bayes' Theorem to iteratively update the probability of a hypothesis as more evidence becomes available. 
   - This is in constrast to Frequentist Statistics which doesn't incorporate prior beliefs or evidence into the analysis. 
-  - Likelihood in Bayesian Stastics is $P(Evidence | Hypothesis)$ meaning what's the chance we saw this new evidence based on what we believe?
+  - Likelihood in Bayesian Stastics is $P(Evidence | Hypothesis)$ meaning what's the chance you saw this new evidence based on what you believe?
   - Posterior Probability is $P(Hypothesis | Evidence)$
-  - Using these two formulas, we update our Prior Probability, i.e. initial Probability $P(Hypothesis)$ with the Likelihood we saw our Posterior, i.e. new evidence, Probability
+  - Using these two formulas, you update our Prior Probability, i.e. initial Probability $P(Hypothesis)$ with the Likelihood you saw our Posterior, i.e. new evidence, Probability
     - $ P(H|E) = \frac{P(E|H) \cdot P(H)}{P(E)}$ where $P(E)$ is the total probability of seeing our new Evidence
-- A Bayesian Approach to this would be instead of finding the most relevant Document per Query, we flip it around and try to estimate the likelihood of the Query for every Document
+- A Bayesian Approach to this would be instead of finding the most relevant Document per Query, you flip it around and try to estimate the likelihood of the Query for every Document
 - How is this used in the world?
   - Most of the Documents will get some sort of score per Term, typically using TF-IDF or BM25.
-    - At this point, we have scores across `(Term, Document)` pairs, and this can be thought of as the Likelihood of a Term given a Document.
+    - At this point, you have scores across `(Term, Document)` pairs, and this can be thought of as the Likelihood of a Term given a Document.
     - For a specific Term, the Marginal Likelihood is:
       $$
       P(Term) = \sum_{\text{docs}} P(Term|Document) \cdot P(Document)
@@ -97,9 +97,9 @@ $text{BM25}(D, Q) = \sum_{i=1}^{n} IDF(q_i) \cdot \frac{f(q_i, D) \cdot (k_1 + 1
   - And then you get the Probability of a Document for each Term, and when your Query comes in it's simply a bunch of terms strung together so you'd find the top Documents for each Term in the Query and Rank the result set
 
 #### Decision Trees
-We cover [Decision Trees](/docs/other_concepts/DECISION_TREES.md) in depth elsewhere, but they are useful for taking many of our Document, Query-Document, and User features into consideration when we want to predict some general category, but they can't really be used on predicting specific videos
+you cover [Decision Trees](/docs/other_concepts/DECISION_TREES.md) in depth elsewhere, but they are useful for taking many of our Document, Query-Document, and User features into consideration when you want to predict some general category, but they can't really be used on predicting specific videos
 
-Decision Tree's roles are typically to predict relevance scores (pointwise) or to optimize ranking orders based on features (listwise). We can incorporate them in [Learning To Rank](#learn-to-rank) to optimize ranking orders
+Decision Tree's roles are typically to predict relevance scores (pointwise) or to optimize ranking orders based on features (listwise). you can incorporate them in [Learning To Rank](#learn-to-rank) to optimize ranking orders
 - Pointwise:
   - Treats ranking as a regression or classification problem.
   - Each document is scored independently, and the scores are used to rank the documents.
@@ -127,7 +127,7 @@ TODO: Logistic regression
 - Learning To Rank Training Samples:
   `[Query ID, Sample ID, [Features of that sample], Relevancy (Target)]`
 - (Google) LTR task that tries to rank pages from a Query
-  - ***Query ID***: If we scrape the web with 100 web calls, this is 1-100
+  - ***Query ID***: If you scrape the web with 100 web calls, this is 1-100
   - ***Sample ID***: The ID of the object, so this would actually just be the URL
   - ***Features***: Any sort of metadata features, binary features, etc... about the example
     - Number of Query Terms in the Page
@@ -160,16 +160,16 @@ TODO: Logistic regression
 ---
 
 ### Graph
-I can really only think of PageRank off the top of my head, and in PageRank the Features are taken from a graph linkage structure, but it doesn't need to be ran on a graph engine. Most of the time we calculate PageRank scores offline, and then for a specific query we use PageRank as a feature along with other ranking mechanisms. 
+I can really only think of PageRank off the top of my head, and in PageRank the Features are taken from a graph linkage structure, but it doesn't need to be ran on a graph engine. Most of the time you calculate PageRank scores offline, and then for a specific query you use PageRank as a feature along with other ranking mechanisms. 
 
-Page Rank simply helps us calculate "page importance", but we still need to compare a query to web page terms and themes by doing lookups based on [Document and Query Embedding Similarity](/docs/transformer_and_llm/EMBEDDINGS.md#embeddings)
+Page Rank simply helps us calculate "page importance", but you still need to compare a query to web page terms and themes by doing lookups based on [Document and Query Embedding Similarity](/docs/transformer_and_llm/EMBEDDINGS.md#embeddings)
 
 #### Page Rank
 An algorithm used by Google Search to rank web pages. It measures the importance of a page based on the number and quality of links to it. PageRank can be used anywhere, not just in Ranking, but makes sense to put it here
 
 It outputs a probability distribution used to represent the likelihood that a person will arrive at any particular page through clicking on random links, similar to probability distribution of the "Wikipedia game" where to try to get to Page B from Page A by visiting referenced links starting at A
 
-PageRank can be solved using iterations and traversing web links using the ***power iteration method***, but it can also be solved analytically if we had an adjacency matrix of all links between pages $M$, where $M[i][j]$ represents the link from page $j$ to page $i$
+PageRank can be solved using iterations and traversing web links using the ***power iteration method***, but it can also be solved analytically if you had an adjacency matrix of all links between pages $M$, where $M[i][j]$ represents the link from page $j$ to page $i$
 
 - **Analytical Formula**:
   - The PageRank vector $PR$ satisfies the equation: $PR = d \cdot M \cdot PR + (1 - d) \cdot v$ where:

@@ -7,9 +7,9 @@ show_back_link: true
 ---
 
 ## VPC
-Virtual Private Clouds are about how we can deploy VM's, storage, and other resources into:
+Virtual Private Clouds are about how you can deploy VM's, storage, and other resources into:
 - "virtual" meaning not physical but logically separated
-- "private" meaning we don't share things in this logically separated unit
+- "private" meaning you don't share things in this logically separated unit
 - "cloud" which is just us using someone elses VM's
 
 So a VPC is a way for us to logically separate a group of VM's, typically by IP addresses
@@ -21,7 +21,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - They have 32 bits in total, or 4 slices of 1 byte
     - `192.168.0.0/24` means the first 24 bits of the address are used to designate the network "slice" and the remaining 8 bites are used by any host inside of it
     - Whatever amount of remaining bits are leftover denotes the size
-        - $2^8 = 256$ means we have 256 IP addresses to use in this network
+        - $2^8 = 256$ means you have 256 IP addresses to use in this network
 - ***Private IP*** are IP's only avaialble inside of a private network
     - These are *the only* IP's able to be used as private IP's, and any other IP is public
         - Technically most people's IP in their homes if they want to have 2 computers talk on local network will be `192.168.X.X` because they're private
@@ -135,8 +135,8 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - Can reference security group of a peered VPC (cross-account)
 - Longest prefix match
     - VPC uses longest prefix match to select most specific route
-    - If we have 2 VPC's with similar CIDR that we peer to frmo a central VPC, we have to use specific route table rules to ensure we send traffic to specific instances
-        - In the below example we want to send some traffic to a specific instance in VPC B, and the rest to VPC C
+    - If you have 2 VPC's with similar CIDR that you peer to frmo a central VPC, you have to use specific route table rules to ensure you send traffic to specific instances
+        - In the below example you want to send some traffic to a specific instance in VPC B, and the rest to VPC C
     - ![Longest Prefix](./images/vpc_longest_prefix.png)
 - Invalid configurations
     - Overlapping CIDR (even just one!)
@@ -144,8 +144,8 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - No edge to edge routing (same as transitive VPC peering)
         - Specifc to VPN, Direct Connect, IGW, NAT GW, VPC Endpoints (S3 and Dynamo)
         - These services also don't allow transitive routing based on peering
-        - This means if we have private VPCs, let's say 5, and then one central VPC with a NAT Gateway and an IGW
-            - If the NGW is peered to the IGW, and our private subnets are peered each to the NGW, that doesn't mean we can access the IGW from the instances
+        - This means if you have private VPCs, let's say 5, and then one central VPC with a NAT Gateway and an IGW
+            - If the NGW is peered to the IGW, and our private subnets are peered each to the NGW, that doesn't mean you can access the IGW from the instances
             - This is definition of "edge to edge routing" and it's not allowed, we'd need to connect each instance to IGW itself
 - Side note - typical `ping <IP>` ICMP protocols don't work over VPC peering connections
     - This is because security groups and network ACL's block this by default, you can set it up to work
@@ -165,10 +165,10 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - **Similar to VPC Peering, you must update route tables:**
     - Destination: Some other Subnet CIDR
     - Target: TGW Attachment
-- Because of having to update route tables, there's still a ton of work on updating each connected resource in the network mesh, but we do not have to manually accept and deny each of the peering requests anymore
+- Because of having to update route tables, there's still a ton of work on updating each connected resource in the network mesh, but you do not have to manually accept and deny each of the peering requests anymore
     - It's still much smaller than peering all of them
-    - If there are $N$ VPC's, then we would need ${N \cdot (N-1)} \over 2$ peering connections (fully completed graph), versus just connecting each of the $N$, once, to the TGW
-        - We would still need to update all route tables, but this is typically more scalable and easier to accomplish
+    - If there are $N$ VPC's, then you would need ${N \cdot (N-1)} \over 2$ peering connections (fully completed graph), versus just connecting each of the $N$, once, to the TGW
+        - you would still need to update all route tables, but this is typically more scalable and easier to accomplish
 - Share cross account via Resource Access Manager (RAM)
 - Route tables allow us to limit which VPC's can talk to each other
 - Works with Direct Connect, VPN Connections
@@ -179,8 +179,8 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - PrivateLink
     - EFS
     - More
-- Using a Transit Gateway allows us to alleviate the problem in [VPC Peering](#vpc-peering) where we couldn't have a central NAT GW!
-    - Below we can see our Egress-VPC has all of the required NAT GW and IGW setup with correct routing tables
+- Using a Transit Gateway allows us to alleviate the problem in [VPC Peering](#vpc-peering) where you couldn't have a central NAT GW!
+    - Below you can see our Egress-VPC has all of the required NAT GW and IGW setup with correct routing tables
         - Shows how Egress-VPC routes any traffic from `10.0.0.0/16` back to TGW-Internet to route to App-VPC's
         - And then how App-VPC's route traffic to TGW-Internet, and any route not back to `10.0.0.0/16` gets routed out to IGW out to the internet
             - ***Q***: TGW-Internet is actually being routed to ENI's, which then route to NAT GW, and this is because:
@@ -191,7 +191,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
             - ***Q***: Also NAT GW need to come before IGW because:
                 - Private instances cannot route directly to an IGW - they have to go through NAT GW which translates private IP to public
                 - *IGW only allows outbound traffic from public IP's*...the NAT GW provides that public IP
-                - If we bypass NAT GW the private instances wouldn't have valid public IP's for internet access
+                - If you bypass NAT GW the private instances wouldn't have valid public IP's for internet access
     - ![Central NAT GW](./images/central_natgw.png)
 - Can use AWS RAM to share a TGW for VPC attachments across accounts or Organizations
     - Allows the Share, Accept, Use flow to happen a lot faster
@@ -199,7 +199,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - Allows us to do Direct Connect to corporate data centers from multiple regions
     - ![Multi Region Direct Connect](./images/mr_directconnect.png)
 - Intra and Inter region peering
-    - Allows for data mesh architecture where we can have a Hub TGW per region that connects multiple resources and accounts in that region, and then for every region we have we connect the Hub TGW's to create a mesh of TGW's across all regions
+    - Allows for data mesh architecture where you can have a Hub TGW per region that connects multiple resources and accounts in that region, and then for every region you have you connect the Hub TGW's to create a mesh of TGW's across all regions
 
 ### VPC Endpoints
 - Allows us to connect to AWS Services using a private network instead of public www network
@@ -208,7 +208,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - ***VPC Endpoint GW used for S3 and DynamoDB*** to access these resources using AWS backbone without going over internet
     - Must update route table entries
         - Destination needs to have target of `vpce-ID`
-            - S3 destinations have a specific IP that will show up when we try to enter it in route table...can come from name, but you'll see it
+            - S3 destinations have a specific IP that will show up when you try to enter it in route table...can come from name, but you'll see it
                 - This is public hostname, use this not public IP
                 - Allows full private access from EC2 to S3
                 - ***DNS Resolution must be enabled***
@@ -219,12 +219,12 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - ***VPC Endpoint Interface used for all other services*** to access without going over internet
     - Endpoint Interfaces are ENI's so it must live in a subnet
         - This ENI has some private hostname
-        - We leverage security groups for security
-        - To reach this we need Private DNS
+        - you leverage security groups for security
+        - To reach this you need Private DNS
             - Public hostname of service will resolve to private endpoint interface hostname
             - ***DNS Hostnames and DNS Support must be enabled***
             - Interfaces shareable across Direct Connect or Site-To-Site VPN
-    - In case of issues using these we can check DNS Settings resolution or route tables to figure out why routing isn't working
+    - In case of issues using these you can check DNS Settings resolution or route tables to figure out why routing isn't working
 
 #### VPC Endpoint Policies
 - JSON documents, similar to IAM policies, that allow us to configure authorization
@@ -248,11 +248,11 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - ![Private Link Arch](./images/privatelink_arch.png)
 
 ### Site to Site VPN (AWS Managed VPN)
-- Corporate Data Center and VPC that we want to connect over public internet
+- Corporate Data Center and VPC that you want to connect over public internet
     - They could connect over private IP with infra above, but let's focus on public
 - Setup software or harddware VPN appliance on-prem
     - On prem VPN should be accessible using a public IP
-- AWS Side we setup a Virtual Private Gateway VGW and attach to VPC
+- AWS Side you setup a Virtual Private Gateway VGW and attach to VPC
     - Setup Customer gateway to point the on prem VPN appliance
 - Two VPN conncetions (tunnels) are created for redundancy
 - At this point the VGW can talk to the Customer Gateway
@@ -268,17 +268,17 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
         - Any changes must be manually updated
     - Dynamic routing is tougher
         - Border Gateway Protocol (BGP) allows us to share routes (route table) automatically (eBGP for internet)
-        - We don't update route table, it's done for us automatically
+        - you don't update route table, it's done for us automatically
         - Just need to specify Autonomous System Number (ASN) for CGW and VGW
             - ASN's are defined and show on each of the 2 gateways, so they're easy to find
-        - Then we just specify we want dynamic routing and things are updated automatically
+        - Then you just specify you want dynamic routing and things are updated automatically
 - Site To Site VPN and Internet Access
-    - At this point we now have a public subnet with NAT GW and IGW in AWS VPC
-    - Can we provide internet access to corporate data center via IGW?
+    - At this point you now have a public subnet with NAT GW and IGW in AWS VPC
+    - Can you provide internet access to corporate data center via IGW?
         - No!
-    - What if we use a NAT Instance instead?
+    - What if you use a NAT Instance instead?
         - For some f'ing reason yes!
-        - "Because we manage the software on NAT instance we can"
+        - "Because you manage the software on NAT instance you can"
     - ![S2S internet](./images/s2s_internet.png)
 - Another valid solution is to flip things around and have an on-premise NAT in corporate data center, and have private instances in VPC get to internet there
     - ***TLDR; If you own NAT software on EC2 instance or on-premise, you can do this***
@@ -295,7 +295,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - Another option here is to use Direct Connect Gateway, but that comes later
 - Another option is a Shared Services VPC
     - Site-To-Site VPN and then replicate services, or deploy a fleet of proxies on VPC, so that any number of VPC's in AWS account can just peer to the Shared Services VPC
-    - Transit Gateway hub-and-spoke model so that we don't have to establish all of these VPN's to our corporate data center
+    - Transit Gateway hub-and-spoke model so that you don't have to establish all of these VPN's to our corporate data center
 
 ### AWS Client VPN
 - Connect from personal computer using OpenVPN to private network on AWS and on-prem
@@ -306,16 +306,16 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - Enable Client VPN to connect to Client VPN ENI
     - This would allow personal computers to access corporate data center and AWS VPC in a private connection
 - Internet Access
-    - Since IGW require public IP addresses we could also setup an ENI in a public subnet
+    - Since IGW require public IP addresses you could also setup an ENI in a public subnet
     - Connect to ENI via AWS Client VPN from personal computer
     - At that point we'd be able to reach the internet via ENI and resources in VPC
-    - If we have Private Subnets as well, then we'd need NAT GW in Public subnets and ENI in private subnets
-        - ENI provides entry/exit point in private subnets (as we described in [TGW](#transit-gateway)) which is routed to NAT GW
+    - If you have Private Subnets as well, then we'd need NAT GW in Public subnets and ENI in private subnets
+        - ENI provides entry/exit point in private subnets (as you described in [TGW](#transit-gateway)) which is routed to NAT GW
     - ![Client VPN Internet Access](./images/client_vpn_internet.png)
 
 ---
-- What if we had a Transit GW?
-    - Thena ll of this is possible, and we can setup 
+- What if you had a Transit GW?
+    - Thena ll of this is possible, and you can setup 
         - Central hub TGW with ENI
         - ENI in private subnets somewhere
             - Connect AWS Client VPN to ENI
@@ -351,7 +351,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 #### Direct Connect Gateway
 - If you want to setup a Direct Connect to one or more VPC in many different regions
 - Can use a Direct Connect Gateway to remove redundant connections and centralize hub-and-spoke
-- We can also connect Direct Connect gateway as another spoke on TGW
+- you can also connect Direct Connect gateway as another spoke on TGW
 - ![Direct Connect GW](./images/direct_connect_gw.png)
 
 ### VPC Flow Logs
@@ -368,7 +368,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - WAF (malicious requests)
     - AWS Shield
     - AWS Firewall Manager (mgmt across accounts)
-- How can we protect VPC in a sophisticated way?
+- How can you protect VPC in a sophisticated way?
     - AWS Network Firewall
     - Protect enitire VPC from OSI Layer 3 - 7
     - Can inspect from any direction:

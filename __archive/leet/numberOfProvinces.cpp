@@ -25,7 +25,7 @@ public:
         //  the component as seen
         // So if everything is connected to
         //  0 then we'll have 1 province, 
-        // We are guaranteed to cover all nodes
+        // you are guaranteed to cover all nodes
         // O(n) time
         int provinces = 0;
         for(int k = 0; k < n; k++) {

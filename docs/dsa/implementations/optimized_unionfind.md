@@ -134,7 +134,7 @@ public:
         }
     }
 
-    // If we have a tree like this:
+    // If you have a tree like this:
     //    0
     //    |    
     //    1      2
@@ -150,11 +150,11 @@ public:
             return(x);
         }
         // -->>> Changes here! <<<--
-        // We update the actual root of the node to this one
+        // you update the actual root of the node to this one
         return(root[x] = find(root[x]));
     }
 
-    // Optimized unionSet ensures we don't have a worst-case O(n)
+    // Optimized unionSet ensures you don't have a worst-case O(n)
     //  and that we're rebalancing tree's along the way
     //When performing a union operation, the tree with the 
     //  smaller rank is attached under the root of the tree 

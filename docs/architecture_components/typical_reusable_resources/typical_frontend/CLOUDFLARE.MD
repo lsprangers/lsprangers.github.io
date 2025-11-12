@@ -47,9 +47,9 @@ Lots of things are solved by Load Balancing, but the 3 main ones covered are:
 #### Performance
 The most common scenario is when a backend server is "hot" and too much load is placed onto a specific endpoint
 
-This may happen by chance, from bad steering / routing rules, from specific geo-location factors, a bad memory leak, or many other things, but ultimately when a backend server is overloaded we should do everything we can to route new requests to other servers!
+This may happen by chance, from bad steering / routing rules, from specific geo-location factors, a bad memory leak, or many other things, but ultimately when a backend server is overloaded you should do everything you can to route new requests to other servers!
 
-Other solutions exist like scaling up the webserver (vertical scaling), but this leads to downtime (low availability), and the org ends up paying for these extra resources when they don't need them! Orgs can also deploy multiple endpoints, and this is where load balancing then comes in - how can we steer / route traffic to the correct location in these scenarios?
+Other solutions exist like scaling up the webserver (vertical scaling), but this leads to downtime (low availability), and the org ends up paying for these extra resources when they don't need them! Orgs can also deploy multiple endpoints, and this is where load balancing then comes in - how can you steer / route traffic to the correct location in these scenarios?
 
 Below is the "bad"
 ![Cloudflare LB](/img/cloudflare_lb_bad_example.png)
@@ -57,19 +57,19 @@ Below is the "bad"
 And then this is the "good"!
 ![Cloudflare LB](/img/cloudflare_lb_good_example.png)
 
-Geolocation is also a factor, as a client $\rarr$ server that's US-2-US can expect a Round Trip Time (RTT) of ~20ms, but US-2-APAC could expect ~150ms - this is more than 7x as much! These small things affect user bounce rate, SLA's, overall availability, and other metrics that we must measure
+Geolocation is also a factor, as a client $\rarr$ server that's US-2-US can expect a Round Trip Time (RTT) of ~20ms, but US-2-APAC could expect ~150ms - this is more than 7x as much! These small things affect user bounce rate, SLA's, overall availability, and other metrics that you must measure
 
 As LB's can pass traffic to a less busy endpoint, they can also pass traffic to a geographically closer one too
 
 #### Availability
-Service availability encompasses both unintentional and intentional downtime of endpoints behind a load balancer. There are thousands of things that can contribute to these downtimes, and instead of solving for all of them we should instead design our system to assume they'll happen, and to handle them appropriately. 
+Service availability encompasses both unintentional and intentional downtime of endpoints behind a load balancer. There are thousands of things that can contribute to these downtimes, and instead of solving for all of them you should instead design our system to assume they'll happen, and to handle them appropriately. 
 
-Load balancers help to solve this by always monitoring the health of our endpoints - they're the reason we have `/ping` or `/heartbeat` endpoints, so that something can poll our backend services to ensure they're still there! These can be ICMP (ping) tests, full on TCP connectivity checks, HTTP GETS, or a range of other things that we need to test (a server can respond to pings but fail TCP checks, however TCP checks are much more costly). If an endpoint fails this check, it's marked as degraded, and few or no more requests will go to it (based on configuration). At this point it's up to our application control plane to spin up more backend servers and register them with the load balancer.
+Load balancers help to solve this by always monitoring the health of our endpoints - they're the reason you have `/ping` or `/heartbeat` endpoints, so that something can poll our backend services to ensure they're still there! These can be ICMP (ping) tests, full on TCP connectivity checks, HTTP GETS, or a range of other things that you need to test (a server can respond to pings but fail TCP checks, however TCP checks are much more costly). If an endpoint fails this check, it's marked as degraded, and few or no more requests will go to it (based on configuration). At this point it's up to our application control plane to spin up more backend servers and register them with the load balancer.
 
 #### Scalability
 Traffic increases and decreases - some things go viral, some things are B2B and only used 9-5, and other things get randomly pressured by bots. During traffic increases orgs typically want more endpoints to handle requests, but they don't want to pay for these during low periods - that's where horizontal scaling comes in.
 
-This again has factors of geo-location, where services may go up and down during business hours as the sun travels around the globe! We don't want APAC users having to use US endpoints, and unnecessarily spinning up more US endpoints because there's a perceived network lag simply because the request has to go around the globe.
+This again has factors of geo-location, where services may go up and down during business hours as the sun travels around the globe! you don't want APAC users having to use US endpoints, and unnecessarily spinning up more US endpoints because there's a perceived network lag simply because the request has to go around the globe.
 
 ### Types of Traffic Management
 There are two layers for load balancing for global apps 

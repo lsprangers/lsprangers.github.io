@@ -29,7 +29,7 @@ The [BST README](/docs/dsa/8.%20trees%20&%20graphs/index.md) has more info
 
 - Binary Search Tree has the property that for any node, all of it's right children are greater, and all of it's left children are less than the current nodes value
 - Therefore, for a balanced search tree, we'd cut off 1/2 of the nodes during each traversal, so in total there's only log n traversals done
-    - Logn because we go from 
+    - Logn because you go from 
         - 16 --> 8 --> 4 --> 2 --> 1
         - 2^4 --> 2^3 --> 2^2 --> 2^1 --> 2^0
         - log(16) = 4, log(8) = 3, log(4) = 2, log(2) = 1
@@ -44,4 +44,4 @@ The [Max Heap README](/docs/dsa/5.%20heap%20&%20priority%20queue/index.md) has m
 |Worst Case  | O(logn)       | O(1)       | O(logn)       |
 
 - A Max Heap is a tree data structure which is a bit more specific than a Binary Search Tree, the Max Heap structure has the largest node as the root node, and any node's children are less than it's node
-- Allows us to get the max item very quickly, and insert and delete operations involve potentially rotating some items but altogether are O(logn) for worst, average, and best cases since we still traverse a general tree structure
+- Allows us to get the max item very quickly, and insert and delete operations involve potentially rotating some items but altogether are O(logn) for worst, average, and best cases since you still traverse a general tree structure

@@ -8,7 +8,7 @@ class Solution:
         resp = []
 
         # O(1)
-        # Need to do the freqs - and + 1 to ensure we don't reuse a number throughout the creation process
+        # Need to do the freqs - and + 1 to ensure you don't reuse a number throughout the creation process
         for n1 in range(0, 10):
             if freqs[n1] == 0 or n1 == 0:
                 continue

@@ -23,12 +23,12 @@ Typical Streaming architectures will have:
 ### Generic Architecture
 ![Generic Streaming Architecture](./images/generic_streaming.png)
 - In the past generic streaming architectures were based on micro-batches and continuous operators
-    - We would collect data for a few seconds, then process it, and repeat
+    - you would collect data for a few seconds, then process it, and repeat
 
 ### Key Concepts
-- **Micro-batches**: Instead of processing data as it arrives, we collect it into small batches and process those batches
+- **Micro-batches**: Instead of processing data as it arrives, you collect it into small batches and process those batches
     - This approach allows us to leverage batch processing techniques and optimizations
-    - It also simplifies fault tolerance, as we can reprocess a failed batch rather than dealing with individual records
+    - It also simplifies fault tolerance, as you can reprocess a failed batch rather than dealing with individual records
     - Micro-batches are typically small, ranging from a few seconds to a minute
     - This approach is used by frameworks like Apache Spark Streaming and Apache Flink
 - **Event Time vs. Processing Time**:

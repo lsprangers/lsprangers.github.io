@@ -1,4 +1,4 @@
-// In quickUnion we store the are able to union things faster, and
+// In quickUnion you store the are able to union things faster, and
 //  just swap the parent of the root of another group
 //  therefore, the union() operation is O(1) 
 //  but the find() operation is O(n)
@@ -12,9 +12,9 @@
 // Example:
 // parent   = [0, 0, 0, 1, 1, 2, 2]
 // root     = [0, 0, 0, 1, 1, 2, 2]
-// So we see here that root just has 0's
+// So you see here that root just has 0's
 
-// If we have a tree like this:
+// If you have a tree like this:
 //    0
 //    |    
 //    1      2
@@ -25,14 +25,14 @@
 // parent   = [0, 0, 2, 1, 1, 2, 2]
 // root     = [0, 0, 2, 1, 1, 2, 2]
 
-// Then we see our find() becomes O(n) since we need to traverse potentially
+// Then you see our find() becomes O(n) since you need to traverse potentially
 //  the entire array
-// And in union() we just need to change parent[rootY] = rootX and root[rootY] = rootX
+// And in union() you just need to change parent[rootY] = rootX and root[rootY] = rootX
 
 // Example:
 // parent   = [0, 0, 0, 1, 1, 2, 2]
 // root     = [0, 0, 2, 0, 0, 2, 2]
-// After this, we need to update 5 and 6 to have
+// After this, you need to update 5 and 6 to have
 //  root[5] = 0 and root[6] = 0
 
 #include <vector>;

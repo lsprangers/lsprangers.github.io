@@ -140,7 +140,7 @@ Indexes allow NoSQL databases to quickly locate data without scanning the entire
        { "email": "john.doe@example.com" }
        ```
 
-TODO: Secondary indexes are basically points but cause bloat sometimes, espeically if we force them across partitions
+TODO: Secondary indexes are basically points but cause bloat sometimes, espeically if you force them across partitions
 
 3. **Composite Index**:
    - Combines multiple fields into a single index to support complex queries.

@@ -37,7 +37,7 @@ This section focuses on building specific systems, often inspired by technical i
 ## Architecture Components
 To implement these systems, you'll find notes under Architecture Components about databases, messaging, calculations, and other essential components.
 
-There's also an entire section on [Typical Resources](/docs/architecture_components/typical_reusable_resources/index.md) where we build all of the typical components from scratch such as:
+There's also an entire section on [Typical Resources](/docs/architecture_components/typical_reusable_resources/index.md) where you build all of the typical components from scratch such as:
 - Distributed Key-Value Stores
   - Front-end Load Balancers with Metadata
   - Distributed Queues
@@ -136,4 +136,6 @@ These are some of the resources I frequently use and reference throughout this r
 - [Dario Amodei's Blog](https://www.darioamodei.com)
 - [The Urgency of Interpretability](https://www.darioamodei.com/post/the-urgency-of-interpretability)
 - [Cristophm Interpretability Blog](https://christophm.github.io/interpretable-ml-book/overview.html)
+- [Log Odds](https://medium.com/@matthewjacobholliday/an-introduction-to-log-odds-86d364fa6630)
+- [Distributed Training](https://apxml.com/courses/advanced-tensorflow/chapter-3-distributed-training-strategies)
 ---

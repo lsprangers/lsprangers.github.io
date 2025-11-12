@@ -12,7 +12,7 @@ class Solution:
     def combinationSum3(self, k: int, n: int) -> List[List[int]]:
         # combinations gives 9 choose 3 total amount
         #   O(n * C(n, 3))
-        # otherwise, we can have N^2 double loop with sum and 
+        # otherwise, you can have N^2 double loop with sum and 
         #   check for last number
         #   O(n ^ 2)
         resp = []
@@ -23,14 +23,14 @@ class Solution:
         return(resp)
 ```
 
-Or without `itertools` we can do typical backtracking
+Or without `itertools` you can do typical backtracking
 
 ```python
 class Solution:
     def combinationSum3(self, k: int, n: int) -> List[List[int]]:
         # combinations gives 9 choose 3 total amount
         #   O(n * C(n, 3))
-        # otherwise, we can have N^2 double loop with sum and 
+        # otherwise, you can have N^2 double loop with sum and 
         #   check for last number
         #   O(n ^ 2)
         resp = []

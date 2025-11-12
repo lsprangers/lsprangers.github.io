@@ -21,7 +21,7 @@ public:
             umap[num]++;
         }
 
-        // O(n) loop, and in each loop we do at most O(log k) operations
+        // O(n) loop, and in each loop you do at most O(log k) operations
         //  since the heap never goes above size K
         priority_queue<pair<int, int>> maxHeap;
         for (auto [key, val]: umap) {

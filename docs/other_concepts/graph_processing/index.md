@@ -22,14 +22,14 @@ It's the common OLAP vs OLTP discussion, but it's just on data comprised of node
 
 The entirety of an algorithm is based on ***super-steps***, where programs are expressed as a sequence of iterations, in each of which a vertex can receive messages sent in the previous iteration, send messages to other vertices, and modify its own state and that of its outgoing edges or mutate graph topology
 
-This basically comes down to BFS iterations, where in each step we expand another step outwards (except in a graph we just follow another hop on the graph), and update nodes there, and if we need to continue updating nodes we push into the queue for next hop
+This basically comes down to BFS iterations, where in each step you expand another step outwards (except in a graph you just follow another hop on the graph), and update nodes there, and if you need to continue updating nodes you push into the queue for next hop
 
 This allows us to run many programs such as Connected Components, Transitive Closure (all reachable nodes from any node), and Shortest Path in an efficient and distributed way
 
 ### GraphX
 GraphX is a Pregel-like implementation that runs on Spark via Scala SDKs
 
-We ended up using this for most of our applications because of the native integration with Spark and by proxy Databricks. This gives us a highly available, distributed, parallel, graph computation engine
+you ended up using this for most of our applications because of the native integration with Spark and by proxy Databricks. This gives us a highly available, distributed, parallel, graph computation engine
 
 #### Triplets
 Triplets are the main data structures in GraphX, and can help us define Edges
@@ -52,7 +52,7 @@ graph.triplets.map { triplet =>
 }
 ```
 
-An example would be only processing source nodes in which we haven't seen all of the destination nodes - this would constitute updates / inserts in the graph we haven't processed
+An example would be only processing source nodes in which you haven't seen all of the destination nodes - this would constitute updates / inserts in the graph you haven't processed
 ```
 graph.pregel(initialMsg)(
   vprog = (id, attr, msg) => attr ++ msg,
@@ -73,7 +73,7 @@ Transitive Closure helps us to identify all transitive paths between records tha
 
 A &rarr; B &rarr; C &rarr; D
 
-Using a few different methods we can calculate:
+Using a few different methods you can calculate:
 - A eventually will connect to D
 - A connects to D at exactly the 3rd hop
 - A connects to D via B connecting to C

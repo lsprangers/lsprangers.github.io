@@ -35,7 +35,7 @@ show_back_link: true
     - Acct level setting to encrypt automatically new EBS volumes and snapshots
 - EBS Multi-Attach
     - This allows us to attach same EBS volume to multiple EC2 isntances ***in the same AZ***
-    - We mentioned above this wasn't possible, so this service is only for very specific use cases
+    - you mentioned above this wasn't possible, so this service is only for very specific use cases
         - Achieve higher app availability in clustered linux application
         - Apps that manage concurrent write ops
         - Must use FS that's cluster-aware
@@ -152,7 +152,7 @@ show_back_link: true
             - Multiple destinations for one rule
             - Proper PubSub of messages based on Events in S3
     - Use cases:
-        - Thumbnail uploads onto S3 we want to return
+        - Thumbnail uploads onto S3 you want to return
 - Baseline performance
     - Automatically scales to high requests, with latency between `100ms - 200ms` 
     - Can achieve these metrics per second per prefix
@@ -173,7 +173,7 @@ show_back_link: true
     - S3 byte range fetches (Downloads)
         - Separate file into chunks of bytes
         - Parallelize GET requests by requesting specific byte range
-        - If one part fails we just re-request that one part
+        - If one part fails you just re-request that one part
         - Also useful for only requesting headers of files, instead of GET whole file
 
 ### S3 Storage Class Analytics
@@ -198,7 +198,7 @@ show_back_link: true
     - etc...
 - Data Protection
     - VersioningEnabledBucketCOunt
-    - etc - lots of metrics around if we are protecting data
+    - etc - lots of metrics around if you are protecting data
 - Access Management Metrics
 - Event Metrics
 - Performance Metrics
@@ -227,8 +227,8 @@ show_back_link: true
     - Works great for static objects that aren't updated often
 
 #### Indexing Objects
-- We can't natively index objects in S3, to do search we'd need to check all files / prefixes
-- On new writes to S3 we can use an Event Notification to trigger a lambda function
+- you can't natively index objects in S3, to do search we'd need to check all files / prefixes
+- On new writes to S3 you can use an Event Notification to trigger a lambda function
 - Lambda would write object metadata and update indexes on DynamoDB
     - Search by date, total storage used by customers, find all objects w/ certain attribute, etc...
 
@@ -246,7 +246,7 @@ show_back_link: true
 ## FSx
 - Launch 3rd party file systems on AWS
 - Fully managed systems
-- Similar to RDS hosting database, but we host File Systems
+- Similar to RDS hosting database, but you host File Systems
 - Types:
     - Lustre
         - Large scale distributed file system
@@ -304,7 +304,7 @@ show_back_link: true
 - Decrease FSx volume size
     - Can only increase
     - If you take a backup, you can only restore to same size
-    - Therefore, we must use DataSync
+    - Therefore, you must use DataSync
         - Standup smaller FSx 
         - Use DataSync for some portion of first FSx to smaller second FSx
 - Some stupid lazy loading thing for FSx that shouldn't be on the test
@@ -318,7 +318,7 @@ show_back_link: true
 - Move large amounts of data to and from places
 - On-Prem, other clouds, etc...
     - Needs an agent on-prem or on the other cloud to do this
-    - One agent can use 10 GB/s, but we can setup a bandwidth limit too
+    - One agent can use 10 GB/s, but you can setup a bandwidth limit too
 - AWS Service to Service
     - No agent needed
 - Can sync to:
@@ -330,10 +330,10 @@ show_back_link: true
     - Compliant with NFS POSIX
     - This is the only service that can keep metadata during replication
 - Multiple on-prem or other cloud servers can sync to one DataSync service
-    - We can also go the other way and sync services back to on-prem or other cloud
+    - you can also go the other way and sync services back to on-prem or other cloud
     - Need DataSync agent in each network that needs to get synced
 - AWS SnowCone
-    - This happens when we don't have network capacity for DataSync
+    - This happens when you don't have network capacity for DataSync
     - SnowCone device comes with agent pre-installed
     - SnowCone pulls data locally, shuts down, and gets shipped to AWS to be uploaded onto cloud
 - AWS Service to Service
@@ -345,14 +345,14 @@ show_back_link: true
     - Metadata is kept
     - Metadata is kept
     - Not continuous, it is a scheduled job
-- How can we do AWS DataSync through private channels and not public?
+- How can you do AWS DataSync through private channels and not public?
     - Need DirectConnect, PrivateLink, and Interface VPC Endpoint
     - ![Private DataSync](./images/private_datasync.png)
 
 ## Data Exchange
 - Find, subscribe to, and use third-party data in cloud
 - Once subscriped to you can use Data Exchange API to load directly into S3 or RedShift
-- We can also license our own data through RedShift onto Exchange
+- you can also license our own data through RedShift onto Exchange
 
 ## Transfer Family
 - Send data in and out of S3 or EFS via only the FTP protocol

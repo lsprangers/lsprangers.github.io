@@ -33,14 +33,14 @@ public:
                 //  the index for 0 is -1 because at the start of the array
                 // there is an equal number of 1's and 0's
                 // So even if the count = 1 somewhere, and 7,000 entries later
-                //  the count = 1 then we know our subarray with equal number
+                //  the count = 1 then you know our subarray with equal number
                 //    of ones and 0's is 6,999
                 // umap[0] = -1 is because equal number of 1's and 0's at start,
                 //  but it doesn't mean our array has to start there
                 resp = max(resp, i - umap.at(curr));
             }
             else {
-                // otherwise we store the first value we've seen of this count
+                // otherwise you store the first value we've seen of this count
                 umap[curr] = i;
             }
         }

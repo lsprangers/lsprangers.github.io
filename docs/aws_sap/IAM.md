@@ -15,7 +15,7 @@ show_back_link: true
 ### Key Concepts
 
 #### Identities
-- Identities in AWS IAM are Users, Groups of Users, or Roles, and we can attach Policies to Identities or Resources
+- Identities in AWS IAM are Users, Groups of Users, or Roles, and you can attach Policies to Identities or Resources
 - IAM Principals are Users or Roles
 
 #### User
@@ -84,7 +84,7 @@ show_back_link: true
 ---
 
 ### Policies
-Policies define Permissions, and we attach Policies to Identities (Users or Roles)
+Policies define Permissions, and you attach Policies to Identities (Users or Roles)
 
 
 - Identity-based policies
@@ -122,23 +122,23 @@ Policies define Permissions, and we attach Policies to Identities (Users or Role
   - If a Permission Boundary allows `s3:*, kafka:*` and the IAM Policy allows `EC2:*`, the User or Role will only have `s3:*, kafka:*` permissions, not the union of all three
 
 ### STS
-Security Token Service allows us to retrieve and impersonate IAM roles in other accounts that specify we can act on their behalf
+Security Token Service allows us to retrieve and impersonate IAM roles in other accounts that specify you can act on their behalf
 
-Impersonation / Assuming means we can have `role1:account1` and specify, via STS, that `user2:account2` can assume it's identity, meanning user 2 can act inside of account1 with the same persmissions as role1 - similar to `user2:role1:account1` 
+Impersonation / Assuming means you can have `role1:account1` and specify, via STS, that `user2:account2` can assume it's identity, meanning user 2 can act inside of account1 with the same persmissions as role1 - similar to `user2:role1:account1` 
 
 #### SSO, Federated Users, and Microsoft AD
 ***Federated Users / Identity Federation*** provides access to externally authenticated users to your AWS account via this STS exchange
 
 Typically happens with corporations that have their own identity system like Active Directory, or if a Web/Mobile App wants to access resources on AWS but you don't want to create a user for the app user, just authenticate
 
-So where can we assume roles from?
-- Straight up `sts:AssumeRole` can be done, and is the most straightforward where we list out users who can do it
+So where can you assume roles from?
+- Straight up `sts:AssumeRole` can be done, and is the most straightforward where you list out users who can do it
 - SAML / OIDC
     - `AssumeRoleWithSAML` and `AssumeRoleWithWebIdentity` allow us to use other IdP's to authenticate users before they are allowed to assume roles
         - Amazon Cognito is the AWS IdP that provides OIDC compatibility
     - `GetSessionToken` works to get the actual session token provided to us from there
     - Each of these users would be a Federated User, where they authenticate elsewhere and don't have explicit AWS Users
-        - `GetFederationToken` obtains temporary credentials for a federated user, and typically a corporate app has a proxy in network that assigns these OIDC credentials out, and we can allow userrs to authenticate this way
+        - `GetFederationToken` obtains temporary credentials for a federated user, and typically a corporate app has a proxy in network that assigns these OIDC credentials out, and you can allow userrs to authenticate this way
 - Security Access Markup Language (SAML) 2.0 is an open standard used by many providers
     - This is a ***historic method***, and isn't used much anymore
     - IdP's would have to be SAML 2.0 compliant for us to use them for authentication, and many are
@@ -152,7 +152,7 @@ So where can we assume roles from?
             - Anonymous users
             - MFA
             - Data Synchronization
-    - With WIFedertation we are able to use IAM Policy variables so that the client can only access resources assigned to them
+    - With WIFedertation you are able to use IAM Policy variables so that the client can only access resources assigned to them
         - In this scenario you use a variable `www.amazon.com:user_id`, and you'd set that on S3 buckets or other resources to restrict user access
 - Azure Active Directory (AAD) and Azure Directory (AD) and Azure Directory Federation Service (ADFS) all allow us to use Azure Directories to provide SSO and SAML across our organization
     - It has a domain controller that hosts all of the user / password / permissions objects
@@ -192,14 +192,14 @@ AD Replication
     - An OU is a logical grouping of AWS accounts within an AWS Organization
 - Member Accounts (Sub-Accounts)
     - OU's act as a tree / hierarchy
-    - We could have HR / Finance as 2 OU's, and each one has dev/stg/prod
-    - Or we could have dev/stg/prod and each one has 2 sub OU's
+    - you could have HR / Finance as 2 OU's, and each one has dev/stg/prod
+    - Or you could have dev/stg/prod and each one has 2 sub OU's
 - If a Management Account creates a Member Account, then it will automatically have an established IAM role inside of that Member Account
     - This is called `OrganizationAccountAccessRole`, and the Management Account can Assume this Role and get full admin permissions on the Member Account
     - This role ***could be*** assumed by an IAM user if they're authorizedm but they shouldn't be
 - Multiple strategies for resources inside of Accounts and how to organize it
 - Features
-    - ***Consolidated Billing*** We can consolidate billing features into the Management Account
+    - ***Consolidated Billing*** you can consolidate billing features into the Management Account
         - Single Payment Method will get pricing benefits because you're aggregating usage across accounts
         - Treat all accounts as the same singular account
         - All accounts in Org can receive the hourly cost benefit of Reserved Instances that are purchased by another account
@@ -208,7 +208,7 @@ AD Replication
         - Consolidated Billing
         - Invited Accounts / Member Accounts must approve enabling all features of Management Account
         - Ability to apply SCP to prevent Member accounts from leaving the Org
-    - ***Movement***: We are able to move Member accounts across different Management Accounts by removing and inviting
+    - ***Movement***: you are able to move Member accounts across different Management Accounts by removing and inviting
 
 ##### SCPs
 - Define AllowList or BlockList IAM actions
@@ -217,10 +217,10 @@ AD Replication
 - Applied to all Users and Roles in account, including Root
 - SCP doesn't affect service linked roles
 - Explicit Denies ***always take precedence*** over Any Allows
-- Really very powerful, we can do things like enforce Tags, enforce regions, etc..
+- Really very powerful, you can do things like enforce Tags, enforce regions, etc..
 
 ![SCP Hierarchy](./images/scp_hierarchy.png)
-- In the example above what will happen if we `Deny Athena` in the Management Account SCP?
+- In the example above what will happen if you `Deny Athena` in the Management Account SCP?
     - Management Account specifically is not affected by SCP's, so it will be ignored
     - No Account will be able to access Athena
     - No Sandbox Account can access S3
@@ -233,7 +233,7 @@ AD Replication
     - AWS Accounts and Orgs
     - Business Apps
     - SAML Apps
-- We can do this with IdP's:
+- you can do this with IdP's:
     - Built in IAM Identity Center IdP
     - 3rd party: AD, OneLogin, Okta, etc...
 - Flow:
@@ -264,7 +264,7 @@ External ID's allow us to mitigate the [Confused Deputy problem](https://docs.aw
 - STS Session Tags in STS force each of the STS Assume Role calls to have specific tags brought along with it, which is another layer similar to External ID's, but more for internal users
 
 ### IAM Access Analyzer
-Allows us to check what resources are allowed externally, so we can establish a "ring of trust" and if anything has access to our resources outside of that, it's a ***Finding***
+Allows us to check what resources are allowed externally, so you can establish a "ring of trust" and if anything has access to our resources outside of that, it's a ***Finding***
 
 
 ### AWS Control Tower
@@ -287,11 +287,11 @@ Guardrails in AWS control tower provide ongoing Governance solutions
     - There's probably ways to apply an SCP for that, but that's too many IAM rules
 - Prefix List: Predefined list of CIDR's you can share with Secutity Groups, other accounts, etc...
     - Allow us to centrally manage prefixes
-- Route53 Outbound Resolver: Allows us to share our forwarding rules of our DNS services, so we can share this with other accounts so that if we update a DNS list in one account it moves to all other accounts
+- Route53 Outbound Resolver: Allows us to share our forwarding rules of our DNS services, so you can share this with other accounts so that if you update a DNS list in one account it moves to all other accounts
 
 
 ## Example - Azure AD Integration with AWS
-Say there's an Azure AD hosted in Azure Cloud, and we wanted to reuse the user pool in AWS for multiple reasons, how can we go about this?
+Say there's an Azure AD hosted in Azure Cloud, and you wanted to reuse the user pool in AWS for multiple reasons, how can you go about this?
 
 If your company uses **Azure Active Directory (Azure AD)** in Azure Cloud and you want to reuse it in AWS, you can do following to integrate Azure AD with AWS for **identity federation**, **single sign-on (SSO)**, and **access management**.
 
@@ -364,7 +364,7 @@ Once complete Cognito will issue a token back to the client
 ---
 
 ### 4. Use Azure AD with AWS Directory Service
-We mention these specifics above, but this would allow us to extend our directory service into AWS
+you mention these specifics above, but this would allow us to extend our directory service into AWS
 
 There are many factors here around replication, syncing, and hosting that come into play
 

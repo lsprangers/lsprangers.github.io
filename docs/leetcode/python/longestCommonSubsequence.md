@@ -36,9 +36,9 @@ Dynamic programming problem - in here we'll need to setup table
 - String A: `abcde`
 - String B: `acfe`
 - Matrix $M$ of rows $i$ and columns $j$ for $str_a$ and $str_b$
-- If a cell $m_{i,j}$ has $str_{a}[i] = str_{b}[j]$, meaning the row and column letters are equal, then we take the last diagonal $m_{i-1, j-1}$ and add 1 to it
-    - This corresponds to "given our last longest subsequence, we found another entry for it"
-- If the cells do not match we need to take the $Max(m_{i-1, j}, m_{i-1, j-1}, m_{i, j-1})$ and just bring along the last largest subsequence we've found
+- If a cell $m_{i,j}$ has $str_{a}[i] = str_{b}[j]$, meaning the row and column letters are equal, then you take the last diagonal $m_{i-1, j-1}$ and add 1 to it
+    - This corresponds to "given our last longest subsequence, you found another entry for it"
+- If the cells do not match you need to take the $Max(m_{i-1, j}, m_{i-1, j-1}, m_{i, j-1})$ and just bring along the last largest subsequence we've found
 
 
 ***Table***:

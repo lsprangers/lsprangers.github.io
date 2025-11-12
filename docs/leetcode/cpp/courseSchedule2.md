@@ -18,7 +18,7 @@ public:
         
         // O(E)
         for(vector<int> prereq : prerequisites) {
-            // Need a list of classes where we need to take 1 before we take 0
+            // Need a list of classes where you need to take 1 before you take 0
             dependencies[prereq[1]].push_back(prereq[0]);
             indegree[prereq[0]]++;
         }

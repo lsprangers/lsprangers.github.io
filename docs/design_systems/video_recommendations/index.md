@@ -17,7 +17,7 @@ Video recommendations will have 3 major components:
 - Modeling
 - Inference / Serving
 
-- In this page we are going to walk through a video from [TRYEXCEPT](https://www.youtube.com/watch?v=EzwfhKqrLQ0), go through the choices made in this video, and then change some things and go deeper into some other topics
+- In this page you are going to walk through a video from [TRYEXCEPT](https://www.youtube.com/watch?v=EzwfhKqrLQ0), go through the choices made in this video, and then change some things and go deeper into some other topics
 
 ### Functional Requirements
 - System must generate personalized video recs for each user
@@ -50,7 +50,7 @@ Assumptions:
     - Video metadata is relatively static over time (schema change over time isn't strictly required for now)
     - Feedback mechanism on client is already created
 
-The data collection piece can just be viewed as apart of the video serving service - basically, whenever a user watches a video on any of these platforms, we assume the client already has like / dislike, comments, and other feedback mechanisms there already
+The data collection piece can just be viewed as apart of the video serving service - basically, whenever a user watches a video on any of these platforms, you assume the client already has like / dislike, comments, and other feedback mechanisms there already
 
 When a user interacts with their mobile client on this video, that data is streamed back into our backend
 
@@ -83,34 +83,34 @@ This will allow us to derive multiple features downstream such as:
 - etc...
 
 ##### Video Upload
-This service we can simply subscribe to a [Webhook](/docs/architecture_components/communication%20protocols/index.md#webhook) and have the URL be a Kafka POST so that whenever a new video is uploaded the message is sent into another Kafka Topic `VideoUpload` Kafka Topic
+This service you can simply subscribe to a [Webhook](/docs/architecture_components/communication%20protocols/index.md#webhook) and have the URL be a Kafka POST so that whenever a new video is uploaded the message is sent into another Kafka Topic `VideoUpload` Kafka Topic
 
 #### Final Sink
-In the [original video posted by TRYEXCEPT](https://www.youtube.com/watch?v=EzwfhKqrLQ0) there's a final sink into MongoDB here, I disagree with this approach, but we will follow this train of thought here and discuss it later on
+In the [original video posted by TRYEXCEPT](https://www.youtube.com/watch?v=EzwfhKqrLQ0) there's a final sink into MongoDB here, I disagree with this approach, but you will follow this train of thought here and discuss it later on
 
-Why can we skip this part? Because we're ultimately looking to have some of our feature be "near real time", and MongoDB in here is just an unnecessary extra step - there's potential discussion around having the raw data stored here and features elsewhere. The main reason I can see this being apart of the architecture is that *we want our raw data stored and our features stored elsewhere*
+Why can you skip this part? Because we're ultimately looking to have some of our feature be "near real time", and MongoDB in here is just an unnecessary extra step - there's potential discussion around having the raw data stored here and features elsewhere. The main reason I can see this being apart of the architecture is that *you want our raw data stored and our features stored elsewhere*
 
-***We could also completely skip this Final Sink portion based on our Data Transformation stage*** - if we want our features to be truly real time we'd need to utilize [Stream Processing Engines](/docs/other_concepts/STREAM_PROCESSING.md) such as Flink, AWS Kinesis Data Analytics, Spark Streaming, or another tool
+***you could also completely skip this Final Sink portion based on our Data Transformation stage*** - if you want our features to be truly real time we'd need to utilize [Stream Processing Engines](/docs/other_concepts/STREAM_PROCESSING.md) such as Flink, AWS Kinesis Data Analytics, Spark Streaming, or another tool
 
-Let's assume we want our raw data stored in NoSQL, and that our features must be hourly (consider this a ***new non-functional requirement***)
+Let's assume you want our raw data stored in NoSQL, and that our features must be hourly (consider this a ***new non-functional requirement***)
 
-At the end of this we should have this data being ingested into a [NoSQL Database](/docs/architecture_components/databases%20&%20storage/NoSQL/index.md) partitioned by either user, video, or user/video combination, to set us up for all downstream feature engineering, metrics creation, and multiple user queries
+At the end of this you should have this data being ingested into a [NoSQL Database](/docs/architecture_components/databases%20&%20storage/NoSQL/index.md) partitioned by either user, video, or user/video combination, to set us up for all downstream feature engineering, metrics creation, and multiple user queries
 
-We recommend NoSQL instead of SQL because it's mostly the defacto "can scale to millions of updates per second" scale conversation, and we aren't as strict no our [transactions and isolation levels](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/ISOLATION_LEVELS.md) and so we would prefer a large scale database to ingest the JSON Kafka Messages
+you recommend NoSQL instead of SQL because it's mostly the defacto "can scale to millions of updates per second" scale conversation, and you aren't as strict no our [transactions and isolation levels](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/ISOLATION_LEVELS.md) and so you would prefer a large scale database to ingest the JSON Kafka Messages
 
-We can use a ***Kafka Connect Sink*** which will have a small service sit on our Kafka broker and write messages from Kafka into MongoDB
+you can use a ***Kafka Connect Sink*** which will have a small service sit on our Kafka broker and write messages from Kafka into MongoDB
 
 ### Data Transformations
 This is the first "tricky" part of the systems design
 
-For something like Netflix with more "static" content, we could simply have a scheduled job run once a day to update our features and prep our data for ML training
+For something like Netflix with more "static" content, you could simply have a scheduled job run once a day to update our features and prep our data for ML training
 
-For something like Youtube, depending on the functional requirements, we may need new videos and user-video data to be prepped as features as close to real-time as possible
+For something like Youtube, depending on the functional requirements, you may need new videos and user-video data to be prepped as features as close to real-time as possible
 
 Let's take our new non-functional requirements, and setup new video features to be [event driven](/docs/event_driven_architecture/index.md), and our user-item features to be daily scheduled [Spark Jobs](/docs/other_concepts/SPARK.md)
 
 #### Features
-The features we can create are almost unlimited
+The features you can create are almost unlimited
 
 - Users:
     - *Temporal statistics* like number of videos over last day, week, month
@@ -127,15 +127,15 @@ The features we can create are almost unlimited
     - Watch time
     - etc...
 
-We can then take these features and plug them into a Feature Store. The recommended one on the video is [FEAST](https://feast.dev/) which ia an open source, on + off line, which sits on top of existing databases
+you can then take these features and plug them into a Feature Store. The recommended one on the video is [FEAST](https://feast.dev/) which ia an open source, on + off line, which sits on top of existing databases
 
 ***FEAST is an abstraction and orchestration layer*** - it's actually not even a database, it just helps to facilitate the movement of data into feature stores that can be online or offline. It helps us to embed "best practices" in our feature stores + feature creation
 
 ### Models
-We can use MLFlow for model training and tracking, and running this all on AWS Batch is a fairly established pattern
+you can use MLFlow for model training and tracking, and running this all on AWS Batch is a fairly established pattern
 
 #### Candidate Generation
-For this we will use [Collaborative Filtering](/docs/design_systems/search_system/CANDIDATE_GENERATION.md#user-item-collaborative-filtering) to predict user-item preferences such as user-video interactions with the help of [Matrix Factorization](/docs/design_systems/search_system/CANDIDATE_GENERATION.md#matrix-factorization) to make this all "fast"
+For this you will use [Collaborative Filtering](/docs/design_systems/search_system/CANDIDATE_GENERATION.md#user-item-collaborative-filtering) to predict user-item preferences such as user-video interactions with the help of [Matrix Factorization](/docs/design_systems/search_system/CANDIDATE_GENERATION.md#matrix-factorization) to make this all "fast"
 
 From our Collaborative Filtering excerpt - "Collaborative Filtering allows us to use Users and Items *at the same time!*. It recommends items to user A based on the preferences / history of similar user B"
 
@@ -155,7 +155,7 @@ Gradient Boosted Decision Tree using XGBoost will allow us to provide a ranked g
 
 It will take as input the candidates (videos) and user metadata 
 
-These models should be global - meaning that every user we have should be able to have their metadata and profiles fed through the model and output the rankings for specific videos we also input
+These models should be global - meaning that every user you have should be able to have their metadata and profiles fed through the model and output the rankings for specific videos you also input
 
 ### Review
 So at the end of all of this our architecture would look like this
@@ -175,7 +175,7 @@ For data collection I think Kafka is still ideal for things like:
 - Logs / generic `POST/` messages
 - Other high throughput, stream-ish, data from Clients
 
-We also introduced a few other services next to this hypothetical Video Upload service - most video uploaders need to chunk out data into different resolutions and store data long term, once this is done there can be calls to something like [Celery Workers](/docs/architecture_components/messaging/Queue/index.md#celery) to scale out on / offline ML models for embeddings, topic classification, segmentation, etc...
+you also introduced a few other services next to this hypothetical Video Upload service - most video uploaders need to chunk out data into different resolutions and store data long term, once this is done there can be calls to something like [Celery Workers](/docs/architecture_components/messaging/Queue/index.md#celery) to scale out on / offline ML models for embeddings, topic classification, segmentation, etc...
 
 #### Data Model
 Sinking this data into a Data Warehouse is a common pattern, and a great design I've used before is to have:
@@ -192,25 +192,25 @@ For Feature creation proposing the [Lambda Architecture](https://www.databricks.
 
 All of these systems have both offline and online components, each with their own characteristics and systems design
 
-In this change we introduced:
+In this change you introduced:
 - Data Warehouse
 - [Stream Processing Engine](/docs/other_concepts/STREAM_PROCESSING.md)
 
-We removed:
+you removed:
 - Lambda for VideoUpload
 - AWS Batch for offline features (Data Warehouse and AWS Batch are comparable)
 
-Our proposal could be more costly at first, but a highly available stream processing engine will scale much more, have higher throughput, allow for Rolling Window Aggregations for features, and many other components that we can't get with bare-bone lambdas
+Our proposal could be more costly at first, but a highly available stream processing engine will scale much more, have higher throughput, allow for Rolling Window Aggregations for features, and many other components that you can't get with bare-bone lambdas
 
 ### Model Serving
 After that, the rest of the architecture is fine for model training
 
-***For Inference*** - ideally we do not use EC2's and we reuse some K8's Cluster (since we have Video Uploader service on Docker) so that we have highly available inference servers
+***For Inference*** - ideally you do not use EC2's and you reuse some K8's Cluster (since you have Video Uploader service on Docker) so that you have highly available inference servers
 
-***Model Considerations*** - Another arrow we added is from the Feature Store into the Model Serving bucket - most of the time we'll need to grab features, in this case video and user metadata, to make our predictions with the XGBoost model
-- Collaborative Filtering model can run off of snapshots of the Feature store and we bumped up refresh to Daily
+***Model Considerations*** - Another arrow you added is from the Feature Store into the Model Serving bucket - most of the time we'll need to grab features, in this case video and user metadata, to make our predictions with the XGBoost model
+- Collaborative Filtering model can run off of snapshots of the Feature store and you bumped up refresh to Daily
     - [Refreshing Collaborative Filtering Matrix Factorization model is typically done daily](/docs/design_systems/search_system/CANDIDATE_GENERATION.md#updating-filtering-and-factorization-models)
-- Once this runs for Candidate Generation, we will get 200 videos to Rank, we need the features of those 200 videos from the FEAST Feature Store
+- Once this runs for Candidate Generation, you will get 200 videos to Rank, you need the features of those 200 videos from the FEAST Feature Store
 
 ### My Final Architecture
 ![My Final Architecure](./images/SysArchTemplate-My-VideoRecommendation.drawio.png)

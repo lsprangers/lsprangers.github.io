@@ -46,4 +46,4 @@ Functional requirements are around "what the system should do" and the generic A
 - Throughput: Transferring GB of data from thousands of users
 - Reliability: Should detect and recover from failure promptly
 - Consistency: System should be consistent with uploads and downlaods
-    - Eventual consistency is enough, and we don't need strictly strong consistency across all replica nodes
+    - Eventual consistency is enough, and you don't need strictly strong consistency across all replica nodes

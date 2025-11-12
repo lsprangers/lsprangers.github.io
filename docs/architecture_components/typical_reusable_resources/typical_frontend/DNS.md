@@ -50,7 +50,7 @@ Some DNS Vocab
 
 
 ## How Does DNS Work
-Ideally we can answer:
+Ideally you can answer:
 - How does it actually get me an IP address
 - How are they updated for companies
 - How does it scale

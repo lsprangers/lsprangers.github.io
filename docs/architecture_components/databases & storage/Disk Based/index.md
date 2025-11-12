@@ -9,7 +9,7 @@ description: Discussion around Disk Based Databases
 ## Disk Based Storage
 Disk based storage underpins almost all "durable storage" systems
 
-Most of the core concepts are the same as volatile memory data structures, except we take these generic data structures and write them to block storage
+Most of the core concepts are the same as volatile memory data structures, except you take these generic data structures and write them to block storage
 
 - Common Disk Based Structures:
     - Tree Based:
@@ -47,8 +47,8 @@ Some open source databases use a B-Tree or LSM-Tree as their primary storage eng
         - Durable
         - Consistent (I think)
         - Relatively $O(\log n)$ read    
-            - Tree lookups can degrade to $O(n)$ if we don't search on the primary sort key 
-            - It would force us to do a full scan of the data until we find the key with a specific attribute, and any range queries are guaranteed $O(n)$
+            - Tree lookups can degrade to $O(n)$ if you don't search on the primary sort key 
+            - It would force us to do a full scan of the data until you find the key with a specific attribute, and any range queries are guaranteed $O(n)$
 
 ### B-Tree
 - There's an entire [BTree Sub Document](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md) showcasing the [Implementation and Runtimes](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md#implementation)
@@ -86,4 +86,4 @@ Some open source databases use a B-Tree or LSM-Tree as their primary storage eng
 - ***WAL***
     - On disk backup for MemTable
 - ***SSTable***
-    - When a MemTable is flushed to disk, we take that Sorted Run and store it on disk as an SSTable
+    - When a MemTable is flushed to disk, you take that Sorted Run and store it on disk as an SSTable

@@ -28,7 +28,7 @@ class SmallestInfiniteSet:
     def popSmallest(self) -> int:
         smallest_added = self.getSmallestInAdded()
         if smallest_added:
-            # We won't addBack a number larger than self.curr, so 
+            # you won't addBack a number larger than self.curr, so 
             # if something is in here it should be smaller
             resp = smallest_added
         else:

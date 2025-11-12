@@ -2,7 +2,7 @@
 using namespace std;
 
 // can use the fact that initial sum can be calculated
-//  and then after that we just remove the leftmost part
+//  and then after that you just remove the leftmost part
 //  of window and include rightmost part
 
 // Find largest sum then convert to double and divide by len

@@ -81,7 +81,7 @@ AWS Graviton Processosrs deliver the best price performance, and they are only o
 - CPU: Utilization + Credit Usage
 - Network: In and Out
 - Status Check: Instance and Systems status
-    - Can have CloudWatch monitor our EC2 instances, and if there's an alarm for `StatusChecFailed_System`, we can use ***EC2 Instance Recovery***
+    - Can have CloudWatch monitor our EC2 instances, and if there's an alarm for `StatusChecFailed_System`, you can use ***EC2 Instance Recovery***
     - EC2 Instance Recovery allows us to keep same Private, Public, and Elastic IP addresses, along with metadata and placement group
 - Disk: Read/Write for Ops/Bytes
 - RAM: ***RAM IS NOT INCLUDED IN AWS EC2 METRICS*** and must be sent from EC2 into CloudWatch metrics by the user
@@ -90,12 +90,12 @@ AWS Graviton Processosrs deliver the best price performance, and they are only o
 High Performance COmputing is being pushed by AWS because the costs of doing it yourself are so large, and really groups want to use a ginormous number of clusters at once, and then run something, and then be done
 
 - Data Mgmt and Transfer:
-    - ***AWS Direct Connect***: We can move GBpS of data to the cloud over a private secure network
+    - ***AWS Direct Connect***: you can move GBpS of data to the cloud over a private secure network
     - ***Snowball***: Moves PB of data to the cloud
     - ***AWS DataSync***: Move large amount of data between on-prem and S3, EFS, EBS, or FSx for Windows
 - Compute and Networking:
-    - EC2! We use CPU or GPU instances, with Spot or Spot Fleets for cheap, giant clusters
-    - We use EC2 placement group of type `Cluster` to keep all of these instances on the same rack with 10 GBpS of networking out of the box
+    - EC2! you use CPU or GPU instances, with Spot or Spot Fleets for cheap, giant clusters
+    - you use EC2 placement group of type `Cluster` to keep all of these instances on the same rack with 10 GBpS of networking out of the box
     - Networking:
         - ***ENI***: Elastic Network Interfaces are the typical networking interface on EC2
         - EC2 Enhanced Networking (SR-IOV):
@@ -131,16 +131,16 @@ High Performance COmputing is being pushed by AWS because the costs of doing it 
 ### Auto Scaling
 
 #### Auto Scaling Groups
-An Auto Scaling Group is a grouping of EC2 instances, where we track the total number of EC2 in the cluster based on some metrics
+An Auto Scaling Group is a grouping of EC2 instances, where you track the total number of EC2 in the cluster based on some metrics
 
-- ***Target Tracking Scaling***: Simplest to setup, where we say something like "we want CPU usage to stay at 40%"
+- ***Target Tracking Scaling***: Simplest to setup, where you say something like "you want CPU usage to stay at 40%"
 - ***Simple / Step Scaling***: 
-    - When CloudWatch alarm is triggered, we can add units of compute or storage
+    - When CloudWatch alarm is triggered, you can add units of compute or storage
 - ***Scheduled Actions***: Anticipate a scaling event and scale up / down for it
 - ***Predictive Scaling***: Will use ML / pattern recognition to find when to scale, and plan ahead of the fact
 
-- Spot Fleet Support: Meaning we can mix Spot and On-Demand instances in the ASG
-        - `MaxSpotPrice` allows us to choose what price we will be open to using Spot Instances
+- Spot Fleet Support: Meaning you can mix Spot and On-Demand instances in the ASG
+        - `MaxSpotPrice` allows us to choose what price you will be open to using Spot Instances
         - Again, don't use these for critical jobs or DB's...use them in apps that are fault tolerant
         - Spot Fleets allow us to have Spot Instances + optional On-Demand
             - Can define multiple launch pools of Instance types, region, OS, etc..
@@ -154,13 +154,13 @@ An Auto Scaling Group is a grouping of EC2 instances, where we track the total n
 - Lifecycle Hooks
     - Perform actions before an instance is in service, or before it's terminated
     - Log cleanup, extraction, or other health checks on start
-- Must update Launch Template if we want AMI to be updated
-    - Instance Refresh: When we update our launch template and want to re-create all EC2 instances
+- Must update Launch Template if you want AMI to be updated
+    - Instance Refresh: When you update our launch template and want to re-create all EC2 instances
         - Set new launch template, and remove old ones or let them naturally die and get recreatd
-        - Instance Refresh can remove old instances for us, and we can set a target minimum threshold and it will keep that percentage alive during refresh
+        - Instance Refresh can remove old instances for us, and you can set a target minimum threshold and it will keep that percentage alive during refresh
             - ***Instance Refresh is basically a rolling upgrade***
 - ASG Scaling Processes / States:
-    - We can start or suspend these processes at any time
+    - you can start or suspend these processes at any time
         - You start them via CLI
     - Launch: Add New EC2 instance to the group, increasing the capacity
     - Terminate: Remove an EC2 instance from the group, decreasing the capacity
@@ -175,29 +175,29 @@ An Auto Scaling Group is a grouping of EC2 instances, where we track the total n
     - AZRebalance: Balances the number of EC2 instances across AZ's based on threshold set
     - AlarmNotification: Accepts notifiations from CloudWatch
     - AddToLoadBalancer: Adds instance to the load balancer / target group
-        - This is how we can add new IP's to LoadBalancer target group
-    - InstanceRefresh: Perform an instance refresh like we explained above
+        - This is how you can add new IP's to LoadBalancer target group
+    - InstanceRefresh: Perform an instance refresh like you explained above
 - Typical Metrics that are used to alarm / autoscale
     - `CPUUtilization` is Avg CPU Utilization across instances
     - `RequestCountPerTarget` is number of requests that go into an EC2 instance
     - `Avg Network I/O` is useful for IO Bound applications like video streaming
-    - Custom: We can also create any custom metric and autoscale on thresholds
+    - Custom: you can also create any custom metric and autoscale on thresholds
 
 ##### Example
-Say we haev a simple architecture where a client connects to an ALB, and that ALB routes traffic to an ASG that is comprised of EC2 instances based on a specific launch template
+Say you haev a simple architecture where a client connects to an ALB, and that ALB routes traffic to an ASG that is comprised of EC2 instances based on a specific launch template
 
-What are the options we have for updating the applications inside of the ASG, the launch templates, or any of the instances themselves? Getting a new JAR file into the EC2, changing the OS version, new config file, etc...
+What are the options you have for updating the applications inside of the ASG, the launch templates, or any of the instances themselves? Getting a new JAR file into the EC2, changing the OS version, new config file, etc...
 
 - Updating Launch Template specifically
-    - We could *double our ASG capacity* after updating the Launch Template
-    - We could *have V1 Launch Tempalte, and V2*, but then the ALB will route traffic to either one and it will be inconsistent for clients
-    - We could also *create a V2 AutoScaling group*, and update our ALB to split traffic between the 2...still inconsistent
-    - We could *double the number of ALB's*...this is the worst, and so we'd need to use Route53 Weighted Records to route clients to the 2 ALB's
-    - Instead we could set our up threshold to 15%, and do an InstanceRefresh process with our new Launch Tempalte which will take care of the changes, while ensuring 15% of our EC2 desired are up and running
-        - After this 100% of our EC2's will have a new launch template, and we will have never had a downed service
+    - you could *double our ASG capacity* after updating the Launch Template
+    - you could *have V1 Launch Tempalte, and V2*, but then the ALB will route traffic to either one and it will be inconsistent for clients
+    - you could also *create a V2 AutoScaling group*, and update our ALB to split traffic between the 2...still inconsistent
+    - you could *double the number of ALB's*...this is the worst, and so we'd need to use Route53 Weighted Records to route clients to the 2 ALB's
+    - Instead you could set our up threshold to 15%, and do an InstanceRefresh process with our new Launch Tempalte which will take care of the changes, while ensuring 15% of our EC2 desired are up and running
+        - After this 100% of our EC2's will have a new launch template, and you will have never had a downed service
 
 ##### Docker
-Docker is used to package up containers, and runs the containers across differnet OS's...lots of other places we talk about Docker
+Docker is used to package up containers, and runs the containers across differnet OS's...lots of other places you talk about Docker
 
 ### Docker Container Mgmt
  
@@ -265,7 +265,7 @@ Docker is used to package up containers, and runs the containers across differne
         - Same pros and cons as general spot instances
     - AWS ECR
         - Store docker images on AWS
-        - Cross region and cross account replication so we don't have to rebuild
+        - Cross region and cross account replication so you don't have to rebuild
         - Private or Public repository
         - IAM Role is needed to pull
         - Resource policy on what can pull from it
@@ -316,7 +316,7 @@ Docker is used to package up containers, and runs the containers across differne
 - Run containers on customer managed infrastructure
 - Use the ECS control plane to manage containers on premise
     - Need ECS Container Agent and SSM agents on our computerss
-    - Both agents register with AWS services, and then we can spin up containers on-prem
+    - Both agents register with AWS services, and then you can spin up containers on-prem
 - Good use case for compliance, regions not on AWS, etc...
 
 ##### EKS Anywhere
@@ -324,7 +324,7 @@ Docker is used to package up containers, and runs the containers across differne
 - Use the Amazon EKS Distro 
 - You use this without connecting to AWS anywhere
     - Use EKS Anywhere installer
-    - We ***could***, but don't have to, connect to AWS using EKS Connector, and then it would allow you to use AWS Console to manage EKS cluster
+    - you ***could***, but don't have to, connect to AWS using EKS Connector, and then it would allow you to use AWS Console to manage EKS cluster
 
 ### Lambda
 It's just running a serverless function - it integrates with almost everything
@@ -374,8 +374,8 @@ It's just running a serverless function - it integrates with almost everything
     - Can't access private RDS's in our instance
 - In Private Subnet:
     - Can deploy a lambda to a specific VPC with a specified security group
-    - With the right SG, we can access private resources because we're in the private subnet
-    - What if we want to access the internet from here?
+    - With the right SG, you can access private resources because we're in the private subnet
+    - What if you want to access the internet from here?
         - Need NAT GW, IGW, or VPCEndpoint:
             - NAT GW: 
                 - Deploy NAT GW in public subnet
@@ -383,8 +383,8 @@ It's just running a serverless function - it integrates with almost everything
                 - IGW interfaces with internet facing API's
             - DyanmoDB:
                 - DynamoDB is a public facing endpoint
-                - We could go same route as above with NAT GW + IGW
-                - We could also put a VPCEndpoint in our private subnet and have it interface with DyanmoDBs
+                - you could go same route as above with NAT GW + IGW
+                - you could also put a VPCEndpoint in our private subnet and have it interface with DyanmoDBs
 - In Public Subnet:
     - Still won't have internet access, need to do above still
 - IP Addresses:
@@ -408,7 +408,7 @@ It's just running a serverless function - it integrates with almost everything
             - Use a dead letter queue
     - Example:
         - SNS and SQS:
-            - If we upload files to S3, and that in turn sends notifications to SNS, should we immediately have a lambda after SNS or should we use SQS as an intermediate?
+            - If you upload files to S3, and that in turn sends notifications to SNS, should you immediately have a lambda after SNS or should you use SQS as an intermediate?
             - SNS to lambda will run immediately, so if 1k files uploaded then we'll have 1k lambdas ran in parallel
                 - Potential throttling and concurrency issues
                 - Need a DLQueue to store errored results
@@ -437,7 +437,7 @@ It's just running a serverless function - it integrates with almost everything
 - Supports only 1 SSL Certificate
     - SSL can have many Subject Alternative Names (SAN), but SSL cert must be changed when new SAN is added / removed
     - Better to use ALB with Server Name Indication (SNI) to host multiple websites using 1 SSL Cert
-    - We'd need multiple CLB's if we have multiple SSL Certs
+    - We'd need multiple CLB's if you have multiple SSL Certs
 - TCP => TCP passes all traffic to EC2 instance
 
 ### ALB
@@ -472,22 +472,22 @@ It's just running a serverless function - it integrates with almost everything
 - Forward TCP and UDP traffic to instances
 - Less latency, and millions of requests per second
 - NLB has ***one static IP per AZ***, and supports ElasticIP
-    - Useful when we need to whitelist IP
+    - Useful when you need to whitelist IP
     - NLB's are deployed regionally, but have Zonal / AZ level deployments
 - Not included in Free Tier
 - Target groups:
     - EC2 instances
     - IP addresses
     - ALB!
-        - Can use ALB for route requesting based on L7, but we want to keep the static IP of the NLB
+        - Can use ALB for route requesting based on L7, but you want to keep the static IP of the NLB
 - Zonal DNS
     - Resolving Regional NLB DNS names return the IP addresses for all NLB nodes in all AZ's
-    - If we query the high level NLB URL, it will return all IP's across all AZ's
+    - If you query the high level NLB URL, it will return all IP's across all AZ's
         - High level: `my-nlb-123.us-east-1.aws`
         - Zonal DNS: `us-east-1a-123.us-east-1.aws`
-            - We can see we're targeting `us-east-1a` here
+            - you can see we're targeting `us-east-1a` here
         - Just need to query the specific Zonal URL
-    - If we only was a specific AZ's DNS name, we can resolve to only a single IP address
+    - If you only was a specific AZ's DNS name, you can resolve to only a single IP address
     - ![Zonal DNS NLB](./images/zonal_nlb.png)
 
 ### GLB
@@ -506,7 +506,7 @@ It's just running a serverless function - it integrates with almost everything
 ### Cross Zone Load Balancing
 - Multi Zone load balancing, or sending requests across zones to other EC2s
 - With Cross-Zone LB each load balancer instance distributes evenly across all registerd instances in all AZ
-- Without Cross-Zone LB, we may have overloaded instances if our zones are uneven
+- Without Cross-Zone LB, you may have overloaded instances if our zones are uneven
 - ![Cross Zone LB](./images/cross_zone_lb.png)
 
 - CLB: Disabled by default
@@ -529,7 +529,7 @@ It's just running a serverless function - it integrates with almost everything
     - Loops over each one for uniform distribution
 - Flow Hash
     - Put all below info through hash to choose a target EC2 / instance
-        - Basically how Sticky Sessions are computed (how we choose the instance for the session)
+        - Basically how Sticky Sessions are computed (how you choose the instance for the session)
     - Selects a target based on:
         - Protocol
         - Source / Dest IP
@@ -587,7 +587,7 @@ Most typical architectures will end up sending HTTP requests to Lambda or ECS
 #### Example
 API GW in front of S3 for uploading files
 
-- We could directly place API GW in front of S3, but as we know there's a 10MB limit
+- you could directly place API GW in front of S3, but as you know there's a 10MB limit
 - A better way to do this would be exposing a lambda from API GW, this lambda calls S3 to generate a pre-signed URL
     - Then API GW returns the response w/ pre-signed URL to client
     - Client can use that to upload to S3
@@ -660,7 +660,7 @@ API GW in front of S3 for uploading files
     - Who can access one or more deployed API stages and methods (authentication and authorization)
     - How much and how fast they can access them (rate limit)
     - API Keys which identify API clients and meter access (both of the above, again)
-        - API Keys are alphanumeric strings we can distribute to customers
+        - API Keys are alphanumeric strings you can distribute to customers
         - Throttling limits applied to API Key level
             - `429 Too Many Requests`
         - Quota limits for overall number of requests across all customers
@@ -673,7 +673,7 @@ API GW in front of S3 for uploading files
     - Chat apps, collab platforms like Confluence, games, and trading platforms
 - Works with AWS Services (Lambda, DynamoDB) or generic HTTP endpoints
 - ![WebSocket Arch](./images/websocket_arch.png)
-- How do we channel replies back to client? I.e server to client
+- How do you channel replies back to client? I.e server to client
     - There are callback URL's that are parameterized by `connectionId`
     - Need to use the special `@connections` sub-URL component, and then parameterize
     - ![WebSocket ConnectionId](./images/websocket_connectionid.png)
@@ -685,7 +685,7 @@ API GW in front of S3 for uploading files
         - Private APIs can only be access from your VPC via a VPC Interface Endpoint
             - Each VPC Interface Endpoint can be used to access multiple private API's
     - API GW Resource Policy
-        - We can specify, on any API GW instance, resource policies that force certain criteria such as:
+        - you can specify, on any API GW instance, resource policies that force certain criteria such as:
             - VPC's via `aws:SourceVPC` or `aws:SourceVPCE`
             - VPC Endpoints
             - AWS Accts
@@ -708,7 +708,7 @@ API GW in front of S3 for uploading files
 - Can perform authorization on Cognito users based on the groups they belong to
 - In GraphQL schema you can specify the security for Cognito groups
     - Allows us to tackle the age old problem in GraphQL of aggregating requests over multiple API's and having fine grained permissions on each source API
-- We can write resolvers such as the ones below, which means it uses auth against Cognito groups of Bloggers and Readers to choose which ones can call certain GraphQL queries
+- you can write resolvers such as the ones below, which means it uses auth against Cognito groups of Bloggers and Readers to choose which ones can call certain GraphQL queries
 ```
 type Query {
     posts: [Post!]!
@@ -778,8 +778,8 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
         - Expanding would be 1-99 more bias
         - Detracting would be -1 - -99 less bias
         - Example:
-            - If we had a single us-east, and us-west, and bias was 0 for both, the line would be in the middle in Kansas City
-            - If we increase bias of us-east, then line shifts to the left and more traffic goes there so line is closer to Denver
+            - If you had a single us-east, and us-west, and bias was 0 for both, the line would be in the middle in Kansas City
+            - If you increase bias of us-east, then line shifts to the left and more traffic goes there so line is closer to Denver
     - IP based routing
         - Let me friggin guess, another policy on closest to IP
         - Let me guess, might get caught up by VPN or something else
@@ -789,7 +789,7 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
             - Can route russian traffic somewhere else
             - Or by Internet Provider
     - Multi Value
-        - Use when we route to multiple resources
+        - Use when you route to multiple resources
         - Route53 to return multiple values / resources
         - Not a substitute for ELB
 - Traffic Flow
@@ -822,11 +822,11 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
     - Route to private IP of EC2 and other things
     - For internal private DNS you must enable VPC settings `enableDnsHostnames` and `enableDnsSupport`
     - Health checks in Private Zones:
-        - Private checkers are outside of VPC, so we can't have them check our private resources
+        - Private checkers are outside of VPC, so you can't have them check our private resources
         - Can create CloudWatch metric and associate a CloudWatch alarm with it
         - Then create a Health Check (public) on that Alarm 
         - ***Very imoprtsnt for test!!!!***
-- Simple arch below shows how we can use lambdas from cloudwatch to trigger read replica failovers during health check failures inside of private VPC's
+- Simple arch below shows how you can use lambdas from cloudwatch to trigger read replica failovers during health check failures inside of private VPC's
 ![Simple Soln Arch](./images/health_check_private.png)
 
 ### Hybrid DNS
@@ -854,7 +854,7 @@ Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) a
         - Create in 2 AZ's for HA
         - 10k queries / sec
         - Remove need for running your own resolver
-    - Below diagram shows ***inbound***, and we can do the same thing, but reversed, for ***outbound***
+    - Below diagram shows ***inbound***, and you can do the same thing, but reversed, for ***outbound***
     - ![Resolver Diagram OnPrem + Private VPC](./images/dns_onprem_private.png)
 
 ## AWS Global Accelerator
@@ -878,9 +878,9 @@ Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) a
 Comparing some web and compute layer architectures 
 
 ### EC2 with Elastic IP
-- This is easy, just stick ElasticIP on an EC2, and if the EC2 fails we can move EIP to another EC2
-- Figuring out how it failed would need some sort of Health Check, which we can get from EC2 instance monitoring which is automatically added in EC2
-    - After some number of fails a CloudWatch alarm gets triggered, and we can have a lambda move the EIP
+- This is easy, just stick ElasticIP on an EC2, and if the EC2 fails you can move EIP to another EC2
+- Figuring out how it failed would need some sort of Health Check, which you can get from EC2 instance monitoring which is automatically added in EC2
+    - After some number of fails a CloudWatch alarm gets triggered, and you can have a lambda move the EIP
 - This architecture does not scale - it's one EIP to one EC2
 
 ### Stateless Web App
@@ -920,15 +920,15 @@ Comparing some web and compute layer architectures
     - ASG manages EC2 instances that ECS runs on
     - ECS Service manages the number of task replicas of application
         - ***ECS Service doesn't automatically increase the number of running tasks just because more EC2 instances become available in ASG***
-        - If more instances join ECS Cluster we add more capacity, but ECS will not schedule new tasks unless ECS Services are scaled as well
+        - If more instances join ECS Cluster you add more capacity, but ECS will not schedule new tasks unless ECS Services are scaled as well
             - 10 EC2's, 20 tasks --> 12 EC2's, still at 20 tasks and 2 EC2's might be apart of the ECS Cluster via ECS Agent, but there are still only 20 tasks
         - ASG monitors instance (EC2) level metric, not container and task load metrics
-            - There's a chance our tasks are overwhelmed while our EC2 isn't, this would be the case if we underutilize EC2 for our tasks
-        - So TLDR; Even if we add more EC2's, ECS won't use them unless we up the number of tasks via ECS Service
+            - There's a chance our tasks are overwhelmed while our EC2 isn't, this would be the case if you underutilize EC2 for our tasks
+        - So TLDR; Even if you add more EC2's, ECS won't use them unless you up the number of tasks via ECS Service
     - To do the dual auto-scaling
         - ASG scaling policy based on EC2 CPU Utilization
         - ECS Service scaling policy based on ALB request count per target, or task CPU Usage
-            - We must scale ECS Task (app layer) to take advantage of newly added EC2 instances (infra layer)
+            - you must scale ECS Task (app layer) to take advantage of newly added EC2 instances (infra layer)
 
 ### ALB + ECS on Fargate
 - You basically remove all the crap above about scaling app and infra layer, and you only worry about scaling app layer based on metrics
@@ -936,7 +936,7 @@ Comparing some web and compute layer architectures
 - Route53 Alias Record pointing to ALB
 - ALB routes to Fargate service
     - Still have limitations of ALB sudden bursts
-- Fargate handles scaling of infra layer, and we only worry about scaling app layer
+- Fargate handles scaling of infra layer, and you only worry about scaling app layer
 
 ### ALB + Lambda
 - Easy way to scale

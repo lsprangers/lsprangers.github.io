@@ -97,7 +97,7 @@ Basically just Tagging
     - 99.9% availability
     - Use for DR and backups
 - S3 One Zone-Infrequent Access
-    - Cheaper infrequent access, but if we lose a zone then we can't get them back
+    - Cheaper infrequent access, but if you lose a zone then you can't get them back
     - High durability inside of one AZ
     - 99.5% availability
 - S3 Intelligent Tiering
@@ -111,7 +111,7 @@ Basically just Tagging
         - *Archive Access:* not accessed for 90 - 700+ days (configurable)
         - *Deep Archive:* not accessed for 180 - 700+ days (configurable)
 - Glacier
-    - All are based on how fast we can get them vs how expensive they are
+    - All are based on how fast you can get them vs how expensive they are
         - Low cost object storage
     - Instant retrieval
         - Millisecond retrieval

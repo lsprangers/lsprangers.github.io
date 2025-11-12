@@ -20,14 +20,14 @@ public:
     int resp;
 
     int minReorder(int n, vector<vector<int>>& connections) {
-        // Create HashMap O(n) - we don't need to, but will be for first go
+        // Create HashMap O(n) - you don't need to, but will be for first go
         seen = vector(n, false);
         resp = 0;
 
         for(vector<int> conxn : connections) {
             umap[conxn[0]].push_back(conxn[1]);
-            // make it undirected so we can traverse starting at 0
-            //  and we'll check if some item is in connections so we know 
+            // make it undirected so you can traverse starting at 0
+            //  and we'll check if some item is in connections so you know 
             //  to include it in response
             umap[conxn[1]].push_back(conxn[0]);
             roads.insert({conxn[0], conxn[1]});

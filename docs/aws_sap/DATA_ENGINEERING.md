@@ -84,7 +84,7 @@ show_back_link: true
             - Data Warehouse reader
             - Can all read from the same Kafka topic on different offsets and use the produced data independently
         - Within a Kafka Consumer Group, each Partition is consumed by one Consumer Instance at any given time
-        - In Kinesis Data Streams one consumer can read from a Shard, so a Shard is most similar to a Parititon, but we don't group shards
+        - In Kinesis Data Streams one consumer can read from a Shard, so a Shard is most similar to a Parititon, but you don't group shards
             - Eh
         - If multiple consumers try to read frmo same Kinesis Data Streams shard, they compete and both are apart of same throughput calculation
             - Meaning they basically act as one consumer
@@ -94,7 +94,7 @@ It is a specific instantiation of Kinesis Data Streams
 
 - One video stream per streaming device (producer)
     - Security cameras, body cameras, smartphones
-- Underlying data stored in S3, but ***we do not have access to it***
+- Underlying data stored in S3, but ***you do not have access to it***
 - ***Cannot output stream data to S3***
 - Consumers:
     - EC2 instances for real time analysis or in batch
@@ -217,8 +217,8 @@ It is a specific instantiation of Kinesis Data Streams
         - Dicsussion Points:
             - Need at least 3 shards based on 1K messages / second throughput of KDS
             - If each message is 1KB, then we'd be limited to ~1,000 messages per shard so it works out the same
-            - If we manage the scaling ourselves we can save some money
-            - If we do fully managed we pay for the GB / second
+            - If you manage the scaling ourselves you can save some money
+            - If you do fully managed you pay for the GB / second
             - `3 shards --> 3 * $0.015 / hr = $32.40 / month`
             - Must use KDF for output to S3 for long term storage
                 - Some costs here, but also negligible
@@ -226,7 +226,7 @@ It is a specific instantiation of Kinesis Data Streams
         - `INSERT INTO` DynamoDB Table
         - Use DyanmoDB Streams (CDC) into AWS Lambda
         - Dicsussion Points:
-            - We would be paying for the data in and out of Dynamo
+            - you would be paying for the data in and out of Dynamo
             - DynamoDB Streams would fill up and take over some transaction log? I think? If Lambda can't pull it
             - Dynamo is long term retention as a database, but it doesn't store historic data or slowly changing dimensions
             - Throughput would have 3,000 Write Compute Units (WCU) = 3MB / second
@@ -448,7 +448,7 @@ It is a specific instantiation of Kinesis Data Streams
 - Cross Region snapshot copy for a KMS encrypted Redshift
     - Snapshot is encrypted at rest in S3
     - Need to do a `snapshot copy grant` from source region to failover region, and copy key over from Region A to Region B
-    - Then we can copy snapshot physically over into new region, and use the copied over encryption key in Region B to access the data
+    - Then you can copy snapshot physically over into new region, and use the copied over encryption key in Region B to access the data
 
 ### Redshift Spectrum
 - Query data that's already in S3 without loading it

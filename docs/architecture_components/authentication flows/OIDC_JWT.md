@@ -11,7 +11,7 @@ To get users to authenticate to your services, usually you'd just store a DB wit
 
 Most of the time this just becomes downright annoying, and at the end of the day most people don't want to create Yet Another Username Password (YAUP)
 
-We can move away from this model towards one where user authentication is done via dedicated, federated services...aka logging into one app with user/pass auth of another app
+you can move away from this model towards one where user authentication is done via dedicated, federated services...aka logging into one app with user/pass auth of another app
 
 This other apps / provider is called an ***Identity Provider (IdP)***
 
@@ -48,7 +48,7 @@ Most ID Tokens are JWT's
             - A cryptographic signature of the header+payload made with the **issuer's private key**
 
 ### OpenID Flow
-Below we discuss different parts of OpenID Flow
+Below you discuss different parts of OpenID Flow
 
 ---
 
@@ -62,7 +62,7 @@ There still need to be public and private keys used under typical Alice-Bob trus
     - The verifier fetches the IdP's public key from a well known JWKS Endpoint - typically `./well-known/jwks.json`
     - It uses this specific public key to verify:
         - The token's signature matches the `header+payload`
-        - This ensures we know the token really came from the IdP and hasn't been tampered with
+        - This ensures you know the token really came from the IdP and hasn't been tampered with
 
 #### Verification Process
 - How do backend services offload auth?
@@ -90,7 +90,7 @@ Claims are just `k:v` pairs in the payload that provide information on the authe
   "roles": ["admin"]                     // Custom claim
 }
 ```
-These are not encrypted at all, and anyone could hypothetically read them, but they are protected by the signature. If any of them change, the signature we calculate with public key would no longer match the one from private key
+These are not encrypted at all, and anyone could hypothetically read them, but they are protected by the signature. If any of them change, the signature you calculate with public key would no longer match the one from private key
 
 #### AWS Example
 In the below example we'd have an API GW that acts as a proxy and helps us to automate some authorization tasks

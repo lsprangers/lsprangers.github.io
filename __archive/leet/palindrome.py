@@ -1,5 +1,5 @@
 # O(n) time for loops (O(n/2))
-# O(1) space since we only use 2 integer variables and 2 pointers
+# O(1) space since you only use 2 integer variables and 2 pointers
 
 def check_palindrome(s: str) -> bool:
     left = 0 

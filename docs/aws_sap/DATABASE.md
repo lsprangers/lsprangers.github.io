@@ -56,7 +56,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - Each item has attributes
     - Can change and evolve over time
     - Can be NULL
-    - This is how we get to "schemaless" and not a rigid SQL schema
+    - This is how you get to "schemaless" and not a rigid SQL schema
 - Max item size is 400KB
 - Data Types:
     - Scalar: String, Num, Boolean, etc
@@ -110,7 +110,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 
 ### Solution Architecture - Indexing
 - S3 does not have the best search functionality, and there's lots of info that S3 has problems going through
-- A common scenario is that on S3 events, we trigger a lambda and that lambda will update a DynamoDB table that acts as an index on multiple different attributes
+- A common scenario is that on S3 events, you trigger a lambda and that lambda will update a DynamoDB table that acts as an index on multiple different attributes
 - This allows us to:
     - Search by date
     - Get metrics and aggregations like total storage used by a customer
@@ -136,7 +136,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
         - Monitoring and metrics of OS data
     - Logstash:
         - Log ingestion mechanism
-        - Alternative to CW Logs where we can decide retention and granularity
+        - Alternative to CW Logs where you can decide retention and granularity
 - OpenSearch + Dynamo or CW 
     - Common pattern is CRUD ops into DynamoDB
     - DynamoDB Streams for CDC
@@ -194,7 +194,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
         - Oracle RMAN recovery manager is for backups, the restores RMAN provides cannot be used to restore to RDS, it only provides restores to non-RDS databases
     - Real Application Clusters (RAC) 
         - RDS Oracle does not support RAC
-        - To get RAC you need to install Oracle on EC2 instance where we have full control
+        - To get RAC you need to install Oracle on EC2 instance where you have full control
     - RDS for Oracle supports Transparent Data Encryption to encrypt data before it's written to storage
     - DMS works on Oracle RDS
         - On-prem Oracle DB $\leftrightarrow$ DMS $\rightarrow$ RDS Oracle
@@ -203,7 +203,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
     - Can use `mysqldump` to migrate RDS DB to non RDS
         - External MySQL DB can run on prem or EC2 or wherever
     - RDS Proxy for AWS Lambda
-        - `TooManyConnections` exception sometimes when we use Lambda functions with RDS since they open and maintain connections
+        - `TooManyConnections` exception sometimes when you use Lambda functions with RDS since they open and maintain connections
         - RDS Proxy can take care of cleaning up idle connections, managing connection pools, etc.
         - Supports IAM Auth
         - RDS Proxy is a service outside of RDS itself - it can be deployed in other subnets if needed
@@ -211,7 +211,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 ### Solution Architecture - Cross Region Failover
 - Can use RDS events and CW health checks together to get notified of downed RDS clusters
 - These CW Events or RDS events or anything else can trigger lambdas that update DNS and promote read replicas to leader
-- Can't use DNS health checks only because we need to promote RR to leader, and that can't be done without custom logic stored in lambda
+- Can't use DNS health checks only because you need to promote RR to leader, and that can't be done without custom logic stored in lambda
 - ![CRFailover](./images/rds_cr_failover.png)
 
 ## Aurora
@@ -248,7 +248,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
     - Custom Endpoints 
         - Represents a set on DB instances that you choose in Aurora cluster
         - Use when you want to connect to specific subset of DB's with different capacities / configs
-            - Basically when different DB's in cluster have different DB parameter groups, we can use custom endpoint to only reach those RR's
+            - Basically when different DB's in cluster have different DB parameter groups, you can use custom endpoint to only reach those RR's
     - Instance Endpoints
         - Connects to specific DB instance in Aurora Cluster
         - Use for diagnosis or fine tuning of one specific instance
@@ -280,7 +280,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
     - Secure HTTPS endpoints to run SQL Statements
     - Users need access to Data API and Secrets Manager
 - RDS Proxy
-    - Allows us to create our own proxy for read only replicas if we desire
+    - Allows us to create our own proxy for read only replicas if you desire
 - Global Aurora
     - 1 primary region
     - 5 secondary regions for read only

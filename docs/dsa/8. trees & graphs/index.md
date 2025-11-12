@@ -21,12 +21,12 @@ Binary Search Tree's are tree's who, for any node, have:
 - All left children $\lt$ node value
 - All right children $\gt$ node value
 
-The reason these are different from regular Binary Tree's are this specific relationship - at each step we can reduce the total search space by half, resulting in $O(\log n)$ search time
+The reason these are different from regular Binary Tree's are this specific relationship - at each step you can reduce the total search space by half, resulting in $O(\log n)$ search time
 
 ### Self-Balancing Binary Search Tree
 - Self Balancing BST's have the same property as Binary Search Tree's, except they will balance themselves out via different methods
 - The reason for this balancing is that Binary Search Tree's worst case lookup time degrades to $O(n)$ if the tree represents a Linked List
-  - This usually happens when we insert nodes in order and it becomes all right or left sides
+  - This usually happens when you insert nodes in order and it becomes all right or left sides
 #### AVL Tree
 #### Red Black Tree
 
@@ -69,14 +69,14 @@ void buildSegTree(vector<int>& arr, int treeIndex, int lo, int hi)
 ```
 
 - The more important part is querying
-  - We can't read partial overlaps, it would be too confusing
+  - you can't read partial overlaps, it would be too confusing
   - Need to traverse down until you get to a section that's smaller than your desired interval, and worst case add in from other sections as well
     - Can hopefully use some internal / middle nodes, and complete the aggregation using other leaf nodes
 - Updating values means finding the leaf node of the actual index, and traversing back up and out to update that leaves parents
 
 ### Prefix Sum
 - The Prefix Sum is defined, for 1-D arrays, in [Arrays and Strings](/docs/dsa/1.%20arrays%20&%20strings/index.md#prefix-sum)
-- The Prefix Sum also comes up in Tree Traversal because we can use it during a tree traversal technique to find things like 
+- The Prefix Sum also comes up in Tree Traversal because you can use it during a tree traversal technique to find things like 
     - *Total number of paths that sum to X*
     - *Total number of paths less than or equal to X*
     - etc
@@ -84,10 +84,10 @@ void buildSegTree(vector<int>& arr, int treeIndex, int lo, int hi)
   
 There is just one thing that is particular for the binary tree...there are two ways to go forward - to the left and to the right
 
-To keep parent->child direction, we shouldn't blend prefix sums from the left and right subtrees in one hashmap
+To keep parent->child direction, you shouldn't blend prefix sums from the left and right subtrees in one hashmap
 ![Tree Path Prefix Sum](./images/tree_pfxsum.png)
 
-So to do this for Binary Tree we start off by defining some global variables
+So to do this for Binary Tree you start off by defining some global variables
 ```
 class Solution:
     def pathSum(self, root: Optional[TreeNode], targetSum: int) -> int:
@@ -98,9 +98,9 @@ class Solution:
     preorder(root, 0)
     return(resp)
 ```
-And then we need to create the traversal code
+And then you need to create the traversal code
 
-Weird part is removing it from `freq` after passing, but just means we take it out so other traversals aren't affected by it, and is from [Backtracking](/docs/dsa/9.%20backtracking/index.md) - it ensures that when you return from a recursive call (i.e., move back up the tree), the prefix sum count for the current path is removed from the frequency map
+Weird part is removing it from `freq` after passing, but just means you take it out so other traversals aren't affected by it, and is from [Backtracking](/docs/dsa/9.%20backtracking/index.md) - it ensures that when you return from a recursive call (i.e., move back up the tree), the prefix sum count for the current path is removed from the frequency map
 
 ```
 target = 3
@@ -142,7 +142,7 @@ class Solution:
             preorder(curr.left, currSum)
             preorder(curr.right, currSum)
 
-            # Remove this from map so we don't use it in other parts of tree
+            # Remove this from map so you don't use it in other parts of tree
             freq[currSum] -= 1
 
         resp = 0
@@ -160,7 +160,7 @@ class Solution:
 - Depth first means exactly as it says, from any single node you traverse as far down / as far away as you can possibly go
 - Breadth first on the other hand means from any node you explore each degree, or "level away", equally
   - BFS is typically used in ***shortest path problems*** because as you go out a degree each level, you're guaranteed to hit the shortest path first, wheras DFS would need to search every path and then take `min()`
-    - Although for BFS to find the optimal solution, each edge has to have ***equal and positve weights***, and so it wouldn't work for weighted edges - that's typiaclly when we would use [Djikstra's](#djikstra) algorithm
+    - Although for BFS to find the optimal solution, each edge has to have ***equal and positve weights***, and so it wouldn't work for weighted edges - that's typiaclly when you would use [Djikstra's](#djikstra) algorithm
 
 $V$ is the number of Vertices, and $E$ is the number of edges
 
@@ -177,7 +177,7 @@ Most common examples are [Finding The Nearest Exit](/docs/leetcode/python/neares
 - Union Find is a data structure that allows us to find a representation of clusters in a disconnected graph
   - It allows us to find connectivity of 2 nodes, i.e. if they're in the same component, in $O(1)$ time
   - Optimizations:
-    - ***Path Compression:*** So that root / parent identification will be updated as we traverse down a graph
+    - ***Path Compression:*** So that root / parent identification will be updated as you traverse down a graph
     - ***Union by Rank:*** So that our tree's don't become unbalanced over time
 - For the time complexities below, $\alpha(n)$ is the *Inverse Achermann Function*, which "grows slowly and is effectively constant for all practical inputs"
 - An [Implementation](/docs/dsa/implementations/optimized_unionfind.md) in C++ can be reviewed for actual runtime info
@@ -204,7 +204,7 @@ Most common examples are [Finding The Nearest Exit](/docs/leetcode/python/neares
 #### *Map Reduce Connected Componenets
 Pregel is a way to do generic BFS and Graph Traversals in the MapReduce world, and there are ways to implement Connected Components via BFS using Pregel framework
 
-We discuss Pregel in other areas, but it's useful to note here as some popular large scale data processing engines use this
+you discuss Pregel in other areas, but it's useful to note here as some popular large scale data processing engines use this
 
 ### Minimum Spanning Tree
 A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connected by the minimum number of edges
@@ -214,7 +214,7 @@ In my opinion it seems similar to a Span in a Vector Space which describes all o
 The pink edges below show the ST
 ![ST](./images/st.png)
 
-A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, we ideally can find the ST with the smallest total weight
+A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, you ideally can find the ST with the smallest total weight
 
 An undirected graph can have multiple ST's and MST's
 
@@ -224,7 +224,7 @@ A ***cut*** in Graph Theory is a way to split up the Vertices and Edges in a Gra
 
 So the ***cut property***, which will help us run different algorithms, says for any Cut $C$ of the Graph $G$, if the weight of an Edge $E$ in a Cut-Set $C_s$ is strictly less than all other Edges in $C_s$, then $E$ belongs to all MST's of $G$
 
-The [proof above would rely on contradiction](https://stackoverflow.com/questions/3327708/minimum-spanning-tree-what-exactly-is-the-cut-property) and goes something along the lines of "well if we didn't have that edge, $E$ in the MST, then we could add it and create a cycle that crosses the cut at least twice (first and newly added edge), and then if we removed the other Edge $E^`$ greater than it, it would result in a MST less than the original one"
+The [proof above would rely on contradiction](https://stackoverflow.com/questions/3327708/minimum-spanning-tree-what-exactly-is-the-cut-property) and goes something along the lines of "well if you didn't have that edge, $E$ in the MST, then you could add it and create a cycle that crosses the cut at least twice (first and newly added edge), and then if you removed the other Edge $E^`$ greater than it, it would result in a MST less than the original one"
 
 MST algorithms are useful to find solutions to things like "min number of vertices to connect all points" similar to traveling salesman
 
@@ -236,7 +236,7 @@ Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-
   - Starting smallest, for each edge:
     - Check if the vertices of the edge are in the same connected component - which can be done via [UnionFind](#unionfind--disjoint-set-union) and takes $O(\alpha(V))$ lookup and add time
       - This essentially shows us if it would create a cycle / unnecessary edge
-    - Once we reach $V - 1$ edges we've constructed our MST
+    - Once you reach $V - 1$ edges we've constructed our MST
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
@@ -249,8 +249,8 @@ Prim's Algorithm is another algorithm for creating a [Minimum Spanning Tree](#mi
 - Start with an arbitrary vertex
   - For each step find all edges that connect `MST <--> NVisited` and take the minimum edge, and add that Vertex into MST
     - *Remember - The edge that connects two disjoint sub-graphs is a ***cut***
-      - Time complexity is all around building min-heap, and then after that we are simply traversing unvisited nodes which is at most $O(V)$ so the min-heap building will dominate time complexity
-      - Inserting into min-heap is $O(log V)$, and we do that for all edges $E$
+      - Time complexity is all around building min-heap, and then after that you are simply traversing unvisited nodes which is at most $O(V)$ so the min-heap building will dominate time complexity
+      - Inserting into min-heap is $O(log V)$, and you do that for all edges $E$
   - So at each step find the minimum edge crossing the cut, add the Vertexes to MST, and remove them from NVisited
 
 Finding all the edges that connect the 2 sets is the majority of complexity here, and typically is solved using
@@ -285,11 +285,11 @@ Djikstra's Algorithm can help solve the shortest path problem for graphs with **
 
 It solves the shortest path problem for a single Vertex, to all other Vertices
 
-We also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases we can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
+you also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases you can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
 
 Djikstra's algorithm is greedy, and essentially starts from a central point `u` and expands outwards, continually getting the min from the seen vertices to find shortest path to other vertices, it uses a min-heap to continuously select the vertex with the smallest known distance
 
-We hold the state of our source vertex to each other vertex in the graph, and we hold "previous vertex" and length information in this table which will help us traverse recursively if we needed to rebuild the path. We can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex we need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since we need to store visited node info)
+you hold the state of our source vertex to each other vertex in the graph, and you hold "previous vertex" and length information in this table which will help us traverse recursively if you needed to rebuild the path. you can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex you need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since you need to store visited node info)
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
@@ -313,9 +313,9 @@ A key property is ***acyclic*** meaning there are no cycles in the graph! It wou
   - Workflow DAGs
   - ...
 
-The main algorithm for this is ***Kahn's Algorithm*** where we will basically iterate over all vertexes that have `indegree = 0`, and do something with them, and then decrement their downstream vertexes. This ultimately creates "levels" where multiple classes or jobs could be ran at the same time, and once they're all done we should be ready for our downstream vertexes (decrement indegree)
+The main algorithm for this is ***Kahn's Algorithm*** where you will basically iterate over all vertexes that have `indegree = 0`, and do something with them, and then decrement their downstream vertexes. This ultimately creates "levels" where multiple classes or jobs could be ran at the same time, and once they're all done you should be ready for our downstream vertexes (decrement indegree)
 
-Since we are only iterating over edges and vertexes and doing increment / decrement, our space and time complexities are $O(V + E)$
+Since you are only iterating over edges and vertexes and doing increment / decrement, our space and time complexities are $O(V + E)$
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|

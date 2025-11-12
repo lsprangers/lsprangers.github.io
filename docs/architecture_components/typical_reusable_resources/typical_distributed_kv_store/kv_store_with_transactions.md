@@ -54,11 +54,11 @@ class KVStoreWithTransactions:
         # map:
         #   pros: O(1) random access, delete, create
         #   cons: O(n) iteration...but we're going to keep a transaction ID and a latest transaction
-        #       so we can just iterate through and transactions we need and get the location in O(1)
-        #   For example, if we need to support committing latest transaction we can do that, or we can allow
-        #       a user to specify a specific transaction ID - both are O(1)....we can also allow something
+        #       so you can just iterate through and transactions you need and get the location in O(1)
+        #   For example, if you need to support committing latest transaction you can do that, or you can allow
+        #       a user to specify a specific transaction ID - both are O(1)....you can also allow something
         #       like "specific iteration through latest iteration" by looping from specific -> latest and
-        #       getting the transaction we need in O(1) 
+        #       getting the transaction you need in O(1) 
         self.transactions = {}
         self.next_transaction_id = 0
     

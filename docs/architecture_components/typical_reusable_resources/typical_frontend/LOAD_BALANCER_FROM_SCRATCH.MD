@@ -7,7 +7,7 @@ description: Architecting a Frontend Solution
 ---
 
 ## Load Balancer From Scratch
-So in the above main file, we sort of skip over how an actual load balancer would be created from scratch
+So in the above main file, you sort of skip over how an actual load balancer would be created from scratch
 
 You'd ultimately need something that can take in requests, and forward to specific targets based on some rules, and upon scaling needs to register itself with specific DNS servers
 

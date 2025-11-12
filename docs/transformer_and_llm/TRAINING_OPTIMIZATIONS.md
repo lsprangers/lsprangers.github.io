@@ -26,7 +26,7 @@ The main crux focused on is the [Self-Attention](/docs/transformer_and_llm/ATTEN
         - Instead of doing the entire $n$ sequence, find a $B \st B << N$ so that the final result is $O(b^2)$ 
             - This is just running self attention on a much smaller window / block
             - Reducing the attention span!
-    - ***Strided***: Similar to above, except we only attend at certain fixed length intervals
+    - ***Strided***: Similar to above, except you only attend at certain fixed length intervals
 - ***Combination of Patterns***
     - This is just using multiple Fixed Patterns in different heads of Multi Headed Attention
     - 1/2 get Blocking, 1/2 get Strided

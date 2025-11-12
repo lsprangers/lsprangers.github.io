@@ -15,7 +15,7 @@ public:
         }
 
         // freqs initialized to 0
-        //  for any row, we hope to get to n_rows, and same for cols
+        //  for any row, you hope to get to n_rows, and same for cols
         unordered_map<int, int> row_freqs;
         unordered_map<int, int> col_freqs;
         

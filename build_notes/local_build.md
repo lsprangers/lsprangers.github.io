@@ -10,7 +10,7 @@
 # Folder Structure
 For any folder, the `index.md` or `index.mdx` will be rendered when clicking on it, and any `subdoc.md` will be displayed underneath the folder
 
-For example below, clicking on Foo would render `docs/foo/index.mdx`, and we'd see `Thing` as a sub-document we can click on
+For example below, clicking on Foo would render `docs/foo/index.mdx`, and we'd see `Thing` as a sub-document you can click on
 ```
 docs/
     foo/

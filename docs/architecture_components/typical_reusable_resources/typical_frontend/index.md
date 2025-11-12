@@ -7,41 +7,41 @@ description: Architecting a Frontend Solution
 ---
 
 ## Distributed Frontend
-Across many product facing applications, there are some repeated patterns that have been seen concerning DNS, load balancing, and serving web applications - they concern all 3 major layers of application, data, and infrastructure, and as discussed below there's no perfect solution. Sessions, routing, caching, scaling, and product needs all dictate these decisions, and they start to combine (even when we try to keep them separate).
+Across many product facing applications, there are some repeated patterns that have been seen concerning DNS, load balancing, and serving web applications - they concern all 3 major layers of application, data, and infrastructure, and as discussed below there's no perfect solution. Sessions, routing, caching, scaling, and product needs all dictate these decisions, and they start to combine (even when you try to keep them separate).
 
 There are 3 main components in typical frontends:
 - DNS lookups: How to find the IP's / servers that host our website
     - What if these servers go down? How do DNS servers get updated? How do clients know where to go?
-- Load balancing: If millions of clients go to our servers, how can we scale it out so that multiple backend servers are serving them
-    - How do we handle state?
+- Load balancing: If millions of clients go to our servers, how can you scale it out so that multiple backend servers are serving them
+    - How do you handle state?
     - Load balancers simply help our other components horizontally scale, by providing a singular place for client requests to go, and then routing them outwards to one of potentially many servers
 - Routing: The actual physical act of our load balancer choosing a backend server to send the request to
     - Round robin, uniform, hash (same server for every user request), etc are all strategies
 
 ![Typical Frontend](images/typical_loadbalancer.png)
 
-If everything was truly stateless, it would be incredibly easy to scale applications, but we will eventually have to deal with:
+If everything was truly stateless, it would be incredibly easy to scale applications, but you will eventually have to deal with:
 - [Distributed databases](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md), which will require their own routing + load balancing
-- [Distributed caches](/docs/architecture_components/typical_reusable_resources/typical_distributed_cache/index.md), where we will want to host frequently accessed content in RAM 
+- [Distributed caches](/docs/architecture_components/typical_reusable_resources/typical_distributed_cache/index.md), where you will want to host frequently accessed content in RAM 
     - The key part here are ***sessions*** - if a user logs in and is routed to an app server on IP `127.0.0.1`, and the next request is routed to `127.0.0.2`, then the local cache / session storage will not have that information
-    - In this scenarion we desire ***sticky sessions*** where all user requests for a session are routed to the same backend application server
+    - In this scenarion you desire ***sticky sessions*** where all user requests for a session are routed to the same backend application server
 - Routing
     - Round robin is easiest, just fling each new requests to the next server, to ensure backend servers are uniformly utilized
-        - This is where we lose session abilities
-    - Hashing alleviates this issue, where we send each clients request to the same backend server
+        - This is where you lose session abilities
+    - Hashing alleviates this issue, where you send each clients request to the same backend server
         - This could create "hot servers" that are overloaded by a particular subset of users by chance
     - Least used will send the next new request to the least utilized server
-        - We could then store the clients backend server in a Distributed K:V store
+        - you could then store the clients backend server in a Distributed K:V store
         - Allows us to uniformly use our backend servers, while also ensuring state / sessions are kept on those servers for clients
-            - Then we get into cache / K:V invalidation when the user has finished their session
-            - We also introduce new components into our architecture, which will all have their own trade-offs
+            - Then you get into cache / K:V invalidation when the user has finished their session
+            - you also introduce new components into our architecture, which will all have their own trade-offs
     - There's a host of other routing choices as well, and the right one depends on the use case of the service(s)!
 
 ## Architecture 
 The core architecture of typical frontend is comprised of:
 - DNS
 - Load balancers
-    - VIP's - which are essentially static IP's ***we can*** hardcode / depend on for DNS / query logic
+    - VIP's - which are essentially static IP's ***you can*** hardcode / depend on for DNS / query logic
         - These are not required, and nowadays most product groups rely on AWS Elastic IP's on load balancers for this, and if not there are ways to register load balancer IP's with DNS servers
         - The architecture for distributed, highly available, load balancers that register their IP's with DNS servers is out of scope here, and is discussed in a sub-document
 - Web servers
@@ -57,7 +57,7 @@ The core architecture of typical frontend is comprised of:
 ### DNS
 DNS (Domain Name Systems) help us to resolve `myexample.app.com` into some IP address `10.0.0.1`
 
-Our computers can't do anything with `myexample.app.com`, so we get into good old-fashioned querying of databases!
+Our computers can't do anything with `myexample.app.com`, so you get into good old-fashioned querying of databases!
 
 DNS systems are essentially gigantic K:V stores with some sort of hierarchy to them to help whittle down where requests need to go, and actually the design of DNS systems requires thoughtful, secure, encrypted, communication channels over distributed, hierarchical, K:V stores and they are a non-trivial component to create on your own
 
@@ -155,7 +155,7 @@ For reference - some of the main points below will use:
     - ***Also helps us route to dynamically scaling ECS / EKS instances***
     - Route53 DNS record can map to ALB DNS name
         - `url.com` can route to `my-alb-123456.<region>.elb.amazon.com`
-    - Similar to above, except we register services and instances instead of IP addresses
+    - Similar to above, except you register services and instances instead of IP addresses
         - If a client goes to `url.com/register` --forward_to $\rarr$ ECS registration service with 1:Many instances running
         - Still need to register port information that ECS containers would be listening to, along with ensuring security group routing rules
 - ***AWS Load Balancer Controller***
@@ -196,8 +196,8 @@ This helps to reduce security risks, separate network concerns, and allows us to
             - Email is port ?
             - SFTP is port 22
             - etc...
-            - So of all potential 64,000 ports, we can probably use the higher up ones
-    - We can then reach a specific container via `ClusterIP:NodePort`
+            - So of all potential 64,000 ports, you can probably use the higher up ones
+    - you can then reach a specific container via `ClusterIP:NodePort`
     - **LoadBalancer**: Inside of a K8's cluster there are specific components called Load Balancers which help to route traffic to Pods / Nodes
         - On AWS EKS it provisions an ELB (ALB or NLB) in AWS, maps traffic to pods via kube-proxy/IPTables or VPC CNI
         - When a Pod goes down, a new one is spun up and registered with a Load Balancer as a target to reach
@@ -206,7 +206,7 @@ This helps to reduce security risks, separate network concerns, and allows us to
             - Ensures as new pods spin up, or old ones die, they become or disassocaite as targets for our Load Balancer
 
 ### Ingress + AWS Load Balancer Controller
-An ***Ingress*** is another K8's component that helps to receive traffic from outside of the cluster, and it's generally what we use to interact with the internet
+An ***Ingress*** is another K8's component that helps to receive traffic from outside of the cluster, and it's generally what you use to interact with the internet
 
 From [AWS docs](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html) - "The controller provisions AWS load balancers that point to cluster Service or Ingress resources. In other words, the controller create a single IP address or DNS name that points to multiple pods in your cluster". This is shown below, and equates to us being able to use this LB Controller to route to Ingress (ALB) or Service (NLB) and AWS can help us manage these routing + target groups easily. The Controller itself watches for K8's Ingress / Service resources, and in response creates appropriate AWS ELB resources, and you can configure those to be different responses if desired.
 
@@ -216,7 +216,7 @@ Ingresses can act as a centralized ingress controller, routing requests to multi
 
 In this example, we're going to showcase a single ingress controller, which will spin up an ALB on AWS, and *helps to translate ingress rules into ALB listeners and target groups*
 
-Above we discuss what target groups are, and how Layer 4 / 7 use different request layers / information to route requests to different targets - targets can be anything such as EC2's, services, VPC endpoints, internet gatway endpoints, database instances, etc.
+Above you discuss what target groups are, and how Layer 4 / 7 use different request layers / information to route requests to different targets - targets can be anything such as EC2's, services, VPC endpoints, internet gatway endpoints, database instances, etc.
 
 ### Request Flow
 1. **Browser** requests `https://myexample.app.com`.
@@ -229,7 +229,7 @@ Above we discuss what target groups are, and how Layer 4 / 7 use different reque
         - If you use AWS LB Controller with K8's Ingress, you can automate this process b/c controllers will watch for new Ingress / K8's Service resources and automatically create / update Route53 records to point to correct ALB DNS name
     - If the actual VM (underlying instance) hosting the ALB goes down and a new one spins up, the DNS name for the ALB (e.g., my-alb-123456.region.elb.amazonaws.com) does NOT change. AWS automatically manages the underlying infrastructure for high availability and will update the IP addresses behind the scenes, but the DNS name remains the same
         - This ensures your clients and Route 53 records continue to work without any changes needed on your end    
-    - ALB's allow for sticky sessions, which we mentioned above may be required        
+    - ALB's allow for sticky sessions, which you mentioned above may be required        
 3. **ALB listener** on port `443` terminates TLS
     - All requests between backend servers (east/west) can be simple HTTP once we've established the client is truly the client (TLS)
 4. **ALB target group** forwards to EKS worker nodes $\rarr$ `kube-proxy` routes to Service endpoints (pod IPs)
@@ -252,7 +252,7 @@ Above we discuss what target groups are, and how Layer 4 / 7 use different reque
 
 So, you maintain **service port mappings** and let Kubernetes/AWS manage pod IPs and external LB IPs. If this is all setup correctly, you just write the correct scaling metrics and AWS / K8's will help deliver a highly available service.
 
-The harder part is writing application code correctly based on infra layer - *if we want sticky sessions both our infra and app layers need to be setup correctly, and it's not something you can easily declare and just have work out of the box*
+The harder part is writing application code correctly based on infra layer - *if you want sticky sessions both our infra and app layers need to be setup correctly, and it's not something you can easily declare and just have work out of the box*
 
 ---
 

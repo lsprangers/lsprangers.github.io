@@ -36,7 +36,7 @@ Feature importance can be calculated as:
 ---
 
 ### Gini Index and Information Splits
-One of the best ArXiv papers I've ever read was on [Understanding Shannon's Entropy Metric for Information](https://arxiv.org/pdf/1405.2061) which is a very useful paper for understanding how we can obtain information from different signals
+One of the best ArXiv papers I've ever read was on [Understanding Shannon's Entropy Metric for Information](https://arxiv.org/pdf/1405.2061) which is a very useful paper for understanding how you can obtain information from different signals
 
 #### Gini Index
 The **Gini Index** is a metric used to measure the impurity of a node in a classification task. It quantifies how often a randomly chosen element from the dataset would be incorrectly classified if it were randomly labeled according to the distribution of labels in the node.
@@ -62,8 +62,8 @@ Where:
 ##### Shannon Entropy
     - $log_2(p_i)$ is equivalent to "number of bits needed to represent choices of $p$" - meaning if there are 4 total values, $log_2(4) = 2$ total bits are needed to represent all of the potential outcomes
         - If a specific $p$ is $p(x) = 2/4$, then the number of bits $ \text{bits} = log_2(4) - log_2(2) = 1$ 1 total bit
-    - So to find the total amount of storage we need for all of our potential values, we need to sum up the total storage bits multiplied by their proportion in our output distribution, if the $p$ that required 1 bit occured 99% of the time, we could almost store the enitre output in 1 bit!
-        - Therefore, to find out the total number of bits we need to store all of our information, we use $sum_{i=1}^{C} p_i \log_2(p_i)$ which is our ***formula for entropy!***
+    - So to find the total amount of storage you need for all of our potential values, you need to sum up the total storage bits multiplied by their proportion in our output distribution, if the $p$ that required 1 bit occured 99% of the time, you could almost store the enitre output in 1 bit!
+        - Therefore, to find out the total number of bits you need to store all of our information, you use $sum_{i=1}^{C} p_i \log_2(p_i)$ which is our ***formula for entropy!***
 
 #### Example of Splitting
 Consider a dataset with the following labels:
@@ -111,4 +111,4 @@ The split with the largest reduction in Gini Index is chosen.
 ---
 
 ### Conclusion
-Decision Trees are a versatile and interpretable machine learning algorithm. They are particularly powerful when combined into ensembles like Random Forests and Gradient Boosted Decision Trees. By understanding concepts like the Gini Index and Information Gain, we can better interpret how decision trees make splits and why they are effective in various tasks.
+Decision Trees are a versatile and interpretable machine learning algorithm. They are particularly powerful when combined into ensembles like Random Forests and Gradient Boosted Decision Trees. By understanding concepts like the Gini Index and Information Gain, you can better interpret how decision trees make splits and why they are effective in various tasks.

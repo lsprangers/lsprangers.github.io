@@ -7,10 +7,10 @@ description: Discussion around storage of data
 ---
 
 # Storing Data
-Storing data is a very wide spectrum, and so we split things up as best we can
+Storing data is a very wide spectrum, and so you split things up as best you can
 
 ## Blob Storage
-We can checkout [Typical Blob Storage](/docs/architecture_components/typical_reusable_resources/typical_blob_storage/) to see what this is usually used for 
+you can checkout [Typical Blob Storage](/docs/architecture_components/typical_reusable_resources/typical_blob_storage/) to see what this is usually used for 
 
 Binary Large Object (BLOb) storage, such as Amazon S3, Google Cloud Storage, or Azure Blob Storage, is one of the most common mechanisms for storing pretty much anything
 
