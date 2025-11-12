@@ -21,7 +21,7 @@ Pretty much the "Hello, world" of ML (or maybe K-Means is) - a Linear Regression
 
 The linearity of a learned relationship leads to many useful things, most of all interpretability 
 
-Linear models can be used to model the dependence of a regression target $y$ on features $\bold{x}$, and the learned relationshop can be written as: $y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \epsilon$ where the $\beta_j \in \{1, ..., p\}$ represent the learned feature weights (aka coefficients), $\beta_0$ is the intercept, and is our way to linearly shift things up, down, left, right without altering slope, and $\epsilon$ is the error that's always involved for any prediction
+Linear models can be used to model the dependence of a regression target $y$ on features $\bold{x}$, and the learned relationshop can be written as: $\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \epsilon$ where the $\beta_j \in \{1, ..., p\}$ represent the learned feature weights (aka coefficients), $\beta_0$ is the intercept, and is our way to linearly shift things up, down, left, right without altering slope, and $\epsilon$ is the error that's always involved for any prediction
 
 Errors in this sense are always assumed to follow a Gaussian distribution, and in-fact most of our input data, data variance, and pretty much any other statistical feature of linear regression can basically be assumed to have some sort of Gaussian distribution
 
@@ -143,3 +143,69 @@ After that, the rest of the interpretation is the same as Linear Regression:
 - For numerical features: If you increase the value of $x_{j}^{(i)}$ by one unit, the estimated odds change by a factor of $\text{exp}(\beta_{j})$
 - For binary categorical features: One of two values of the feature is the reference category (mean / "typical value"), and so changing $x_{j}^{(i)}$ from the reference to the other category changes the esimated odds by a factor of $\text{exp}(\beta_{j})$
 - For categorical features with many values: Typically you just one-hot-encode things, set one specific category as reference, and interpret them as reference vs other for all categories
+
+### GLM and GAM
+Linear regression assumptions are typically violated in practice, and so Generalized Linear Models and Generalized Additive Models were created to help solve some of the issues stemming from data that doesn't fit into Linear Regression's reqiurements
+
+Linear regression assumes the prediction of an instance can be expressed by a weighted sum of it's $p$ features with a random variable $\epsilon^{(i)}$ which follows a Gaussian distribution. 
+
+#### Issues With Linear Regression
+- Wanting our predictions to only be positive, which cannot happen under Gaussian constraints which have 1/2 above and 1/2 below zero
+    - How many minutes will this car ride be
+    - How much food to eat in a day
+- Most data we scrape / collect ends up being correlated or interacting in some way
+- The true relationship between features and target $\hat{Y}$ is not completely and totally linear
+
+These are common scenario's that Linear Regression models cannot overcome, and they're typical enough scenario's that most people do want to end up modeling
+
+In this case, need something a bit more robust
+
+#### GLM - Non Gaussian Outcomes
+Linear regression assumes the outcome given a feature follows a Gaussian distribution, which excludes many cases such as:
+- Positive only
+- Categorical
+- Count
+- Highly skewed events (housing prices)
+
+Generalized Linear Models are an extension of Linear Regression models that are stood up to specifically tackle this issue
+
+The core idea is ***Keep the weighted sum of the features, but allow non-Gaussian outcome distributions and connect the expected mean of this distribution and the weighted sum through a non-linear function***
+
+Basically, this means keep the weighted sum setup, but tie this weighted sum to an expected mean in a non-gaussian distribution by using some new function
+
+Old LR formula:
+$\hat{y} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \epsilon$
+
+A potential GLM formula:
+$\hat{y} = g(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p) + \epsilon$
+
+Where $g(\cdot)$ is a non-linear function that helps to map our linear output to a non-gaussian distribution
+
+Logistic Regression is actually an example of this where the model assumes a [Bernoulli Distribution](/docs/old_math_notes/probability_and_statistics/index.md) for the outcome variable and links the expected mean of that Bernoulli Distribution and the weighted sum of $\beta_j x_j$ using the logistic function - meaning $g(\cdot)$ is the logistic function
+
+Formally, the equation is
+$g(E[Y | \bold{x}]) = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p = \bold{x}^T \beta$
+
+The above equation equates to "the link function connects the expected value of the outcome (possibly transformed) to the linear predictors" - outcome is modeled using a probability distribution from exponential family
+
+And GLM's consist of 3 components:
+- Link function $g(\cdot)$
+- The weighted sum $\bold{x}^T \beta$
+- Probability distribution from the exponential family that defines $E_Y$
+    - This exponential family is a set of distributions that can be written with the same formula (it has parameters to "tweak" it to map to new formulas) that includes an exponent, mean, and variance of a distribution
+    - Essentially the exponential family is a parameterized distribution setup that allows us to create distributions with certain profiles using parameters
+    - There are a lot - [Wikipedia List of Exponential Family](https://en.wikipedia.org/wiki/Exponential_family#Table_of_distributions)
+
+Any exponential distribution from that family can be used for a GLM, and they are chosen based on what you'd like to predict:
+- Outputting a count typically uses the Poisson Distribution
+    - Natural logarithm as link function and Poisson as expected distribution allow us to model things like "number of coffee's drank in a day"
+- Positive only events typically use the Exponential Distribution
+- Probabilities and odds are tpyically done using Bernoulli Distribution 
+    - Logistic function is the link function
+- etc...
+
+Each exponential family distribution has a canonical link function that can be derived mathematically from the distribution - so how do you choose the right distribution and link function? There's no perfect recipe... Typically, you just choose functions that respect the domain of the expected distribution / problem. A good recipe is to try and use a link function / distribution that resembles the data gathering process, but it's not always easy to tell what this process is! Plotting the data can showcase it at times.
+
+Our classic Linear Regression model can also be modeled this way, but $g(\cdot)$ is just the identity function
+
+#### GLM Interpretation

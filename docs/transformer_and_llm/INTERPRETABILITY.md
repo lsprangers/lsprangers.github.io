@@ -58,11 +58,11 @@ Typical Methods (mostly in Classical ML):
 ![ML Interpretability Methods](/img/ml_interpretability_methods.png)
 
 ## Classic ML
-
-### Linear Regression Interpretability
 - [Linear Regression Interpretability](/docs/classic_ml/index.md#linear-regression-interpretability)
     - Linear regression is typically very easy to interpret, and all of it's weights have easy to interpret meanings, along with measurements around confidence and feature importance baked into the model
-- 
+- [Logistic Regression Interpretability](/docs/classic_ml/index.md#logistic-regression) focuses on how log odds are updated
+    - The interpretation is similar to Linear Regression, except a one unit update of a weight corresponds to an increase / decrease in log odds output
+- [GLM and GAM Interpretability]
 
 ## Neural Networks
 Neural networks involve millions of multiplications on weights, linear and non-linear transformations, and multiple parallel architecture components inside of it
