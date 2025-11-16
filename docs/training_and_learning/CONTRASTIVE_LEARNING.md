@@ -163,7 +163,7 @@ Significant components of the framework:
     - In english, this means applying lots of different random changes (like cropping, flipping, rotating, color changes, etc) to images. The model is trained to recognize that these different augmentations are "the same"
 - The quality of learned representations can be substantially improved by introducing a learnable non-linear transformation between the representation and contrastive loss
     - Basically this means you encourage the model to make the representations (feature vectors) of different augmented views of the same image similar, while making representations of different images dissimilar
-    - Contrastive loss will penalize the model is the two feature vectors of the same augmented image are far apart, and rewards them if they're similar
+    - Contrastive loss will penalize the model if the two feature vectors of the same augmented image are far apart, and rewards them if they're similar
         - Common contrastive loss example is *NT-Xent* (Normalized Temperature-scaled Cross Entropy) loss 
 - Representation learning with cross-entropy loss can be improved by normalizing embeddings and adjusting the temperature parameter appropriately
     - **Temperature** is a parameter in the contrastive loss function that controls how sharply the model distinguishes between similar and dissimilar pairs
