@@ -154,6 +154,19 @@ class Solution:
 ```
 
 ## Graphs
+At it's core a Graph is a data structure consisting of two components - vertices (or nodes) $V$ and edges (connections between nodes) $E$
+
+Then a Graph $G = (V, E)$ is defined by these sets of vertices and edges, both $V$ and $E$ are sets of objects
+
+Let's say there are $n$ vertices, with $m$ edges overall, where each node can have up to $f$ features
+
+In most scenario's the set $E$ will consist of ***triplets***, which are objects of $(V_i, V_j, w)$ where $w$ represents the weight of the edge between vertices $V_i$ and $V_j$. Other times it will include other information, so $(V_i, V_j, [R])$ that $R$ represents a set of relationships, but ultimately the relationships are defined by concepts such as "friends with", or "employs" or some other relationship that may or may not have weight. These features can be represented in a node feature matrix $R \in \mathbb{R}^{n \times f}$
+
+A Graph $G$ is often stored and represented digitally using an adjacency list or adjacency matrix $A$ - then $A \in \mathbb{R}^{n \times n}$ where each node is both a row and a column, and $A[i, j]$ represents the edge between vertices $V_i$ and $V_j$
+
+Most data structures can actually be considered specific dimensional graphs, lists are 1-dimensional graphs, trees are hierarchical graphs, images are consistently dimensioned graphs (pixel sizes), etc
+
+![Everything Is Graph](/img/everything_is_graph.png)
 
 ## Graph Traversal
 - Traversing a graph has generally 2 strategies, either Depth first or Breadth first
@@ -167,6 +180,9 @@ $V$ is the number of Vertices, and $E$ is the number of edges
 | Operation        | Time Complexity    | Space Complexity   |
 |------------------|--------------------|--------------------|
 | Traverse         | $O(V + E)$         | $O(V)$             |
+
+
+This theoretical discussion is useful, but in large scale processing graph traversal is typically done via message passing over super-steps in a breadth first search format
 
 ### Maze
 Maze's are a special kind of graph where you essentially have a connected 2-D diagram

@@ -16,6 +16,8 @@ Some neural networks are categorized as classical ML! Some deep learning models 
 
 For the rest of this area / blog post classical ML will refer to regression, decision tree's, clustering, and some other area's that stay away from deep learning 
 
+Other things like [Graph Neural Networks](/docs/other_concepts/graph_processing/GRAPH_NN.md) are considered "Classical ML" as well, but trying to divvy things up by concept is tough so those are placed with Graph Processing components
+
 ### Linear Regression
 Pretty much the "Hello, world" of ML (or maybe K-Means is) - a Linear Regression model predicts the target as a weighted sum of the feature inputs
 

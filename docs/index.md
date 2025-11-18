@@ -138,4 +138,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Cristophm Interpretability Blog](https://christophm.github.io/interpretable-ml-book/overview.html)
 - [Log Odds](https://medium.com/@matthewjacobholliday/an-introduction-to-log-odds-86d364fa6630)
 - [Distributed Training](https://apxml.com/courses/advanced-tensorflow/chapter-3-distributed-training-strategies)
+- [Neptune AI GNN](https://neptune.ai/blog/graph-neural-network-and-some-of-gnn-applications)
 ---
