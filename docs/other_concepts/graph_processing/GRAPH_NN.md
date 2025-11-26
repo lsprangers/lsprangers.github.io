@@ -36,11 +36,85 @@ This sliding window approach was thought to be generalizable to graphs as well, 
 Moving forward, GNN's have taken more of a message passing / aggregation approach, where nodes aggregate information from their neighbors to update their own representations - this is the core idea behind many GNN and Parallel Graph Processing frameworks like GraphX and Pregel
 
 ## Basics of Graph Neural Networks
-A lot of below comes from a few sources:
-- [Neptune AI GNN](https://neptune.ai/blog/graph-neural-network-and-some-of-gnn-applications)
+Thinking about graph ML, can you still view it as supervised, unsupervised, contrastive, etc? Well, yes, you can, but a lot of the old ML tasks like regression, classification, and segmentation aren't portable over to graphs because underlying data assumptions typically can't port over to a graph
+
+There are no independent and identically distributed (i.i.d) distributions, and data is no longer independent at all (vertices are, but edges aren't?)
+
+The main difference is something called ***homophily***, which is the tendency for nodes to share attributes with their neighbors in the graph
+
+From this, there are other [Graph Statistics](/docs/dsa/8.%20trees%20&%20graphs/index.md#graph-statistics), [Sub-Graph Statistics](/docs/dsa/8.%20trees%20&%20graphs/index.md#sub-graph-and-node-statistics) such as [Eigencentrality](/docs/dsa/8.%20trees%20&%20graphs/index.md#eigenvectors-in-graphs), and Vertex Statistics 
+- Eigencentrality is a core theoretical underpinning that PageRank and other centrality / ranking graph algorithms used in their initial setup
+    - PageRank, hypothetically, could assign important nodes (webpages) in the internet based on their centrality rank (this would ignore user queries, but we could serve the "most central internet page")
+- Eigenvectors as a whole have a whole slew of things they can help uncover in graphs such as stable distributions, node important, community detection, network dynamics, etc - these sorts of analysis don't even require neural nets, they just need linear algebra
+    - Large eigenvalues indicate an overall interconnected and influential network (as a whole)
+    - Dominant eigenvectors provide insights into the most significant vertices inside of a graph, higher magnitudes indicate higher centrality and importance
+    - Eigenvectors associated with smaller (non-dominant) eigenvalues acn be used for community detection or identifying sub-graphs (neighborhoods)
+    - Algebraic connectivity of a graph's Laplacian can indicate the connectivity or presence of bridges in the network
+    - Node rankings can be found via the eigenvector relating to the largest eigenvalue - the higher the rank (value) of the entry, the more influential the node
+
+Some online articles mention different types of graph learning, but realistically they are just 2 different types of machine learning overall:
+- **Transductive Learning**: Solves a specific problem by leveraging both training and test data together. If test node features and adjacency are available during training $\rarr$ transductive
+    - In graph problems, it means the full graph, including nodes we'll predict later on, are known at training time
+    - You still learn embeddings for those unknown nodes, and at test time you reveal labels for the unknown nodes in the test set
+        - This means the unknown nodes can still influence embeddings of other nodes during training
+- **Inductive Learning**: Generalizes from training data to unseen data, making predictions on new nodes or graphs. If test nodes / graphs appear only after training (no adjacency seen) $\rarr$ inductive
+    - You must produce embeddings for nodes (or entire sub-graphs), not seen during training - they are net new and arrive after training and weight updates
+- Common examples and their types:
+    - GraphSAGE is more aimed towards inductive, where you can create embeddings on net new nodes that arrive after training, specifically without retraining
+    - Link prediction can be both
+        - Transductive when we predict missing edges in known graphs, or reveal edges in graphs
+    - Whole graph classification is typically inductive, where the model generalizes to classify unseen graphs
+
+### Graph Kernel Methods
+Graph Kernel Methods are classes of ML algorithms that can be used to learn from data that's represented as a graph to create statistics, embeddings, features, or other tasks on top of graphs (or sub-graphs by extension)
+
+Graph kernel methods define similarity between whole graphs or sub-structures by utilizing non-parametric methods
+
+Other Graph Neural Networks like Node Embedding and Classification are parametric methods, and so they are outside of the scope here
+
+For example the *Bag Of Nodes* graph kernel method will create a graph embedding by simply utilizing a permutation invariant function over all of the vertices in a graph, such as concatenation, averaging, summation, etc. Since vertices are just vectors, combining them is a valid way of embedding a graph! The *Weisfeiler-Lahman* method will take the dot product of all of the vectors
+
+Neighborhood overlap detection is also technically a graph kernel method which answers the question of "which pair of nodes are related based on their similarities" - similar to the [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) example of `King - Man + Woman = Queen`, where `(King, Man)` is probably related to `(Queen, Woman)`
+
+#### Random Walk Methods
+Random walk–based methods matter because they connect graph structure to Markov chain theory (PageRank, DeepWalk, Node2Vec, spectral clustering)
+
+A stationary distribution in a Markov Chain is a long run equilibrium of a random process, and it can also be useful to identify steady-state behaviors in graphs
+
+The stationary distribution of a (finite, irreducible, aperiodic) Markov chain gives long‑run visit frequencies; on a simple random walk over a connected, non‑bipartite undirected graph it is proportional to node degree. In english, this means that a random walk method is proportional to node degree (given the graph has certain characteristics and no "missing bumps")
+
+If you take a random walk around a graph starting at $v$ and end up, eventually, at $u$, then there exists ***some*** path between the two nodes and means they're in the same connected component
+
+The stationary distribution, $\pi$, is a single global vector, $\pi P = \pi$, that gives long-run visit frequencies. Therefore, long run visit probabilities between nodes are entries of $P^t$, Figuring out the long term stationary distribution from every node to every other node is a similar idea to finding the transition probabilities, and long run stationary distribution, in a Markov Chain - and can be formalized as powers of the transition matrix
+
+Therefore, graph random walk methods can be understood through the lens of Markov chains, providing insights into node connectivity, graph structure, and visiting probabilities
+
+The TLDR of the article below is that the similarity between a pair of nodes is based on how likely they are to visit eachother
+[Random Walk Method - Page Rank Algorithm using NetworkX](https://medium.com/@gbrnc28/random-walk-method-page-rank-algorithm-using-networkx-7da8696ecc38)
 
 ### Node Embedding
 One of the most common GNN tasks is Node Embedding - where each node in the graph is mapped to a low-dimensional vector space, capturing both the node's features and its structural context within the graph with a goal of mapping similar nodes to nearby points in the embedding space. Similarity in the embedding space should approximate similarity in the graph structure or node attributes
+
+The task at hand is to learn a function $f: V \rightarrow \mathbb{R}^d$ that maps each node to a $d$-dimensional embedding vector - typically, it utilizes operations like:
+- Convolutional layers
+    - These convolutional layers consists of graph convolutions that aggregate information from a node's neighbors, and different layers or functions can be used to capture different aspects of the graph structure
+        - Can aggregate only a slice of neighbors, all neighbors, certain radius neighbors, etc
+- Pooling layers
+- Fully connected layers
+- Attention mechanisms
+- Non-linear activations
+- Normalization layers
+- Parameter learning 
+    - Typical backpropogation, gradient descent, SGD, Adam, etc
+- Loss functions
+    - These are typically designed to encourage similar nodes to have similar embeddings, such as contrastive loss, triplet loss, cross-entropy loss for classification tasks, reconstruction loss for autoencoder setups
+- etc..
+
+A fair amount of node embeddings are done via encoder-decoder methodologies, where the encoder maps nodes to embeddings and the decoder reconstructs graph properties or predicts tasks based on these embeddings. The encoder operates on input graph data, which will be adjacency list or edge list and node feature matrix. For an encoder to create meaningful features, it will use tools from above like aggregating and transforming node attributes, incorporating neighborhood information via message passing, or potentially some combination of the two
+
+After this is done the decoder is meant to map the latent embeddings back out to graph structures for different tasks - it can do edge prediction (link prediction), attribute prediction, or other graph-related tasks. Loss functions depend on the task type, so the typical ML techniques of choosing your loss based on task still are valid here
+
+Outside of these methods we can also see [contrastive architectures](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) where we mask some of the known inputs and try to recreate them after the decoder output, ultimately utilizing contrastive loss functions to test if our embeddings capture this information. This helps with datasets where there aren't specific supervised learning tasks and we still want embeddings and other prediction tasks as output.
 
 ![Node Embedding](/img/node_embedding_example.png)
 
@@ -51,7 +125,11 @@ The encoder function should be able to:
 - Aggregate information from neighboring nodes
 - Stack multiple layers (compute across multiple hops)
 
-Most of these 3 things can be achieved by utilizing graph traversal algorithms, implemented via message passing in scalable parallel frameworks, to aggregate information from neighbors and update node representations
+Ultimately, the similarity $S(z_u, z_v)$ should be high for similar nodes and low for dissimilar ones, and during inference time this similarity score would be output for all relationships and we'd do threshold tuning and typical precision / recall trade-offs for link prediction, attribute prediction, or other tasks
+
+Most of these 3 things can be achieved by utilizing graph traversal algorithms, implemented via message passing in scalable parallel frameworks, to aggregate information from neighbors and update node representations. Perhaps the most common way to do this is through neighborhood aggregation, where each node aggregates information from its immediate neighbors to update its own representation
+
+After this is done the decoder reconstructs graph properties or predicts tasks based on these embeddings. Loss functions can help us optimize the embeddings to be useful for downstream tasks, where we compare what the decoder predicted for edges, node
 
 ![Graph Propogation](/img/graph_propogation.png)
 
@@ -161,6 +239,193 @@ h_C^{(2)} =
 + b_2
 \Bigg)
 $$
+
+#### Factorization-Based Node Embeddings
+Factorization based approaches will want to use matrix factorization techniques on adjacency or similarity matrices to derive node embeddings - these could be bucketed into [Graph Kernel Methods](/docs/other_concepts/graph_processing/GRAPH_NN.md#graph-kernel-methods) as matrix factorization is not a parameter learning method, but it's mentioned here for the sake of completeness
+
+Matrix factorization looks to take adjacency matrix $A$ of dimension $N \times N$ and turn it into 2 new matrices, $W$ and $V$, each of dimension $N \times K$ where $K$ is the dimensions of our node embeddings. $W$ would represent the node embeddings, and $V$ would represent the edge embeddings
+
+$$
+A \in \mathbb{R}^{N \times N} \space W, V \in \mathbb{R}^{N \times K} : A \approx W V^T
+$$
+
+Methods to compute this are Singular Value Decomposition (SVD) and Non-Negative Matrix Factorization (NMF) - these all come with pros and cons, but mostly being that it's a compute intensive process that doesn't allow for non-linear relationships
+
+#### Random Walk Node Embeddings
+Random walk embeddings are based on the idea of randomly walking through the graph and using the sequence of nodes visited by the random walk to learn a node embedding
+
+If we have our typical setup of $N$ nodes and $M$ edges, we can define our adjacency matrix $A \in \mathbb{R}^{N \times N}$
+
+That then allows us to define a transition matrix $T \in \mathbb{R}^{N \times N}$ that defines the probabilities of transitioning from one node to the other. We can use this $T$ to generate a random walk through the graph, and any self-multiplication of the matrix $(T)^k$ would produce the probabilities for one random walk from any node to the other
+
+That means $(TT)$ represents the probabilities of a 2-hop random walk, so any entry $[i, j]$ would represent the probability of reaching node $j$ from node $i$ in 2 hops
+
+This random walk can be used to learn a node embedding by representing each node in the graph as a vector, where the elements of that vector are the probabilities of transitioning from the row node to each of the other nodes in the graph
+
+Furthermore, generating these random walks and doing sampling comes to a number of different algorithms including Metropolis-Hastings Random Walks, Node2Vec, Gibbs Sampling, and a few others - these methods can be used over any type of graph including directed, undirected, weighted, and unweighted, homogeneous, and heterogeneous, etc... as they simply represent the probabilities of a path between the 2 nodes
+
+#### Node2Vec
+Similar to [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec), Node2Vec is used as a way to generate static embeddings for nodes in a graph. It does this by simulating random walks and applying the Word2Vec algorithm to these walks 
+
+The general structure is: 
+- Corpus: sequences of nodes from biased random walks (instead of word sequences)
+- Model: skip‑gram with negative sampling (SGNS) on node “contexts” from walk windows
+- Bias controls: p (return) and q (in/out) trade off BFS (community/homophily) vs DFS (structural roles)
+- Output: static node embeddings; similar embeddings for nodes that co‑occur in walks
+- Use cases: link prediction, node classification, clustering; typically transductive
+- Practical: choose walk length, number of walks per node, window size, embedding dim; train SGNS like Word2Vec on the generated sequences
+
+TODO: Write out, above was Copilot generated
+
+#### LinkPrediction Example
+The python script below shows an example, from [This Medium Article](https://medium.com/the-modern-scientist/graph-neural-networks-series-part-3-node-embedding-36613cc967d5), about creating link predictions utilizing some Graph Conv layers and encoder-decoder architecture
+
+- Dataset: Cora citation network dataset from Planetoid, and we use RandomLinkSplit to create train/val/test splits for link prediction
+- Model: 2-layer GCN encoder to get node embeddings, dot product decoder to predict edge existence
+    - `encode()` does neighborhood aggregation via GCN layers
+    - `decode()` computes dot product scores for given edge indices
+        - `decode_all()` computes full adjacency via dot products for all node pairs
+- Training: supervised training on known edges, with negative sampling for non-edges
+    - Negative sampling finds node pairs that are not connected to serve as negative examples
+        - Then concatenate positive (known edges) and negative samples for training
+    - Loss: `BCEWithLogitsLoss` binary cross-entropy loss on edge existence labels
+        - This specific loss function combines a [sigmoid layer](/docs/training_and_learning/LOSS_FUNCTIONS.md#sigmoid) and the [BCELoss](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) in one single class
+            - [BCELoss (Binary Cross Entropy Loss)](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) measures the difference between predicted probabilities and true binary labels
+            - [Sigmoid layer](/docs/training_and_learning/LOSS_FUNCTIONS.md#sigmoid) squashes raw model outputs (logits) into probabilities between 0 and 1
+- Evaluation: ROC-AUC metric on validation and test sets to measure link prediction performance
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+import os.path as osp
+
+import torch
+from sklearn.metrics import roc_auc_score
+
+import torch_geometric.transforms as T
+from torch_geometric.datasets import Planetoid
+from torch_geometric.nn import GCNConv
+from torch_geometric.utils import negative_sampling
+
+# Setup device, and setup train/test/val splits
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+transform = T.Compose([
+    T.NormalizeFeatures(),
+    T.ToDevice(device),
+    T.RandomLinkSplit(num_val=0.05, num_test=0.1, is_undirected=True,
+                    add_negative_train_samples=False),
+])
+path = osp.join(osp.dirname(osp.realpath(__file__)), '..', 'data', 'Planetoid')
+dataset = Planetoid(path, name='Cora', transform=transform)
+# After applying the `RandomLinkSplit` transform, the data is transformed from
+# a data object to a list of tuples (train_data, val_data, test_data), with
+# each element representing the corresponding split.
+train_data, val_data, test_data = dataset[0]
+
+
+class Net(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels, out_channels):
+        super().__init__()
+        self.conv1 = GCNConv(in_channels, hidden_channels)
+        self.conv2 = GCNConv(hidden_channels, out_channels)
+
+    # Encoding is done on input features and edge indices
+    def encode(self, x, edge_index):
+        x = self.conv1(x, edge_index).relu()
+        return self.conv2(x, edge_index)
+
+    # Predicts edge existence (similarity) via dot product of node embeddings
+    def decode(self, z, edge_label_index):
+        return (z[edge_label_index[0]] * z[edge_label_index[1]]).sum(dim=-1)
+
+    # Predicts all edges by computing the full adjacency via dot products
+    def decode_all(self, z):
+        prob_adj = z @ z.t()
+        return (prob_adj > 0).nonzero(as_tuple=False).t()
+
+
+model = Net(dataset.num_features, 128, 64).to(device)
+optimizer = torch.optim.Adam(params=model.parameters(), lr=0.01)
+criterion = torch.nn.BCEWithLogitsLoss()
+
+
+def train():
+    model.train()
+    optimizer.zero_grad()
+    z = model.encode(train_data.x, train_data.edge_index)
+
+    # We perform a new round of negative sampling for every training epoch:
+    neg_edge_index = negative_sampling(
+        edge_index=train_data.edge_index, num_nodes=train_data.num_nodes,
+        num_neg_samples=train_data.edge_label_index.size(1), method='sparse')
+
+    # Concat positive and negative edge indices.
+    edge_label_index = torch.cat(
+        [train_data.edge_label_index, neg_edge_index],
+        dim=-1,
+    )
+    # Label for positive edges: 1, for negative edges: 0.
+    edge_label = torch.cat([
+        train_data.edge_label,
+        train_data.edge_label.new_zeros(neg_edge_index.size(1))
+    ], dim=0)
+
+    # Note: The model is trained in a supervised manner using the given
+    # `edge_label_index` and `edge_label` targets.
+    out = model.decode(z, edge_label_index).view(-1)
+    loss = criterion(out, edge_label)
+    loss.backward()
+    optimizer.step()
+    return loss
+
+
+@torch.no_grad()
+def test(data):
+    model.eval()
+    z = model.encode(data.x, data.edge_index)
+    out = model.decode(z, data.edge_label_index).view(-1).sigmoid()
+    return roc_auc_score(data.edge_label.cpu().numpy(), out.cpu().numpy())
+
+# Train/Test Loop
+best_val_auc = final_test_auc = 0
+for epoch in range(1, 101):
+    loss = train()
+    val_auc = test(val_data)
+    test_auc = test(test_data)
+    if val_auc > best_val_auc:
+        best_val_auc = val_auc
+        final_test_auc = test_auc
+    print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, Val: {val_auc:.4f}, '
+        f'Test: {test_auc:.4f}')
+
+print(f'Final Test: {final_test_auc:.4f}')
+
+z = model.encode(test_data.x, test_data.edge_index)
+final_edge_index = model.decode_all(z)
+```
+</details>
+
+#### Multi-Relational Graph Node Embedding
+[Multi Relational Graphs](/docs/dsa/8.%20trees%20&%20graphs/index.md) are graphs where edges can have different types or relations, allowing for more complex and expressive graph structures - these are of a form $(U, \tau, V)$ where $\tau$ represents a relationship between nodes $U$ and $V$ - one example would be $U, \text{treats}, V$ where a doctor $U$ treats a patient $V$
+
+In order to create embeddings for these nodes is a similar setup to the one edge type Node Embedding example above, except the encoder and decoder both need to be slightly tweaked
+- The decoder component should now be multi-relational, able to output weights for each type of relation (they do not need to sum to 1, 2 nodes can have multiple edges of high probability)
+- The encoder needs to utilize all information and edges during it's node embedding, and some encoders will "squish" this all together and create 1 embedding, or create an embedding-per-relationship for the decoder
+
+### Graph Cuts and Clustering
+A [Graph Cut (from Min Spanning Tree doc)](/docs/dsa/8.%20trees%20&%20graphs/index.md#minimum-spanning-tree) describes a way to split up a graph into distinct sub-graphs by cutting edges between nodes - this is the main motivation behind **Laplacian Spectral Clustering** which is a analytical algorithm (using matrix multiplication and eigendecomposition) to find clusters of graphs (sub-graphs)
+
+It does this in an iterative approach by minimizing the cost of each cut, where a cost is defined as number of edges that would span the 2 new disjoint subsets, ultimately to help find the best ways to create neighborhoods (sub-graphs) of low connected clusters
+
+Essentially if we had a big 3 star graph, where there was 1 single edge between the tightly clustered stars, we'd simply want to cut that edge to separate the stars into distinct clusters
+
+Other methods that do this are **Louvain Clustering**, **Leiden Clustering**, and **Girvan-Newman Algorithm** - Louvain and Leiden are scalable, modularity based community detection algorithms for large graphs, where Laplacian uses eigenvectors of the graph Laplacian to partition data
+
+Louvain and Leiden are greedy modularity based algorithms, where Laplacian spectral clustering is more algebraic (compute eigenvectors) and relies on matrix operations, and afterwards will run k-means over low-dimensional embeddings. Finding the correct "minimum graph cut" corresponds to finding the smallest eigenvalue of the Laplacian - the corresponding eigenvector is the solution to this optimization problem. That optimal eigenvector can then be used to partition the nodes into 2 sets, $V_1$ and $V_2$
+
+This can be extended into the Ratio Cut problem which attempts to balance the number of edges cut by the partition, and the size of the resulting partitions - ultimately finding a set of well balanced neighborhoods
 
 ## Graph Convolutional Networks
 Graph Convolutional Networks (GCN's) were first introduced as a method for applying NN's to graph structured data

@@ -168,6 +168,139 @@ Most data structures can actually be considered specific dimensional graphs, lis
 
 ![Everything Is Graph](/img/everything_is_graph.png)
 
+### Structuring
+There are 2 main ways to structure a graph in memory, either via an Adjacency List or an Adjacency Matrix
+- An Adjacency List is simply a list of lists, where each index represents a vertex, and the list at that index represents all of the connected vertices
+  - This is typically more space efficient for sparse graphs, where not every vertex is connected to every other vertex
+- An Adjacency Matrix is a 2-D matrix where each row and column represents a vertex, and the value at that index represents the weight of the edge between those vertices (or 1 if unweighted, or 0 if no edge)
+  - This is typically more space efficient for dense graphs, where many vertices are connected to many other vertices
+
+In most real world scenarios graphs are sparse, and so Adjacency Lists are more commonly used, and even those structures are further optimized and compressed to ensure space efficiency
+
+Representing a graph digitally is a large topic, and there are many more advanced structures like Compressed Sparse Row (CSR) or Compressed Sparse Column (CSC) formats that are used in large scale graph processing systems
+
+For common API's on graphs we usually store 2 data structures:
+- Node list / set
+- Edge list / set
+
+These 2 data structures allow us to traverse and manipulate the graph effectively, and are the basis for most graph algorithms - they also allow us to have ***heterogeneous*** graphs where different nodes and edges can have different types and properties. At the end of the day each of these properties typically extend an `Object`, so you can store any kind of data you want in them - the traversal algorithm is then expected to handle the different data types accordingly
+
+### Graph Types
+Graphs can have a few different topological setups as well - including:
+- **Multi-Relational**: A graph that has more than one type of relationship between vertices
+  - In a social network we can have friend, family, coworker, etc..
+    - Formally, a multi-relational graph is defined as $G = (V, T, E)$ where $T$ is a set of edge-types
+  - The adjacency matrix in this scenario would be a $3-D$ matrix (a ***Tensor***), where $A[n1, n2, type] = 1$ if there's an edge of type `type` between `n1` and `n2`
+    - The tensor dimension here would be $V \times V \times T$
+- **Multiplex**: A graph where there are multiple types of edges between the same pair of vertices, and furthermore each edge has it's own weight
+  - It introduces intra-layer (within) and inter-layer (between)
+    - Intra layer edges are edges that connect nodes for that layer type
+    - Inter layer edges are routes that connect nodes across different layer types
+  - Using transportation network as an example, where nodes are cities and the types are transportation types (flight, rail, train, car, walk, etc...)
+    - Intra layer edges represent getting between 2 citites using a single transportation type
+    - Inter layer routes represent getting between 2 cities utilizing more than 1 transportation type
+
+### Sub Graph and Node Statistics
+Graph statistics revolve around profiling graphs, sub-graphs, and other components by using various metrics and algorithms to understand their structure and properties - some are basic counting, some are combinatorics, and some are more advanced distributions. They answer questions about centrality, sparsity, density, connectivity, and other metrics
+
+A common one to start off is cluster (sub-graph) density, and the intuition is finding the ratio of observed edges to possible edges within a cluster or sub-graph
+
+- $\text{possible connections} = \frac{n \cdot (n-1)}{2}$
+- $\text{observed connections} = e$
+- $\text{cluster density} = \frac{\text{observed connections}}{\text{possible connections}}$
+
+The "hello world" of graph statistics is centrality utilizing the [Florentine Families Dataset](https://networks.skewed.de/net/florentine_families), which showcases relationships between families in Renaissance Florence, and typically should always have the Medici family as the most central node
+
+To get to centrality and other metrics, there are some common statistics we'll define below:
+- **Degree**: The number of edges connected to a vertex
+  - In-Degree: Number of incoming edges to a vertex (for directed graphs)
+  - Out-Degree: Number of outgoing edges from a vertex (for directed graphs)
+- **Degree Centrality**: The number of edges connected to a vertex, normalized by the maximum possible degree
+  - If there are 8 nodes in a graph, and a specific node has 2 edges to 2 other nodes, it's degree centrality would be \(\frac{2}{7}\)
+- **Path Length**: The number of edges in the shortest path between two vertices
+- **Clustering Coefficient**: A measure of the degree to which nodes in a graph tend to cluster together
+  - For a vertex, it's the ratio of the number of edges between its neighbors to the number of possible edges between those neighbors
+  - For the whole graph, it's the average clustering coefficient of all vertices
+- **Betweenness Centrality**: A measure of how often a node appears on the shortest paths between other nodes
+  - Betweenness shows how often a node lies on the shortest path between two other nodes, and these nodes can be considered "route hubs" of sorts
+  - Cincinnati is a good example used to illustrate betweenness centrality in transportation networks, no one ever stops there, everyone just drives through it
+- **Eigenvector Centrality**: A measure of a node's influence based on the influence of its neighbors
+  - Sum of centrality scores of neighbors
+- **Closeness Centrality**: A measure of how close a node is to all other nodes in the graph, based on the average shortest path length from the node to all other nodes
+  - Inverse of average shortest path length to all other nodes
+  - Gives information on how close a node is to all other nodes, and simply showcases what node, even if it's not as important, is closest to everything
+- Subgraph classifications and definitions:
+  - **Closed Triangles**: Sets of three nodes where each node is connected to the other two nodes
+  - **Ego Graphs***: Subgraphs consisting of a focal node, and all the nodes that are connected to that focal node
+    - Most likely is star shaped
+  - **Motifs**: Patterns of node connectivity that occur more than would be expected by chance
+    - Basically a catch all for sub-graph patterns - closed triangles and ego graphs are specific motifs
+- **Clustering Coefficient**: Measures the proportion of closed triangles in a node's local neighborhood
+  - Can be used to find communities in a network, which help to show how clustered a node is
+  - $\frac{\text{# of triangles in a node's local neighborhood}}{\text{# of possible triangles in a node's local neighborhood}}$
+#### Eigenvectors in Graphs
+Seeing an [Eigenvector](/docs/old_math_notes/linear_algebra/index.md#eigenvalues-eigenvectors-and-eigendecomposition) scared me - they're actually utilized in Graph Theory to understand how certain graphs change as operations are performed on them 
+
+Eigenvectors can be used to find equilibrium points of graphs, which ultimately are points that aren't affected by any changes that are made to it
+
+Graphs are just matrices, so eigenvectors help us understand their properties and behaviors - an adjacency matrix represents the connections between nodes, and therefore eigenvectors represent directions in which the graph can be transformed without changing its structure
+
+An adjacency matrix can be seen as a transformation that acts on "node vectors", or functions defined on the graphs nodes
+
+The intuition of an eigenvector on an adjacency matrix is that it allows us to find important nodes in a graph, where the eigenvector centrality of a node is proportional to the sum of the centralities of its neighbors
+
+[Some intuition from Reddit](https://www.reddit.com/r/3Blue1Brown/comments/18kieax/intuition_behind_eigenvector_centrality_in_graph/)
+
+[Some definitions on GeeksForGeeks](https://www.geeksforgeeks.org/data-science/eigenvector-centrality-centrality-measure/)
+
+[Some Medium Articles](https://medium.com/the-modern-scientist/graph-neural-networks-series-part-2-graph-statistics-4f271857ec70)
+
+If we wanted to find a function below that essentially brings a node to the real numbers, we can use a vector with one entry for any node - i.e. a **node vector**
+$$f(\text{node}) \rarr \mathbb{R}$$
+
+Backtracking a bit, this ends up relating to *harmonic functions*, which are function $f: \mathbb{R} \rarr \mathbb{R^2}$ that is always equal to it's average on circles - this means the function is always reverting towards it's average within some bounding box
+
+The analogy of eigenvectors on graphs is a node vector so that each entry is always equal to the average of the entries of it's neighbors - i.e. within a small bounding box (neighbors), we want the eigenvector entries to always be equal to the average of it's neigbors. Therefore, if an eigenvector's value is large, we can see that it's node (the average of it's neighbors) means that node and it's neighbors must be a sort of critical central component
+
+This node vector intuitively encodes some information about adjacency between nodes, and ultimately this encoded vector would have to be constant over each connected component of a graph (they're all neighbors)
+
+Therefore, at the end, ***eigenvector centrality (eigencentrality) is a measure of the influence of a node in a network!***
+
+PageRank and Katz centrality are related concepts that build upon eigenvector centrality to rank nodes in a network, and they are natural variants of this eigencentrality
+
+***The $v^{\text{th}}$ component of the related eigenvector gives the relative centrality score of the vertex $v$!***
+
+What can this help us with graph profiling:
+- Graph structure: Eigenvectors can reveal overall "sub-clusters" within a graph, and reveal if the entire graph is highly connected
+- Centrality measures: The eigenvector values are measure's of node importance that consider both the node's direct connections, and their neighboring node's
+  - Assigning higher scores to nodes that are connected to other highly connected central nodes
+- Network dynamics: Eigenvectors can be used to understand the stability or equilibrium of processes on the network, and can even help us find steady state distributions and feeback loops (similar to markov chains)
+- Community detection: Eigenvectors can be used in community detection algorithms to identify groups of nodes that have similar connectivity patternss
+
+##### Proof / Math
+- For a given graph $G := (V, E)$ with $|V|$ vertices
+- $A = (a_v, t)$ is the adjacency matrix such that 
+  - $a_{v, t} = 1$ if vertex $v$ is linked to vertex $t$
+  - 0 otherwise
+- $M(v)$ is a set of neighbors of vertex $v$
+
+Then, the relative centrality score of a vertex $v$ can be defined as:
+$$x_{v} = {\frac{1}{\lambda}} \sum_{t \in M(v)} x_t = {\frac{1}{\lambda}} \sum_{t \in G} a_{v,t} \cdot x_t$$
+
+Rearranging the above equation (somehow) you can get to vector notation where:
+$$\bold{A}\bold{x} = \lambda \bold{x}$$
+
+There'll be many eigenvalues $\lambda$ for which a non-zero eigenvector solution exists, but extra conditions such as all entries in the eigenvector be non-negative (Perron-Frobenius) implies that only the greatest eigenvalue is considered for eigenvector centrality
+
+***The $v^{\text{th}}$ component of the related eigenvector gives the relative centrality score of the vertex $v$!***
+
+### Graph Statistics
+Now they Sub-Graph and Node Statistics are covered above, there's a natural way to extend those to entire graphs
+
+The typical proposal is to extract these metrics utilizing [Graph Kernel Methods](https://ethz.ch/content/dam/ethz/special-interest/bsse/borgwardt-lab/documents/slides/CA10_GraphKernels_intro.pdf) which are classes of ML algorithms that can be used to learn from data that's represented as a graph
+
+Most graph kernel methods are proper ML algorithms, and so we'll define them further in [Graph Neural Networks](/docs/other_concepts/graph_processing/GRAPH_NN.md#graph-kernel-methods)
+
 ## Graph Traversal
 - Traversing a graph has generally 2 strategies, either Depth first or Breadth first
 - Depth first means exactly as it says, from any single node you traverse as far down / as far away as you can possibly go
