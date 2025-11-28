@@ -427,6 +427,135 @@ Louvain and Leiden are greedy modularity based algorithms, where Laplacian spect
 
 This can be extended into the Ratio Cut problem which attempts to balance the number of edges cut by the partition, and the size of the resulting partitions - ultimately finding a set of well balanced neighborhoods
 
+## Message Passing
+Neural message passing is a crucial part of most GNN architectures because it enables infromation exchange and aggregation among nodes in a graph
+
+[GraphX](/docs/other_concepts/graph_processing/index.md#graphx) or [Pregel](/docs/other_concepts/graph_processing/PREGEL.md) utilize super-steps where at any node you have a message you can pass to any other immediately adjacent node, and each node in each step has a `receive()` and / or `aggregate()` function that can ingest one or many messages from multiple neighbors
+
+In the classic example of shortest path, each node would receive `0-Many` messages and it would choose the lowest one and then add one to that and pass it forward to all of it's neighbors
+
+The image below shows how we can find the max node in a graph utilizing message passing
+![Freehand Supersteps](/img/freehand_supersteps.png)
+
+![More Formal Supersteps](/img/more_formal_supersteps.png)
+
+In this way there's no centralized controller, and each node is only aware of it's immediate neighbors - this allows for distributed computation and scalability across large graphs utilizing Spark and other actor frameworks like in Scala. These message passing frameworks are also inherently parallelizable, as each node can process messages and send out new messages simultaneously, which speeds up computation on large graphs
+
+In the context of Graph Neural Networks (GNN's), message passing is used to aggregate information from neighboring nodes to update a node's representation or embedding. Each node sends its current state as a message to its neighbors, which then aggregate these messages (using functions like sum, mean, or max which are permutation invariant) to update their own states. This process is repeated for multiple iterations (or layers), allowing nodes to gather information from further away in the graph
+
+A way to aggregate messages from neighbors  is:
+$$
+m_v^{(k)} = \text{AGGREGATE}^{(k)}(\{h_u^{(k-1)} : u \in N(v)\})
+$$
+- Each node starts with an initial feature vector $h_v^{(0)}$ (node attributes)
+- At each layer $k$, each node $v$ aggregates messages from its neighbors $N(v)$ using a permutation invariant function `AGGREGATE`
+    - Can define this as sum, mean, max, etc or even a learnable function
+- The aggregated message $m_v^{(k)}$ is then used to update the node's representation
+- $m_v^{(k)}$ is the aggregated message for node $v$ at layer $k$
+- $\text{AGGREGATE}^{(k)}$ is a permutation invariant function (sum, mean, max, etc)
+- $h_u^{(k-1)}$ is the representation of neighbor node $u$ from the previous layer
+- $N(v)$ is the set of neighbors of node $v$
+
+In diagram below, each node aggregates messages from its neighbors (using mean aggregation) to update its own representation at each layer, and finally all of those go back to the original node after multiple layers of aggregation and transformation
+![AggregateNeighbors](/img/aggregate_neighbors.png)
+
+In most scenario's the `AGGREGATE` function is followed by a `COMBINE` function that merges the aggregated message with the node's own previous representation, often using a neural network layer and non-linear activation, and they mostly just need to be differentiable to allow for backpropogation
+
+Code below shows how to implement this in Python where:
+- Update and aggregate functions are `nn.Linear` layers followed by ReLU activations
+    - Allows learnable transformations of messages and node features that may not be linearly separable
+- The GNN consists of multiple layers of these message passing operations
+- MessagePassing is done via matrix multiplication with the adjacency matrix to gather neighbor information
+- The reason multiplying by the adjacency matrix works is that it effectively sums up the features of neighboring nodes for each node in the graph
+    - If we are at node `v`, the row in the adjacency matrix corresponding to `v` has `1`s for each neighbor and `0`s elsewhere, and so multiplying this row by the feature matrix sums up the features of all neighbors of `v` (message passing!)
+<!-- Collapsible Python snippet -->
+<details>
+    <summary>Show Python Code</summary>
+```python
+class GNNLayer(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super(GNNLayer, self).__init__()
+        self.update_fn = nn.Linear(input_dim, output_dim)
+        self.aggregate_fn = nn.Linear(input_dim, output_dim)
+    def forward(self, h, adj_matrix):
+        messages = torch.matmul(adj_matrix, h)  # Aggregating messages from neighbors
+        aggregated = self.aggregate_fn(messages)  # Applying the aggregate function
+        updated = self.update_fn(h) + aggregated  # Updating the node embeddings
+        return updated
+class GNN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim, num_layers):
+        super(GNN, self).__init__()
+        self.layers = nn.ModuleList()
+        self.layers.append(GNNLayer(input_dim, hidden_dim))
+        for _ in range(num_layers - 2):
+            self.layers.append(GNNLayer(hidden_dim, hidden_dim))
+        self.layers.append(GNNLayer(hidden_dim, output_dim))
+    def forward(self, features, adj_matrix):
+        h = features.clone()
+        for layer in self.layers:
+            h = layer(h, adj_matrix)
+        return h
+# Example usage
+input_dim = 16
+hidden_dim = 32
+output_dim = 8
+num_layers = 3
+# Generating random node features and adjacency matrix
+num_nodes = 10
+features = torch.randn(num_nodes, input_dim)
+adj_matrix = torch.randn(num_nodes, num_nodes)
+# Creating a GNN model
+gnn = GNN(input_dim, hidden_dim, output_dim, num_layers)
+# Forward pass through the GNN
+embeddings = gnn(features, adj_matrix)
+print("Node embeddings:")
+print(embeddings)
+```
+</details>
+
+### Neighborhood Aggregation Methods
+Neighborhood aggregation is a fundamental operation in Graph Neural Networks (GNNs) that allows nodes to gather information from their local neighborhood in the graph. The choice of aggregation method can significantly impact the performance and expressiveness of the GNN. Here are some common neighborhood aggregation methods:
+- **Mean Aggregation**: This method computes the average of the feature vectors of a node's neighbors. It is simple and effective, ensuring that the output is invariant to the order of neighbors
+    - $$ m_v^{(k)} = \frac{1}{|N(v)|} \sum_{u \in N(v)} h_u^{(k-1)} $$
+- **Sum Aggregation**: This method sums the feature vectors of a node's neighbors. It can capture the total influence of neighbors but may be sensitive to the number of neighbors
+    - $$ m_v^{(k)} = \sum_{u \in N(v)} h_u^{(k-1)} $$
+- **Max Pooling**: This method takes the element-wise maximum of the feature vectors of a node's neighbors. It can capture the most prominent features among neighbors
+    - $$ m_v^{(k)} = \max_{u \in N(v)} h_u^{(k-1)} $$
+- **Attention Mechanism**: This method assigns different weights to neighbors based on their importance, allowing the model to focus on more relevant neighbors. The weights are learned during training
+    - $$ m_v^{(k)} = \sum_{u \in N(v)} \alpha_{vu} h_u^{(k-1)} $$
+    - where $\alpha_{vu}$ are attention coefficients computed using a learnable function
+- **LSTM-based Aggregation**: This method uses a Long Short-Term Memory (LSTM) network to aggregate neighbor features, allowing for more complex interactions among neighbors
+    - $$ m_v^{(k)} = \text{LSTM}(\{h_u^{(k-1)} : u \in N(v)\}) $$
+
+Each of these methods has its own advantages and trade-offs, and the choice of aggregation method may depend on the specific application and characteristics of the graph data being used
+
+Another important topic is how to handle nodes with varying degrees (number of neighbors) during aggregation. Techniques such as neighbor sampling (e.g., GraphSAGE) or normalization can help mitigate issues arising from high-degree nodes dominating the aggregation process.Neighbor normalization can be done by dividing the aggregated message by the degree of the node, ensuring that nodes with more neighbors do not disproportionately influence the aggregation. This is particularly important in graphs with a power-law degree distribution, where a few nodes may have a very high degree compared to others, and so we don't want them to dominate the aggregation process
+
+Over-smoothing is just as dangerous as under-smoothing in GNNs. Over-smoothing occurs when node representations become indistinguishable after multiple layers of aggregation, leading to a loss of local information. This can happen when too many layers are stacked, causing the embeddings to converge to similar values. It essentially resolves to "everything looks the same, because we made our radius of neighbors too large" - if you look at everyone to create embeddings for everyone, they all come out to be the same. To mitigate over-smoothing, techniques such as residual connections, layer normalization, or limiting the number of layers can be employed, and implementations of these are found in libraries like PyTorch Geometric and DGL
+
+The below script shows how to implement skip connections in a GNN layer, allowing the model to retain information from previous layers and mitigate over-smoothing. In this example, we concatenate the original node features with the aggregated messages before passing them through a linear transformation
+<!-- Collapsible Python snippet -->
+<details>
+    <summary>Show Python Code with Skip Connections</summary>
+```python
+class GNN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super(GNN, self).__init__()
+        self.linear1 = nn.Linear(input_dim, hidden_dim)
+        self.linear2 = nn.Linear(hidden_dim + input_dim, output_dim)
+    def forward(self, h, adj_matrix):
+        # Initial node representations
+        h0 = self.linear1(h)
+        
+        # Message passing with concatenation-based skip connections
+        m = torch.matmul(adj_matrix, h)
+        h1 = self.linear2(torch.cat((h, m), dim=1))
+        h_updated = h1 + h0  # Skip connection: add previous layer representation
+        
+        return h_updated
+```
+</details>
+
 ## Graph Convolutional Networks
 Graph Convolutional Networks (GCN's) were first introduced as a method for applying NN's to graph structured data
 
