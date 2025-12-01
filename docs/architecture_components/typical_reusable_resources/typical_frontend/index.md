@@ -80,6 +80,8 @@ In the context of "frontend" they can be thought of as used to route client requ
 - Layer 7 (L7) load balancers are based on data of app layer protocols like HTTP headers, URLs, cookies, and other app specfic data (even userId)
     - Can also handle TLS offloading, rate limiting, HTTP routing, header rewriting, and many other features
 
+There's a discussion point in [Python Socket Programming Application Server Example](/docs/other_concepts/PYTHON_SOCKET_ASYNCIO.md#proper-application-servers) that talks through socket layers, address forwarding, headers, and other information that's relevant here - in our load balancer discussion above, an L4 load balancer will simply swap out destionation IP address information in TCP network packets, whereas L7 keeps multiple TCP socket connections between client and backend server. TCP has segments and they include source and destination IP addresses for networking infrastructure to forward, but HTTP headers are used so that applications can read dynamic length HTTP messages. NAT Translation happens from local private to public (or vice versa), and this happens on the actual router / load balancer before it forwards
+
 #### Tiers
 ![LB Tiers](/img/lb_tiers.png)
 
