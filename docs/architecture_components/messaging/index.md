@@ -8,6 +8,8 @@ description: Discussion around Messaging Components
 
 # Messagings
 
+![Queue, PubSub, and Kafka](/img/queue_pubsub_kafka_freehand.png)
+
 ## Kafka
 
 ## PubSub

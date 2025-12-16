@@ -13,6 +13,8 @@ They also, generally, provide durability, single point connectivity, scaling, an
 
 Queue's are useful when you have producers and consumers that have different workloads, where you might want to scale the consumers to comply with new messages coming in from producers - the most typical example I see is an API fielding requests and sending messages to workers to run complicated ML pipelines and models
 
+![Queue, PubSub, and Kafka](/img/queue_pubsub_kafka_freehand.png)
+
 Example:
 - Message comes in with JSON field holding a document, or an S3 URL that holds a large text based document
 - API fields the request, checks priority, and sends to a queue

@@ -13,6 +13,8 @@ you design an entire [PubSub](/docs/architecture_components/typical_reusable_res
 
 The PubSub broker in the middle takes care of receiving and sending messages
 
+![Queue, PubSub, and Kafka](/img/queue_pubsub_kafka_freehand.png)
+
 PubSub brokers are different from other message brokers like [Kafka](/docs/architecture_components/messaging/Kafka%20Broker/index.md) by how Consumers interact with the Broker
     - In Kafka the Consumers pull
     - In PubSub the Consumers get pushed to

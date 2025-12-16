@@ -140,4 +140,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Distributed Training](https://apxml.com/courses/advanced-tensorflow/chapter-3-distributed-training-strategies)
 - [Neptune AI GNN](https://neptune.ai/blog/graph-neural-network-and-some-of-gnn-applications)
 - [GNN Article Series on Medium by Omar Hussein](https://medium.com/the-modern-scientist/graph-neural-networks-series-part-1-an-introduction-49a88941f888)
+- [Michael Noll Kafka Blog](https://www.michael-noll.com/blog/2018/04/05/of-stream-and-tables-in-kafka-and-stream-processing-part1/)
 ---
