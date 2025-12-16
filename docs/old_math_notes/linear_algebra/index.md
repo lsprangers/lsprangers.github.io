@@ -282,13 +282,16 @@ Why does that matter? Intuitively it means that $\bold{v}$ is a direction in spa
 
 If a matrix $\textit{A}$ has $n$ linearly independent Eigenvectors $\{\bold{v}_1, \bold{v}_2, ..., \bold{v}_n\}$ with corresponding Eigenvalues $\{\lambda_1, \lambda_2, ..., \lambda_n\}$, then these Eigenvectors can form a basis for $\mathbb{R}^n$. We can concatenate these Eigenvectors into a matrix $\textit{V}$ where each column is an Eigenvector:
 $$\textit{V} = [\bold{v}_1 \ \bold{v}_2 \ ... \ \bold{v}_n]$$
-And we can create a diagonal matrix $\textit{D}$ with the corresponding Eigenvalues on the diagonal:
-$$\textit{D} = \begin{bmatrix}
+And we can create a diagonal matrix $\textit{D}$ with the corresponding Eigenvalues on the diagonal
+
+$$
+\textit{D} = \begin{bmatrix}
 \lambda_1 & 0 & \cdots & 0 \\
 0 & \lambda_2 & \cdots & 0 \\
 \vdots & \vdots & \ddots & \vdots \\
 0 & 0 & \cdots & \lambda_n
-\end{bmatrix}$$
+\end{bmatrix}
+$$
 
 **Eigendecomposition** is the process of decomposing a matrix into its eigenvalues and eigenvectors. For a square matrix $\textit{A}$, if it can be decomposed, it can be expressed as:
 $$\textit{A} = \textit{V} \textit{D} \textit{V}^{-1}$$
