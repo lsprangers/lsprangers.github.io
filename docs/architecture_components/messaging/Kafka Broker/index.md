@@ -46,7 +46,15 @@ At a high level this is simple, but working through different use cases starts t
 
 As we stated above, Kafka Brokers only seeing raw bytes makes them "dumb", but they can scale much better - any new node in the cluster simply wakes up and can start being processing new Messages for a topic. The quote from the main [Confluent Blog](https://www.confluent.io/blog/kafka-streams-tables-part-2-topics-partitions-and-storage-fundamentals/) this article is based off of really sums it up:
 
-<div style="margin: 2em auto; max-width: 600px; background: #f5f7fa; border-left: 4px solid #4f8cff; padding: 1.5em 2em; border-radius: 8px; text-align: left;">
+<div style={{
+  margin: "2em auto",
+  maxWidth: 600,
+  background: "#f5f7fa",
+  borderLeft: "4px solid #4f8cff",
+  padding: "1.5em 2em",
+  borderRadius: 8,
+  textAlign: "left"
+}}>
   <em>
 In event streaming and similar distributed data processing systems, lots of CPU cycles are spent on mere serialization/deserialization of data. If you ever had to paint a room, you may have experienced that the preparation (moving furniture, protecting the floor with drop cloths, convincing your significant other that olive green is doubtlessly a more suitable color than that horrible yellow, etc.) can consume more time than the actual painting. Fortunately, brokers don’t need to deal with any of that!
   </em>
