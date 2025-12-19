@@ -209,7 +209,7 @@ Docker is used to package up containers, and runs the containers across differne
         - Direct integration with ALB or NLB + target groups
             - ***Dynamic Port Mapping*** allows us to run multiple instances of same application on the same EC2 instance, and then the ALB finds the right port on EC2 instances to forward traffic to
             - Helps to increase resiliency in case containers go down
-            - ![Dynamic Port Mapping](./images/dynamic_port_mapping.png)
+            - ![Dynamic Port Mapping](/img/dynamic_port_mapping.png)
         - Easy autoscaling
     - Run batch processing / scheduled tasks
         - Schedule ECS tasks to run on different launch tempalte instances 
@@ -229,7 +229,7 @@ Docker is used to package up containers, and runs the containers across differne
             - This role basically specifies what the EC2 instance itself can do outside of the ECS IAM Role
         - ***ECS Task IAM Role***: Allows each task to have a specific role so it can make API call to specific services
         - These two differentiate how the VM itself can make API calls, and how the running container can make calls
-        - ![ECS Concepts](./images/ecs_concepts.png)
+        - ![ECS Concepts](/img/ecs_concepts.png)
     - ***AWS Fargate*** is a serverless way to provision ECS containers
         - Just create task definitions, and then they get created for you
         - Need a VPC Endpoint to get from our VPC to AWS Backbone VPC 
@@ -281,7 +281,7 @@ Docker is used to package up containers, and runs the containers across differne
 - Alternative to ECS, but a bit more involves
 - EC2 and Fargate integrations
 - K8's is cloud agnostic
-- ![EKS Diagram](./images/eks_diagram.png)
+- ![EKS Diagram](/img/eks_diagram.png)
 - Node Types
     - ***Managed***:
         - AWS creates and manages nodes for you
@@ -308,7 +308,7 @@ Docker is used to package up containers, and runs the containers across differne
 - Auto scaling, highly available, load balancer, encryption
 - VPC Access Support
 - Connect to DB, Cache, Message queue, etc...
-- ![AWS App Runner](./images/app_runner.png)
+- ![AWS App Runner](/img/app_runner.png)
 
 #### On-Prem Integration
 
@@ -488,7 +488,7 @@ It's just running a serverless function - it integrates with almost everything
             - you can see we're targeting `us-east-1a` here
         - Just need to query the specific Zonal URL
     - If you only was a specific AZ's DNS name, you can resolve to only a single IP address
-    - ![Zonal DNS NLB](./images/zonal_nlb.png)
+    - ![Zonal DNS NLB](/img/zonal_nlb.png)
 
 ### GLB
 - Deploy, scale, and manage a fleet of 3rd party Network Virtual Appliances in AWS
@@ -507,7 +507,7 @@ It's just running a serverless function - it integrates with almost everything
 - Multi Zone load balancing, or sending requests across zones to other EC2s
 - With Cross-Zone LB each load balancer instance distributes evenly across all registerd instances in all AZ
 - Without Cross-Zone LB, you may have overloaded instances if our zones are uneven
-- ![Cross Zone LB](./images/cross_zone_lb.png)
+- ![Cross Zone LB](/img/cross_zone_lb.png)
 
 - CLB: Disabled by default
 - ALB: Always on, can't disable, and no charge for inter-AZ
@@ -638,7 +638,7 @@ API GW in front of S3 for uploading files
         - Client auth to Cognito
         - Client passes token to API GW
         - API GW knows out of the box how to verify to token
-        - ![Cognito APIGW](./images/cognito_apigw.png)
+        - ![Cognito APIGW](/img/cognito_apigw.png)
     - Lambda based auth allows us to do OAuth, SAML, or 3rd party
 
 #### Logging and Monitoring
@@ -672,11 +672,11 @@ API GW in front of S3 for uploading files
 - Allows us to do stateful application use cases
     - Chat apps, collab platforms like Confluence, games, and trading platforms
 - Works with AWS Services (Lambda, DynamoDB) or generic HTTP endpoints
-- ![WebSocket Arch](./images/websocket_arch.png)
+- ![WebSocket Arch](/img/websocket_arch.png)
 - How do you channel replies back to client? I.e server to client
     - There are callback URL's that are parameterized by `connectionId`
     - Need to use the special `@connections` sub-URL component, and then parameterize
-    - ![WebSocket ConnectionId](./images/websocket_connectionid.png)
+    - ![WebSocket ConnectionId](/img/websocket_connectionid.png)
 
 ### Private APIs
 - ***All APIs in API GW are Public and accessible over Internet unless specified***
@@ -719,7 +719,7 @@ type Mutation {
     @aws_auth(cognito_groups: ["Bloggers"])
 }
 ```
-- ![Cognito Auth AppSync](./images/cognito_appsync.png)
+- ![Cognito Auth AppSync](/img/cognito_appsync.png)
 
 ## Route53
 Route53 is a managed DNS service that integrates well with Load Balancers, Container Services, and Databases
@@ -827,7 +827,7 @@ Extremely simply - client asks for IP of `example.com` and gets back IP `123.45.
         - Then create a Health Check (public) on that Alarm 
         - ***Very imoprtsnt for test!!!!***
 - Simple arch below shows how you can use lambdas from cloudwatch to trigger read replica failovers during health check failures inside of private VPC's
-![Simple Soln Arch](./images/health_check_private.png)
+![Simple Soln Arch](/img/health_check_private.png)
 
 ### Hybrid DNS
 Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) and other on-prem, public, or other cloud networks (other DNS Resolvers)
@@ -855,7 +855,7 @@ Hybrid DNS allows us to resolve DNS queries between our VPC (Route53 Resolver) a
         - 10k queries / sec
         - Remove need for running your own resolver
     - Below diagram shows ***inbound***, and you can do the same thing, but reversed, for ***outbound***
-    - ![Resolver Diagram OnPrem + Private VPC](./images/dns_onprem_private.png)
+    - ![Resolver Diagram OnPrem + Private VPC](/img/dns_onprem_private.png)
 
 ## AWS Global Accelerator
 - Allows you to leverage AWS internal network to route to your application
@@ -905,7 +905,7 @@ Comparing some web and compute layer architectures
         - Some clients could lose connection during massive scale events
     - Can use CloudWatch, and can use Cross-Zone scaling for even distribution
     - Slow scale...few minutes for startup script, ECR pull, boot, etc...
-- ![ALB to ASG Arch](./images/alb_asg_arch.png)
+- ![ALB to ASG Arch](/img/alb_asg_arch.png)
 
 ### ALB + ASG + ECS on EC2
 - Exact same as one above, except there are ECS Tasks running on the EC2 instances versus standalone EC2 instances

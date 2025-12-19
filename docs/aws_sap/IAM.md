@@ -182,10 +182,10 @@ So where can you assume roles from?
             - Doesn't support MFA, RDS, SQL, SSO, etc...
 
 ADFS SAML
-![ADFS SAML](./images/adfs_saml.png)
+![ADFS SAML](/img/adfs_saml.png)
 
 AD Replication
-![alt text](./images/AD_replication.png)
+![alt text](/img/AD_replication.png)
 
 ##### AWS Organization
 - Root Organization (OU) has an overall Management Account
@@ -219,14 +219,14 @@ AD Replication
 - Explicit Denies ***always take precedence*** over Any Allows
 - Really very powerful, you can do things like enforce Tags, enforce regions, etc..
 
-![SCP Hierarchy](./images/scp_hierarchy.png)
+![SCP Hierarchy](/img/scp_hierarchy.png)
 - In the example above what will happen if you `Deny Athena` in the Management Account SCP?
     - Management Account specifically is not affected by SCP's, so it will be ignored
     - No Account will be able to access Athena
     - No Sandbox Account can access S3
     - Account A cannot access Athena, S3, or EC2
     - An Accounts permissions are all of it's Denies (taking precedence) with some Allows
-![IAM Policy Evaluation](./images/iam_policy_eval_flowchart.png)
+![IAM Policy Evaluation](/img/iam_policy_eval_flowchart.png)
 
 ##### AWS IAM Center (AWS SSO)
 - AWS IAM Center (FKA AWS SSO) allows us to have one single sign on for all:
@@ -250,7 +250,7 @@ AD Replication
         - Business Cloud Apps (Slack, Teams, etc...)
         - SAML 2.0 Enabled Apps
 
-![AWS IAM ID Flow](./images/aws_iamid_flow.png)
+![AWS IAM ID Flow](/img/aws_iamid_flow.png)
 
 
 ###### External ID

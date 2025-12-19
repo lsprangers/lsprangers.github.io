@@ -104,11 +104,11 @@ show_back_link: true
     - EC2 instance can use DNS or IP of EFS 
 - Can use Direct Connect and/or Site-To-Site VPN for On-Prem server to connect to EFS
     - Need to attach EFS to one or many ENI, and then On-Prem needs to connect to IPv4 address of ENI, they cannot use DNS address
-![Peering EFS Arch](./images/peering_vpc_arch.png)
+![Peering EFS Arch](/img/peering_vpc_arch.png)
 
 - Security:
     - Can use IAM + POSIX user and groups to control access to directories on file system
-        - ![EFS POSIX Security](./images/efs_posix.png)
+        - ![EFS POSIX Security](/img/efs_posix.png)
     - File System Properties:
         - Resource-based policy to control access to EFS file systems
             - Same thing as S3, but can control read/write
@@ -131,7 +131,7 @@ show_back_link: true
     - POSIX file system (use EFS instead since it has file locks)
     - Search features, queries, and rapidly changing data
     - Websites with dynamic content
-- ![S3 Storage Classes](./images/s3_storage_classes.png)
+- ![S3 Storage Classes](/img/s3_storage_classes.png)
     - Can use S3 lifecycle policies to move between these storage classes
 - Replication
     - Cross Region Replication (CRR)
@@ -347,7 +347,7 @@ show_back_link: true
     - Not continuous, it is a scheduled job
 - How can you do AWS DataSync through private channels and not public?
     - Need DirectConnect, PrivateLink, and Interface VPC Endpoint
-    - ![Private DataSync](./images/private_datasync.png)
+    - ![Private DataSync](/img/private_datasync.png)
 
 ## Data Exchange
 - Find, subscribe to, and use third-party data in cloud

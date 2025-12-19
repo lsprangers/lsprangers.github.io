@@ -51,11 +51,11 @@ show_back_link: true
             - Many groups will use CloudFront Custom HTTP header as extra authentication to ALB
                 - Create a secret header on CF servers, and use that as header, and then public ALB will only forward requests to backend with that header
                 - Update CF + ALB headers with Lambda 
-                - ![CF ALB Custom Header](./images/cf_alb_custom.png)
+                - ![CF ALB Custom Header](/img/cf_alb_custom.png)
 - Origin Groups
     - To increase HA and failover
     - Has secondary origin, which ***can be cross-region***, which takes over if first one fails
-    - ![CF Origin Groups HA](./images/cf_ha_cr.png)
+    - ![CF Origin Groups HA](/img/cf_ha_cr.png)
 
 ### Security
 - Geo Restriction:
@@ -68,7 +68,7 @@ show_back_link: true
     - Forces a client to use a pre-signed URL to access CloudFront, and an app server would generate the pre-signed URL if authenticated to
         - CF Signed URLs allow us to access a path no amtter the origin
         - Different from S3 pre-signed URLs since you act as the signer when using S3 PSURL
-    - ![CF Pre Signed URL](./images/cf_signed_url.png)
+    - ![CF Pre Signed URL](/img/cf_signed_url.png)
 
 ### Pricing and Performance
 - Pricing is done by where the CF Origin server sits
@@ -111,17 +111,17 @@ show_back_link: true
                 - Viewer Response: Before CF forwards the response to the viewer
                 - Origin Request: Before CF forwards the request to origin
                 - Origin Response: After CF receives response frmo origin
-                - ![View / Origin Req Resp](./images/viewer_origin_req_resp.png)
+                - ![View / Origin Req Resp](/img/viewer_origin_req_resp.png)
         - Arch:
             - CF Functions deployed at Edge locations, and Lambda deployed at Regional Edge Cache
-            - ![Function Differencs](./images/cf_vs_lambda_edge.png)
+            - ![Function Differencs](/img/cf_vs_lambda_edge.png)
 - Use cases:
     - Manipulate HTTP req / resp
     - Implement request filtering before reaching app server
     - Auth:
         - Doing Auth on CF means there's just validating JWT token locally somehow
         - Lambda Auth means you can use 3rd party tools like Incognito or Okta IdP
-        - ![Auth at Edge](./images/auth_at_edge.png)
+        - ![Auth at Edge](/img/auth_at_edge.png)
     - Content Filtering:
         - you can also use Lambda to do content filtering based on headers. If Chrome browser on laptop trying to GET image you can return larger image than if an iPhone is trying to
         - Comes from `User-Agent` header
@@ -164,7 +164,7 @@ show_back_link: true
 
 ### Architecture
 - DB Cache
-- ![ElastiCache DB Cache](./images/elasticache.png)
+- ![ElastiCache DB Cache](/img/elasticache.png)
 - User Session store
     - Can use as a session store to GET and POST sessions for different users across horizontally scaled apps
 - Redis
