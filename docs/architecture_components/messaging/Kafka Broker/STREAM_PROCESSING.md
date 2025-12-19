@@ -182,6 +182,103 @@ These are useful for things like broadcast joins where you need quick access to 
 
 ![Global Tables](/img/global_tables.png)
 
+### Storage Deep Dive
+Most of the stream and table fault tolerant properties emerge simply from using disk instead of RAM - if something breaks while processing a stream, we just replay from a topic that's stored on disk on a broker node...just re-read it!
+
+For tables, it's a bit harder because of the stateful processing and aggregations like `SUM()` and `COUNT()` - if we don't process messages exactly once, the aggregations won't be reliable
+
+On the other hand, we can't do a ton of backtracking and checking because our system needs to be high throughput and highly performant - this is all typically remediated via state stores that are stored locally on consumer application instances, but these machines themselves can be lost or destroyed! So how do we ensure all of the consumer instance management (think ZooKeeper) is handled?
+
+![Kafka Consumer Local Disk](/img/kafka_consumer_local_disk.png)
+
+#### Fault Tolerance
+Fortunately, each table has it's own change stream, and each table is built off of data that's sitting remotely in Kafka topics. Everytime something is updated in a table, the corresponding change stream would record the actual event changing in the table - all we need to ensure is that the change stream itself is durably stored, and that other consumer applications can access it to replay events!
+
+***These change streams are stored as Kafka topics themselves*** - therefore, fault tolerance is achieved by exploiting the [stream-table duality](/docs/architecture_components/messaging/Kafka%20Broker/STREAM_PROCESSING.md#changelog-streams). Whatever happens to the stream task or container / consumer application doesn't matter, the table's data can always be correctly restored from it's change stream via the *changlog topic*
+
+If a consumer application instance (container, VM, etc) dies that was calculating account balances for each `event.user_id`, and it needs to be rebuilt on another consumer application instance, we don't need to completely rebuild it, we can just restore the state of the table as it was when the failure happened directly from the changelog topic itself
+
+![Changelog Restart](/img/kafka_changelog_restart.png)
+
+
+#### Elasticity
+Elasticity (ease of adding or removing new containers due to scaling requirments) is extremely similar to what happens in Fault Tolerance - if a cluster needs to be downsized and remove a consumer instance, it's essentially equivalent to what we wrote above
+
+Scaling up is similar, but not exact - in this scenario we will just move stream tasks on one instance to another new instance
+
+![Scale Up Consumer Appplication Instances](/img/scale_up_consumer_app_instances.png)
+
+Since each application instance has the same application binary that includes all of the business processing logic, we don't have to migrate that. When a new instance is spun up we must migrate all table data, i.e. application tables state stores, to the new consumer instance via the changelog topic - the new consumer instance will just read off the changelog topic and bring itself up to speed and then at some point we need to perform a "switcheroo" and sunset the task on the old instance
+
+#### Table Compaction
+The discussion below is strictly for table topics! Some aggregations allow us to purge old events that aren't needed anymore 
+
+Table topics (i.e. changelog topics) are compacted - this is a feature that ensures Kafka will always retain, at a minimum, the last event for each event key within a topic partition
+
+This helps reduce the footprint of a tables change stream in the actual Kafka broker by periodically purging old events for the same event key from storage (once it's known to be processed and unneeded)
+
+These tables with compaction are useful because it allows you to store table data forever in Kafka as the permanent system of record without data growing out of bounds - this is great for reference data like customer profiles, product catalogues, account balances, etc
+
+Another benefit is that recovery during rebalancing or instance failure there's much less data to be transferred over the network - if there are 1,000,000 customers with ~50 changes / day, we'd see ~50,000,000 events / day, but they are all just upserts or aggregations, then it may result in only 1,000,000 records. All that needs to be transferred is the result set, not every event.
+
+<div style={{
+  margin: "2em auto",
+  maxWidth: 600,
+  background: "#f5f7fa",
+  borderLeft: "4px solid #4f8cff",
+  padding: "1.5em 2em",
+  borderRadius: 8,
+  textAlign: "left"
+}}>
+  <em>
+  Although it is great when your schema is fairly constant, these compaction and table semantics for reference data can fall short if you're repeatedly changing aggregation and business logic as it forces you to store all messages in topics forever for re-processing
+
+  If you do need its full history but don’t have the historic data elsewhere, such as in another stream from which the table was generated, then consider disabling compaction. And for what it’s worth, you should never enable compaction for streams because here, new events for the same key should not be interpreted as “superseding” prior events!
+
+  i.e. ***changing aggregation and business logic defeats the usefulness of compaction***
+  </em>
+</div>
+
+#### Operational Availability
+Kafka is highly available, but there are still down periods - one common one is during rebalancing, the "switcheroo" mentioned above, we'll need to take the system offline to ensure that we can rebalance appropriately and the instance switch has consistent data. This should only affect the part of the application dependent on those rebalanced partitions / tables, and the total time is just however long it takes the system to fully migrate any impacted tasks, tables, and state stores. The more data that needs to be transferred, the longer it will take - there's no way around it!
+
+There are some ways around this by utilizing ***standby replicas*** which are application instances that are configured to maintain passive replicas of another instances *table data and state*. In this setup an app instance will be continuously restored to a configurable number of other instances *just in case*. This is helpful to reduce the total migration time during rebalancing as it significantly speeds things up, but it does cause us to replicate data in a number of different locations, increases network transmission (extra data over network), and total storage of the system would double or triple depending on number of replicas
+
+![Kafka Standby Replicas](/img/kafka_standby_replicas.png)
+
+So that during a failover, we just switch instead of having to migrate data
+
+![Kafka Standby Replicas Failover](/img/kafka_standby_replicas_failover.png)
+
+#### Spark S's
+Just like Spark, Kafka also deals with (some of) the 5 S's, but for the most part Kafka actually tries to force the user to avoid these 5 S's by enforcing processing on partitions only, and asking the user to avoid aggregations across partitions
+
+The 2 worst ones in Kafka are shuffles and skew
+- Shuffles would occur when aggregations are needed across different partitions, rebalancing, or generally when we need to transfer a stream tasks data to another instance
+- Skew occurs naturally based on partition functions, and requires careful considerations as it will overlap business and infrastructure logic
+    - i.e. your processing logic is then tied to the brokers partitioning logic
+
+Thinking above those things above, we can look into the 5 S's below
+
+- **Skew**: This is a major problem on both platforms, and requires similar solutions
+    - Salt keys...Kafka tries to not do aggregations over separate partitioins though
+    - User defined partition functions
+        - This would help in rebalancing, but would require constant observability and reporting on if it causes issues elsewhere
+        - Also forces businesss logic to change because of the partitioning function
+    - etc...
+    - The best way to find this skew is via ***operational monitoring*** via datadog, confluent cloud, etc
+- **Shuffle**: Shuffle would occur more on global tables as compared to Spark
+    - Spark hits these issues during joins or aggregations over non-partition keys across Stages
+    - Kafka by design tries to ensure the user doesn't do this
+    - If a join or aggregation requires keys that span multiple partitions, Kafka Streams will repartition the data. This is done by creating an internal repartition topic, where records are re-keyed and redistributed so that all records with the same join key end up in the same partition of the repartition topic
+        - This repartitioning (shuffling) does involve network transfer. Records are sent over the network to the appropriate partition, so that the join or aggregation can be performed locally by a single
+- **Serialization**: This is offloaded to producers and consumers to run the actual CPU cycles 
+- **Storage**: Instead of having small file problems like Spark does, Kafka would suffer from misuses of partitions
+    - If your partitions are too large or too small, you'll get constant rebalancing, or require further partitioning to increase parallelism
+    - A Kafka application can only run as parallel as the number of partitions, so if you're seeing a clog it's most likely too few partitions
+    - ***Changing the number of partitions requires alterations to business logic, so it's not a small feat***
+- **Spill**: Kafka spills everything to disk by nature, so it's actually a feature and not a bug
+
 ## OLAP, OLTP, Streaming, Batch, and Overlaps
 TODO: Lambda and Kappa without storing data 85 times and losing all lineage everywhere
 Most companies will bridge these gaps by having stream Processing interact with OLAP data warehousing, and that brings things to [Lambda Architectures] and [Kappa Architectures]
