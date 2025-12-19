@@ -41,10 +41,16 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - Used to control where network traffic is directed to
     - Can be associated with specific subnets
     - The most specific routing rule is always followed
+    - Route tables have the purpose of directing traffic to specific targets based on destination IP address
+        - Targets can be IGW, NAT GW, ENI, Peering connections, TGW, etc
 - ***Internet Gateway (IGW)*** allow our VPC to connect to the internet
     - HA, scales, yada yada
     - Acts as a NAT for instances that have a public IPv4 or IPv6 IP address
     - *Any instance that have traffic routed to the IGW (via route tables) will have internet access, any instances that do not will not!*
+        - IGW also facilitates inbound traffic from internet to instances with public IP's
+        - If you have a private instance, and you route traffic to IGW, it will not work because private instances don't have public IP's
+            - This is typically solved by first routing to a NAT GW or NAT Instance in a public subnet, which then routes to IGW
+            - Internet traffic can flow back through to the private instance via NAT at this point
 - ***Public Subnets*** have a route table that sends `0.0.0.0/0` traffic to IGW
     - This is the "most broad rule", so if nothing "more specific" is defined in the route table then all instances are public and internet enabled
     - If route table has more specific rules, then some of the VM's may not be internet enabled
@@ -201,6 +207,48 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - Intra and Inter region peering
     - Allows for data mesh architecture where you can have a Hub TGW per region that connects multiple resources and accounts in that region, and then for every region you have you connect the Hub TGW's to create a mesh of TGW's across all regions
 
+##### End-to-end flow: Private subnet → Internet via NAT GW + IGW
+So the main question that always comes up is "I have an instance in a private subnet, how does it reach the internet?"
+
+The solution involves using a NAT Gateway in a public subnet to translate private IP's to public ones, which then routes to an Internet Gateway which requires a public IP being sent to it, and then the IGW routes to the internet
+
+- ***Nat GW*** allows traffic out to internet, but not back in
+    - A NAT GW performs Network Address and Port Translation (NAPT): it rewrites the source private IP and ephemeral port to the NAT GW Elastic IP and a mapped port
+        - This operates at the IP and transport layers (L3/L4) on TCP/UDP packets
+    - NAT GW does require an IGW to actually reach the internet
+    - We can then route `0.0.0.0/0` traffic from private subnet to NAT GW, and it can go out into the world
+- ***IGW*** allows traffic both ways, but only for public IP's
+    - These make subnets public
+    - Allows internet to reach instances with public IP's
+        - Egress-only IGW for IPv6 outbound only (this is a very specific use case for IPv6)
+
+With the 2 above components we can allow private instances to reach the internet
+
+- Prereqs:
+  - Private subnet route table: `0.0.0.0/0` $\rarr$ `nat-xxxxxxxx`
+  - Public subnet (where NAT GW lives) route table: `0.0.0.0/0` $\rarr$ `igw-xxxxxxxx`
+  - NAT GW has an Elastic IP (EIP). NAT Instance alternative must have Src/Dst check disabled.
+
+- Outbound (private EC2 → Internet):
+  1. Private EC2 sends packet to public dest (e.g., 1.2.3.4). Src IP = 10.x.x.x (private).
+  2. VPC router matches `0.0.0.0/0` in the private subnet route table $\rarr$ forwards to NAT GW ENI in a public subnet.
+  3. Subnet NACLs are evaluated (SGs on EC2; NAT GW does not use SGs).
+  4. NAT GW performs source NAT: `10.x.x.x:ephemeral` $\rarr$ `EIP:ephemeral`, stores the translation state.
+  5. NAT GW forwards to IGW (via the public subnet route table default route).
+  6. IGW egresses to the AWS edge $\rarr$ public Internet $\rarr$ remote service.
+
+- Return (Internet $\rarr$ private EC2):
+  1. Remote service replies to the NAT GW’s EIP.
+  2. Packet enters AWS at the IGW and is delivered to the NAT GW ENI.
+  3. NAT GW uses the flow state to translate dest back: `EIP:ephemeral → 10.x.x.x:ephemeral`.
+  4. Packet is sent into the VPC to the private subnet; NACLs evaluated; EC2 SG allows the stateful return.
+  5. EC2 receives the reply.
+
+- Notes:
+  - NAT GW supports only outbound-initiated flows; unsolicited inbound to private EC2 is blocked.
+  - NAT Instance variant: replace steps with instance target; instance SG applies; it performs NAT then forwards to IGW.
+  - IPv6: use an Egress-Only IGW (no NAT); outbound is allowed, inbound unsolicited is blocked.
+
 ### VPC Endpoints
 - Allow us to privately connect to AWS services without going over internet or needing IGW, NAT GW, VPN, Direct Connect
 - Two types:
@@ -332,8 +380,8 @@ AWS VPN solutions:
 - AWS Direct Connect (not a VPN, but private connection)
 
 
-
-#### Site to Site VPN (AWS Managed VPN)
+#### Setting Up Site to Site VPN (AWS Managed VPN)
+TLDR;
 - Corporate Data Center and VPC that you want to connect over public internet
     - They could connect over private IP with infra above, but let's focus on public
 - Setup software or harddware VPN appliance on-prem
@@ -343,8 +391,56 @@ AWS VPN solutions:
 - Two VPN conncetions (tunnels) are created for redundancy
 - At this point the VGW can talk to the Customer Gateway
 
+So we know we need 2 main resources:
+- Customer Gateway on-prem (needs public ip address)
+    - BGP ASN number uniquely identifies the customer gateway
+        - Default is 65000, but you can change it to something else
+        - Must be in private ASN range (64512 - 65534)
+    - Public IP address of on-prem VPN appliance
+        - This is typically given by the ISP or whoever manages the public IP's for the corporate data center
+    - After Site to Site VPN is created AWS provides configuration files for many different types of VPN appliances
+        - These config files have all of the pre-shared keys, tunnel IP's, routing options, etc
+        - We must add this to the actual hardware / software device to finalize connectivity
+- Virtual Private GW in AWS
+    - This is a representation of the AWS side of the VPN connection
+    - Attached to VPC
+    - ASN is also an option, default is 64512
+        - Must be in private ASN range (64512 - 65534)
+- Then we create a VPN Connection resource that links the two together
+    - This creates 2 tunnels for redundancy
+    - Each tunnel has its own public IP address on AWS side
+    - Each tunnel has pre-shared keys for authentication
+    - Each tunnel has routing options (static or dynamic using BGP)
+        - Static routing means you manually enter all of the routes on both sides
+        - Dynamic routing means BGP is used to share routes automatically
+    - 2 tunnels are created for redundancy purposes to ensure if one connection is broken it doesn't bring down the connectivity for the company
+- Further configurations are helpful such as:
+    - Route propogation which takes care of updating route tables automatically when using dynamic routing
+        - It takes any routes from on-premise and adds them to route tables in VPC subnets
+    - Tunnel options such as:
+        - Encryption algorithms
+        - Hashing algorithms
+        - Diffie-Hellman groups
+
 ![S2S VPN](/img/s2s_vpn.png)
----
+
+#### Setting Up A Client VPN
+- Create a Client VPN Endpoint resource
+    - This represents the VPN endpoint in AWS
+    - You can specify authentication options (Active Directory, Mutual Auth with certs, etc)
+    - You can specify server certs for encryption
+    - Specify DNS servers to use when connected
+    - Specify split-tunnel or full-tunnel
+        - Split-tunnel means only traffic destined for VPC goes through VPN, rest goes through local internet
+        - Full-tunnel means all traffic goes through VPN
+- Create target network ENI in VPC subnet
+    - This is the entry point for the VPN connection
+    - You can create multiple ENI's in multiple subnets for HA
+- On the actual client device you'll need to 
+    - Download OpenVPN client software
+    - Download Client VPN configuration file from AWS
+    - Import config file into OpenVPN client
+    - Connect using credentials
 
 #### Route Propogation
 - How can instances communicate to VGW?
@@ -368,6 +464,8 @@ AWS VPN solutions:
     - ![S2S internet](/img/s2s_internet.png)
 - Another valid solution is to flip things around and have an on-premise NAT in corporate data center, and have private instances in VPC get to internet there
     - ***TLDR; If you own NAT software on EC2 instance or on-premise, you can do this***
+- A "blackhole" route is a route that goes nowhere
+
 
 #### VPN CloudHub
 - Allows us to connect up to 10 customer gateways for each VGW
@@ -408,8 +506,22 @@ AWS VPN solutions:
         - Reach any VPC from ENI + TGW
 
 ### AWS Direct Connect
-- Provides a dedicated private connection from remote network to VPC
+- Provides a dedicated private connection from remote network (typically company data center) to VPC
+    - This is ***different than a VPN*** which goes over public internet
+    - Direct Connect is a physical connection from corporate data center to AWS data center
+- More reliable, consistent network experience, lower latency, higher bandwidth than VPN
+- Can be used with Site to Site VPN for encryption
+- Can be used with TGW to connect multiple VPC's in multiple regions to corporate data center
 - Completely bypasses ISP
+- Provisioning Direct Connect:
+    - Choose AWS Direct Connect location
+    - Create a Direct Connect request
+        - This will end up going to a local provider like Equinix, Megaport, etc
+    - Once accepted, set up physical connection to AWS Direct Connect router utilizing configuration files provided by AWS
+    - Set up cross connect between customer router and AWS Direct Connect router
+    - Create a Virtual Interface (VIF)
+- You need to fully reconfigure local network hardware to route traffic to AWS Direct Connect router
+    - This typically involves BGP routing
 - ***Virtual Interfaces (VIF)***:
     - Public VIF allows us to connect to public AWS endpoints (S3, EC2 services, anything AWS)
     - Private VIF conncets to resources in private VPC (EC2, ALB, S3, etc)
