@@ -208,7 +208,7 @@ It is a specific instantiation of Kinesis Data Streams
 - OR Producers can write directly into Firehose for buffered batching
     - Firehose can then move it into Redshift or S3
     - Back into Kinesis Data Analytics for more advanced transformations
-- ![Real Time DE Arch](./images/real_time_de_arch.png)
+- ![Real Time DE Arch](/img/real_time_de_arch.png)
 
 - Example:
     - 3000 messages of 1KB per second
@@ -234,7 +234,7 @@ It is a specific instantiation of Kinesis Data Streams
                 - Long term storage, but streaming it out is extremely expensive
 
 ### Streaming Resource Comparison Chart
-![Streaming Comparison Chart](./images/streaming_comparison_chart.png)
+![Streaming Comparison Chart](/img/streaming_comparison_chart.png)
 
 ## Amazon MSK
 - Amazon Managed Streaming for Kafka
@@ -458,7 +458,7 @@ It is a specific instantiation of Kinesis Data Streams
     - They are managed and used by the compute nodes though
     - Spectrum nodes load and interact with S3 data
 - Data is then collected and sent back to Leader node
-- ![Redshift Spectrum](./images/redshift_spectrum.png)
+- ![Redshift Spectrum](/img/redshift_spectrum.png)
 
 ### Redshift Workload Management (WLM)
 - Emables you to flexibly manage query priorities within workloads
@@ -480,7 +480,7 @@ It is a specific instantiation of Kinesis Data Streams
 - Storage layer grows incrementally in 10GB increments
 - Automatically scales to workloads wiht millions of requests per second
 - Pay as you go, no upfront costs
-- ![Architecture](./images/documentdb_arch.png):
+- ![Architecture](/img/documentdb_arch.png):
     - On-Demand primary and replica instances
         - You pay per second with min of 10 minutes
     - Database storage on block

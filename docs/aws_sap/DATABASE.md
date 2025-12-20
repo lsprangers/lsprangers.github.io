@@ -149,7 +149,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
         - Lambda for real time
         - Kinesis for near real time (it does batching)
             - Allows for more robust search over logs
-    - ![OS and Dynamo](./images/os_dynamo.png)
+    - ![OS and Dynamo](/img/os_dynamo.png)
 
 ## RDS
 - Relational Database Service
@@ -212,7 +212,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - Can use RDS events and CW health checks together to get notified of downed RDS clusters
 - These CW Events or RDS events or anything else can trigger lambdas that update DNS and promote read replicas to leader
 - Can't use DNS health checks only because you need to promote RR to leader, and that can't be done without custom logic stored in lambda
-- ![CRFailover](./images/rds_cr_failover.png)
+- ![CRFailover](/img/rds_cr_failover.png)
 
 ## Aurora
 - Engines: Postgres compatible and MySQL compatible
@@ -237,7 +237,7 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - Aurora Cluster: Read and Write
     - Read and Write endpoints for client app
     - Shared volume auto expanding storage underneath
-    - ![Aurora Cluster](./images/aurora_cluster.png)
+    - ![Aurora Cluster](/img/aurora_cluster.png)
 - Aurora Endpoints
     - Endpoint = cluster address + port
     - Write Endpoints

@@ -24,11 +24,11 @@ This section is all around how to deploy and manage code, applications, and mach
         - Single instance deployment is good for dev
         - LB + ASG good for prod / pre-prod web apps
         - ASG good for non web-apps (workers, backend services, etc)
-        - ![Three Architecture Models Beanstalk](./images/beanstalk_arch.png)
+        - ![Three Architecture Models Beanstalk](/img/beanstalk_arch.png)
 - Web Server vs Worker:
     - Any decoupling ==== SQS!!!
     - App performs long running tasks to complete, then offloadnig them to dedicated workers is typically used
-        - ![Decoupled Beanstalk](./images/decoupled_beanstalk.png)
+        - ![Decoupled Beanstalk](/img/decoupled_beanstalk.png)
         - Decoupled beanstalk can help us manage web app and worker environment
     - Blue / Green Deployment
         - Can use a new environment (green) and validate independently

@@ -190,7 +190,7 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
         - This means that the asymmetric handshake is used strictly to create a shared session key, which can be used as a symmetric key to encrypt and decrypt information from the client to the server and vice versa
 - The ***master key (or session key)*** in the SSL/TLS flow is a symmetric encryption key that is shared between the client and the server after the handshake process. It is used to encrypt and decrypt all subsequent communication between the client and server during the session.
 
-![SSL Flow](./images/ssl.png)
+![SSL Flow](/img/ssl.png)
 
 ### SSL/TLS Flow
 
@@ -407,7 +407,7 @@ Secure communication begins using Symmetric Encryption
         - Dyanmically routes requests to nearest S3 bucket to the region the user is in
         - *Syncs / duplicates data between regions for you*
         - If closest region fails, requests failover to next closest region or our passive choice
-![S3 Regional Access Points](./images/s3_multi_region.png)
+![S3 Regional Access Points](/img/s3_multi_region.png)
 
 - S3 Object Lambda
     - Allows us to change an S3 Object before it's retrieved by a calling application

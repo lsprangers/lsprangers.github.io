@@ -19,7 +19,7 @@ To be honest idk why these are included in here
     - Conditions
     - Timeout, error handling, etc
     - Basically airflow for lambdas, and it runs them for you
-    - ![Step Function Flow](./images/step_function_flow.png)
+    - ![Step Function Flow](/img/step_function_flow.png)
 - Max execution time of 1 year
 - Possible to implement human approval feature
 - If you chain lambda functions using Step Functions, the latency is not visualized so you must take that into account yourself
@@ -67,7 +67,7 @@ To be honest idk why these are included in here
 - Express is much smaller burst durations, with more transitions and smaller turnaround times
     - Must complete in 5 min
     - Can start 100k / second
-- ![Step Function Standard vs Express](./images/sf_standard_vs_express.png)
+- ![Step Function Standard vs Express](/img/sf_standard_vs_express.png)
 
 ### Error Handling
 - Can enable error handling retries, and add alerting to SF State Machine
@@ -138,7 +138,7 @@ To be honest idk why these are included in here
 - Work processor pulls from Request queue
 - Work processor writes to Response queue
 - Client reads from Response queue
-- ![SQS Async](./images/sqs_async_arch.png)
+- ![SQS Async](/img/sqs_async_arch.png)
 
 ## Amazon MQ
 - SQS and SNS are cloud native services with proprietary protocols from AWS
@@ -239,7 +239,7 @@ To be honest idk why these are included in here
         - Buying Service needs to relay a new purchase to both services
         - If you only use SNS and make the 2 services subscribers, the Fraud service may become overwhelmed even though our Shipping Service is fine
         - you can use a queue for each of them, but you don't want to force the Buying service to need to update it's application code every time there's another downstream service / worker
-        - Therefore, you can use ![FanOut pattern](./images/fanout_pattern.png)
+        - Therefore, you can use ![FanOut pattern](/img/fanout_pattern.png)
 - What this gives us:
     - Push once for producer
     - Fan out to multiple subscribers
@@ -264,7 +264,7 @@ To be honest idk why these are included in here
     - A delivery policy is applied and retries / backoffs are used
     - Immediate, Pre-Backoff, Post-Backoff
     - Can retry over 23 days, so there's a lot of time to debug
-- ![SNS Retries](./images/sns_retries.png)
+- ![SNS Retries](/img/sns_retries.png)
 - Only HTTP(S) supports custom policies
     - Don't want SNS to DOS attack your backend though
 - SNS Dead Letter Queue
