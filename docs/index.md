@@ -144,4 +144,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-2-topics-partitions-and-storage-fundamentals/)
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-3-event-processing-fundamentals/)
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-4-elasticity-fault-tolerance-advanced-concepts/)
+- [Rebalancing Protocol Medium Article](https://medium.com/streamthoughts/apache-kafka-rebalance-protocol-or-the-magic-behind-your-streams-applications-e94baf68e4f2)
 ---
