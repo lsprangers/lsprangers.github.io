@@ -36,7 +36,8 @@ Kafka is built up on independent SQS brokers as partitions, and partitions are s
 At a high level this is simple, but working through different use cases starts to show where the actual implementation details matter:
 - Schemas and Serialization
 - Scaling and Partitioning
-- Durability, Fault Tolerance, and Disk Seeks
+  - Heavily drawing on rebalancing, which is covered in [Rebalancing SubDocument](/docs/architecture_components/messaging/Kafka%20Broker/REBALANCING_PROTOCOL.md)
+- Durability and Fault Tolerance
 - Streams, Tables, Offsets, and Aggregations
 
 ### Storage Fundamentals
