@@ -207,7 +207,7 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
 - Intra and Inter region peering
     - Allows for data mesh architecture where you can have a Hub TGW per region that connects multiple resources and accounts in that region, and then for every region you have you connect the Hub TGW's to create a mesh of TGW's across all regions
 
-##### End-to-end flow: Private subnet → Internet via NAT GW + IGW
+#### End-to-end flow: Private subnet → Internet via NAT GW + IGW
 So the main question that always comes up is "I have an instance in a private subnet, how does it reach the internet?"
 
 The solution involves using a NAT Gateway in a public subnet to translate private IP's to public ones, which then routes to an Internet Gateway which requires a public IP being sent to it, and then the IGW routes to the internet
@@ -474,7 +474,6 @@ So we know we need 2 main resources:
 - Low cost hub-and-spoke model
 - Provides secure communication between sites and uses IPSec for secure communication
 
----
 - If there are multiple VPC's on AWS, and one single on-premise corporate network with a Customer Gateway, AWS recommends making one VPN connection from each VPC to CGW
 - Another option here is to use Direct Connect Gateway, but that comes later
 - Another option is a Shared Services VPC
@@ -497,7 +496,7 @@ So we know we need 2 main resources:
         - ENI provides entry/exit point in private subnets (as you described in [TGW](#transit-gateway)) which is routed to NAT GW
     - ![Client VPN Internet Access](/img/client_vpn_internet.png)
 
----
+
 - What if you had a Transit GW?
     - Thena ll of this is possible, and you can setup 
         - Central hub TGW with ENI

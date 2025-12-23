@@ -7,7 +7,9 @@ show_back_link: true
 ---
 
 ## Databases
-This whole fuckin section is going to be on serverless Dynamo I bet
+This whole section is going to be on serverless Dynamo I bet
+
+Pricing will always come to On-Demand vs Reserved Instances...on demand typically more expensive, reserved instances cheaper but need to commit to a certain usage level over a certain year period
 
 ## DynamoDB
 - NoSQL DB, fully managed, massive scale (1M req / sec)
@@ -37,7 +39,9 @@ This whole fuckin section is going to be on serverless Dynamo I bet
     - Standards
 
 ### DyanmoDB Basics
-Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_components/databases%20&%20storage/NoSQL/index.md)
+Most of these basics are covered in the [NoSQL Walkthrough](/docs/architecture_components/databases%20&%20storage/NoSQL/index.md)
+TLDR; is that DynamoDB is schemaless K:V store with tables, primary keys, items, and attributes, it can scale almost infinitely, meaning it's partitioned, and it has local and global secondary indexes for different query patterns. Authenticating to RDS involves security groups, IAM policies, and KMS encryption at rest, because at the end of the day it's just a number of servers running a DB engine in a VPC somewhere (DynamoDB is serverless so you don't have to manage the servers, but RDS you do)
+
 - Made of tables
 - Each table has a Primary key
     - Primary Key is either Partition Key, Partition and Sort Keys, or Combo Key
@@ -159,7 +163,13 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - Deployed in a VPC, usually private
     - Lambda that wants access needs to be deployed in private VPC since lambda and other serverless services are deployed on AWS
 - Storage by EBS, and can increase volume size automaitcally via auto-scaling
+    - Scaling here is similar to plugging in a new hard drive to a server rack on-premise
+    - If we attach new disks to an RDS instance, somehow the RDS engine will need to know about the new disks and be able to use them
+        - RDS handles this for us
 - Backups allow PIT recovery, and they expire
+    - Can set backup retention period from 1 to 35 days
+    - Automated backups happen during a specified backup window
+    - Backups stored in S3
 - Snapshots are manual, and can help DR plans and send full databases across regions
 - RDS events send events similar to S3 to SNS
     - Not CDC, events like operations, outages, etc...
@@ -199,6 +209,12 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
     - DMS works on Oracle RDS
         - On-prem Oracle DB $\leftrightarrow$ DMS $\rightarrow$ RDS Oracle
         - Allows us to replicate DB's, common pattern is replicating an on-prem DB to cloud one
+- IOPS
+    - RDS supports both Provisioned IOPS and General Purpose SSD
+    - Provisioned IOPS good for high performance DB's that need low latency and high throughput
+    - General Purpose SSD good for dev / test or low traffic DB's
+    - SSD better for OLTP high throughput workloads, HDD better for OLAP workloads
+    - HDD isn't supported on RDS, only on EC2 installed DB's
 - RDS for MySQL gotchas:
     - Can use `mysqldump` to migrate RDS DB to non RDS
         - External MySQL DB can run on prem or EC2 or wherever
@@ -215,6 +231,8 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - ![CRFailover](/img/rds_cr_failover.png)
 
 ## Aurora
+- Tabular DBase, compatible with MySQL and Postgres
+- Managed Service, handles provisioning, patching, backups, monitoring, etc...
 - Engines: Postgres compatible and MySQL compatible
 - Storage automatically frows by 10GB increments to 128TB max
     - 6 copies of data across multi AZ by default
@@ -281,6 +299,11 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
     - Users need access to Data API and Secrets Manager
 - RDS Proxy
     - Allows us to create our own proxy for read only replicas if you desire
+    - RDS Proxy handles connection pooling, auth, etc...
+        - This is different from the Aurora Serverless Proxy Fleet, but similarly helps to manage connections to a database cluster
+    - RDS proxy also helps reducing failover times by maintaining warm connections to DB instances
+        - So when failover happens, RDS Proxy already has connections to the new leader DB instance, and we don't have to wait for DNS resolution or new connections to be made
+        - No change in application code needed to access new database leader if it changes
 - Global Aurora
     - 1 primary region
     - 5 secondary regions for read only
@@ -296,3 +319,14 @@ Most of these basicas are covered in the [NoSQL Walkthrough](/docs/architecture_
 - Create Aurora RReplica on RDS DB Instance
     - Gets replicated via synchronous replication
     - Once it's replicated, just promote it 
+
+## Caching
+Caching is covered in [Elasticache Section in Cache Document](/docs/aws_sap/CACHE.md#elasticache), but can give a high level overview here
+
+Elasticache is a managed caching service that supports both Memcached and Redis engines - a common use case is having a private subnet database, VPC endpoint for Elasticache, and pointing app servers to the Elasticache endpoint to reduce read and write latency to the database
+
+Elasticache sits in front of databases to help reduce read latency and offload read traffic from the database itself. It can also be used as a write through cache to help with write latency as well. Elasticache supports both Memcached and Redis engines, and Redis is the more fully featured of the two. Elasticache is a managed service, so AWS handles patching, monitoring, scaling, etc... for you. Common use cases are session stores, leaderboards, caching of frequently accessed objects or query results, and pub/sub messaging systems
+
+Memcached is for simple K:V data, no built in replication, persistence, or advanced data structures
+
+Redis supports more advanced data structures like lists, sets, sorted sets, hashes, bitmaps, hyperloglogs, and geospatial indexes. Redis also supports replication, failover, clustering, persistence to disk, and has Lua scripting capabilities. Redis is often used when you need more than just simple K:V caching

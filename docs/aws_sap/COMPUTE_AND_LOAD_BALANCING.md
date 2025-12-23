@@ -1013,3 +1013,38 @@ Comparing some web and compute layer architectures
     - LZ
         - Can associate subnets with LZ's, and restrict subnet CIDR to a certain LZ
     - WaveLength Zone
+
+
+## On Test Not Covered
+- Lightsail can manage instances and containers, Lightsail is used for simple use cases and small businesses
+- Elastic Beanstalk is PaaS for deploying and managing apps without worrying about infra
+- `.ppk` key used for Putty SSH connections on Windows
+- SSH port 22, RDP port 3389
+- Powershell commands
+    - `New-EC2Instace`, `Get-EC2Instance`, `Stop-EC2Instance`, `Start-EC2Instance`, `Remove-EC2Instance`
+    - `Initialize-AWSDefaultConfiguration`
+    - `Stop-EC2Instace` is used for hibernation
+        - Just need to add `-Hibernate` flag
+        - `Stop-EC2Instance -InstanceId "i-1234567890abcdef0" -Hibernate`
+- Linux commands
+    - `aws ec2 describe-instances`, `aws ec2 start-instances --instance-ids i-1234567890abcdef0`, `aws ec2 stop-instances --instance-ids i-1234567890abcdef0`, `aws ec2 terminate-instances --instance-ids i-1234567890abcdef0`
+        - `run-instances` to create instance
+        - `describe-instances` to list instances, `describe-instance-attributes` to get attributes
+            - Sample test mentioned descirbe, but to modify type you must stop, modify attribute, and then start again
+        - `modify-instance-attribute` to modify attributes
+        - `hibernate-instances` to hibernate
+            - Even thought he AWS documentation mentions `stop-instances`
+            ```
+            To hibernate an instance
+            Use the stop-instances command and specify the --hibernate parameter.
+
+
+            aws ec2 stop-instances \
+                --instance-ids i-1234567890abcdef0 \
+                --hibernate
+            ```
+- EC2 hibernation needs encrypted root volume, and only works on certain instance types
+    - Hibernation is the act of saving the contents of the instance's RAM to the root EBS volume, and then stopping the instance
+    - When the instance is started again, the RAM contents are restored from the EBS volume
+    - Using private key to decrypt volume on boot
+    - Also use PK to decrypt admin passwords on Windows

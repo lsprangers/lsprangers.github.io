@@ -40,6 +40,19 @@ show_back_link: true
         - Apps that manage concurrent write ops
         - Must use FS that's cluster-aware
     - Each instance has full read and write permissions to the volume
+- Partitioned disks vs non-partitioned disks
+    - GPT vs MBR
+        - GPT = GUID Partition Table
+             GPT (GUID Partition Table) is the modern partitioning scheme. On Windows it supports up to 128 partitions per disk; MBR supports only 4 primary (or 3 + 1 extended)
+            - Use GPT when you need more than 4 partitions or disks larger than 2 TB. For “400 GB EBS, up to 10 partitions,” initialize as GPT
+        - MBR = Master Boot Record
+            - MBR is the older partitioning scheme. It supports up to 4 primary partitions per disk and disks up to 2 TB in size
+            - Use MBR when you need maximum compatibility with older operating systems. For “up to 2 TB EBS, up to 4 partitions,” initialize as MBR
+    - Partitioned disks need to be formatted and partitioned before use
+    - Non-partitioned disks can be used right away
+    - Linux uses `/dev/xvdf` naming convention
+    - Windows uses `xvdg` naming convention
+
 
 ### Amazon Data Lifecycle Manager
 - Automate creation, retention, and deletion of EBS snapshot and EBS backed AMI's
@@ -69,6 +82,16 @@ show_back_link: true
 - Elastic File System
 - Managed Network File System (NFS) that can be mounted on many EC2
 - Multiple EC2, multi AZ, and can be across on prem and on cloud
+- Allows us to mount same file system on multiple EC2 instances
+- Shared file storage for Linux based workloads
+- POSIX compliant file system with file locking
+- Use cases:
+    - Lift and shift apps that need shared file storage
+    - Content management, web serving, home directories
+    - Big data and analytics
+    - Media processing workflows
+    - Container storage
+    - DevOps tools
 - Highly available, scalable, and expensive file system - you pay per GB used
 - Use cases:
     - Web serving, content management, data sharing, WordPress
@@ -98,6 +121,14 @@ show_back_link: true
         - One Zone IA is best to use
     - Archive: Rarely accessed data, and 50% cheaper
     - Implement lifecycle policies to move files between storage tiers
+- Mount target configuration provides an IP address in your VPC subnet to mount EFS
+    - Each AZ needs its own mount target
+    - EC2 instances connect to mount target via IP or DNS name
+    - Security groups control access to mount targets
+- Accessing EFS from Lambda
+    - Lambda functions in VPC can mount EFS file systems
+    - EFS provides highly scalable and shared file storage for Lambda functions
+
 
 ### On Prem and VPC
 - Can use VPC peering for VPC-2-VPC connection between EC2 and EFS
@@ -175,6 +206,114 @@ show_back_link: true
         - Parallelize GET requests by requesting specific byte range
         - If one part fails you just re-request that one part
         - Also useful for only requesting headers of files, instead of GET whole file
+- Tiering
+    - Each object stored in S3 has its own storage class
+    - Lifecycle policies to transition between storage classes
+    - Can set policies based on object age, size, prefix, or tags
+    - Types:
+        - Standard has 3 AZ's and millisecond access
+        - Standard IA has 3 AZ's, millisecond access, but lower cost for infrequent access
+        - One Zone IA has 1 AZ, millisecond access, lower cost for infrequent access
+            - Data is not replicated across AZ's, so ***if AZ goes down data is lost***
+        - Intelligent Tiering automatically moves between frequent and infrequent access based on usage
+        - Glacier Instant Retrieval has 3 AZ's, 1-2 second access, lower cost for archival data
+            - Good for data that is rarely accessed, but needs immediate access when requested
+        - Glacier Flexible Retrieval has 3 AZ's, minutes to hours access, lowest cost for archival data
+            - You can't directly download these files in UI
+            - They would need to be restored first, which creates a temporary copy in S3 Standard for a set amount of time
+            - Same thing with CLI, SDK, etc...
+        - Glacier Deep Archive has 3 AZ's, 12 hours access, lowest cost for long term archival data
+- Versioning
+    - Keep multiple versions of same object in S3 bucket
+    - Can recover from accidental deletes or overwrites
+    - Once enabled can't be disabled, can only be suspended
+    - MFA Delete
+        - Additional security for versioned buckets
+        - Requires multi-factor authentication for delete operations on versioned objects
+        - Can only be enabled / disabled via AWS CLI
+- Object Locking
+    - Write Once Read Many (WORM) model
+    - Prevent object deletion or modification for a fixed amount of time or indefinitely
+    - Use cases:
+        - Regulatory compliance
+        - Financial records
+        - Healthcare records
+    - Modes:
+        - Governance Mode
+            - Users with special permissions can override lock
+        - Compliance Mode
+            - No one can override lock, even root user
+    - Retention Periods
+        - Fixed Retention
+            - Set retention period for objects
+        - Legal Hold
+            - Indefinite retention until legal hold is removed
+- S3 Access Points
+    - Simplify managing data access at scale for shared datasets in S3
+    - Unique hostname for each access point
+    - Each access point has its own policy to control access
+    - VPC Access Points
+        - Restrict access to S3 bucket to specific VPC
+        - Ensure data never leaves Amazon network
+    - Use Cases:
+        - Shared datasets for big data and analytics
+        - Simplified access management for large teams
+- Caching
+    - AWS CloudFront in front of S3
+        - Cache static content globally
+        - Reduce latency for end users
+        - Offload S3 read requests
+    - AWS Storage Gateway
+        - LAN (Local Area Network) users will see these objects as some local file system or storage device, and on the backend these objects are stored in S3
+            - Can create these as proper EC2 instances in a VPC, or on-prem virtual machines, and then make accessible to corporate LAN via networking VPN's or Direct Connect
+        - Helps to reduce latency for on-prem users accessing S3 objects
+        - Hybrid cloud storage with on-prem caching of S3 objects
+        - Allows low latency access to frequently accessed data, and means on-prem servers don't have to do any further code changes to use S3
+        - Gateway Types:
+            - S3 File: On-prem objects sent here will be uploaded to S3 as objects
+                - At that point other services like Athena can query the data
+            - FSx: On-premise servers can use FSx as a file system
+                - Acts as a file system on-prem
+                - Actually has nothing to do with S3, but is a way to use FSx on-prem
+            - Tape: This enables cloud backups
+                - On-prem backup software writes to virtual tapes
+                - Virtual tapes are stored in S3 Glacier or Glacier Deep Archive
+            - Volume: On-prem block storage that asynchronously backs up to S3 as EBS snapshots
+        - File Gateway
+            - NFS or SMB mount on-prem that caches S3 objects locally
+            - Write through cache, writes go to S3 and local cache
+        - Volume Gateway
+            - iSCSI block storage on-prem that asynchronously backs up to S3 as EBS snapshots
+            - Cached Volumes: frequently accessed data cached on-prem, full volume in S3
+            - Stored Volumes: entire volume stored on-prem, backed up to S3
+        - Tape Gateway
+            - Virtual tape library on-prem that backs up to S3 Glacier or Glacier Deep Archive
+            - Use existing backup software to write to virtual tapes
+    - Deploying AWS Storage Gateway
+        - Can be deployed as:
+            - Virtual Machine on VMware ESXi, Microsoft Hyper-V, or KVM
+            - Amazon EC2 instance
+            - AWS Snowcone device for edge locations with limited connectivity
+        - Connect to AWS Management Console to configure and manage gateway
+        - Create storage volumes, file shares, or virtual tape libraries as needed
+
+### S3 Access Lists
+We can allow bucket objects to be accessible to other AWS accounts, public, or via Cognito via ACL's
+
+We utilize bucket policies for more complex access control, which allow for conditional access based on IP, VPC, MFA, etc...
+
+- Manage access to S3 buckets and objects using ACLs
+- Bucket Owner Full Control
+    - When another AWS account uploads object to your bucket, they can give you full control over
+    - This is useful for cross-account uploads
+- Predefined ACLs
+    - Private
+    - Public Read
+    - Public Read Write
+    - Authenticated Read
+    - Bucket Owner Read
+    - Log Delivery Write
+
 
 ### S3 Storage Class Analytics
 - AKA Storage Class Analysis
@@ -227,7 +366,7 @@ show_back_link: true
     - Works great for static objects that aren't updated often
 
 #### Indexing Objects
-- you can't natively index objects in S3, to do search we'd need to check all files / prefixes
+- You can't natively index objects in S3, to do search we'd need to check all files / prefixes
 - On new writes to S3 you can use an Event Notification to trigger a lambda function
 - Lambda would write object metadata and update indexes on DynamoDB
     - Search by date, total storage used by customers, find all objects w/ certain attribute, etc...
