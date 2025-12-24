@@ -196,12 +196,25 @@ What are the options you have for updating the applications inside of the ASG, t
     - Instead you could set our up threshold to 15%, and do an InstanceRefresh process with our new Launch Tempalte which will take care of the changes, while ensuring 15% of our EC2 desired are up and running
         - After this 100% of our EC2's will have a new launch template, and you will have never had a downed service
 
-##### Docker
-Docker is used to package up containers, and runs the containers across differnet OS's...lots of other places you talk about Docker
+### Containers
+Containers are lightweight, stand-alone, executable packages of software that include everything needed to run an application: code, runtime, system tools, libraries, and settings. They are isolated from one another and the host system, ensuring consistent behavior across different environments
 
-### Docker Container Mgmt
- 
+Docker engines sit on top of Host OS (typically Linux), and then Docker containers sit on top of Docker engine - this abstracts away the OS differences so that our binaries / libraries can run anywhere
+
+AWS then allows us to run these Docker containers on EC2 instances, or via Fargate (serverless), and helps to manage the control and compute planes for us in different ways:
+- EKS will use Kubernetes to manage containers, and AWS manages the high availability of the control plane
+- ECS uses an AWS managed (serverless) control plane to manage containers, and AWS manages the high availability of that control plane, i.e. we only see the compute plane in our account
+    - ECS can run on EC2 instances or Fargate
+    - If it runs on Fargate, that means the compute plane is also serverless, and AWS manages everything for us
+
+AWS also has migration tools to migrate on-prem applications to containers, and to move on-prem containers to cloud containers:
+- App2Container is a tool to containerize existing applications on-prem into Docker containers
+- ECS Anywhere and EKS Anywhere allow us to run containers on-prem while still using the AWS managed control plane
+
+
 #### Amazon Elastic Container Service (ECS)
+ECS is AWS's managed container orchestration service
+
 - Typical use cases
     - Running microservices
         - Run multiple containers on a single machine
@@ -263,7 +276,8 @@ Docker is used to package up containers, and runs the containers across differne
         - Work for ECS 
         - Use Launch Template for ECS Tasks
         - Same pros and cons as general spot instances
-    - AWS ECR
+    - ***AWS ECR***
+        - Managed image repository
         - Store docker images on AWS
         - Cross region and cross account replication so you don't have to rebuild
         - Private or Public repository
@@ -300,6 +314,24 @@ Docker is used to package up containers, and runs the containers across differne
         - FSx Lustre
         - FSx for NetApp
 
+#### DNS and Service Discovery
+- ECS Service Discovery
+    - Use Route53 to create private hosted zone inside of VPC
+    - Each ECS service gets a DNS name in the hosted zone
+    - ECS tasks register and deregister with Route53 when they start and stop
+    - ECS services can discover each other via DNS names
+    - Supports A records (IPv4) and SRV records (service and port)
+- EKS Service Discovery
+    - Use CoreDNS add-on for service discovery
+    - Each K8s service gets a DNS name in the cluster
+    - K8s pods register and deregister with CoreDNS when they start and stop
+    - K8s services can discover each other via DNS names
+    - Supports A records (IPv4) and SRV records (service and port)
+
+Typically, DNS will target a load balancer sitting in front of the ECS / EKS services for high availability, and this load balancer will route traffic to the ECS / EKS tasks / pods
+
+Load balancers DNS is then registered in Route53 as an Alias or CNAME record for the service domain name
+
 #### AWS App Runner
 - Fullymanaged service that makes it easy to deploy web apps and APIs
 - No infra experience needed
@@ -313,7 +345,7 @@ Docker is used to package up containers, and runs the containers across differne
 #### On-Prem Integration
 
 ##### Amazon ECS Anywhere
-- Run containers on customer managed infrastructure
+- Run containers on customer managed infrastructure, i.e. on-premise
 - Use the ECS control plane to manage containers on premise
     - Need ECS Container Agent and SSM agents on our computerss
     - Both agents register with AWS services, and then you can spin up containers on-prem
