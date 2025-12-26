@@ -7,6 +7,12 @@ show_back_link: true
 ---
 
 ## Caching
+Ultimately, Caching + CDN's help to bring content closer to users, reduce latency, and offload traffic from origin servers, and they can even provide security features like DDoS protection and SSL termination
+- CloudFront can also do compression of files to reduce bandwidth
+- It can run javascript functions at the edge to modify requests and responses (Lambda@Edge)
+- Can do streaming of media files as well
+
+![Caching Overview](/img/caching_cloudfront_overview.png)
 
 ## CloudFront
 - CloudFront is a CDN
@@ -18,7 +24,13 @@ show_back_link: true
     - Would then cache on PoP server closest to Client in China
 - Helps to protect against network and app layer attacks (L4 / L7)
 - Can expose external HTTPS and can talk to internal HTTP(S) backends
-- Supports WebSocket
+    - S3, EC2, ELB, ALB, API GW, HTTP Servers, MediaStore, MediaPackage, etc
+- Supports WebSockets as well
+- Supports HTTP/2 and IPv6
+- Utilizing CloudFront with something like BeanStalk means you have to change the Beanstalk URL to the CloudFront URL for clients to access
+    - Or use Route53 to point to CloudFront distribution
+
+Cloudfront cache behavioral settings are almmost entirely focused on how to handle requests and responses, and how to cache content. Ultimately, it has TTL, PUT/POST/GET/DELETE handling, header and cookie forwarding, query string handling, and compression settings - similar to Redis or Memcached caching settings, but for HTTP content and files. CloudFront creates proper URL's that are cached at edge locations, and different URL's can have different caching behaviors
 
 ### Origins
 - S3
@@ -160,7 +172,7 @@ show_back_link: true
 - Typical TTL and other things that need to be setup and configured
 - AWS takes care of OS patching, optimizations, configuration, failover, recovery, backups, and HA
     - As always, AWS is basically a rolling DevOps person
-- ElastiCache means heabvy app code changes to use ElastiCache
+- ElastiCache means heavy app code changes to use ElastiCache
 
 ### Architecture
 - DB Cache
