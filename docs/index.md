@@ -5,7 +5,7 @@ title: Technical Content
 description: A collection of technical notes, implementations, and concepts
 ---
 
-# 📚 Tech Notes
+# Tech Notes
 
 Why this? I had this all in word docs when I was going through interviews, so figured I'd put it in here somewhere
 
@@ -145,4 +145,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-3-event-processing-fundamentals/)
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-4-elasticity-fault-tolerance-advanced-concepts/)
 - [Rebalancing Protocol Medium Article](https://medium.com/streamthoughts/apache-kafka-rebalance-protocol-or-the-magic-behind-your-streams-applications-e94baf68e4f2)
+- [Oreilly Multi Tenancy Book - Building Multi Tenant SaaS](https://learning.oreilly.com/library/view/building-multi-tenant-saas/9781098140632/)
 ---
