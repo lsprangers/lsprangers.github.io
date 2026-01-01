@@ -78,6 +78,16 @@ To be honest idk why these are included in here
 - Simple Queue Service!
 - Serverless managed queue, integrated with IAM
 - Extreme scale and no provisioning
+- SQS is just a standard message queue service from AWS that allows you to send messages between producers and consumers, but there are a few different types of queues:
+- Standard Queues: The default type of SQS queue that offers high throughput, best-effort ordering, and at-least-once delivery
+    - You must design your application to handle potential duplicate messages and out-of-order delivery
+        - At least once delivery means that a message might be delivered more than once, so your consumer logic should be idempotent to handle duplicates
+        - Messages are invisible to other consumers for a specified visibility timeout period after being received, allowing the consumer to process the message without interference
+        - Messages are generally delivered in the order they are sent, but this is not guaranteed
+        - Messages must be deleted from the queue by the consumer after processing to prevent them from being received again
+    - You can mark messages with a `MessageGroupID` to ensure ordering within that group, but across groups there's no ordering guarantee
+- FIFO Queues
+    - Designed to ensure that messages are processed in the exact order they are sent and that each message is delivered exactly once
 - ***Main Purpose is to decouple services to scale them independently***
 - Doesn't handle big messages
     - Max size if 256KB
@@ -132,6 +142,34 @@ To be honest idk why these are included in here
         - Setup on SQS queue, not on lambda
             - DLQ lambda is only for async invocations
         - Lambda destination for failures means lambda pushes to another queue on failure, but doesn't help on retries
+
+### SQS FIFO Exactly Once Processing
+- SQS FIFO has exactly once processing built in
+    - Deduplication ID
+        - Client generated ID for each message
+        - If same ID sent within 5 minute deduplication interval, message is ignored
+    - Content Based Deduplication
+        - SQS generates SHA-256 hash of message body
+        - If same hash sent within 5 minute deduplication interval, message is ignored
+
+Covered this extensively in [SQS Overview in Queue Section](/docs/architecture_components/messaging/Queue/index.md#exactly-once-fifo-queues), and specifically the implementation is detailed in [AWS SQS FIFO Queues](/docs/architecture_components/messaging/Queue/index.md#aws-sqs-fifo-queues)
+
+The TLDR;
+
+<div style={{
+  margin: "2em auto",
+  maxWidth: 600,
+  background: "#f5f7fa",
+  borderLeft: "4px solid #4f8cff",
+  padding: "1.5em 2em",
+  borderRadius: 8,
+  textAlign: "left"
+}}>
+  <em>
+    For publishers, we saw that the only way to guarantee ordered message delivery is to restrict throughput to a single publisher per message group. For consumers, we saw that the only way to guarantee exactly-once and in order processing is to process messages one at a time by coordinating message processing through a transactional datastore. You also need to somehow guarantee that duplicate publishes never happen at wider than five minute intervals, or that consumers check existing processed data and drop duplicates during processing.
+  </em>
+</div>
+
 
 ### Solution Architecture Async
 - Client uploads to SQS Request queue
