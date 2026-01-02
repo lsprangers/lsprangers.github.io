@@ -122,6 +122,10 @@ TLDR; is that DynamoDB is schemaless K:V store with tables, primary keys, items,
     - Find all objects within some date range
 
 ## OpenSearch (ElasticSearch)
+Opensearch is a way to index and search over large amounts of semi-structured data. It's commonly used for log analytics, real time application monitoring, and full text search use cases. OpenSearch is based on a fork of ElasticSearch, and OpenSearch Dashboards is based on a fork of Kibana. It writes all of this / indexes all of the logs that are on disk, and then provides an endpoint to search over disk backed indexes. OpenSearch can be integrated with DynamoDB streams or CloudWatch logs to provide search capabilities over data stored in those services too, and it's often used in conjunction with DynamoDB to provide search capabilities over data stored in DynamoDB tables
+
+Searching over DynamoDB tables with OpenSearch is a common pattern. Since DynamoDB is a key-value store, it doesn't have great search capabilities out of the box. By using DynamoDB streams to capture changes to the DynamoDB table, you can use a Lambda function to process those changes and index (push) the relevant data into OpenSearch. This allows you to perform complex searches, full text search, and analytics on the data stored in DynamoDB without creating even more indexes in DynamoDB itself
+
 - Renamed from ElasticSearch to OpenSearch
     - Fork of ES b/c of licensing issues
 - OpenSearch Dashboards === Kibana Dashboards for ElasticSearch
@@ -154,6 +158,23 @@ TLDR; is that DynamoDB is schemaless K:V store with tables, primary keys, items,
         - Kinesis for near real time (it does batching)
             - Allows for more robust search over logs
     - ![OS and Dynamo](/img/os_dynamo.png)
+- What does OpenSearch allow us to do then:
+    - Storage:
+        - Indexing and storing large amounts of semi-structured data
+    - Search:
+        - Full text search, structured search, and analytics
+        - Search is done over indexes (which are faster) or just raw data
+    - Analytics:
+        - Real time analytics and visualization with OS Dashboards
+    - Visualization
+        - Create dashboards and visualizations for data stored in OpenSearch
+    - Reporting
+        - Generate reports based on search and analytics results
+        - CSV or HTML
+
+The TLDR of why this is useful is that the data is sitting on disk, and allows us to do a ton of search and analytics over it that would be hard to do in DynamoDB or other services directly, and the number of integrations from other services to here makes it a great search and analytics engine for semi-structured data
+
+Some groups will use this for OTEL / monitoring, and it's a common pattern to have logs and metrics go into OpenSearch for searching and alerting, but it's not meant for notifications or alerting directly - that's what CloudWatch is for
 
 ## RDS
 - Relational Database Service

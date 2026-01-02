@@ -13,6 +13,15 @@ How different services can communicate with each other
 To be honest idk why these are included in here
 
 - Build serverless visual workflows to orchestrate your Lambda functions
+    - Essentially DAGs of Lambda functions
+- Can also orchestrate other AWS services
+- Used for long running processes that may take hours or days to complete
+    - E.g., order processing, data pipelines, etc
+- Can coordinate multiple microservices into serverless workflows
+- Visual editor to design and run workflows
+- State Machines
+    - Step Functions are always labeled as State Machines
+    - Each step is a state
 - Represent flow as JSON state machine
 - Features:
     - Sequence, parallel
@@ -26,6 +35,24 @@ To be honest idk why these are included in here
 - Has both sync and async
     - Sync returns to caller after everything finishes
     - Async immediately returns that workflow has started 
+- Execution input and output:
+    - Input can be triggers from other services, or manual input
+    - Output is JSON data from last step
+- Can pass data between steps
+    - Input to step is output of previous step
+    - Can use JSON Path to filter and transform data between steps
+- Can monitor with CloudWatch
+    - Metrics, logs, alarms
+- Can trace with X-Ray
+- Can version state machines
+    - Can have multiple versions of same state machine
+    - Can use Aliases to point to different versions
+- Can use IAM to control access to state machines
+- Pricing:
+    - Based on number of state transitions
+    - Standard: $0.025 per 1,000 state transitions
+    - Express: $1.00 per million requests + $0.000004 per GB-second of compute
+    - Free tier: 4,000 state transitions per month for free
 
 ### Service Integrations
 - Lambda functions
@@ -79,6 +106,27 @@ To be honest idk why these are included in here
 - Serverless managed queue, integrated with IAM
 - Extreme scale and no provisioning
 - SQS is just a standard message queue service from AWS that allows you to send messages between producers and consumers, but there are a few different types of queues:
+- Standard vs FIFO
+    - Standard means the first message in may not be the first message out, FIFO means first in first out
+    - Standard has at least once delivery, FIFO has exactly once processing
+        - There are some caveats to exactly once processing in FIFO, see below
+- Parameters of SQS:
+    - Message Retention Period
+        - How long messages are kept in the queue if not processed
+        - Default is 4 days, max is 14 days
+    - Visibility Timeout
+        - How long a message is invisible to other consumers after being received by a consumer
+        - Default is 30 seconds, max is 12 hours
+    - Delivery Delay
+        - How long to delay the delivery of messages to consumers
+        - Default is 0 seconds, max is 15 minutes
+    - Maximum Message Size
+        - Max size of a message in bytes
+        - Default is 256 KB, max is 256 KB
+    - Encryption at rest via KMS
+    - Access Policy
+        - IAM policy that controls access to the queue
+        - Can be owner only, or multiple accounts / roles
 - Standard Queues: The default type of SQS queue that offers high throughput, best-effort ordering, and at-least-once delivery
     - You must design your application to handle potential duplicate messages and out-of-order delivery
         - At least once delivery means that a message might be delivered more than once, so your consumer logic should be idempotent to handle duplicates
@@ -142,6 +190,22 @@ To be honest idk why these are included in here
         - Setup on SQS queue, not on lambda
             - DLQ lambda is only for async invocations
         - Lambda destination for failures means lambda pushes to another queue on failure, but doesn't help on retries
+- Debugging
+    - You're able to send and receive messages via AWS Console for testing
+    - Can view CloudWatch Metrics for SQS
+    - Can enable CloudTrail logging for SQS API calls
+    - Can "peek" at messages in the queue without removing them
+        - Useful for debugging consumer issues
+- SQS Long Polling
+    - Reduces empty responses and false empty responses
+    - Waits until a message is available in the queue before sending a response
+    - Up to 20 seconds wait time
+    - Reduces cost by reducing number of API calls
+- SQS Short Polling
+    - Default behavior
+    - Immediately returns a response, even if no messages are available
+    - May result in more empty responses
+    - Higher cost due to more API calls
 
 ### SQS FIFO Exactly Once Processing
 - SQS FIFO has exactly once processing built in

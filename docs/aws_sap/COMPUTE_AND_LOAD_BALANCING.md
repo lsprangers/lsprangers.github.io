@@ -359,7 +359,9 @@ Load balancers DNS is then registered in Route53 as an Alias or CNAME record for
     - you ***could***, but don't have to, connect to AWS using EKS Connector, and then it would allow you to use AWS Console to manage EKS cluster
 
 ### Lambda
-It's just running a serverless function - it integrates with almost everything
+It's just running a serverless function - it integrates with almost everything. Most of the time you write a function that gets triggered by some event, and then it runs your code on a server in AWS data center, and you place IAM roles on it to allow it to access other services
+
+Most important metrics are execution time, memory usage, and invocations - that's what SAP test focuses on...this is shown in [Limitations](#limitations) section
 
 - Useful, and almost hello world, example:
     - New image dropped in S3
@@ -385,6 +387,25 @@ It's just running a serverless function - it integrates with almost everything
 - XRay: 
     - Add tracing into lambda SDK 
     - Lambda needs correct IAMs to write to XRay
+
+Lambda has many triggers:
+- API Gateway
+- ALB
+- S3
+    - S3 is most used, and it's based on S3 notifications - anything an S3 notification can do, can trigger a lambda
+    - Most are "file dropped in this directory, and matches my pattern"
+        - All of these patterns are configurable
+- SNS
+- SQS
+- DynamoDB Streams
+
+Lastly, there's something called [Lambda At Edge](/docs/aws_sap/CACHE.md#lambdaedge) which allows us to run lambda functions at Cloudfront edge locations, so that we can do things like:
+- Dynamic web page generation
+- HTTP header manipulation
+- URL rewrites and redirects
+- etc
+
+These help us to run lambda as close to the user as possible for low latency, and helps with some caching and CDN use cases
 
 #### Limitations
 - RAM (10GB)
@@ -464,6 +485,12 @@ It's just running a serverless function - it integrates with almost everything
         - Operates at L3 Network IP Protocol layer
 - Load Balancers are deployed in a specific region, and can be configured to span multiple AZ's so that if one AZ goes down the LB does not also go down
     - i.e. they are highly available
+- Packet headers can be mapped to OSI layers:
+    - Ethernet header (layer 2): MAC address
+    - IP header (layer 3): Source and destination IP addresses
+    - TCP/UDP header (layer 4): Source and destination ports, sequence numbers
+    - Application layer headers (layer 7): HTTP headers, cookies, etc
+
 ### CLB
 - Health Checks can be HTTP (L7) or TCP (L4)
 - Supports only 1 SSL Certificate

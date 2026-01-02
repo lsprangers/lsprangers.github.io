@@ -7,6 +7,53 @@ show_back_link: true
 ---
 
 ## Security
+AWS is compliant with many security standards and frameworks, including:
+- SOC 1, SOC 2, SOC 3
+- ISO 27001, ISO 27017, ISO 27018
+- PCI DSS Level 1
+- HIPAA
+- FedRAMP
+- GDPR
+- CCPA
+
+There's a shared responsibility model between AWS and the customer:
+- AWS is responsible for the security *of* the cloud
+    - Physical security of data centers
+    - Network infrastructure
+    - Hardware and software that run AWS services
+- Customers are responsible for security *in* the cloud
+    - Configuring security settings for AWS services
+    - Managing access to AWS resources
+    - Protecting data stored in AWS services
+
+AWS has root user when you create an account, and then you create IAM users and roles for access control
+- Best practice is to avoid using root user for day to day tasks
+- Use IAM roles for applications and services that need access to AWS resources
+- Use IAM policies to define permissions for users and roles
+
+Roles are just generic identities that can be assumed by users or services, and policies define what actions are allowed or denied for those identities
+
+Users also have policies, but users are typically tied to a single person or application
+
+Below we cover IPv4 and debugging network traffic because it's just important to understand networking basics before diving into security services
+
+### IPv4/6 Addressing Basics
+IPv4 addresses are used for network communication, and security groups and network ACLs are used to control inbound and outbound traffic to resources in a VPC
+- Each portion of IPv4 address is 8 bits, and there are 4 portions, so total of 32 bits
+- CIDR notation is used to define IP address ranges, e.g. `192.168.1.0/24`
+    - `/24` means first 24 bits are network portion, last 8 bits are host portion
+    - So `192.168.1.0/24` includes all IP addresses from `192.168.1.0` to `192.168.1.255`
+- IPv6 addresses are 128 bits long, represented as 8 groups of 4 hexadecimal digits, e.g. `2001:0db8:85a3:0000:0000:8a2e:0370:7334`
+    - CIDR notation is also used for IPv6, e.g. `2001:0db8::/32`
+    - `/32` means first 32 bits are network portion, last 96 bits are host portion
+
+### Examining Network Traffic
+Wireshark is a popular tool for capturing and analyzing network traffic
+- Can capture packets on a network interface and display detailed information about each packet
+- Useful for troubleshooting network issues and analyzing security incidents
+- Can filter packets based on criteria like source/destination IP, protocol, port, etc.
+
+On AWS, examing network traffic can be done using VPC Flow Logs, or by capturing traffic on EC2 instances using tools like tcpdump or Wireshark
 
 ## CloudTrail
 Allow us to log SDK, CLI, or Console calls / actions from IAM Users or IAM Roles
@@ -135,6 +182,16 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
 
 ## Secrets Manager
 - Store secrets! Like passwords, API Keys, etc...
+    - Formats are database, JSON key/value pairs, or plaintext
+    - Integrations with RDS, Redshift, DocumentDB, etc...
+        - Secrets manager can also test connections to these services to ensure secrets are valid, and then rotate them
+- Replication across regions for DR
+- Allows applications to retrieve secrets securely in application layer without embedding them in environment variables or config files
+- Encryption at rest with KMS
+- Access control with IAM policies and resource policies
+- Audit access with CloudTrail
+- Automatic rotation of secrets with Lambda functions
+    - Cron scheduling done in service, or can be done via EventBridge
 - Can force rotation of secrets every X days
     - Automatic generation of secrets on rotation, it uses a lambda function with cron job to run new insert / update
     - Native support with almost everything - RDS, ECS, Fargate, EKS, etc...
@@ -424,18 +481,24 @@ Secure communication begins using Symmetric Encryption
 
 ## Other Random Services
 ### DDOS Attacks
-    - Distributed Denial of Service (DDOS) are Network Based Attacks attacks on EC2 instances and web servers can take down web servers
-        - When a service is unavailable b/c of a flood of requests 
-        - SYN Flood (Layer 4): Too many TCP connection requests
-        - UDP Reflection (Layer 4): Get other servers to send big UDP requests
-        - DNS flood attack: Overwhelm DNS so legitimate users can't get IP / DNS Records
-        - Slow Loris: Many HTTP conections are opened and maintained
-    - Application Attacks:
-        - All depend on app configs, caches, etc...
+- Distributed Denial of Service (DDOS) are Network Based Attacks attacks on EC2 instances and web servers can take down web servers
+    - When a service is unavailable b/c of a flood of requests 
+    - SYN Flood (Layer 4): Too many TCP connection requests
+    - UDP Reflection (Layer 4): Get other servers to send big UDP requests
+    - DNS flood attack: Overwhelm DNS so legitimate users can't get IP / DNS Records
+    - Slow Loris: Many HTTP conections are opened and maintained
+- Application Attacks:
+    - All depend on app configs, caches, etc...
 #### AWS Shield
 - Shield is for DDoS! WAF is for other firewall and Xss stuff
 - Standard Shield protects against DDoS attacks for web apps at no additional costs
     - Covers SYN/UDP Floods, Reflections, and other L3/L4 attacks
+- Covers entire [OSI model](/docs/other_concepts/GENERIC_NETWORKING.md#theoretical) layers
+    - Packet headers can be mapped to OSI layers:
+        - Ethernet header (layer 2): MAC address
+        - IP header (layer 3): Source and destination IP addresses
+        - TCP/UDP header (layer 4): Source and destination ports, sequence numbers
+        - Application layer headers (layer 7): HTTP headers, cookies, etc
 - Advanced is premium 24/7 DDoS protection
     - Protects EC2, ELB, Cloudfront, Route53 and others
     - Also acts as insurance for incurred costs from DDoS attacks on services that run up auto-scaling costs
@@ -443,54 +506,56 @@ Secure communication begins using Symmetric Encryption
 - CloudFront and Route53: Protect CDN Cloudfront and Route53 DNS
     - Separating static resources and placing them on Cloudfront / S3 is always a good practice
 - AWS WAF: Web Application Firewall can filter specific requests based on rules
+
 ### AWS Web App Firewall (WAF)
-    - Protects web apps from common web exploits on Layer 7
-    - Deploy on:
-        - ALB
-        - API GW
-        - CloudFront (globally edge)
-        - AppSync (GraphQL API's)
-    - ***WAF IS NOT FOR DDOS***
-    - Define Web Access Control Lists (WebACL)
-        - Rules can include IP addresses, HTTP Headers, HTTP body, URI's, etc...
-        - Help protect from XSS, SQL Injection, and other common L7 app exploits
-        - Size constraints
-        - Geo Matching
-        - Rate based rules and rate limiting
-    - Rule Actions:
-        - Count, Allow, Block, CAPTCHA, Challenge
-            - Could Count before Blocking
-    - Managed Rules:
-        - Baseline rule groups protect from common threats / patterns
-        - Use case specific give protection for specific applications like SQL, Windows, etc...
-        - IP Reputation rule groups give us the AWS reputable IP's (spam or scammers)
-        - Bot control managed group can help to reject bots
-    - WAF Logging
-        - CloudWatch Logs
-            - Small SLA's
-        - S3 Bucket
-            - Every 5 minutes
-        - Kinesis Firehose
-            - Only limited by Kinesis SLA's
-    - Architecture with CloudFront
-        - Can setup WebACL's in front of CloudFront
-        - On CloudFront you can create a custom HTTP Header
-            -`X-Origin-Verify:xxxxxx` where `xxxx` is a secret string
-        - ALB behind CloudFront in front of EC2 Web Apps
-        - WAF Firewall on our ALB for headers to filter down to only those headers from CLoudFront with the secret string
-            - Stops anyone from directly accessing the ALB URL
-        - Lambda function from Secrets Manager can replcae the secret on CloudFront and the ALB header filter every X days
+- Protects web apps from common web exploits on Layer 7
+- Deploy on:
+    - ALB
+    - API GW
+    - CloudFront (globally edge)
+    - AppSync (GraphQL API's)
+- ***WAF IS NOT FOR DDOS***
+- Define Web Access Control Lists (WebACL)
+    - Rules can include IP addresses, HTTP Headers, HTTP body, URI's, etc...
+    - Help protect from XSS, SQL Injection, and other common L7 app exploits
+    - Size constraints
+    - Geo Matching
+    - Rate based rules and rate limiting
+- Rule Actions:
+    - Count, Allow, Block, CAPTCHA, Challenge
+        - Could Count before Blocking
+- Managed Rules:
+    - Baseline rule groups protect from common threats / patterns
+    - Use case specific give protection for specific applications like SQL, Windows, etc...
+    - IP Reputation rule groups give us the AWS reputable IP's (spam or scammers)
+    - Bot control managed group can help to reject bots
+- WAF Logging
+    - CloudWatch Logs
+        - Small SLA's
+    - S3 Bucket
+        - Every 5 minutes
+    - Kinesis Firehose
+        - Only limited by Kinesis SLA's
+- Architecture with CloudFront
+    - Can setup WebACL's in front of CloudFront
+    - On CloudFront you can create a custom HTTP Header
+        -`X-Origin-Verify:xxxxxx` where `xxxx` is a secret string
+    - ALB behind CloudFront in front of EC2 Web Apps
+    - WAF Firewall on our ALB for headers to filter down to only those headers from CLoudFront with the secret string
+        - Stops anyone from directly accessing the ALB URL
+    - Lambda function from Secrets Manager can replcae the secret on CloudFront and the ALB header filter every X days
+
 ### AWS Firewall Manager
-    - Manage all Firewall rules in all accounts in AWS Organization
-    - Set a security policy which is a common set of security rules
-        - WAF Rules
-        - AWS Shield Advanced
-        - Security groups for EC2, ALB, etc...
-        - AWS Network Firewall on VPC Level
-        - AWS Route53 Resolver DNS Firewall
-        - Policies created at regional level
-        - Rules are automatically applied to new resources as they're created
-    - We'd define all of our rules in WAF, Shield, etc... and then you can use AWS Firewall Manager with AWS WAF to automtate these rules over all new resources
+- Manage all Firewall rules in all accounts in AWS Organization
+- Set a security policy which is a common set of security rules
+    - WAF Rules
+    - AWS Shield Advanced
+    - Security groups for EC2, ALB, etc...
+    - AWS Network Firewall on VPC Level
+    - AWS Route53 Resolver DNS Firewall
+    - Policies created at regional level
+    - Rules are automatically applied to new resources as they're created
+- We'd define all of our rules in WAF, Shield, etc... and then you can use AWS Firewall Manager with AWS WAF to automtate these rules over all new resources
 - Example: Blocking an IP address
     - First line of defense is Network ACL on our VPC Subnet
     - Security group on EC2 could also deny it
@@ -504,87 +569,87 @@ Secure communication begins using Symmetric Encryption
         - Can have AWS WAF at CloudFront level, and it won't matter if you have a Network ACL or not since WAF takes care of it
         - Could do IP restriction, GeoFiltering restriction, etc...
 ### Amazon Inspector allows us to run automated security assessments
-    - EC2
-        - Using AWS Systems Manager (AWS SSM) agent, you can analyze network and OS level vulnerabilities
-        - Only for *running* EC2 instances
-    - ECR Container Images
-        - Assessment of container images as they're pushed
-    - Lambda Functions
-        - Identifies software vulnerabiltieis in function code and package dependencies
-    - Can report and integrate into AWS Security Hub
-    - Can also send finding to EventBridge
-    - Checks against database of vulnerabilities (CVE)
-        - Each time it's updated, Inspector will rerun and check OS and netowrk vulnerabilities
+- EC2
+    - Using AWS Systems Manager (AWS SSM) agent, you can analyze network and OS level vulnerabilities
+    - Only for *running* EC2 instances
+- ECR Container Images
+    - Assessment of container images as they're pushed
+- Lambda Functions
+    - Identifies software vulnerabiltieis in function code and package dependencies
+- Can report and integrate into AWS Security Hub
+- Can also send finding to EventBridge
+- Checks against database of vulnerabilities (CVE)
+    - Each time it's updated, Inspector will rerun and check OS and netowrk vulnerabilities
 ### AWS Config
-    - Helps for auditing and compliance of resources, and how they change over time
-    - Config doesn't prevent actions from happening, but it records configurations and changes over time
-    - Can help us showcase audits and to send alerts (SNS) notifications for any changes
-        - SSH access in security groups
-        - S3 public access
-        - ALB configuration changes over time
-        - ...
-    - It creates a dashboard to have red or green on resources over time
-        - CloudTrail can show us who made the changes
-    - Can create ouw own config rules
-        - Need to use a lambda function to create the custom config rules
-        - Rules can be evaluated / triggered
-            - Triggered off config change via EventBridge
-            - Evaluated at regular cron time intervals as well
-        - Can triggooer an Event to EventBridge if the rule isn't compliant
-            - Destination can be SNS
-        - Rules can have automations via SSM Automations
-            - If a resource isn't compliant, you can trigger auto-remediation
+- Helps for auditing and compliance of resources, and how they change over time
+- Config doesn't prevent actions from happening, but it records configurations and changes over time
+- Can help us showcase audits and to send alerts (SNS) notifications for any changes
+    - SSH access in security groups
+    - S3 public access
+    - ALB configuration changes over time
+    - ...
+- It creates a dashboard to have red or green on resources over time
+    - CloudTrail can show us who made the changes
+- Can create ouw own config rules
+    - Need to use a lambda function to create the custom config rules
+    - Rules can be evaluated / triggered
+        - Triggered off config change via EventBridge
+        - Evaluated at regular cron time intervals as well
+    - Can triggooer an Event to EventBridge if the rule isn't compliant
+        - Destination can be SNS
+    - Rules can have automations via SSM Automations
+        - If a resource isn't compliant, you can trigger auto-remediation
 ### AWS Managed Logs
-    - Logs that can be produced by AWS Services
-    - Load Balancer Access Logs can go 
-        - To S3
-        - Access and IP logs for Load Balancers
-    - CloudTrail Logs can go 
-        - To S3 and CloudWatch Logs
-        - Logs for API calls made within the account
-    - VPC Flow Logs 
-        - To S3, Cloudwatch, and Kinesis
-        - IP traffic in and out of network interfaces on VPC
-    - Route53 
-        - To CloudWatch Logs
-        - Queries that Route53 receives
-    - S3 Logs 
-        - To S3
-        - Server accesss provides detailed records foor requests made to the bucket
-    - CloudFront Access 
-        - To S3
-        - Info about every user request that CloudFront receives
-    - AWS Config 
-        - To S3
+- Logs that can be produced by AWS Services
+- Load Balancer Access Logs can go 
+    - To S3
+    - Access and IP logs for Load Balancers
+- CloudTrail Logs can go 
+    - To S3 and CloudWatch Logs
+    - Logs for API calls made within the account
+- VPC Flow Logs 
+    - To S3, Cloudwatch, and Kinesis
+    - IP traffic in and out of network interfaces on VPC
+- Route53 
+    - To CloudWatch Logs
+    - Queries that Route53 receives
+- S3 Logs 
+    - To S3
+    - Server accesss provides detailed records foor requests made to the bucket
+- CloudFront Access 
+    - To S3
+    - Info about every user request that CloudFront receives
+- AWS Config 
+    - To S3
 ### Amazon Guard Duty
-    - ML for intelligent threat discovery
-    - Goes through all logs from above to find anomalies 
-        - VPC, CloudTrail, and DNS are required
-        - S3, Lambda, EKS, EBS, etc... are optional 
-    - If there's a finding, it goes to EventBridge
-        - Can go to Lambda or SNS
-    - An AWS Organization member account can be a Delegated Administrator for all other member accounts under an organization
-        - The Org Mgmt account needs to delegate the specific member account
+- ML for intelligent threat discovery
+- Goes through all logs from above to find anomalies 
+    - VPC, CloudTrail, and DNS are required
+    - S3, Lambda, EKS, EBS, etc... are optional 
+- If there's a finding, it goes to EventBridge
+    - Can go to Lambda or SNS
+- An AWS Organization member account can be a Delegated Administrator for all other member accounts under an organization
+    - The Org Mgmt account needs to delegate the specific member account
 ### IAM Conditions
-    - AWS allows conditional logic in IAM policies
-    - `aws:SourceIP` would mean you can condition that an IP address is or is not in / apart of a certain CIDR range
-        - Can have `Effect: Deny` for `Action:*` on `Resource: *` based on Conditions
-    - `aws:RequestedRegion` allows us to allow or deny access to services in other specified regions
-    - `ec2:ResourceTag` could allow us to start instances only if they have a specific tag
-    - `aws:MultiFactorAuthPresent` allows us to require MFA to do specific actions
-    - Can do this on IAM Roles, Resource Policies like S3
-    - Resource policies
-        - `aws:PrincipalOrgID` can help us to ensure S3 actions aren't able ot be done unless the Principal Org ID is from our Org account, bascially allows any member account to perform the actions
+- AWS allows conditional logic in IAM policies
+- `aws:SourceIP` would mean you can condition that an IP address is or is not in / apart of a certain CIDR range
+    - Can have `Effect: Deny` for `Action:*` on `Resource: *` based on Conditions
+- `aws:RequestedRegion` allows us to allow or deny access to services in other specified regions
+- `ec2:ResourceTag` could allow us to start instances only if they have a specific tag
+- `aws:MultiFactorAuthPresent` allows us to require MFA to do specific actions
+- Can do this on IAM Roles, Resource Policies like S3
+- Resource policies
+    - `aws:PrincipalOrgID` can help us to ensure S3 actions aren't able ot be done unless the Principal Org ID is from our Org account, bascially allows any member account to perform the actions
 - Connecting to EC2 via SSH
-    - When you allow SSH on an EC2, what happens is that when a User tries to connect it will hit a EC2 Instance Connect API
-        - This API will 
-            - Upload a private key to the EC2
-            - Respond to user with a public key
-            - Allow us to connect for 60 seconds before disabling
-        - Security group rules deny or allow access to EC2 Instance Connect API
+- When you allow SSH on an EC2, what happens is that when a User tries to connect it will hit a EC2 Instance Connect API
+    - This API will 
+        - Upload a private key to the EC2
+        - Respond to user with a public key
+        - Allow us to connect for 60 seconds before disabling
+    - Security group rules deny or allow access to EC2 Instance Connect API
 ### AWS Security Hub
-    - Yet Another Dashboard for security and compliance
-    - Allows us to do this over multiple accounts
-    - Then aggregates info from basically every single other service you listed above
-    - Issues and Findings to EventBridge
-    - *AWS Detective* can help us figure out RCA / cause of these findings
+- Yet Another Dashboard for security and compliance
+- Allows us to do this over multiple accounts
+- Then aggregates info from basically every single other service you listed above
+- Issues and Findings to EventBridge
+- *AWS Detective* can help us figure out RCA / cause of these findings
