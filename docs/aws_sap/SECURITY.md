@@ -156,6 +156,15 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
             - Used by AWS internally
             - Maybe for serverless?
         - What?
+- Lifecycle
+    - We can manage rotation, access, deletion / lifetime, and other scopes
+    - Rotation and access are the 2 most important concepts 
+        - Rotation means we can specify cron jobs of when to rotate these keys, and that rotation will invalidate any keys located on machines at the time - they'll need to repull the keys
+            - Automatic rotation is done annually, and shortest interval is 7 days
+            - When a key is rotated, that means a new cryptographic key is generated to replace the old one
+            - In asymmetric keys only the private key is rotated, the public key remains the same
+            - For symmetric keys versioning is enabled so old keys can still be used to decrypt data encrypted with them
+        - This goes into access then, as ideally we expose the necessary items (like the new key) in secrets manager, and then in application code the machines would just need to repull the secrets manager secret to get the new key
 - Key Source
     - AWS KMS hosted, where KMS takes care of everything
     - ***Exteral***: Where you create keys and use sources outside of KMS, and you import it into KMS
@@ -229,6 +238,59 @@ AWS Key Management Service (KMS) is a way to use keys, certificates, and ***encr
 - Can copy unencrypted RDS snapshot to an encrypted one
 - CloudTrail cannot be used to track RDS queries
     - You'll need a different observability solution for database query logging
+
+## Cryptography Overview
+- ***Symmetric*** keys have a single key which is used to encrypt and decrypt messages
+- ***Asymmetric*** encryption utilizes 2 keys (public and private)
+    - Public key can be out in the open and used to encrypt messages
+    - Private key is kept secret and used to decrypt messages
+
+Hashing is a one way function that converts data into a fixed length string of characters - it doesn't involve keys
+- Typically used for integrity and authentication
+    - Shows that data hasn't been altered, and that the data is from a trusted source
+
+Data at rest means data stored on disk, while data in transit means data being transmitted over a network, and data encryption at rest means encrypting data stored on disk to protect it from unauthorized access, while data encryption in transit means encrypting data being transmitted over a network to protect it from interception and eavesdropping
+
+Encryption in AWS revolves around:
+- AWS Certificate Manager (ACM)
+- AWS Key Management Service (KMS)
+- S3 Encryption utilizing AES 256
+- VPN Encrypted Tunnels 
+- SSL/TLS for web applications
+    - HTTPS is HTTP over SSL/TLS
+
+Rotation, sharing, access management, and auditing are all important aspects of encryption key management and these are the typical things covered by [AWS KMS](#kms) along with other AWS services that integrate with KMS
+
+### Public Key Infrastructure
+Hierarchy of dihital security certificates and certificate authorities (CA's) that verify and authenticate the validity of each party involved in an electronic transaction
+
+Certificates are issued by a certificate authority (CA) and contain:
+- Public key
+- Information about the entity the certificate is issued to
+- Information about the CA that issued the certificate
+- Expiration date
+- Digital signature of the CA (hashes of the certificate data encrypted with CA's private key)
+
+Private untrusted CA's can be created using AWS Certificate Manager Private CA (ACM PCA), and they typically are used by large companies for internal applications and services that require secure communication - however these certificates won't be trusted by public browsers and operating systems by default, so they are only suitable for internal use within an organization (when you try to pip install from a company computer and it fails b/c no one trusts your companies palo alto proxy certificate)
+
+PKI's main components:
+- Certificate Authority (CA): Issues and manages digital certificates
+- Registration Authority (RA): Verifies the identity of entities requesting certificates
+- Digital Certificates: Contain public key and identity information
+- Certificate Revocation List (CRL): List of revoked certificates
+- Each PKI can be hierarchical with a root CA at the top, intermediate CA's below it, and end-entity certificates at the bottom
+    - PKI's can be assigned to users, devices, applications, or services to allow for secure communication and authentication
+- Certificate lifecycle:
+    - Requesting
+    - Issuance
+    - Usage
+    - Revocation
+        - Certificate revocation list (CRL)
+        - Online Certificate Status Protocol (OCSP)
+    - Renewal
+- Types:
+    - Wildcard Certificates: Secure multiple subdomains with a single certificate (e.g., `*.example.com`)
+        - This covers any domain like `app.example.com`, `mail.example.com`, etc...
 
 ## SSL/TLS and MITM
 - Secure Socket Layer (SSL) is used to encrypt connections
@@ -362,6 +424,83 @@ Secure communication begins using Symmetric Encryption
     - Any manually upload cert must be renewed manually
 - ACM is ***regional***
     - Therefore each region needs its own SSL Cert, and you can't copy SSL Certs across regions
+- AWS also acts as a public CA, and you can request public SSL certs for free
+    - These certs are trusted by all major browsers and operating systems
+- AWS allows you to host a private CA using ACM Private CA
+    - This allows you to issue private SSL certs for internal applications and services
+    - These certs won't be trusted by public browsers and operating systems by default, so they are only suitable for internal use within an organization
+    - Private untrusted CA's can be created using AWS Certificate Manager Private CA (ACM PCA), and they typically are used by large companies for internal applications and services that require secure communication - however these certificates won't be trusted by public browsers and operating systems by default, so they are only suitable for internal use within an organization (when you try to pip install from a company computer and it fails b/c no one trusts your companies palo alto proxy certificate)
+    - Certificate usage:
+        - Authenticate users and devices
+        - Secure internal web applications
+        - Encrypt internal communications
+        - Sign code and documents
+        - Establish secure VPN connections
+        - Encrypt data at rest
+        - Secure HTTPS connections in a web-app
+            - SSL is deprecated, TLS is the modern standard (use TLS >= 1.2)
+
+### Private CA
+Private CA's are used for internal applications and services that require secure communication, but they are not trusted by public browsers and operating systems by default. Therefore, you can't utilize these for public facing web applications
+
+Root CA's are at the top of the hierarchy and issue certificates to subordinate CA's, which in turn issue certificates to end-entities (users, devices, applications, services)
+- Typically suboordinate CA's are used to issue end-entity certificates, while root CA's are kept offline and only used to sign subordinate CA's
+- You could think of this as suboordinate CA's per OU or department within an organization, but it's not required
+- Once one is created, requesting a private key is similar to requesting a public key, and mostly involves ensuring you have a correct IAM policy to request the certificate from the private CA, and then you can use that certificate in your internal applications and services
+    - If your application has this certificate then, it can validate secure connections from other applications that have certificates issued by the same private CA
+    - As an example:
+        - App 1 has certificate 1 issued by Private CA
+        - App 2 has certificate 2 issued by Private CA
+        - When App 1 connects to App 2 over HTTPS, App 2 can validate App 1's certificate using the Private CA's public key, and vice versa
+        - This allows us to do a service mesh internally with mutual TLS authentication between services, but this is rarely required in most organizations as it's complex to manage
+    - Private certificates are hosted on the actual application instance itself (end-entity certificate + private key). 
+        - The private key remains on the server and is never transmitted
+    - During TLS, the server presents its certificate (public key + identity) signed by the Private CA and proves possession of the private key
+        - The client authenticates the server by validating the certificate chain to the Private CA certificate installed in its trust store and by checking CN/SAN, validity period, and revocation (CRL/OCSP) as needed
+        - i.e. the client checks what the server is presenting with the known Private CA public key
+    - Distribute the Private CA certificate to clients via OS trust store/MDM, SSM/Secrets Manager, or image bake
+        - Clients do not retrieve the CA public key during the handshake; they rely on their preconfigured trust store
+    - For mutual TLS, clients also present certificates issued by the Private CA
+        - The server validates the client certificate against its trust store and authorizes based on subject/SAN or extended attributes
+
+Therefore, ACM helps us host private CA's and issue private certificates for internal applications and services that require secure communication, it also exposes API's to manage the lifecycle of these certificates, and it also exposes API's to retrieve the public key of the Private CA for validating certificates issued by it. The only ***typical*** use case(s) for private CA's is internal applications and services that require secure communication, such as:
+- Internal web applications
+- VPN connections
+- User and device authentication
+
+Private CA features:
+- Hierarchical PKI with root CA and subordinate CA's
+- Can issue end-entity certificates for users, devices, applications, and services
+- Certificate lifecycle management:
+    - Issuance
+    - Renewal
+    - Revocation
+- Integration with AWS services:
+    - Load Balancers
+    - CloudFront
+    - API Gateway
+    - IoT
+- Access control with IAM policies and resource policies
+- Audit with CloudTrail
+
+Public vs private certs:
+- Public certs: Issued by public CAs; chain to roots trusted by browsers/OS; for internet-facing hosts
+    - When requesting public certs from ACM, you must validate domain ownership via DNS or Email
+    - The DNS record must also be CNAME type specifically
+- Private certs: Issued by your org’s Private CA (e.g., ACM PCA); only trusted by clients where you’ve installed the CA cert; for internal services
+
+### Application Load Balancer with HTTPS
+Typically ALB's are used to do SSL offloading for web applications, and we can integrate ACM with ALB to host SSL certificates for HTTPS connections
+- ALB listens on port 443 for HTTPS traffic
+- ALB uses SSL certificate from ACM for SSL handshake
+- ALB can host multiple SSL certificates for multiple domain names using SNI
+- ALB does SSL offloading, meaning it handles SSL handshake and encryption/decryption, reducing load on backend servers
+- Backend servers can use HTTP or HTTPS
+- SSL certificates can be managed with ACM, which can automatically renew them
+
+To get target groups to use HTTPS, you must specify HTTPS as the protocol when creating the target group, and then ensure that the backend servers have SSL certificates installed and are configured to listen on port 443 for HTTPS traffic. To get certificates onto backend servers, you can use SSM Parameter Store, Secrets Manager, or CloudHSM to securely store and retrieve the certificates during server bootstrapping
+- You can specify default SSL / TLS cetrtificate to be "From ACM" when creating the ALB listener, and then select the specific certificate from ACM to use for SSL handshake
+- You 
 
 ## CloudHSM
 - KMS gives us software

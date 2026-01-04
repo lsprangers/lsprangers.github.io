@@ -128,6 +128,7 @@ To be honest idk why these are included in here
         - IAM policy that controls access to the queue
         - Can be owner only, or multiple accounts / roles
 - Standard Queues: The default type of SQS queue that offers high throughput, best-effort ordering, and at-least-once delivery
+    - Standard queue's do not have partitions, they are just a "single tube" where multiple producers and consumers pull from without guaranteed ordering
     - You must design your application to handle potential duplicate messages and out-of-order delivery
         - At least once delivery means that a message might be delivered more than once, so your consumer logic should be idempotent to handle duplicates
         - Messages are invisible to other consumers for a specified visibility timeout period after being received, allowing the consumer to process the message without interference
