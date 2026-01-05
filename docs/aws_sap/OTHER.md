@@ -8,6 +8,11 @@ show_back_link: true
 
 ## Other Services
 
+### AWS Config
+AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. It helps you monitor and record your AWS resource configurations and allows you to automate the evaluation of recorded configurations against desired configurations
+
+Conformance packs are a collection of AWS Config rules and remediation actions that can be easily deployed in an account and region which are considered best practices
+
 ### App Stream
 - Desktop app streaming service, i.e. it's a service that streams to us desktop applications
 - Deliver a specific application to any computer without provisioning infrastructure

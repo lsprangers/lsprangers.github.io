@@ -165,6 +165,7 @@ You'll still need to write and manage your application code, but Beanstalk handl
     - Allows for scripting and updating of hundreds of instances across cloud and on-prem
     - Integrated with IAM and CloudTrail
     - No need for SSH!
+    - Allows up to 5 admins to connect to 1,500 instances concurrently
     - Rate Control (how fast to run over instances) + Error control (what to do on failure)
     - SSM agent ensures all of this can be done on the machine from calling party
 - Common use cases:

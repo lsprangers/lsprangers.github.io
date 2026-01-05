@@ -148,12 +148,19 @@ Basically just Tagging
 - Up to 5 SNS notifications per budget
 - Can filter by many tag and metadata values
 - Same options as AWS Cost Explorer
+    - Cost explorer tracks usage and reports over a 14 month period
+    - Cost reports can send notifiactions based on usage and cost
+        - There are up to 50 tags per EC2 instance, and these can be used to filter down reports to track usage
 - Runs actions for you when budget exceeds a certain threshold
     - Budget service itself will run some compute
     - Supports 3 action types:
         - Apply IAM policy to a user, group, or IAM role
         - Apply an SCP to an OU
         - Stop EC2 or RDS instances
+
+Savings Plans and Reserved Instances can be tracked here too - they are different in scope, but similar:
+- Reserved Instances are for specific instance types within a region, whereas Savings Plans are more flexible and can apply to various instance types and regions based on your usage commitment
+- Savings plans mean you're committing to a certain amount of usage ($/hour) for a 1 or 3 year period, whereas Reserved Instances are committing to specific instance types and configurations for a 1 or 3 year period
 
 ### AWS Compute Optimizer
 - Can help us with right sizing EC2 instances based on metrics around CPU, RAM, Network, Disk, etc...

@@ -491,6 +491,8 @@ These help us to run lambda as close to the user as possible for low latency, an
     - TCP/UDP header (layer 4): Source and destination ports, sequence numbers
     - Application layer headers (layer 7): HTTP headers, cookies, etc
 
+We discuss DNS and load balancing in [DNS and Service Discovery](#dns-and-service-discovery) section under [Containers](#containers), as well as in the [DNS Document](/docs/aws_sap/DNS.md#aws-hosted-zone-record-set-and-alb-example)
+
 ### CLB
 - Health Checks can be HTTP (L7) or TCP (L4)
 - Supports only 1 SSL Certificate
@@ -503,9 +505,23 @@ These help us to run lambda as close to the user as possible for low latency, an
 - Layer7 HTTP(S) only
     - ***YOU can't assign Static IP to ALB!!***
     - Need to place NLB in front w/ static IP and route to ALB
+    - ALB do have a fixed DNS name assigned by AWS
+- Best for web apps, microservices, containerized apps
 - Load Balancing to multiple HTTP apps across machines (target groups)
 - Load balancing to multiple apps on the same machine (containers) with dynamic port mapping on target groups
 - Support for HTTP/2 and WebSockets
+- Can do TLS Termination at ALB
+    - Offloads decryption from EC2 instances
+    - Use SNI to host multiple SSL certs on same ALB
+- Security:
+    - Integrates with AWS WAF for web application firewall
+    - Integrates with AWS Shield for DDoS protection
+- Sticky Sessions (Affinity) supported
+    - This means same client always goes to same backend instance
+    - Helpful for stateful apps, and is based on cookies
+- Detailed Metrics in CloudWatch
+- Access Logs to S3
+- Request Tracing with X-Ray
 - Routing rules for paths, headers, query strings, etc...
     - Routing based on HTTP headers / paths (L7)
 - Target Groups:

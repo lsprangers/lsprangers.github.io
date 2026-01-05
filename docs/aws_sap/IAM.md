@@ -135,6 +135,7 @@ AWS Simlpe AD and AWS Managed Microsoft AD are both managed directory services p
     - Supports small (up to 2,000 objects) and large (up to 20,000 objects) directory sizes
     - Mimics active directory by using Samba 4, but isn't a full AD implementation
     - Doesn't support MFA, domain trusts, RDS SQL, SSO, etc... so you can't use Powershell , but you can use standard AD tooling for it
+    - Must specify admin password and DNS name at creation - this ensures Simple AD is only accessible within the VPC it was created in
 - **AWS Managed Microsoft AD**:
     - A fully managed, cloud-native Microsoft Active Directory service
     - Suitable for larger organizations or complex use cases that require advanced AD features
@@ -292,6 +293,8 @@ AD Replication
 - SCP doesn't affect service linked roles
 - Explicit Denies ***always take precedence*** over Any Allows
 - Really very powerful, you can do things like enforce Tags, enforce regions, etc..
+- SCP's only define the ***maximum permissions*** for an account, they don't grant any permissions
+    - So if an SCP allows `s3:*` but the IAM policies in the account don't allow anything, then no one can access S3
 
 ![SCP Hierarchy](/img/scp_hierarchy.png)
 - In the example above what will happen if you `Deny Athena` in the Management Account SCP?
