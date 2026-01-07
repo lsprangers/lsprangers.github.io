@@ -64,6 +64,8 @@ An ALB or NLB will typically have static DNS names that do not change, so using 
 
 There are some [Stack Overflow Questions](https://serverfault.com/questions/1167031/how-do-application-load-balancers-maintain-high-availability-without-a-stable-ip) about this, which lead to other [Stack Overflow Answers](https://stackoverflow.com/questions/35313134/assigning-static-ip-address-to-aws-load-balancer/35317682#35317682) that go into more detail
 
+And now I summarized these concepts in a [Load Balancing and ELB Deep Dive](/docs/architecture_components/typical_reusable_resources/typical_frontend/ELB_DEEP_DIVE.md) document
+
 The general idea is that ALB will have a static DNS name that resolves to multiple IP addresses across zones, and as ALB's scale their backing IP addresses constantly change - therefore, to ensure DNS stays available and valid we would point to the ALB's DNS name via an `Alias` record / `CNAME` record rather than trying to manage IP addresses directly. Below shows how we can route a few different services using `Alias` and `CNAME` records:
 ```
 service.quick24x7.local  IN  A     ALIAS  dualstack.my-alb-1234567890.us-west-2.elb.amazonaws.com
