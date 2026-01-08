@@ -185,6 +185,30 @@ EC2 instances that are joined to an AWS Managed Microsoft AD or Simple AD can us
   - Join methods: EC2 launch “Domain join” with AWS Managed Microsoft AD, SSM AWS-JoinDirectoryServiceDomain, or OS-native join scripts/user data.
   - Note: AD/domain join is for OS/app auth; AWS API access still uses IAM/SSO.
 
+#### Shared Services vs AWS Organizations
+- Shared Services Account:
+    - A centralized account that hosts shared resources and services used by multiple accounts within an organization
+    - Examples: centralized logging, monitoring, security services, networking components (e.g., VPN gateways, transit gateways)
+    - Benefits:
+        - Centralized management and control of shared resources
+        - Simplified billing and cost allocation for shared services
+        - Improved security and compliance through centralized policies and monitoring
+    - Considerations:
+        - Requires careful planning and governance to ensure proper access controls and resource sharing
+        - Potential for increased complexity in managing cross-account access and dependencies
+- AWS Organizations:
+    - A service that allows you to centrally manage and govern multiple AWS accounts within an organization
+    - Provides features like consolidated billing, service control policies (SCPs), and account management
+    - Benefits:
+        - Simplified account management and governance
+        - Centralized billing and cost optimization
+        - Ability to enforce policies and controls across multiple accounts
+    - Considerations:
+        - Requires careful planning and governance to ensure proper account structure and policy enforcement
+        - Potential for increased complexity in managing cross-account access and dependencies 
+
+Lots of questions around "if you need to manage multiple AWS accounts for X, Y, or Z issue, what tool should you use" and most of the time shared services are useful for hosting shared resources like logging, monitoring, and security services that multiple accounts need to access - whereas AWS Organizations is more about managing the accounts themselves, billing, and applying policies across those accounts. For example if you need to setup directory services for networks across accounts or centralized logging, you'd use a Shared Services account
+
 #### STS
 Security Token Service allows us to retrieve and impersonate IAM roles in other accounts that specify you can act on their behalf
 

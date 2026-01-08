@@ -20,6 +20,10 @@ Strategies for migrating applications to AWS can be broadly classified into the 
 
 Migration begins with discovery, assessment, and execution. AWS provides tools to help you discover your existing environment, plan your migration, and execute the migration itself - during that migration you can use AWS tooling, or 3rd party tools that integrate with AWS Migration Hub
 
+These can be paired with ORR's (Operational Readiness Reviews) and MTR's (Migration Readiness Assessments) to ensure that your organization is ready for the migration:
+- ORR's are focused on the application and workload being migrated
+- MTR's are focused on the overall organizational readiness for migration
+
 ## AWS Migration Hub
 AWS Migration Hub provides a single location to track the progress of application migrations across multiple AWS and partner solutions. You can choose the AWS and partner migration tools that best fit your needs, while gaining visibility into the status of your migrations from a single dashboard
 

@@ -1,0 +1,225 @@
+---
+layout: technical
+title: Questions and Answers about AWS SAP
+category: AWS SAP
+difficulty: Advanced
+show_back_link: true
+---
+
+## Multiple Choice
+- Q: Review existing workloads for network cost optimization, which data transfer operations would incur transfer charges on AWS?
+  - A: Data transfer between AWS regions, data transfer out to the internet, and data transfer between Availability Zones within the same region would incur transfer charges on AWS. Data transfer within the same Availability Zone is typically free, and most services that transfer data within AZ's do not incur charges.
+- Q: You have a monthly limit of $10k for EC2 instance usage, and you want an alert whenever EC2 costs exceed $9k
+    - A: Use AWS Budgets to create a budget for EC2 usage with a threshold of $9k, and set up an alert to notify you when the budget is exceeded. This alert can be done via SNS, or email.
+- Q: Your company is running MongoDB cluster on prem with several databases, and you want to migrate it to AWS while ensuring both databases and applications remain available during the migration. What AWS service should you use?
+    - A: Use AWS Database Migration Service (DMS) to migrate the MongoDB databases to Amazon DocumentDB. DMS supports continuous data replication, allowing both databases and applications to remain available during the migration process. Use DMS CDC to replicate changes from on-prem to AWS, and then point applications in a rolling upgrade to the new DocumentDB cluster once the initial sync and change replication is complete.
+- Q: You are running an ECS cluster where the underlying OS and container runtime need to be regularly patched for security vulnerabilities. What is the best way to manage this patching process?
+    - A: Use AWS Systems Manager Patch Manager to automate the patching of the underlying OS of the ECS instances. For container runtime and application-level patches, implement a CI/CD pipeline that builds and deploys updated container images to the ECS cluster. This approach ensures that both the OS and container runtime are regularly patched while minimizing downtime.
+    - A: Allow SSM Agent on all ECS instances, and allow cybersecurity in company to SSH in with IAM role to use AWS SSM Run Command for applying changes to instances 
+        - This is answer if there are special scripts or commands that need to be run on the instances directly
+        - ***This is also required if ECS is backed by EC2 instances rather than Fargate***
+    - Q: You need to update application code which is very complex and requires a lot of data to be pre-downloaded, and you need to launch multiple EC2 instances for testing and deployment. What is the best way to ensure that all EC2 instances are launched with the necessary code and data pre-downloaded?
+    - A: Create a custom Amazon Machine Image (AMI) that includes the pre-downloaded code and data. Use this AMI to launch the EC2 instances, ensuring that they all have the necessary code and data available at launch time. This approach reduces the time required for instance initialization and ensures consistency across all instances.
+    - This is known as ***prebaking*** the AMI with code and data
+- Q: You need to migrate the workload of a Fortune 500 organization to AWS. Before migration, what's the first thing you need to do? ORR, Rolling, prebaking, or Right sizing?
+    - A: The first step before migration is to conduct a Migration Readiness Assessment (MTR) to evaluate the organization's readiness for migration. This assessment helps identify gaps in skills, processes, and technology that need to be addressed before proceeding with the migration.
+    - ORR's are done after MTR's and are focused on the application and workload being migrated
+    - ***The above answer was marked wrong, and the correct choice was Right Sizing***
+    - Right sizing is the process of evaluating and selecting the appropriate AWS resources (instance types, storage options, etc.) based on the workload requirements. This step is crucial to ensure that the migrated workloads are optimized for performance and cost-efficiency on AWS
+- Q: You want to review how changing your AWS IAM policies would impact resource sharing across accounts before deploying the changes. What AWS service would you use to simulate and analyze the impact of these policy changes?
+    - A: Use AWS IAM Access Analyzer to simulate and analyze the impact of IAM policy changes on resource sharing across accounts. IAM Access Analyzer helps identify resources that are shared with external entities and provides insights into how policy changes would affect access permissions.
+- Q: You run a phone app, and you need to completely replace the existing infrastructure of its AWS deployments as soon as possible, which of the following deployment strategies would be best?
+    - The 2 I looked at were Blue/Green and Rolling - I choise Blue/Green but it was wrong
+    - A: A rolling deployment slowly replaces the current app version with the new one through fully replacing the infra onw hich the app is running - it differs from blue/green in that there's no environment isolation between the two versions of the app. Rolling deployments are quicker than blue/green at the cost of higher risk and more complicated rollbacks
+        - The key word was "immediately" - blue/green requires setting up a whole new environment which takes time
+- Q: Your companies cloud data usage has become very complex. The data is used by several businesses and teams in the company, and tech / accounting need granular access insights as well as cost deviation data. What solutions can you implement for this?
+    - A: Use AWS Cost and Usage Reports (CUR) to get detailed insights into cloud data usage across the organization. CUR provides granular data on resource usage and costs, which can be analyzed using AWS Athena or Amazon QuickSight for reporting and visualization. Additionally, implement AWS Budgets to monitor cost deviations and set up alerts for specific teams or business units.
+        - The answe mentions create CUR report, set Athena for integration, use AWS Glue Crawler for integrating CUR with Athena (moving data to S3), and then use QuickSight for visualizations
+- Q: Key pillars to well architected framework
+    - A: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization
+- Q: You need to create resiliency for an AWS deployment and ensure that instances can be launched successfully following a disruption of services. Which actions can you perform to prepare for a failover event?
+    - What I thought: Use Auto Scaling groups to automatically launch new instances in the event of a failure. Additionally, implement health checks to monitor the status of instances and ensure that only healthy instances are used to serve traffic. Use Elastic Load Balancing to distribute traffic across multiple instances and Availability Zones for high availability
+    - A: Launch drill instances in AWS using AWS Elastic Disaster Recovery and perform testing for the instances
+    - The question specifically asked how to "prepare for a failover event", not how to architect for high availability
+    - Therefore, the best answer is to use AWS Elastic Disaster Recovery to create drill instances that can be used to test failover scenarios and ensure that instances can be launched successfully following a disruption of services
+- Q: Your comapny has several apps that use Route53, Global Accelerator, EC2, CFront, and ELB - you want to architect something that performs detection and mitigation for complex DDoS attacks automatically, and perform scrubbing for bad traffic at certain layers automatically
+    - A: Use AWS Shield Advanced to provide automatic detection and mitigation for complex DDoS attacks. Shield Advanced integrates with Route 53, Global Accelerator, EC2, CloudFront, and ELB to provide comprehensive protection against DDoS attacks. It also offers advanced features such as traffic scrubbing and real-time attack visibility through the AWS Management Console.
+    - Shield Standard is automatic and free, but only protects at basic levels, Advanced is nmeeded for complex attacks and DDoS scrubbing
+    - AWS Guard Duty was another option, but that's more for threat detection rather than DDoS mitigation
+        - Guard Duty is used to automatically update to VPC NACL's and Security Groups based on detected threats
+- Q: You're a SysOps Engineer managing multiple AWS environments, and you need to ensure all AWS resources don't exceed resource limits and also demonstrate AWS best practices
+    - I thought AWS Config was the best, but the answer was AWS Trusted Advisor. AWS Config doesn't inspect resource limits, it just monitors configuration compliance
+    - A: Use AWS Trusted Advisor to monitor AWS resource limits and provide recommendations for best practices. Trusted Advisor checks for service limits, security vulnerabilities, cost optimization opportunities, and performance improvements across multiple AWS environments. It provides real-time guidance to help you optimize your AWS infrastructure and ensure compliance with best practices.
+- Q: EBS Scan Choices for a warehouse that has a few scans per day
+    - Use EBS Provisioned IOPS SSD (io2) volumes for the warehouse workload. io2 volumes are designed for I/O-intensive applications that require high performance and low latency, making them suitable for workloads with a few scans per day. They provide consistent performance and are optimized for transactional databases and other demanding applications
+    - A: Cold HDD (sc1) volumes are designed for infrequently accessed data and are optimized for large, sequential workloads. They are not suitable for workloads that require frequent scans or low latency
+    - Each EBS configuration:
+        - General Purpose SSD (gp3): Balanced price and performance for a wide range of workloads
+        - Provisioned IOPS SSD (io2): High performance for I/O-intensive applications
+        - Throughput Optimized HDD (st1): Low-cost storage for frequently accessed, throughput-intensive workloads
+        - Cold HDD (sc1): Low-cost storage for infrequently accessed data
+- Q: You're tasked with running network troubleshooting tasks usign real-time data related to communication within AWS infrastructure. You want to capture packet traces from elastic network interfaces (ENI) and analyze the data for troubleshooting purposes. Which AWS service should you use to achieve this?
+    - A: Use AWS VPC Traffic Mirroring to capture packet traces from elastic network interfaces (ENIs) within your VPC. VPC Traffic Mirroring allows you to replicate network traffic from ENIs to a designated monitoring appliance or instance for analysis. This service is ideal for real-time network troubleshooting and monitoring within AWS infrastructure.
+        - You can forward and copy this data to a fleet of security instances using Gateway Load Balancer with UDP listener or a NLB with TCP/UDP listener
+        - You can also filter traffic based on protocols, ports, and IP addresses to capture only the relevant data for analysis in VPC Traffic Monitoring 
+    - VPC Flow Logs capture metadata about IP traffic, but do not provide full packet captures for detailed analysis
+- Q: You're providing network consulting services to an e-commerce website who uses AWS. They want to optimize the costs associated with data transfers through NAT devices, how can you do this
+    - Customer is charged each hour the NAT GW is operational as well as each GB of data processed by the NAT GW
+    - A
+        - Keep the AWS resources in the same AZ as the NAT GW
+            - This is because cross-AZ data transfer incurs additional costs, so keeping resources in the same AZ as the NAT Gateway minimizes these charges
+        - Use service endpoints to connect to AWS services directly without using the NAT GW
+            - This means that traffic to supported AWS services (like S3, DynamoDB, etc.) can bypass the NAT Gateway, reducing data transfer costs
+            - You don't have to go to internet and back, you can go directly from private subnet to some AWS Services via service endpoint
+- Q: You're setting up employee access to company VPC's using VPN's, and you want to create a system for the VPC so that VPG's can add the necessary routes to the routing tables automatiaclly
+    - I didn't even know what VPG stood for - it's Virtual Private Gateway
+    - A: Enable propogation for the route table associated with the VPG
+        - Route propagation allows the VPG to automatically add routes to the routing table based on the routes learned from the VPN connections
+        - This simplifies the management of routing tables and ensures that traffic is correctly routed between the VPC and on-premises networks
+- Q: Your company has an AWS landing zone for its multi-account networking, aand you're asked to create directory services for the network
+    - AWS Shared Services vs AWS Organizations
+    - Shared Services account is used to host shared resources and services that are utilized across multiple AWS accounts within the organization. This account typically includes resources such as directory services (like AWS Managed Microsoft AD), centralized logging, security tools, and networking components (like VPCs and VPNs) that are shared among other accounts
+    - AWS Organizations is a service that allows you to centrally manage and govern multiple AWS accounts within
+    - A: Use the AWS Shared Services account to create and manage directory services for the multi-account networking setup. This approach centralizes directory management and allows multiple AWS accounts to utilize the same directory services, simplifying administration and improving security across the organization.
+- A: Real-time operations versus DR plan updates for reliability
+    - Real-time operations focus on ensuring that systems and applications are continuously available and can recover quickly from failures. This includes implementing high availability architectures, automated failover mechanisms, and real-time monitoring to detect and respond to issues promptly.
+    - DR plan updates involve regularly reviewing and updating disaster recovery plans to ensure they remain effective and aligned with current business needs and technological changes. This includes testing recovery procedures, updating contact information, and ensuring that backup data is current and accessible.
+- Q: Your company has workloads that utilize on-prem services and services in VPC's. You need to ensure that on-prem resources can resolve AWS host names
+    - A: Set up an Amazon Route 53 Resolver inbound endpoint in the VPC to allow on-premises resources to resolve AWS host names. The inbound endpoint enables DNS queries from on-premises networks to be forwarded to Route 53 Resolver for resolution of AWS resources.
+    - Additionally, configure the on-premises DNS servers to forward queries for AWS domain names to the Route 53 Resolver inbound endpoint. This setup ensures that on-premises resources can successfully resolve AWS host names and access AWS services as needed.
+- Q: your company manages a high-end product that's requested thousands of times per day, your VPC needs to house an EC2 instance that can withstand a higher than normal bandwidth - with a large increase in packets-per-second (PPS) specifically on Linux
+    - A: Implement an Instance Type that utilizes Enhanced Networking
+    - Enhanced networking instance types provide higher bandwidth, higher PPS, and lower latency between instances by utilizing single root I/O (SR-IOV) 
+    - Types:
+        - Elastic Network Adapter (ENA): Provides high performance networking capabilities for a wide range of instance types, including support for up to 100 Gbps of network bandwidth.
+        - Intel 82599 Virtual Function (VF) interface: Available on certain older instance types, providing enhanced networking capabilities with support for up to 10 Gbps of network bandwidth.
+- Q: You set up a network across the glove for weather monitoring, and you need to create a dedicated link between the main office and its local data center that's operational at all times
+    - A: Use AWS Direct Connect to establish a dedicated network connection between the main office and the local data center. Direct Connect provides a private, high-bandwidth connection that is operational at all times, ensuring reliable and consistent network performance for weather monitoring data transfer.
+    - Direct Connect bypasses the public internet, reducing latency and improving security for data transfers between the main office and the local data center
+    - Direct Connect is literally a fiber-optic cable that AWS installs between your location and an AWS Direct Connect location (they don't install it for just you, they install it for multiple customers at once)
+- Q: Your company wants to create an automated method of maintaining backups, and they need very high availability where there is a near-real-time recovery of operations during a disaster
+    - There are multiple disaster recovery strategies:
+        - **Backup and Restore**: Regular backups are taken and stored in a separate location. In the event of a disaster, systems are restored from the backups. This method may have longer recovery times depending on the backup frequency and restoration process.
+        - **Pilot Light**: Maintains a minimal version of the environment that includes only essential services like databases, allowing for quick scaling up during a disaster
+        - **Warm Standby**: Provides a scaled down version of a fully functional environment that can be quickly scaled up to handle production traffic in the event of a disaster, but it's not real time
+        - **Multi-Site Active-Active**: This is a real time replicated environment in another region
+    - A: Implement a Multi-Site Active-Active disaster recovery strategy to achieve near-real-time recovery of operations during a disaster. This approach involves running fully functional copies of the application in multiple AWS regions, allowing for automatic failover and load balancing between sites. In the event of a disaster, traffic can be redirected to the healthy site with minimal downtime and data loss.
+    - Multi-Site Active-Active provides the highest level of availability and resilience, making it suitable for mission-critical applications that require continuous operation and minimal disruption during disasters.
+- Q: Your web app is hosted in multiple regions, and you want to improve the performance of the app for users by serving requests from the fastest AWS region based on their location
+    - A: Use Amazon Route 53 with latency-based routing to improve the performance of the web app for users. Latency-based routing directs user requests to the AWS region that provides the lowest latency, ensuring that users are served from the fastest region based on their geographic location. This approach enhances the user experience by reducing response times and improving overall application performance.
+    - Additionally, consider using Amazon CloudFront as a content delivery network (CDN) to cache static content closer to users, further improving performance and reducing latency for frequently accessed resources.
+- Q: Which resources allow you to configute detailed monitoring without incurring extra charges outside of standard costs?
+    - A:
+        - Amazon EC2 instances
+        - Route 53 hosted zones
+        - EBS volumes
+        - ELB load balancers
+        - RDS DB instances
+        - DynamoDB tables
+        - Some others
+    - Detailed monitoring provides 1-minute metrics for these resources, allowing for more granular monitoring and analysis of performance without incurring additional charges beyond the standard costs associated with the resources themselves.
+- Q: You have to migrate a 5TB on-prem postgres instance to AWS that's considered OLTP during the day with heavy read/write operations, and you need to minimize downtime during the migration. What AWS service should you use?
+    - A: Use AWS Database Migration Service (DMS) to migrate the on-premises PostgreSQL instance
+        - Use Aurora PostgreSQL as the target database in AWS
+        - DMS supports continuous data replication, allowing for minimal downtime during the migration process
+        - Set up DMS to perform an initial full load of the data from the on-premises PostgreSQL instance to the Aurora PostgreSQL database in AWS
+        - After the initial load, configure DMS to replicate ongoing changes (CDC) from the source database to the target database
+        - Once the data is fully synchronized, switch the application to point to the new Aurora PostgreSQL database with minimal downtime
+- Q: You need to deploy a MySQL database on EC2 with periodic backups and point-in-time recovery. What is the best way to achieve this?
+    - A: Use Amazon EBS volumes for the MySQL database storage on EC2 instances. Configure EBS snapshots to take periodic backups of the database data. EBS snapshots can be automated using AWS Backup or custom scripts to create snapshots at regular intervals.
+        - For point-in-time recovery, enable binary logging in MySQL to capture all changes made to the database. Store the binary logs on a separate EBS volume or S3 bucket for durability.
+        - In the event of a recovery, restore the latest EBS snapshot and apply the binary logs to bring the database to the desired point in time.
+        - This approach provides a cost-effective solution for backups and point-in-time recovery while leveraging the flexibility of EC2 and EBS.
+- Q: You want a comprehensive view of the company's security posture and security alerts across accounts in a large AWS Organization. What AWS service should you use?
+    - A: Use AWS Security Hub to gain a comprehensive view of the company's security posture and security alerts across accounts in a large AWS Organization. Security Hub aggregates security findings from multiple AWS services and third-party security solutions, providing a centralized dashboard for monitoring and managing security alerts.
+        - Enable Security Hub in the master account of the AWS Organization and invite member accounts to join. This allows for consolidated security findings and insights across all accounts.
+        - Use Security Hub's built-in compliance standards and automated checks to assess the security posture of the organization and identify potential vulnerabilities.
+        - Integrate Security Hub with other AWS services like Amazon GuardDuty, AWS Config, and AWS IAM Access Analyzer for enhanced security monitoring and incident response.
+- Q: You're updating a phone app that needs high availability - what is the *safest and most efficient deployment strategy* for this?
+    - A: This answer is B/G instead of rolling...above we chose rolling because it had to be immediate, but this specific question asks for safest and most efficient
+    - Blue/Green deployment provides a safe and efficient way to update the phone app while minimizing downtime and risk. In a Blue/Green deployment, two separate environments (Blue and Green) are maintained. The current version of the app runs in the Blue environment, while the new version is deployed
+- Q: You need to spin up multiple EC2 instances to flush a queue full of videos that need transcoding. Which instances are the most cost-effective for this purpose?
+    - A: Use Spot Instances for the EC2 instances to flush the queue full of videos that need transcoding. Spot Instances allow you to take advantage of unused EC2 capacity at significantly reduced prices compared to On-Demand Instances. This makes them a cost-effective option for workloads that are flexible and can tolerate interruptions, such as batch processing tasks like video transcoding.
+    - The reason it's spot and not on-demand is that the queue is already holding onto the videos in a durable manner, so if we spin up spot-instances and one goes down the timeout period will allow the video to be re-queued and processed by another instance
+- Q: You are an app admin with web servers that are very busy, your servers are experiencing high CPU and abnormal spikes in memory because of unpredictable workloads - what type of EC2 instance can you use to meet this requirement?
+    - This question doesn't really have a question...they were asking about what instances should you use in backend autoscaling
+    - A: On-Demand instances are pay-as-you-go instances that won't be terminated (like spot) and so you can use them for unpredictable workloads that require consistent performance. On-Demand instances provide flexibility and scalability, allowing you to quickly adjust capacity based on workload demands without long-term commitments.
+- Q: Load testing vs performance benchmarking
+    - Load testing is the process of simulating real-world user traffic and workloads on an application or system to evaluate its performance under expected usage conditions. The goal of load testing is to identify performance bottlenecks, measure response times, and ensure that the application can handle the anticipated load without degradation in performance.
+    - Performance benchmarking, on the other hand, involves measuring and comparing the performance of an application or system against predefined standards or benchmarks. The goal of performance benchmarking is to establish a baseline for performance metrics, such as throughput, latency, and resource utilization, and to compare these metrics against industry standards or competitor applications.
+- Q: You need to migrate operations frmo existing on-premise systems to AWS cloud, and you must apply the appropriate security methods to migration tools and seleect appropriate governance model for AWS system - what's the best resource to help with this:
+    - A: AWS Control Tower Landing Zone
+        - AWS Control Tower provides a pre-configured landing zone that includes best practices for security, governance, and compliance. It helps organizations set up and govern multi-account AWS environments with built-in security controls and policies.
+        - Control Tower automates the setup of AWS accounts, applies guardrails for security and compliance, and provides a centralized dashboard for monitoring the AWS environment.
+        - This makes it an ideal resource for migrating operations from on-premises systems to AWS while ensuring that appropriate security methods and governance models are applied.
+- Q: You own a large AWS deployment with several resources and you need to restrict the ability for specific roles to provision EC2 resources when you've reached 75% of the month's forecasted cost - you want this solution to run automaticlly
+    - A: Use AWS Budgets to create a budget for EC2 resources in whichever account(s) you need, and set a threshold of 75% of the month's forecasted cost. Configure an alert to notify you when the budget threshold is reached.
+        - Next, create an IAM policy that denies the ability to provision EC2 resources. Attach this policy to the specific roles that you want to restrict.
+            - You could also specify SCP's if you're using AWS Organizations
+        - This notification can be sent to EventBridge, which can trigger a Lambda function to automatically update the IAM policies or SCP's to restrict EC2 provisioning when the budget threshold is reached
+ - Q: Your company provides coding and dev services for clients. You must ensure the dev teams are following secure coding guidelines. Which security control categories on AWS Security Hub should you look into for this?
+    - A: Protect. The protect category in AWS Security Hub focuses on security controls related to protecting data, applications, and systems. This includes secure coding practices, vulnerability management, and application security.
+        - Secure access management
+        - Secure network configuration
+        - Data protection
+        - API protection
+        - Protective services (WAF, Shield, etc)
+        - Secure coding
+    - Other types:
+        - Identify is for inventory and logging of resources and usage
+        - Detect is for threat detection and monitoring
+        - Recover is for backup and disaster recovery along with resiliency operations
+
+
+----
+## Flashcards
+- Q: Which AWS feature limits request rates on API operations to protect services from abuse, and is used to prevent accidental provisioning of more resources than needed?
+    - A: Service Quotas 
+    - I was looking for rate limiting, or some sort of thing around limiting request rates on API's, but service quotas are the all encompassing feature that does this
+- Q: Which AWS service provides preventive and detective systems that you can use for governing resources and monitoring compliance?
+    - A: AWS Control Tower
+    - I thought it was AWS Config, or some SCP controls, but Control Tower is the all-encompassing service that provides preventive and detective systems for governing resources and monitoring compliance across multiple AWS accounts
+    - AWS Config is used to monitor, record, and bring best practices to individual AWS resources, but Control Tower provides a broader governance framework for multi-account environments
+- Q: What optimization technique would you use when you have known resource usage for an RDS instance?
+    - A: Reserved Instances
+    - I thought it was right-sizing, but reserved instances are the way to go when you know there will be a dedicated amount of usage that's predictable
+- Q: Which AWS service would you use for sharing volume pricing discounts, reserved instance discounts, and savings plans through combined usage across accounts?
+    - A: AWS Organizations
+    - AWS Orgs are a way to combine accounts that you own, specifically for billing, IAM, and policy management
+- Q: Which AWS service provides an orchestration layer for managing multi-account AWS environments, including account provisioning, governance, and compliance?
+    - A: AWS Control Tower
+    - Control Tower is the orchestration layer for multi-account AWS environments, providing automated account provisioning, governance, and compliance features
+- Q: What approach would you follow so that changes are made by building the necessary architecture in a new infrastructure that's then deployed to production?
+    - I thought between Blue/Green, QA environment, and Rolling deployments
+    - A: Using immutable infrastructure approach
+    - Immutable infrastructure involves creating new instances or environments for each deployment, rather than modifying existing ones. This approach ensures that changes are made in a controlled manner, reducing the risk of configuration drift and deployment errors
+- Q: Which AWS service provides intelligent threat detection via ML for AWS resources and infra by analyzing data from sources like VPC Flow Logs, CloudTrail, and DNS logs?
+    - A: Amazon GuardDuty
+    - GuardDuty uses machine learning to analyze data from various sources to detect potential threats and anomalies in AWS environments
+- Q: What databases can be added via Beanstalk?
+    - A: Most types from RDS
+    - Postgres, SQL Server, Oracle, MySQL
+- Q: Which AWS service provides you integrity and encryption while moving data from databases to on-cloud storage systems?
+    - I thought it was DMS, but it's actually DataSync
+    - A: AWS DataSync
+    - DataSync is designed for transferring data between on-premises storage and AWS services, providing integrity and encryption during the transfer process
+- Q: Which instance types use co-processors to execute functions such as graphic processing and data pattern matching more efficiently than general-purpose CPUs?
+    - I thought it was HPC instances, but those are for distribured parallel computing
+    - A: Accelerated Computing Instances
+    - Accelerated computing instances use hardware accelerators, such as GPUs or FPGAs, to offload specific tasks from the CPU, improving performance for workloads that require intensive computation
+- Q: Which AWS service allows you to bridge event communication between producers and consumers?
+    - A: Amazon EventBridge
+    - EventBridge is a serverless event bus that enables you to connect applications using events, allowing for decoupled communication between producers and consumers
+    - Other pub-sub services include SNS and SQS, but EventBridge is specifically designed for event-driven architectures with multiple producers and consumers into a single event bus
+
+
+To read up on:
+- AWS Control Tower
+- Well architected framework
+- VPC options for on prem, and DNS options for on prem
+- Immutable infrastructure
+- AWS GuardDuty
+- Volume GW
+- DataSync vs DMS
+- Cloud Adoption Readiness Tool (CART)
+- EC2 instance type groups

@@ -1123,3 +1123,12 @@ Comparing some web and compute layer architectures
     - When the instance is started again, the RAM contents are restored from the EBS volume
     - Using private key to decrypt volume on boot
     - Also use PK to decrypt admin passwords on Windows
+
+- Using AMI Templates allows for Prebaking and Bootstrapping EC2 instances when you need to utilize a lot of EC2 instances that are setup the same way without containers:
+    - If your application relies heavily on customizing or deploying applications onto Amazon EC2 instances, then you can optimize your deployments through bootstrapping and prebaking practices
+    - ***Prebaking*** is embedding a significant portion of your application artifacts within an AMI
+    - ***Bootstrapping*** is installing application(s), dependencies, and/or customizations whenever an EC2 instance is launched
+    - These are separate from containers where you store code to retrieve these in a docker file which eventually pulls them into an Image that has all of this setup in directories
+    - Therefore, you can prebake application components into an AMI so that they are available immediately when an instance is launched from that AMI
+    - Or you can bootstrap by using user data scripts to install application components at launch time
+    - Prebaking is faster since everything is already in the AMI, but bootstrapping allows for more flexibility and easier updates since you can change the user data script without creating a new AMI
