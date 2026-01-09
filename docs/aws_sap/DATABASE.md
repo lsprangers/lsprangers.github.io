@@ -261,6 +261,8 @@ Some groups will use this for OTEL / monitoring, and it's a common pattern to ha
 - Cross region RR entire database is copied
 - Load / offload data directly to / from S3
 - Backup, Snapshot, and Restore exactly same as RDS
+- AWS SCT and DMS work with Aurora, and can migrate from on-prem or other cloud DB's to Aurora
+
 
 ### HA and Scaling
 - Peer to peer replication + durability is fully discussed in [KV Store Deep Dive Peer to Peer](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/index.md#peer-to-peer-with-sharding)

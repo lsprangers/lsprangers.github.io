@@ -406,6 +406,35 @@ Secure communication begins using Symmetric Encryption
         - CPU on EC2 doesn't get used to do decryption
         - Must setup a Cryptographic User (CU) on the CloudHSM device
 
+## Disaster Recovery
+The main metric objectives to be handled and tracked during disaster recovery are:
+- Recovery Time Objective (RTO): The maximum acceptable amount of time that a system can be down after a disaster before causing significant harm to the business
+- Recovery Point Objective (RPO): The maximum acceptable amount of data loss measured in time. It defines the point in time to which data must be restored after a disaster
+
+There are multiple strategies for disaster recovery on AWS, each with different RTO and RPO characteristics:
+- Backup and Restore: Data is backed up to AWS S3 or Glacier, and in the event of a disaster, data is restored from backups. This approach has a high RTO and RPO, as it can take hours or days to restore data and systems.
+- Pilot Light: A minimal version of the system is always running in AWS, with critical components pre-configured. In the event of a disaster, the full system is quickly scaled up from the pilot light. This approach has a moderate RTO and RPO, as it can take minutes to hours to scale up the system.
+- Warm Standby: A scaled-down version of the system is always running in AWS, with all components pre-configured. In the event of a disaster, the system is quickly scaled up to full capacity. This approach has a low RTO and RPO, as it can take minutes to scale up the system.
+- Multi-Site Active-Active: The system is fully deployed and running in multiple AWS regions simultaneously. In the event of a disaster, traffic is automatically routed to the healthy region. This approach has the lowest RTO and RPO, as there is no downtime or data loss.
+
+### AWS Backup
+AWS Backup is a fully managed backup service that makes it easy to centralize and automate the backup of data across AWS services
+- Supports services like EBS, RDS, DynamoDB, EFS, and more
+- Provides a single console to manage backups, set backup policies, and monitor backup activity
+- Supports cross-region and cross-account backups for disaster recovery
+- Provides backup scheduling, retention management, and lifecycle policies to automate backup processes
+
+### AWS Disaster Recovery Services
+- AWS Elastic Disaster Recovery (DRS): Enables quick recovery of applications and data in AWS in the event of a disaster
+- AWS CloudEndure Disaster Recovery: Provides continuous replication of applications and data to AWS for rapid recovery
+- AWS Route 53: Can be used for DNS failover to route traffic to healthy endpoints in the event of a disaster
+
+Elastic Disaster Recovery (DRS) is the next version of CloudEndure, and it allows us to replicate on-premises or cloud-based servers to AWS, and in the event of a disaster, we can quickly launch these replicated servers in AWS to minimize downtime and data loss
+
+The difference between Elastic DRS and AWS Backup is that Elastic DRS focuses on continuous replication and rapid recovery of entire applications and servers, while AWS Backup focuses on scheduled backups of data for long-term retention and recovery, they're both focused on backups, but Elastic DRS is more about disaster recovery of entire systems, while AWS Backup is more about data backup and retention
+
+Elastic DRS focuses on replicating data and applications to staging areas in AWS, and these are not live systems (closer to pilot light), while Multi-Site Active-Active involves running fully functional systems in multiple AWS regions simultaneously. Elastic DRS then has commands for launching entire systems in AWS from the staging area in the event of a disaster, and these systems can be scaled up as needed
+
 ## AWS Certificate Manager ACM
 - AWS ACM can host your publicly created certifiacte, and it can help provision and renew public SSL certificates for you free of cost
 - ACM loads SSL Certificates on the following integrations:
@@ -707,6 +736,7 @@ To get target groups to use HTTPS, you must specify HTTPS as the protocol when c
     - you could also have CloudFront before Network ACL
         - Can have AWS WAF at CloudFront level, and it won't matter if you have a Network ACL or not since WAF takes care of it
         - Could do IP restriction, GeoFiltering restriction, etc...
+
 ### Amazon Inspector allows us to run automated security assessments
 - EC2
     - Using AWS Systems Manager (AWS SSM) agent, you can analyze network and OS level vulnerabilities
@@ -719,6 +749,7 @@ To get target groups to use HTTPS, you must specify HTTPS as the protocol when c
 - Can also send finding to EventBridge
 - Checks against database of vulnerabilities (CVE)
     - Each time it's updated, Inspector will rerun and check OS and netowrk vulnerabilities
+
 ### AWS Config
 - Helps for auditing and compliance of resources, and how they change over time
 - Config doesn't prevent actions from happening, but it records configurations and changes over time
@@ -760,6 +791,7 @@ To get target groups to use HTTPS, you must specify HTTPS as the protocol when c
     - Info about every user request that CloudFront receives
 - AWS Config 
     - To S3
+
 ### Amazon Guard Duty
 - ML for intelligent threat discovery
 - Goes through all logs from above to find anomalies 
@@ -769,6 +801,7 @@ To get target groups to use HTTPS, you must specify HTTPS as the protocol when c
     - Can go to Lambda or SNS
 - An AWS Organization member account can be a Delegated Administrator for all other member accounts under an organization
     - The Org Mgmt account needs to delegate the specific member account
+
 ### IAM Conditions
 - AWS allows conditional logic in IAM policies
 - `aws:SourceIP` would mean you can condition that an IP address is or is not in / apart of a certain CIDR range
@@ -786,9 +819,56 @@ To get target groups to use HTTPS, you must specify HTTPS as the protocol when c
         - Respond to user with a public key
         - Allow us to connect for 60 seconds before disabling
     - Security group rules deny or allow access to EC2 Instance Connect API
+
 ### AWS Security Hub
 - Yet Another Dashboard for security and compliance
 - Allows us to do this over multiple accounts
 - Then aggregates info from basically every single other service you listed above
 - Issues and Findings to EventBridge
 - *AWS Detective* can help us figure out RCA / cause of these findings
+
+AWS Security Hub Controls
+    - A control is a safeguard within a security standard that helps you achieve a specific security objective. A control is related to a resource in your AWS environment
+        - When you enable controls, Security Hub runs automated checks against your AWS resources to determine whether they comply with the control's requirements
+    - Control categories:
+        - Each control category represents a group of controls and items you can implement to ensure the security of AWS environment, and understanding of it
+        - **Identify**: Develop the organizational understanding to manage security risk to systems, people, assets, data, and capabilities
+            - Identify is about understanding your environment, inventorying resources, and establishing governance frameworks
+            - Includes:
+                - Asset Management
+                - Inventory - have tags been assigned, what resources does the service use, are there unused resources
+                - Logging - Have you enabled all relevant logging services, are logs being stored securely
+        - **Protect**: Develop and implement appropriate safeguards to ensure delivery of critical infrastructure services
+            - Protect is about implementing security controls to safeguard data, applications, and systems
+            - Includes:
+                - Access Management - are IAM policies following least privilege, are MFA enabled, are roles being used instead of users
+                - Data Protection - is data encrypted at rest and in transit, are backups being taken
+                - Network Protection - are security groups and NACLs properly configured, is VPC flow logging enabled
+                - Protective Services - are WAF, Shield, and GuardDuty enabled
+                - Secure Coding - are secure coding practices being followed, are code repositories scanned for vulnerabilities
+        - **Detect**: Develop and implement appropriate activities to identify the occurence of a security event
+            - Detect is about monitoring and identifying potential security threats and anomalies
+            - Includes:
+                - Anomalies and Events - are CloudWatch Alarms set up for critical metrics, are unusual activities being detected
+                - Continuous Monitoring - is AWS Config enabled, are resources being monitored for changes
+                - Detection Processes - are incident response plans in place, are detection processes regularly tested
+        - **Respond**: Develop and implement appropriate activities to take action regarding a detected security event
+            - Respond is about having processes and procedures in place to respond to security incidents effectively
+            - Includes:
+                - Response Planning - are incident response plans documented, are roles and responsibilities defined
+                - Communications - are communication channels established for incident response, are stakeholders informed
+                - Analysis - are incidents analyzed to determine root cause, are lessons learned documented
+                - Mitigation - are steps taken to contain and mitigate incidents, are vulnerabilities addressed
+                - Improvements - are response processes reviewed and improved regularly
+        - **Recover**: Develop and implement appropriate activities to restore capabilities or services that were impaired due to a security event
+            - Recover is about having plans and processes in place to recover from security incidents and restore normal operations
+            - Includes:
+                - Recovery Planning - are disaster recovery plans documented, are recovery objectives defined
+                - Improvements - are recovery processes reviewed and improved regularly
+                - Communications - are communication channels established for recovery, are stakeholders informed during recovery
+        - So back to laymens terms:
+            - Identify means do you have the abilities to query and inventory your resources, and do you have logging enabled to track activity
+            - Protect means are you following best practices to secure your resources, data, and applications
+            - Detect revolves around ability to capture anomalies and events, and the continuous monitoring of them
+            - Respond is about having plans and processes to respond to security incidents
+            - Recover is about having plans and processes to recover from security incidents and restore normal operations

@@ -140,17 +140,17 @@ An Auto Scaling Group is a grouping of EC2 instances, where you track the total 
 - ***Predictive Scaling***: Will use ML / pattern recognition to find when to scale, and plan ahead of the fact
 
 - Spot Fleet Support: Meaning you can mix Spot and On-Demand instances in the ASG
-        - `MaxSpotPrice` allows us to choose what price you will be open to using Spot Instances
-        - Again, don't use these for critical jobs or DB's...use them in apps that are fault tolerant
-        - Spot Fleets allow us to have Spot Instances + optional On-Demand
-            - Can define multiple launch pools of Instance types, region, OS, etc..
-            - Spot Fleet can then choose from multiple launch pools
-                - Spot Fleets try to meet demand up to some price constraints
-            - ***Strategies*** - Splot Fleet has multiple strategies for creating instances from a launch pool
-                - ***lowestPrice*** pulls new instances frmo pool with lowest price
-                - ***diversified*** distributes evenly across pools
-                - ***capacityOptimized*** finds the pool with optimal capacity for number of instances required
-                - ***priceCapacityOptimized*** uses pool with highest capacity available, and from there finds the pool with the lowest price
+    - `MaxSpotPrice` allows us to choose what price you will be open to using Spot Instances
+    - Again, don't use these for critical jobs or DB's...use them in apps that are fault tolerant
+    - Spot Fleets allow us to have Spot Instances + optional On-Demand
+        - Can define multiple launch pools of Instance types, region, OS, etc..
+        - Spot Fleet can then choose from multiple launch pools
+            - Spot Fleets try to meet demand up to some price constraints
+        - ***Strategies*** - Splot Fleet has multiple strategies for creating instances from a launch pool
+            - ***lowestPrice*** pulls new instances frmo pool with lowest price
+            - ***diversified*** distributes evenly across pools
+            - ***capacityOptimized*** finds the pool with optimal capacity for number of instances required
+            - ***priceCapacityOptimized*** uses pool with highest capacity available, and from there finds the pool with the lowest price
 - Lifecycle Hooks
     - Perform actions before an instance is in service, or before it's terminated
     - Log cleanup, extraction, or other health checks on start

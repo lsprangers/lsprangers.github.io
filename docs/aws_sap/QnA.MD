@@ -54,10 +54,10 @@ show_back_link: true
     - Use EBS Provisioned IOPS SSD (io2) volumes for the warehouse workload. io2 volumes are designed for I/O-intensive applications that require high performance and low latency, making them suitable for workloads with a few scans per day. They provide consistent performance and are optimized for transactional databases and other demanding applications
     - A: Cold HDD (sc1) volumes are designed for infrequently accessed data and are optimized for large, sequential workloads. They are not suitable for workloads that require frequent scans or low latency
     - Each EBS configuration:
-        - General Purpose SSD (gp3): Balanced price and performance for a wide range of workloads
-        - Provisioned IOPS SSD (io2): High performance for I/O-intensive applications
-        - Throughput Optimized HDD (st1): Low-cost storage for frequently accessed, throughput-intensive workloads
-        - Cold HDD (sc1): Low-cost storage for infrequently accessed data
+        - ***General Purpose SSD (gp3)***: Balanced price and performance for a wide range of workloads
+        - ***Provisioned IOPS SSD (io2)***: High performance for I/O-intensive applications
+        - ***Throughput Optimized HDD (st1)***: Low-cost storage for frequently accessed, throughput-intensive workloads
+        - ***Cold HDD (sc1)***: Low-cost storage for infrequently accessed data
 - Q: You're tasked with running network troubleshooting tasks usign real-time data related to communication within AWS infrastructure. You want to capture packet traces from elastic network interfaces (ENI) and analyze the data for troubleshooting purposes. Which AWS service should you use to achieve this?
     - A: Use AWS VPC Traffic Mirroring to capture packet traces from elastic network interfaces (ENIs) within your VPC. VPC Traffic Mirroring allows you to replicate network traffic from ENIs to a designated monitoring appliance or instance for analysis. This service is ideal for real-time network troubleshooting and monitoring within AWS infrastructure.
         - You can forward and copy this data to a fleet of security instances using Gateway Load Balancer with UDP listener or a NLB with TCP/UDP listener
@@ -215,11 +215,177 @@ show_back_link: true
 
 To read up on:
 - AWS Control Tower
+    - AWS Control Tower is an organization level shared service that helps to set up and govern a secure, multi-account AWS environment based on AWS best practices
+        - Allows for preventative and detective online systems to help with governance and compliance
+    - AWS Config on the other hand is a resource-level service that helps to monitor and record AWS resource configurations and compliance
+        - Allows for resource-level compliance monitoring and best practices, and is a detective system only
 - Well architected framework
+    - 5 principles of operational excellence, security, reliability, performance efficiency, cost optimization
+    - Operational Excellence
+        - Perform operations as code
+        - Annotate documentation
+        - Make frequent, small, reversible changes
+        - Refine operations procedures frequently
+        - Anticipate failure
+        - Learn from all operational failures
+    - Security
+        - Implement a strong identity foundation
+        - Enable traceability
+        - Apply security at all layers
+        - Automate security best practices
+        - Protect data in transit and at rest
+        - Keep people away from data
+        - Prepare for security events
+    - Reliability
+        - Test recovery procedures
+        - Automatically recover from failure
+        - Scale horizontally to increase aggregate system availability
+        - Stop guessing capacity
+        - Manage change in automation
+    - Performance Efficiency
+        - Democratize advanced technologies
+        - Go global in minutes
+        - Use serverless architectures
+        - Experiment more often
+        - Consider mechanical sympathy
+    - Cost Optimization
+        - Adopt a consumption model
+        - Measure overall efficiency
+        - Stop spending money on data center operations
+        - Analyze and attribute expenditure
+        - Use managed and application-level services to reduce cost of ownership
+- Disaster Recovery Strategies
+    - Backup and Restore
+    - Pilot Light
+    - Warm Standby
+    - Multi-Site Active-Active
 - VPC options for on prem, and DNS options for on prem
+    - To connect on-premises resources to AWS VPC's, you can use:
+        - AWS Site-to-Site VPN
+        - AWS Direct Connect
+        - VPC Peering (for connecting VPC's)
+        - VPN's allow for a direct, encrypted connection over the internet from on-prem to AWS VPC
+    - Route53 Resolver inbound endpoints allow on-premises resources to resolve AWS host names by forwarding DNS queries to Route 53 Resolver
+        - This involves some setup of on-prem DNS servers to forward queries for AWS domain names to the Route 53 Resolver inbound endpoint
 - Immutable infrastructure
+    - Immutable infrastructure involves creating new instances or environments for each deployment, rather than modifying existing ones. This approach ensures that changes are made in a controlled manner, reducing the risk of configuration drift and deployment errors
+    - Immutable infra on AWS can be implemented using services like AWS CloudFormation, AWS Elastic Beanstalk, or AWS OpsWorks to automate the provisioning of new instances or environments for each deployment
+    - Instead of creating net new infra with IaC, you'd bump some key version number or AMI ID in your deployment scripts to create new instances with the updated code/configuration, and then once deployed you switch traffic over to the new instances and terminate the old ones
 - AWS GuardDuty
+    - ML based service that crawls and analyzes data from VPC Flow Logs, CloudTrail logs, and DNS logs to detect threats and anomalies in AWS environments
+    - Provides intelligent threat detection and continuous monitoring for AWS accounts and workloads
+    - Integrates with AWS Security Hub for centralized security management and alerting
 - Volume GW
+    - AWS Storage Gateway Volume Gateway provides cloud-backed storage volumes that can be mounted as iSCSI devices on on-premises servers
+    - i.e. this means you can create EBS-like volumes that are stored in AWS, but can be accessed from on-premises servers via iSCSI protocol, and when someone changes something locally on-prem it's synced back to AWS
+    - Volume Gateway has two modes:
+        - Cached Volumes: Store frequently accessed data locally while keeping the full dataset in AWS
+        - Stored Volumes: Store the entire dataset locally while asynchronously backing up data to AWS
+- Accelerated Computing Instances
+    - Accelerated computing instances use hardware accelerators, such as GPUs or FPGAs, to offload specific tasks from the CPU, improving performance for workloads that require intensive computation
+    - Examples include:
+        - P4d instances for machine learning and HPC workloads
+        - G4dn instances for graphics-intensive applications and machine learning inference
 - DataSync vs DMS
+    - DMS is an entire suite of services for migrating databases to AWS, including homogeneous and heterogeneous migrations, schema conversion, and continuous data replication
+    - DataSync is specifically designed for transferring large amounts of data between on-premises storage systems and AWS services like S3, EFS, and FSx
+    - DataSync provides integrity and encryption during data transfer, making it suitable for moving files, objects, and large datasets to the cloud
 - Cloud Adoption Readiness Tool (CART)
+    - Cloud Adoption Readiness Tool (CART) is an assessment tool provided by AWS to help organizations evaluate their readiness for cloud adoption
+        - CART assesses various aspects of an organization's IT environment, including technical, operational, and organizational readiness
+        - The tool provides a comprehensive report with recommendations and best practices for cloud adoption, helping organizations plan their migration to AWS effectively
 - EC2 instance type groups
+    - General Purpose (e.g., t3, m5)
+        - General administrative processing
+    - Compute Optimized (e.g., c5, c6g)
+        - Larger ratio of vCPU, and the lowest price per compute unit
+    - Memory Optimized (e.g., r5, x1e)
+        - Ideal for memory-bound applications, and have lowest price per GiB of RAMs
+    - Storage Optimized (e.g., i3, d2)
+        - Low latency and high IOPS local storage
+    - Accelerated Computing (e.g., p4d, g4dn)
+        - Compute intensive applications and workloads that need more throughput for specific tasks
+- Event Bridge
+- AWS RAM 
+    - AWS Resource Access Manager (RAM) allows you to share AWS resources with other AWS accounts or within your AWS Organization
+    - RAM enables resource sharing without the need to duplicate resources, reducing costs and simplifying management
+    - Resources that can be shared using RAM include VPC subnets, Transit Gateways, License Manager configurations, and more
+- Benchmarking vs Load Testing
+    - Benchmarking measures and compares the performance of an application or system against predefined standards or benchmarks to establish a baseline for performance metrics
+    - Load testing simulates real-world user traffic and workloads on an application or system to evaluate its performance under expected usage conditions
+- Amazon Inspector 
+    - Amazon Inspector is an automated security assessment service that helps improve the security and compliance of applications deployed on AWS
+    - It automatically assesses applications for vulnerabilities or deviations from best practices, providing detailed findings and recommendations for remediation
+    - Inspector integrates with AWS Security Hub for centralized security management and alerting
+- Query string forwarding on Cloudfront is a way for Cloudfront to cache different versions of your content based on query string parameters in the URL. This is useful when your application serves different content based on query strings, such as filtering or sorting options.
+    - When query string forwarding is enabled, CloudFront includes the query string parameters in the cache key, allowieng it to cache and serve diffrent versions of the content based on the specific query strings
+    - This helps improve performance and reduce latency for users accessing content with different query string parameters
+- Packet capture and analysis in AWS
+    - AWS VPC Traffic Mirroring allows you to capture and analyze network traffic from elastic network interfaces (ENIs) within your VPC
+    - Traffic Mirroring enables you to replicate network traffic to a designated monitoring appliance or instance for detailed analysis and troubleshooting
+    - You can filter traffic based on protocols, ports, and IP addresses to capture only the relevant data for analysis
+    - Traffic Mirroring is useful for real-time network troubleshooting, security monitoring, and performance analysis within AWS environments
+- PrivateLink is one-directional, and VPC Peering is bi-directional
+    - VPC Peering allows two VPC's to communicate with each other directly, allowing resources in both VPC's to access each other
+    - PrivateLink allows resources in one VPC to access services in another VPC, but not the other way around
+    - PrivateLink is typically used for accessing services like AWS services or third-party services securely within a VPC, while VPC Peering is used for direct communication between two VPC's
+- Disaster Recovery Strategies
+    - Backup and Restore
+        - Regular backups are taken and stored in a separate location. In the event of a disaster, systems are restored from the backups. This method may have longer recovery times depending on the backup frequency and restoration process.
+    - Pilot Light
+        - Maintains a minimal version of the environment that includes only essential services like databases, allowing for quick scaling up during a disaster
+    - Warm Standby
+        - Provides a scaled down version of a fully functional environment that can be quickly scaled up to handle production traffic in the event of a disaster, but it's not real time
+    - Multi-Site Active-Active
+        - This is a real time replicated environment in another region
+- Disaster Recovery Tools
+    - AWS Backup helps with automating and managing backups across AWS services, ensuring data protection and compliance
+    - AWS CloudEndure Disaster Recovery provides continuous replication of workloads to a target AWS region, enabling rapid recovery in the event of a disaster
+    - AWS Elastic Disaster Recovery (AWS DRS) allows for quick recovery of applications and data in AWS, minimizing downtime and data loss during disasters
+    - Elastic disaster recovery is the next generation of CloudEndure
+        - 
+- AWS Security Hub Controls
+    - A control is a safeguard within a security standard that helps you achieve a specific security objective. A control is related to a resource in your AWS environment
+        - When you enable controls, Security Hub runs automated checks against your AWS resources to determine whether they comply with the control's requirements
+    - Control categories:
+        - Each control category represents a group of controls and items you can implement to ensure the security of AWS environment, and understanding of it
+        - **Identify**: Develop the organizational understanding to manage security risk to systems, people, assets, data, and capabilities
+            - Identify is about understanding your environment, inventorying resources, and establishing governance frameworks
+            - Includes:
+                - Asset Management
+                - Inventory - have tags been assigned, what resources does the service use, are there unused resources
+                - Logging - Have you enabled all relevant logging services, are logs being stored securely
+        - **Protect**: Develop and implement appropriate safeguards to ensure delivery of critical infrastructure services
+            - Protect is about implementing security controls to safeguard data, applications, and systems
+            - Includes:
+                - Access Management - are IAM policies following least privilege, are MFA enabled, are roles being used instead of users
+                - Data Protection - is data encrypted at rest and in transit, are backups being taken
+                - Network Protection - are security groups and NACLs properly configured, is VPC flow logging enabled
+                - Protective Services - are WAF, Shield, and GuardDuty enabled
+                - Secure Coding - are secure coding practices being followed, are code repositories scanned for vulnerabilities
+        - **Detect**: Develop and implement appropriate activities to identify the occurence of a security event
+            - Detect is about monitoring and identifying potential security threats and anomalies
+            - Includes:
+                - Anomalies and Events - are CloudWatch Alarms set up for critical metrics, are unusual activities being detected
+                - Continuous Monitoring - is AWS Config enabled, are resources being monitored for changes
+                - Detection Processes - are incident response plans in place, are detection processes regularly tested
+        - **Respond**: Develop and implement appropriate activities to take action regarding a detected security event
+            - Respond is about having processes and procedures in place to respond to security incidents effectively
+            - Includes:
+                - Response Planning - are incident response plans documented, are roles and responsibilities defined
+                - Communications - are communication channels established for incident response, are stakeholders informed
+                - Analysis - are incidents analyzed to determine root cause, are lessons learned documented
+                - Mitigation - are steps taken to contain and mitigate incidents, are vulnerabilities addressed
+                - Improvements - are response processes reviewed and improved regularly
+        - **Recover**: Develop and implement appropriate activities to restore capabilities or services that were impaired due to a security event
+            - Recover is about having plans and processes in place to recover from security incidents and restore normal operations
+            - Includes:
+                - Recovery Planning - are disaster recovery plans documented, are recovery objectives defined
+                - Improvements - are recovery processes reviewed and improved regularly
+                - Communications - are communication channels established for recovery, are stakeholders informed during recovery
+        - So back to laymens terms:
+            - Identify means do you have the abilities to query and inventory your resources, and do you have logging enabled to track activity
+            - Protect means are you following best practices to secure your resources, data, and applications
+            - Detect revolves around ability to capture anomalies and events, and the continuous monitoring of them
+            - Respond is about having plans and processes to respond to security incidents
+            - Recover is about having plans and processes to recover from security incidents and restore normal operations

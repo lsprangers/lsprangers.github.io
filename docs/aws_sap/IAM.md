@@ -371,13 +371,20 @@ Allows us to check what resources are allowed externally, so you can establish a
 ### AWS Control Tower
 AWS Control Tower helps to automate and establish multiple accounts under a management OU following best practices and supplying interactive dashboards
 
+AWS CT is a service that helps you setup and govern a secure, multi-account AWS env known as a "landing zone" based on AWS best practices - it automates the setup of your environment using AWS Organizations, AWS IAM Identity Center (AWS SSO), and other AWS services to help you manage your accounts, apply policies, and monitor compliance
+
 Guardrails in AWS control tower provide ongoing Governance solutions
-- Preventative methods via SCP's
-- Detective methods via AWS Config
+- ***Preventative*** methods via SCP's
+- ***Detective*** methods via AWS Config
 - Types:
     - Mandatory
     - Strongly Recommended
     - Elective
+
+Missed a lot of things in QnA about Control Tower, but it's basically a way to quickly setup an AWS Organization with multiple accounts following best practices - it helps with governance, preventative guardrails, and detective guardrails:
+- Governance at scale means we can apply policies and controls across multiple accounts
+- ***Preventative*** guardrails use SCP's to prevent actions across all accounts as universal rules
+- ***Detective*** guardrails use AWS Config to monitor compliance and report violations across accounts
 
 #### AWS Resource Access Manager
 - AWS Resource Access Manager (RAM) allows us to share AWS reosources that you own with other AWS accounts

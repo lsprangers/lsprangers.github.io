@@ -33,10 +33,13 @@ Agentless Discovery is ideal for large-scale server discovery and application de
 
 There are multiple tools:
 - AWS Application Discovery Service
+    - App Discovery Service helps you plan your migration to the AWS Cloud by collecting usage and configuration data about your on-premises servers to help you better understand your workloads
+    - It can help find dependencies between applications and servers to help you plan your migration strategy
 - AWS Migration Hub
 - AWS Server Migration Service (SMS)
 - AWS Database Migration Service (DMS)
 - AWS Schema Conversion Tool (SCT)
+    - SCT helps convert your existing database schema and code to a format compatible with your target database engine on AWS
 - AWS CloudEndure Migration
 - AWS CloudEndure Disaster Recovery
 - AWS DataSync

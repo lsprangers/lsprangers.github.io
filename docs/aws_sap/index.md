@@ -8,6 +8,42 @@ This section is around notes for AWS Solutions Architect Professional and Networ
 
 Most of AWS is tough to understand because everything has some marketed name like "Route53" instead of just "DNS Service", and figuring out how those components tie together now requires a 2-3 week in-depth course
 
+- Well architected framework
+    - 5 principles of operational excellence, security, reliability, performance efficiency, cost optimization
+    - Operational Excellence
+        - Perform operations as code
+        - Annotate documentation
+        - Make frequent, small, reversible changes
+        - Refine operations procedures frequently
+        - Anticipate failure
+        - Learn from all operational failures
+    - Security
+        - Implement a strong identity foundation
+        - Enable traceability
+        - Apply security at all layers
+        - Automate security best practices
+        - Protect data in transit and at rest
+        - Keep people away from data
+        - Prepare for security events
+    - Reliability
+        - Test recovery procedures
+        - Automatically recover from failure
+        - Scale horizontally to increase aggregate system availability
+        - Stop guessing capacity
+        - Manage change in automation
+    - Performance Efficiency
+        - Democratize advanced technologies
+        - Go global in minutes
+        - Use serverless architectures
+        - Experiment more often
+        - Consider mechanical sympathy
+    - Cost Optimization
+        - Adopt a consumption model
+        - Measure overall efficiency
+        - Stop spending money on data center operations
+        - Analyze and attribute expenditure
+        - Use managed and application-level services to reduce cost of ownership
+
 ## General Knowledge
 There are:
 - 200+ services
