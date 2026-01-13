@@ -161,4 +161,4 @@ Route 53 Resolver is a DNS service that provides DNS resolution for VPCs and on-
 - Route 53 Resolver supports both inbound and outbound DNS queries
     - Inbound queries allow on-premises systems to resolve DNS names for resources in VPCs
     - Outbound queries allow VPC resources to resolve DNS names for on-premises systems
-- Route 53 Resolver supports conditional forwarding rules to route DNS queries based on domain names or patterns    
+- Route 53 Resolver supports conditional forwarding rules to route DNS queries based on domain names or patterns
