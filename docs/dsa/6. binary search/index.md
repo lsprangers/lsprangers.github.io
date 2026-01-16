@@ -40,13 +40,13 @@ For the capacity to ship packages problem, the `check()` function revolves aroun
 The reason this is "fast" is that in $O(\log(n))$ time you can propose capacity values, and then for each of them it takes $O(n)$ time to check so the overall solution is $O(n \cdot \log(n))$. This is faster than iterating from 1 to 2 to 3... capacity which would result in $O(n^2)$
 
 ## Typical Patterns And Pitfalls
-There are some typical patterns pitfalls that annoyingly come up in almost every review, and using them correctly is very important!
+There are some typical patterns pitfalls that annoyingly come up in almost every review
 
-The main questions to ask yourself:
+The main questions to ask:
 - What is the search space?
-- What does check(mid) mean?
+- What does `check(mid)` mean?
 - What is the goal (min valid, max valid, exact match)?
-    - This will alter what you return
+    - This will alter the return
 - When is mid good/bad? Adjust low/high accordingly
     - This will alter our `low = ` and `high =` updates
 - Do you return low, high, or mid?
