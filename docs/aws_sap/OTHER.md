@@ -8,6 +8,11 @@ show_back_link: true
 
 ## Other Services
 
+### AWS Config
+AWS Config is a service that enables you to assess, audit, and evaluate the configurations of your AWS resources. It helps you monitor and record your AWS resource configurations and allows you to automate the evaluation of recorded configurations against desired configurations
+
+Conformance packs are a collection of AWS Config rules and remediation actions that can be easily deployed in an account and region which are considered best practices
+
 ### App Stream
 - Desktop app streaming service, i.e. it's a service that streams to us desktop applications
 - Deliver a specific application to any computer without provisioning infrastructure
@@ -20,6 +25,8 @@ show_back_link: true
 - Can remotely login to devices for debugging to figure out why it works on one OS and not the other!
 
 ### CICD
+Done in Code Pipeline / CodeBuild / CodeDeploy CICD
+
 - Continuous Integration:
     - As new code is pushed, testing is automatically done via testing / build servers
     - Helps us to check code for errors or things that "worked on developers laptop"
@@ -40,6 +47,14 @@ show_back_link: true
 
 CodePipeline and GitHub have some integrations as well, usually use GitHub WebHooks into CodePipeline or a CodeStar pipeline to sync GitHub and CodePipeline
 
+CodePipeline is used for orchestrating the CICD process, and CodeBuild is used for building and testing code
+    - Codepipeline has stages, and each stage can have multiple actions
+        - Actions can be things like source, build, test, deploy, etc...
+        - The results can go to S3, Beanstalk, lambda, ECS, etc...
+    - CodeBuild is used to run the actual build and test commands
+        - This is for when we need to do `gradle build`, ``mvn package`, `npm install`, etc...
+        - CodeBuild is a step in CodePipeline
+
 ### CodeGuru
 - ML powered services for code reviews and app performance recommendations
     - ***CodeGuru Reviewer***: Automated code reviews for static code analysis (development)
@@ -51,6 +66,16 @@ CodePipeline and GitHub have some integrations as well, usually use GitHub WebHo
 - Data security and data privacy service
 - Helped to identify and alert you to sensitive PII data
 - Analyzes data in S3, and notifies Amazon EventBridge
+
+### Cloud9
+- Cloud based IDE
+- Write, run, and debug code with just a browser
+- Can commit code directly to CodeCommit repos, which then integrate with CodePipeline
+- Comes with terminal with AWS CLI pre-installed and configured
+- Prepackaged with essential tools for popular programming languages
+- Collaborate with others in real-time
+- Integrates with some core AWS Services for code deployment
+    - Lambda, CodeCommit, CodePipeline, Beanstalk, etc...
 
 ### SES
 - Simple Email Service

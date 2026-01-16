@@ -140,17 +140,17 @@ An Auto Scaling Group is a grouping of EC2 instances, where you track the total 
 - ***Predictive Scaling***: Will use ML / pattern recognition to find when to scale, and plan ahead of the fact
 
 - Spot Fleet Support: Meaning you can mix Spot and On-Demand instances in the ASG
-        - `MaxSpotPrice` allows us to choose what price you will be open to using Spot Instances
-        - Again, don't use these for critical jobs or DB's...use them in apps that are fault tolerant
-        - Spot Fleets allow us to have Spot Instances + optional On-Demand
-            - Can define multiple launch pools of Instance types, region, OS, etc..
-            - Spot Fleet can then choose from multiple launch pools
-                - Spot Fleets try to meet demand up to some price constraints
-            - ***Strategies*** - Splot Fleet has multiple strategies for creating instances from a launch pool
-                - ***lowestPrice*** pulls new instances frmo pool with lowest price
-                - ***diversified*** distributes evenly across pools
-                - ***capacityOptimized*** finds the pool with optimal capacity for number of instances required
-                - ***priceCapacityOptimized*** uses pool with highest capacity available, and from there finds the pool with the lowest price
+    - `MaxSpotPrice` allows us to choose what price you will be open to using Spot Instances
+    - Again, don't use these for critical jobs or DB's...use them in apps that are fault tolerant
+    - Spot Fleets allow us to have Spot Instances + optional On-Demand
+        - Can define multiple launch pools of Instance types, region, OS, etc..
+        - Spot Fleet can then choose from multiple launch pools
+            - Spot Fleets try to meet demand up to some price constraints
+        - ***Strategies*** - Splot Fleet has multiple strategies for creating instances from a launch pool
+            - ***lowestPrice*** pulls new instances frmo pool with lowest price
+            - ***diversified*** distributes evenly across pools
+            - ***capacityOptimized*** finds the pool with optimal capacity for number of instances required
+            - ***priceCapacityOptimized*** uses pool with highest capacity available, and from there finds the pool with the lowest price
 - Lifecycle Hooks
     - Perform actions before an instance is in service, or before it's terminated
     - Log cleanup, extraction, or other health checks on start
@@ -359,7 +359,9 @@ Load balancers DNS is then registered in Route53 as an Alias or CNAME record for
     - you ***could***, but don't have to, connect to AWS using EKS Connector, and then it would allow you to use AWS Console to manage EKS cluster
 
 ### Lambda
-It's just running a serverless function - it integrates with almost everything
+It's just running a serverless function - it integrates with almost everything. Most of the time you write a function that gets triggered by some event, and then it runs your code on a server in AWS data center, and you place IAM roles on it to allow it to access other services
+
+Most important metrics are execution time, memory usage, and invocations - that's what SAP test focuses on...this is shown in [Limitations](#limitations) section
 
 - Useful, and almost hello world, example:
     - New image dropped in S3
@@ -385,6 +387,25 @@ It's just running a serverless function - it integrates with almost everything
 - XRay: 
     - Add tracing into lambda SDK 
     - Lambda needs correct IAMs to write to XRay
+
+Lambda has many triggers:
+- API Gateway
+- ALB
+- S3
+    - S3 is most used, and it's based on S3 notifications - anything an S3 notification can do, can trigger a lambda
+    - Most are "file dropped in this directory, and matches my pattern"
+        - All of these patterns are configurable
+- SNS
+- SQS
+- DynamoDB Streams
+
+Lastly, there's something called [Lambda At Edge](/docs/aws_sap/CACHE.md#lambdaedge) which allows us to run lambda functions at Cloudfront edge locations, so that we can do things like:
+- Dynamic web page generation
+- HTTP header manipulation
+- URL rewrites and redirects
+- etc
+
+These help us to run lambda as close to the user as possible for low latency, and helps with some caching and CDN use cases
 
 #### Limitations
 - RAM (10GB)
@@ -464,6 +485,14 @@ It's just running a serverless function - it integrates with almost everything
         - Operates at L3 Network IP Protocol layer
 - Load Balancers are deployed in a specific region, and can be configured to span multiple AZ's so that if one AZ goes down the LB does not also go down
     - i.e. they are highly available
+- Packet headers can be mapped to OSI layers:
+    - Ethernet header (layer 2): MAC address
+    - IP header (layer 3): Source and destination IP addresses
+    - TCP/UDP header (layer 4): Source and destination ports, sequence numbers
+    - Application layer headers (layer 7): HTTP headers, cookies, etc
+
+We discuss DNS and load balancing in [DNS and Service Discovery](#dns-and-service-discovery) section under [Containers](#containers), as well as in the [DNS Document](/docs/aws_sap/DNS.md#aws-hosted-zone-record-set-and-alb-example)
+
 ### CLB
 - Health Checks can be HTTP (L7) or TCP (L4)
 - Supports only 1 SSL Certificate
@@ -476,9 +505,23 @@ It's just running a serverless function - it integrates with almost everything
 - Layer7 HTTP(S) only
     - ***YOU can't assign Static IP to ALB!!***
     - Need to place NLB in front w/ static IP and route to ALB
+    - ALB do have a fixed DNS name assigned by AWS
+- Best for web apps, microservices, containerized apps
 - Load Balancing to multiple HTTP apps across machines (target groups)
 - Load balancing to multiple apps on the same machine (containers) with dynamic port mapping on target groups
 - Support for HTTP/2 and WebSockets
+- Can do TLS Termination at ALB
+    - Offloads decryption from EC2 instances
+    - Use SNI to host multiple SSL certs on same ALB
+- Security:
+    - Integrates with AWS WAF for web application firewall
+    - Integrates with AWS Shield for DDoS protection
+- Sticky Sessions (Affinity) supported
+    - This means same client always goes to same backend instance
+    - Helpful for stateful apps, and is based on cookies
+- Detailed Metrics in CloudWatch
+- Access Logs to S3
+- Request Tracing with X-Ray
 - Routing rules for paths, headers, query strings, etc...
     - Routing based on HTTP headers / paths (L7)
 - Target Groups:
@@ -1080,3 +1123,12 @@ Comparing some web and compute layer architectures
     - When the instance is started again, the RAM contents are restored from the EBS volume
     - Using private key to decrypt volume on boot
     - Also use PK to decrypt admin passwords on Windows
+
+- Using AMI Templates allows for Prebaking and Bootstrapping EC2 instances when you need to utilize a lot of EC2 instances that are setup the same way without containers:
+    - If your application relies heavily on customizing or deploying applications onto Amazon EC2 instances, then you can optimize your deployments through bootstrapping and prebaking practices
+    - ***Prebaking*** is embedding a significant portion of your application artifacts within an AMI
+    - ***Bootstrapping*** is installing application(s), dependencies, and/or customizations whenever an EC2 instance is launched
+    - These are separate from containers where you store code to retrieve these in a docker file which eventually pulls them into an Image that has all of this setup in directories
+    - Therefore, you can prebake application components into an AMI so that they are available immediately when an instance is launched from that AMI
+    - Or you can bootstrap by using user data scripts to install application components at launch time
+    - Prebaking is faster since everything is already in the AMI, but bootstrapping allows for more flexibility and easier updates since you can change the user data script without creating a new AMI

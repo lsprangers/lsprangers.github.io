@@ -64,6 +64,8 @@ An ALB or NLB will typically have static DNS names that do not change, so using 
 
 There are some [Stack Overflow Questions](https://serverfault.com/questions/1167031/how-do-application-load-balancers-maintain-high-availability-without-a-stable-ip) about this, which lead to other [Stack Overflow Answers](https://stackoverflow.com/questions/35313134/assigning-static-ip-address-to-aws-load-balancer/35317682#35317682) that go into more detail
 
+And now I summarized these concepts in a [Load Balancing and ELB Deep Dive](/docs/architecture_components/typical_reusable_resources/typical_frontend/ELB_DEEP_DIVE.md) document
+
 The general idea is that ALB will have a static DNS name that resolves to multiple IP addresses across zones, and as ALB's scale their backing IP addresses constantly change - therefore, to ensure DNS stays available and valid we would point to the ALB's DNS name via an `Alias` record / `CNAME` record rather than trying to manage IP addresses directly. Below shows how we can route a few different services using `Alias` and `CNAME` records:
 ```
 service.quick24x7.local  IN  A     ALIAS  dualstack.my-alb-1234567890.us-west-2.elb.amazonaws.com
@@ -147,7 +149,16 @@ So this section is around DNS Firewalls specifically:
 - DNS Firewall provides logging and monitoring capabilities to track DNS query activity and identify potential threats
 - DNS Firewall integrates with AWS services like Route 53 Resolver and CloudWatch for enhanced security monitoring and alerting
 
+### AWS Outposts
+AWS Outposts is a fully managed service that extends AWS infrastructure, services, APIs, and tools to virtually any data center, colocation space, or on-premises facility. Outposts lets you run AWS Services locally on your own hardware
+- Outposts can run services like EC2, EBS, RDS, ECS, EKS, and more
+- Outposts are ideal for workloads that require low latency access to on-premises systems, local data processing, or data residency requirements
+- Outposts are fully managed by AWS
+- Outposts can be connected to your existing on-premises network and data center infrastructure
 
-## How AWS ALB / NLB work without static IP's
-[This is a great blog on the topic](https://shlomoswidler.com/2009/07/elastic-in-elastic-load-balancing-elb/) that goes into more detail on how ELB's manage their own IP addresses behind the scenes
-
+### Route53 Resolver
+Route 53 Resolver is a DNS service that provides DNS resolution for VPCs and on-premises networks. It allows us to route DNS queries between VPCs and on-premises networks, enabling hybrid cloud architectures
+- Route 53 Resolver supports both inbound and outbound DNS queries
+    - Inbound queries allow on-premises systems to resolve DNS names for resources in VPCs
+    - Outbound queries allow VPC resources to resolve DNS names for on-premises systems
+- Route 53 Resolver supports conditional forwarding rules to route DNS queries based on domain names or patterns

@@ -70,6 +70,8 @@ TLDR for all of this - Use a Transit Gateway as it's the best hub-and-spoke setu
     - Bandwidth scales automatically
     - Must dpeploy multiple NAT for multiple AZ for HA
     - *Has an elastic IP, external services see IP of NAT GW if a private instance utilizes it*
+    - Cross-region NAT GW isn't possible, and best practices are to have one per AZ as cross-AZ costs money
+    - Service endpoints can be used to avoid NAT GW costs for specific AWS services
 - Internet access
     - Instances ***must have IPv4*** IP to talk to internet
     - Or in a ***Private (non-public) Subnet*** instances can access internet with a NAT instance or NAT Gateway setup in a Public Subnet
@@ -587,3 +589,26 @@ So we know we need 2 main resources:
         - Everything goes to Inspection VPC via TGW, and back to TGW, and then any internet traffic routed to Egress VPC
             - Routing is done entirely in TGW, and ensures all traffic sink into Inspect VPC and then back out to TGW
         - ![AWS NFW Arch](/img/aws_nfw_arch.png)
+
+## Costs
+Figuring out where you pay for network ingress and egress is typically done for each AWS product, across AZ's, and across regions
+- VPC Peering
+    - Intra-region: $0.01 per GB data transfer out from one VPC to another
+    - Inter-region: Varies by region, typically $0.02 - $0.09 per GB data transfer out
+- Transit Gateway
+    - $0.05 per GB data processed
+    - $0.02 per hour per attachment
+- VPN
+    - Site to Site VPN: $0.05 per hour per VPN connection + data transfer
+    - Client VPN: $0.10 per hour per endpoint + $0.05 per GB data transfer
+- Direct Connect    
+    - Dedicated Connection: $0.25 - $2.25 per hour depending on port speed
+    - Hosted Connection: $0.30 - $3.00 per hour depending on port speed
+    - Data transfer rates vary by region and connection type
+- VPC Endpoints
+    - Gateway Endpoints: No additional cost
+    - Interface Endpoints: $0.01 per hour per endpoint + $0.01 per GB data processed
+- AWS Network Firewall
+    - $0.395 per hour per firewall endpoint + $0.065 per GB data processed  
+
+For each core AWS service like S3, EC2, RDS, etc, there are specific data transfer costs for ingress and egress that can be found on the respective pricing pages, but the TLDR is that you pay for egress across regions, and sometimes across AZ's, but typically not within the same AZ or region

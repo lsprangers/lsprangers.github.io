@@ -65,6 +65,40 @@ show_back_link: true
     - AWS Backup for management and monitoring of backups across AWS services from a single place
         - Includes EBS volumes
 
+### AWS Backup
+Centralized backup service to automate and manage backups across AWS services
+
+Integrates out of the box with:
+- EBS
+- DynamoDB
+    - Full table backup
+- EFS
+    - Full and item level restore available
+- EC2 instances
+- Storage Gateway (remember these are on-prem virtual machines that cache S3 objects locally, but store data long term in S3)
+- RDS is special because it has its own snapshot system, but AWS Backup can manage these snapshots as well:
+    - You create replicas in other regions manually, and these replicas are updated async via WAL logs
+    - Outside of replicas, we can also backup RDS snapshots via AWS Backup
+        - These are full snapshots at instance level
+        - ***You cannot restore RDS snapshots into an existing instance, must create new instance from snapshot***
+            - Therefore, when you restore a snapshot, you must specify instance class, storage type, VPC, subnet group, security groups, parameter groups, option groups, etc... because you are creating a new instance from the snapshot
+
+
+Backup policies are then used to define:
+- Backup frequency
+- Retention period
+- Backup window
+- Lifecycle policies to transition backups to cold storage or delete them
+    - Cold storage, like Glacier, is cheaper but takes longer to restore from
+    - Can define transition to cold storage after X days, and deletion after Y days
+- Backup vaults to store and encrypt backups
+    - And even if encrypted is used or not
+- Cross account and cross region backup copies for DR
+
+Backup vaults are where backups are stored, and a backup plan specifies when and how backups are created and retained, and which vault to store them in. Backup plans should ensure RTO and RPO requirements are met
+
+If data restore is ever needed, AWS Backup can restore entire resources or specific files from EFS backups via CLI or UI commands. We can also run backups based on a trigger from EventBridge
+
 ### Local EC2 Instance Store
 - EC2 instance store is the physical disk attached to physical server where EC2 is
 - Very high IOPS

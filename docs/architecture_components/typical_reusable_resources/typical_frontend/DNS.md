@@ -79,3 +79,29 @@ There are mainly 4 server types:
     - These would hypothetically be served by Educative, and once reached they will dish out the actual `144.10.8.0` IP address
 
 ![Server Types](/img/dns_server_type.png)
+
+### DNS Query Process
+When you type in `educative.io` in your browser, the following happens:
+1. The browser checks its cache for the IP address of `educative.io`
+    - If found, it uses that IP address to connect to the server
+    - If not found, it proceeds to the next step
+2. The browser sends a DNS query to the local DNS resolver (usually provided by your ISP)
+3. The local DNS resolver checks its cache for the IP address of `educative.io`
+    - If found, it returns that IP address to the browser
+    - If not found, it proceeds to the next step
+4. The local DNS resolver sends a query to a root-level DNS server
+5. The root-level DNS server responds with the IP address of a TLD server for the `.io` domain
+6. The local DNS resolver sends a query to the TLD server for `educative.io`
+7. The TLD server responds with the IP address of the authoritative DNS server for `educative.io`
+8. The local DNS resolver sends a query to the authoritative DNS server for `educative.io`
+9. The authoritative DNS server responds with the IP address of the web server for `educative.io`
+10. The local DNS resolver caches the IP address for future queries and returns it to the browser
+11. The browser uses the IP address to connect to the web server and load the website
+
+## Highly Available Services on DNS
+DNS, for most reasons any developer cares about, needs to help with high availability and service discovery - in Kubernetes and other orchestration platforms this is done via service registries and internal DNS servers that can resolve services to IP addresses
+
+TODO: Add more on actually writing app and infra code that uses DNS for service discovery and high availability
+
+TLDR;
+The [AWS DNS Page](/docs/aws_sap/DNS.md) goes into more detail about how AWS Route53 and ELB's work together to provide high availability via DNS, and is probably enough - can probably delete this page

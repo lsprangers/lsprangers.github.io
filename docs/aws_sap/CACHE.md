@@ -33,6 +33,7 @@ Ultimately, Caching + CDN's help to bring content closer to users, reduce latenc
 Cloudfront cache behavioral settings are almmost entirely focused on how to handle requests and responses, and how to cache content. Ultimately, it has TTL, PUT/POST/GET/DELETE handling, header and cookie forwarding, query string handling, and compression settings - similar to Redis or Memcached caching settings, but for HTTP content and files. CloudFront creates proper URL's that are cached at edge locations, and different URL's can have different caching behaviors
 
 ### Origins
+CF Origins are the backend servers that CF fetches content from when it doesn't have it cached at the edge location. Origins can be S3 buckets, MediaStore containers, ALB/NLB/EC2 in VPC private subnets, or any HTTP backend server. These origin servers have to allow AWS managed CF instances to access them, either via public internet or via VPC Origin connections
 - S3
     - Distributing files
     - Uploading files to S3
@@ -40,18 +41,18 @@ Cloudfront cache behavioral settings are almmost entirely focused on how to hand
     - Security with CloudFront Origin Access Control
         - Ensures that content of S3 bucket is cached at edge in various locations and the number of requests to S3 is significantly lower
     - CloudFront vs S3 Cross Region Replication
-        - CloudFront is global edge network that will cache static content with a TTL
+        - CloudFront is global edge network that ***will cache static content with a TTL***
             - Useful for static content that must be available everywhere
         - S3 CRR must be setup for each new region, and is updated in real time, i.e. pushed to, by origin bucket
             - S3 CRR is also read only and can't accept origin writes
-            - Good for dynamic changing content that should be available in low latency in multiple regions
+            - *Good for dynamic changing content that should be available in low latency in multiple regions*
 - MediaStore Container & MediaPackage Endpoint
     - To deliver Video on Demand (VoD) or live streaming
 - VPC Origin
     - For apps hosted in VPC private subnets
     - ALB / NLB / EC2 instances
         - Allows us to deliver content from apps hosted in ***VPC private subnets***
-        - CF can deliver traffic to ALB, NLB, EC2 in private subnets because it does not need to go over public internet
+        - *CF can deliver traffic to ALB, NLB, EC2 in private subnets because it does not need to go over public internet*
             - Would need a VPC Origin, similar to a VPC Endpoint, connected on our VPC to CF to our Private Subnet
 - Custom Origin (HTTP)
     - API GW
@@ -64,6 +65,8 @@ Cloudfront cache behavioral settings are almmost entirely focused on how to hand
                 - Create a secret header on CF servers, and use that as header, and then public ALB will only forward requests to backend with that header
                 - Update CF + ALB headers with Lambda 
                 - ![CF ALB Custom Header](/img/cf_alb_custom.png)
+            - This allows ALB to have very simple security rules, and we can push WAF rules to CF instead of ALB
+                - ALB security groups can be wide open to CF IP ranges
 - Origin Groups
     - To increase HA and failover
     - Has secondary origin, which ***can be cross-region***, which takes over if first one fails

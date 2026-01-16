@@ -19,7 +19,7 @@ show_back_link: true
 - IAM Principals are Users or Roles
 
 #### User
-- A **User** represents an individual person or service that interacts with AWS resources
+- A **User** represents an individual person or service that inteƒracts with AWS resources
 - Users can have:
     - **Keys** (Access Key ID and Secret Access Key)
     - **Secrets**
@@ -30,6 +30,7 @@ show_back_link: true
 - A **User Group** is just an aggregation of Users
 - Similar to other policies, denies on User groups would take precedence over Allows to a specific User
 - Otherwise User Groups follow the same standards, and a User having their own policies, multiple Group policies, and Org SCP policies would have different outcomes based on the precedence levels
+- ***Groups cannot be nested*** inside of other Groups
 
 #### Role
 - A **Role** is a temporary identity that can be assumed by Users, Services, or Applications
@@ -81,7 +82,7 @@ show_back_link: true
 - Example:
     - You can scope each User to resources with their own username without defining individual IAM policies for each User
 
----
+
 
 ### Policies
 Policies define Permissions, and you attach Policies to Identities (Users or Roles)
@@ -110,7 +111,7 @@ Policies define Permissions, and you attach Policies to Identities (Users or Rol
 - Session policies
     - Pass advanced session policies when you use the AWS CLI or AWS API to assume a role or a federated user. Session policies limit the permissions that the role or user's identity-based policies grant to the session. Session policies limit permissions for a created session, but do not grant permissions. For more information, see Session Policies.
     - These allow things like `AssumeRoleWithSAML` so that someone can Assume a Role via cookies / authentication for a short lived time
-    - This is tied into [***AWS Federated Users***](#federated-users) which are users who access Resources using credentials from an External Identity Provider (IdP) rather than creating AWS user identities
+    - This is tied into [***AWS Federated Users***](#sso-federated-users-and-microsoft-ad) which are users who access Resources using credentials from an External Identity Provider (IdP) rather than creating AWS user identities
 
 ### Permission Boundaries
 
@@ -121,7 +122,94 @@ Policies define Permissions, and you attach Policies to Identities (Users or Rol
 - Example:
   - If a Permission Boundary allows `s3:*, kafka:*` and the IAM Policy allows `EC2:*`, the User or Role will only have `s3:*, kafka:*` permissions, not the union of all three
 
-### STS
+### Directory Services
+AWS Directory Services allow us to manage users and groups in a centralized way, and integrate with on-premise Active Directory if needed.Directory services are typically thought of as a centralized network configuration database that stores information about users, groups, computers, and other resources in a network - the most used example is Microsoft Active Directory (AD)
+
+AWS Simlpe AD and AWS Managed Microsoft AD are both managed directory services provided by AWS, but they have some key differences in terms of features, scalability, and use cases:
+- **AWS Simple AD**:
+    - A cost-effective, managed directory service that is compatible with Microsoft Active Directory
+    - Suitable for small to medium-sized businesses or simple use cases
+    - Supports basic AD features like user and group management, Kerberos-based authentication, and LDAP
+    - Limited scalability and features compared to AWS Managed Microsoft AD
+    - Does not support advanced AD features like trust relationships with on-premises AD, Group Policy Objects (GPOs), or schema extensions
+    - Supports small (up to 2,000 objects) and large (up to 20,000 objects) directory sizes
+    - Mimics active directory by using Samba 4, but isn't a full AD implementation
+    - Doesn't support MFA, domain trusts, RDS SQL, SSO, etc... so you can't use Powershell , but you can use standard AD tooling for it
+    - Must specify admin password and DNS name at creation - this ensures Simple AD is only accessible within the VPC it was created in
+- **AWS Managed Microsoft AD**:
+    - A fully managed, cloud-native Microsoft Active Directory service
+    - Suitable for larger organizations or complex use cases that require advanced AD features
+      - Standard and Enterprise editions available, Standard supports up to 5,000 objects, Enterprise up to 500,000 objects
+    - Supports all standard AD features, including trust relationships with on-premises AD, GPOs, schema extensions, and more
+    - Highly scalable and can handle larger workloads and more complex directory structures
+    - Provides better integration with other AWS services that require AD authentication
+- **AD Connector**:
+    - A proxy service that allows you to connect your AWS resources to your on-premises Microsoft Active Directory without caching any information in the cloud
+    - Suitable for organizations that want to maintain their existing on-premises AD infrastructure while leveraging AWS services
+    - Does not provide a standalone directory service; it simply acts as a bridge between AWS and your on-premises AD
+    - Supports features like user authentication, group membership, and Kerberos-based authentication
+    - Does not support advanced AD features like trust relationships with other AD domains or schema extensions
+    - One connector config per on-prem AD domain
+      - Users can continue to use on-prem AD credentials to access AWS resources without an IAM user being created
+- ***Amazon Cognito User Pools***:
+    - A user directory service that provides sign-up and sign-in options for web and mobile applications
+    - Not a traditional directory service like AD, but rather a user management service that can integrate with social identity providers (e.g., Google, Facebook) and SAML-based IdPs
+    - Suitable for applications that require user authentication and management without the need for a full-fledged directory service
+    - Supports features like multi-factor authentication (MFA), user profile management, and customizable authentication flows
+    - Can be used in conjunction with AWS Managed Microsoft AD or Simple AD for more complex use cases
+
+EC2 instances that are joined to an AWS Managed Microsoft AD or Simple AD can use domain credentials for authentication and access control - ultimately this involves DNS resolution to the directory service, correct IAM permissions to access the directory, and proper network connectivity (VPC, subnets, security groups) to reach the directory service endpoints. The actual benefit and functionality comes from the directory service itself, not just the EC2 instance being joined to it, but joining the instance allows it to leverage the directory's capabilities for authentication and access control
+
+- What happens on join:
+  - The instance points DNS to the domain controllers and syncs time.
+  - A computer account is created in AD; the instance establishes a secure channel using a machine account secret.
+  - Kerberos/NTLM are enabled for logon; SPNs can be registered for hosted services (IIS, SQL, SMB).
+  - Group Policy applies at join and on refresh, enforcing security baselines, scripts, and config.
+- Benefits:
+  - Centralized authentication/SSO with AD credentials.
+  - RBAC via AD groups for local rights, file shares, SQL Server, and apps.
+  - Policy-driven hardening and compliance through GPOs.
+  - Enables Windows Integrated Auth (Kerberos) and features like constrained delegation.
+  - Required by several services: FSx for Windows File Server, Amazon WorkSpaces/AppStream, SQL Server integrated auth, legacy LDAP/Kerberos apps.
+  - Linux can also join (realmd/sssd) for central user auth and sudo policy.
+  - *You can RDP into the EC2 instance utilizing AD credentials.*
+    - In an admin account on an EC2 you can just create users, groups, and other AD resources like you normally would on-premise
+- Common use cases:
+  - Lift-and-shift Windows apps that expect AD.
+  - File services (FSx), IIS with Kerberos SSO, SQL Server with AD logins.
+  - Hybrid environments using on‑prem AD via VPN/DX and trusts.
+  - WorkSpaces/AppStream fleets needing domain policies and profiles.
+- Prereqs and plumbing:
+  - Directory: AWS Managed Microsoft AD (preferred), Simple AD (limited), or on‑prem AD with trust.
+  - VPC: enable DNS hostnames/support; routes to DC subnets; security groups allow AD ports (53, 88, 123, 135, 389/636, 445, 3268/3269, and high RPC).
+  - Join methods: EC2 launch “Domain join” with AWS Managed Microsoft AD, SSM AWS-JoinDirectoryServiceDomain, or OS-native join scripts/user data.
+  - Note: AD/domain join is for OS/app auth; AWS API access still uses IAM/SSO.
+
+#### Shared Services vs AWS Organizations
+- Shared Services Account:
+    - A centralized account that hosts shared resources and services used by multiple accounts within an organization
+    - Examples: centralized logging, monitoring, security services, networking components (e.g., VPN gateways, transit gateways)
+    - Benefits:
+        - Centralized management and control of shared resources
+        - Simplified billing and cost allocation for shared services
+        - Improved security and compliance through centralized policies and monitoring
+    - Considerations:
+        - Requires careful planning and governance to ensure proper access controls and resource sharing
+        - Potential for increased complexity in managing cross-account access and dependencies
+- AWS Organizations:
+    - A service that allows you to centrally manage and govern multiple AWS accounts within an organization
+    - Provides features like consolidated billing, service control policies (SCPs), and account management
+    - Benefits:
+        - Simplified account management and governance
+        - Centralized billing and cost optimization
+        - Ability to enforce policies and controls across multiple accounts
+    - Considerations:
+        - Requires careful planning and governance to ensure proper account structure and policy enforcement
+        - Potential for increased complexity in managing cross-account access and dependencies 
+
+Lots of questions around "if you need to manage multiple AWS accounts for X, Y, or Z issue, what tool should you use" and most of the time shared services are useful for hosting shared resources like logging, monitoring, and security services that multiple accounts need to access - whereas AWS Organizations is more about managing the accounts themselves, billing, and applying policies across those accounts. For example if you need to setup directory services for networks across accounts or centralized logging, you'd use a Shared Services account
+
+#### STS
 Security Token Service allows us to retrieve and impersonate IAM roles in other accounts that specify you can act on their behalf
 
 Impersonation / Assuming means you can have `role1:account1` and specify, via STS, that `user2:account2` can assume it's identity, meanning user 2 can act inside of account1 with the same persmissions as role1 - similar to `user2:role1:account1` 
@@ -130,6 +218,12 @@ Impersonation / Assuming means you can have `role1:account1` and specify, via ST
 ***Federated Users / Identity Federation*** provides access to externally authenticated users to your AWS account via this STS exchange
 
 Typically happens with corporations that have their own identity system like Active Directory, or if a Web/Mobile App wants to access resources on AWS but you don't want to create a user for the app user, just authenticate
+
+***Identity Providers*** (IdP's) are the external systems that authenticate users, and then provide tokens to AWS IAM to allow access to resources, while ***Service Providers*** (SP's) are the systems that consume those tokens to provide access to resources. In our case a central companies Okta or AD system is the IdP, and AWS IAM is the SP. ***Claims*** are pieces of information about the user that the IdP sends to the SP, like username, email, group membership, etc...and they give information about what the user is allowed to do. A Claim can contain anything, and AWS IAM can use these claims to map users to specific roles or permissions
+
+![Identity Federation Freehand](/img/identity_federation_freehand.png)
+
+In this federated access, we typically use AWS IAM Identity Center (FKA AWS SSO) or straight up AWS IAM to manage the trust relationship between the external IdP and AWS IAM, and then AWS Security Token Service (STS) to handle the actual token exchange and role assumption
 
 So where can you assume roles from?
 - Straight up `sts:AssumeRole` can be done, and is the most straightforward where you list out users who can do it
@@ -181,6 +275,11 @@ So where can you assume roles from?
             - Can't be joined with on-prem AD
             - Doesn't support MFA, RDS, SQL, SSO, etc...
 
+So how is this trust set up in AWS to trust that central identity provider? It typically involves setting up public keys and certificates between the IdP and AWS IAM
+- Centralized identity provider will digitally sign a security token with it's private key when it authenticates a user
+  - After that, AWS IAM will need to utilize a public key from that identity provider to verify the signature on the token
+- These trusted identity providers can span one or more organizations, and you can have multiple identity providers in AWS IAM
+
 ADFS SAML
 ![ADFS SAML](/img/adfs_saml.png)
 
@@ -218,6 +317,8 @@ AD Replication
 - SCP doesn't affect service linked roles
 - Explicit Denies ***always take precedence*** over Any Allows
 - Really very powerful, you can do things like enforce Tags, enforce regions, etc..
+- SCP's only define the ***maximum permissions*** for an account, they don't grant any permissions
+    - So if an SCP allows `s3:*` but the IAM policies in the account don't allow anything, then no one can access S3
 
 ![SCP Hierarchy](/img/scp_hierarchy.png)
 - In the example above what will happen if you `Deny Athena` in the Management Account SCP?
@@ -270,13 +371,20 @@ Allows us to check what resources are allowed externally, so you can establish a
 ### AWS Control Tower
 AWS Control Tower helps to automate and establish multiple accounts under a management OU following best practices and supplying interactive dashboards
 
+AWS CT is a service that helps you setup and govern a secure, multi-account AWS env known as a "landing zone" based on AWS best practices - it automates the setup of your environment using AWS Organizations, AWS IAM Identity Center (AWS SSO), and other AWS services to help you manage your accounts, apply policies, and monitor compliance
+
 Guardrails in AWS control tower provide ongoing Governance solutions
-- Preventative methods via SCP's
-- Detective methods via AWS Config
+- ***Preventative*** methods via SCP's
+- ***Detective*** methods via AWS Config
 - Types:
     - Mandatory
     - Strongly Recommended
     - Elective
+
+Missed a lot of things in QnA about Control Tower, but it's basically a way to quickly setup an AWS Organization with multiple accounts following best practices - it helps with governance, preventative guardrails, and detective guardrails:
+- Governance at scale means we can apply policies and controls across multiple accounts
+- ***Preventative*** guardrails use SCP's to prevent actions across all accounts as universal rules
+- ***Detective*** guardrails use AWS Config to monitor compliance and report violations across accounts
 
 #### AWS Resource Access Manager
 - AWS Resource Access Manager (RAM) allows us to share AWS reosources that you own with other AWS accounts

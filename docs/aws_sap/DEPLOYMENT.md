@@ -10,6 +10,10 @@ show_back_link: true
 This section is all around how to deploy and manage code, applications, and machines
 
 ## Elastic Beanstalk
+Beanstalk = PaaS, it helps us deploy and manage applications without worrying about the underlying infrastructure. Like actual full stack web applications with backend, frontend, DB, etc...
+
+You'll still need to write and manage your application code, but Beanstalk handles the deployment, capacity provisioning, load balancing, auto-scaling, and application health monitoring
+
 - Elastic Beanstalk is a developer centric view of deploying an application on AWS
 - Helpful for porting on-prem to cloud with minimal changes
     - If you can dockerize your container, you can deploy on Beanstalk
@@ -34,6 +38,19 @@ This section is all around how to deploy and manage code, applications, and mach
         - Can use a new environment (green) and validate independently
         - Use Route53 weighted routing to redirect small amounts of tradffic to Green, and shift over time
         - Beanstalk "Swap URLS" DNS Swap feature
+- Parameters
+    - Environment properties
+        - Key/Value pairs that are passed to app as env variables
+    - Environment
+        - Manages size of instances, scaling policies, rolling updates, etc...
+    - Application versions
+        - Each deploy is a new application version
+        - Stored in S3 bucket
+        - Can roll back to previous versions easily
+    - Monitoring
+        - Integrated with CloudWatch
+        - Health status of instances and app
+        - Enhanced health monitoring for more metrics and data
 
 ## Code Deploy
 - Helps us to Deploy code!
@@ -148,6 +165,7 @@ This section is all around how to deploy and manage code, applications, and mach
     - Allows for scripting and updating of hundreds of instances across cloud and on-prem
     - Integrated with IAM and CloudTrail
     - No need for SSH!
+    - Allows up to 5 admins to connect to 1,500 instances concurrently
     - Rate Control (how fast to run over instances) + Error control (what to do on failure)
     - SSM agent ensures all of this can be done on the machine from calling party
 - Common use cases:

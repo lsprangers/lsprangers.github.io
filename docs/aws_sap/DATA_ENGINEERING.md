@@ -449,6 +449,13 @@ It is a specific instantiation of Kinesis Data Streams
     - Snapshot is encrypted at rest in S3
     - Need to do a `snapshot copy grant` from source region to failover region, and copy key over from Region A to Region B
     - Then you can copy snapshot physically over into new region, and use the copied over encryption key in Region B to access the data
+- Terms:
+    - RTO: Recovery Time Objective
+        - How long it takes to recover
+    - RPO: Recovery Point Objective
+        - How much data you can afford to lose
+        - Relates to snapshot backup frequency
+    
 
 ### Redshift Spectrum
 - Query data that's already in S3 without loading it

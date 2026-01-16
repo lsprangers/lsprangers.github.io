@@ -24,6 +24,8 @@ Basically just Tagging
 - Search tagged / untagged resources in all AWS Regions
 
 ### Trusted Advisor
+Trusted Advisor is a service that provides real time guidance to help provision your resources following AWS best practices. It helps you to reduce cost, increase performance, and improve security by optimizing your AWS environment. It's different from AWS Config, which is more about compliance and configuration management
+
 - No need to install anything
 - Gives high level account assessment
 - Analyzes and provides recommendation for:
@@ -72,7 +74,7 @@ Basically just Tagging
     - Can define Host Affinity so that instance reboots are kept on same host
 
 ### AWS Savings Plan
-- New pricing model to get a discount based on long-term usage
+New pricing model to get a discount based on long-term usage
 - Commit to a certain type of usage
     - $10 / hour for 1 to 3 years
     - Anything beyond is based on the on-demand pricing
@@ -136,7 +138,7 @@ Basically just Tagging
         - So if you create the role, and they assume it, then you'll end up paying
 
 ### AWS Budgets
-- Create budgets and send alarms when cost exceeds the budget
+Create budgets and send alarms when cost exceeds the budget
 - 4 types of budgets: 
     - Usage
     - Cost
@@ -148,12 +150,19 @@ Basically just Tagging
 - Up to 5 SNS notifications per budget
 - Can filter by many tag and metadata values
 - Same options as AWS Cost Explorer
+    - Cost explorer tracks usage and reports over a 14 month period
+    - Cost reports can send notifiactions based on usage and cost
+        - There are up to 50 tags per EC2 instance, and these can be used to filter down reports to track usage
 - Runs actions for you when budget exceeds a certain threshold
     - Budget service itself will run some compute
     - Supports 3 action types:
         - Apply IAM policy to a user, group, or IAM role
         - Apply an SCP to an OU
         - Stop EC2 or RDS instances
+
+Savings Plans and Reserved Instances can be tracked here too - they are different in scope, but similar:
+- Reserved Instances are for specific instance types within a region, whereas Savings Plans are more flexible and can apply to various instance types and regions based on your usage commitment
+- Savings plans mean you're committing to a certain amount of usage ($/hour) for a 1 or 3 year period, whereas Reserved Instances are committing to specific instance types and configurations for a 1 or 3 year period
 
 ### AWS Compute Optimizer
 - Can help us with right sizing EC2 instances based on metrics around CPU, RAM, Network, Disk, etc...
