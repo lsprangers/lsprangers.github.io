@@ -266,16 +266,16 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
 #### Decoder
 The decoder is a much more interesting part to focus on, as it starts to incorporate many new architectures that will eventually underpin things like [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) and contextual embeddings
 
-At each time step $t^{'}$ the decoder assigns a probability to each possible token in the vocabulary, and the probability is conditioned upon previous output tokens $\{y_{[0]}, y_{[1]}, ... , y_{[t^{'} - 1]} \}$, the previous hidden state $h_{[t^{'} - 1]}$, and the encoder hidden state context variable $c$
+At each time step $t'$ the decoder assigns a probability to each possible token in the vocabulary, and the probability is conditioned upon previous output tokens $\{y_{[0]}, y_{[1]}, ... , y_{[t' - 1]} \}$, the previous hidden state $h_{[t' - 1]}$, and the encoder hidden state context variable $c$
 
 $$
-h_{[t^{'}]} = g(h_{[t^{'} - 1]}, y_{[t^{'} - 1]}, c)
+h_{[t']} = g(h_{[t' - 1]}, y_{[t' - 1]}, c)
 $$
 
-After getting the hidden state for current time $t^{'}$, we can use an output layer and softmax operation to compute the predictive distribution 
+After getting the hidden state for current time $t'$, we can use an output layer and softmax operation to compute the predictive distribution 
 
 $$
-P(y_{[t^{'}]} | y_{[0]}, y_{[1]}, ... , y_{[t^{'} - 1], c) = f(h_{[t - 1]}, y_{[t^{'} - 1]}, c)
+P(y_{[t']} | y_{[0]}, y_{[1]}, ... , y_{[t' - 1], c) = f(h_{[t - 1]}, y_{[t' - 1]}, c)
 $$
 
 Below python script showcases some of this:
@@ -341,7 +341,7 @@ This best probability is usually found via the ***beam search algorithm***, whos
 ##### Beam Search
 Beam search is a method for decoding a sequence given an auto-regressive function that outputs a probability distribution over the next possible symbols - in this scenario it's specifically focusing on how to choose a word from an output probability distribution in an encoder-decoder seq2seq model architecture
 
-For any time $t^{'}$ the decoder outputs predictions representing the probability of each token in the vocabulary coming next in the sequence, and it's conditioned on the previous tokens, $\{y_{[0]}, y_{[1]}, ... , y_{[t^{'} - 1]} \}, along with the context variable $c$. If we denote $V$ as the output vocabulary list, we can also define the max number of tokens of an output sequence as $T^{'}$
+For any time $t'$ the decoder outputs predictions representing the probability of each token in the vocabulary coming next in the sequence, and it's conditioned on the previous tokens, $\{y_{[0]}, y_{[1]}, ... , y_{[t' - 1]} \}, along with the context variable $c$. If we denote $V$ as the output vocabulary list, we can also define the max number of tokens of an output sequence as $T'$
 
 The goal of beam search is to search for an ideal output from all $O(|V^T|)$ possible output sequences
 
@@ -349,7 +349,7 @@ The goal of beam search is to search for an ideal output from all $O(|V^T|)$ pos
 
 ***Exhaustive Search*** would look to generate all possible combinations of output tokens, and then run probability distributions over all combinations in the resulting set. If there are 100 words in our vocabulary with max sentence size of 20, we'd need to run $100^20$ simulations, which is well beyond the capabilities (and frankly wasteful)
 
-So greedy search is extremely cheap at $O(|V| \times T^{'})$, but is sub-optimal, and exhaustive search is extremely compute intensive, and so beam search looks to bridge the gap inbetween 
+So greedy search is extremely cheap at $O(|V| \times T')$, but is sub-optimal, and exhaustive search is extremely compute intensive, and so beam search looks to bridge the gap inbetween 
 
 Beam search itself is characterized, mostly, by a hyperparameter *beam size k*
 - At step 1 we choose $k$ tokens with the highest predicted possibilities
