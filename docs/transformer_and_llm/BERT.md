@@ -96,7 +96,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - Basically it's a representation of our token's actual word embedding, it's sentence, and it's position in the sentence
     - TODO: `[CLS]` token is just at the front - I thought this wold be at the end? Why would you use the final hidden layer of the first token?
     - Even though `[CLS]` is at the front of a sentence, it's still a useful token to use for the final hidden layer as it will contain all of the information for the rest of the sentence - since BERT is bidirectional using the start or ending word should be equivalent
-- ![Input Representation](./images/input_representation.png)
+- ![Input Representation](/img/input_representation.png)
 
 #### Masked Language Modeling Architecture
 - ***Training Objective:*** to predict the masked word via `MAX(softmax_score)`!

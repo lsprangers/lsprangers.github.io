@@ -24,7 +24,7 @@ All of these Attention mechanisms are tunable matrices of weights - they are lea
 
 Below shows an example of how an embedding like creature would change based on surrounding context
 <!-- ![Bert, GPT, BART](/img/bert_gpt_bart.png) -->
-![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
+![Fluffy Blue Attention](/img/fluffy_blue_creature.png)
 
 ### Keys, Queries, and Values Intuition
 Lots of the excerpts here are from the [D2L AI Blog on Attention](https://d2l.ai/chapter_attention-mechanisms-and-transformers/queries-keys-values.html)
@@ -294,7 +294,7 @@ All of the above are solved via the Transformer Architecture itself outside of S
 #### Example
 Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning.
 
-![Fluffy Blue Attention](./images/fluffy_blue_creature.png)
+![Fluffy Blue Attention](/img/fluffy_blue_creature.png)
 
 #### How Self Attention Works
 TLDR;
@@ -311,7 +311,7 @@ TLDR;
    - you multiple them together + softmax
    - Multiply the result of that by each Value vector on the bottom
 
-![SelfAttention](./images/self_attention.png)
+![SelfAttention](/img/self_attention.png)
 
 In depth mathematical explanation below
 
@@ -321,7 +321,7 @@ In depth mathematical explanation below
      $
      q_i = x_i \cdot W_Q, \quad k_i = x_i \cdot W_K, \quad v_i = x_i \cdot W_V
      $
-![QKV](./images/qkv.png)
+![QKV](/img/qkv.png)
 2. **Self-Attention Calculation**:
    - **Step 1**: Compute attention scores by taking the dot product of the Query vector $ q_i $ with all Key vectors $ k_j $:
      $
@@ -344,7 +344,7 @@ In depth mathematical explanation below
      $
      Z_i = \sum_j \text{Attention Weight}_{ij} \cdot V_j
      $
-![Attention Calc](./images/attention_calc.png)
+![Attention Calc](/img/attention_calc.png)
 3. **Output**:
    - The output $ Z_i $ is a context-aware representation of the word $ i $, influenced by its relationship with other words in the sequence.
 
@@ -356,7 +356,7 @@ In depth mathematical explanation below
      $
      Z = \text{Concat}(O^{(head_1)}, O^{(head_2)}, \dots) \cdot W_O
      $
-![Multi Headed Attention](./images/multi_attn.png)
+![Multi Headed Attention](/img/multi_attn.png)
 
 #### Positional Encoding
 
@@ -365,7 +365,7 @@ In depth mathematical explanation below
 - **Why is ***sinusoidal*** relevant and useful?**
    - Allows Transformer to learn relative positions via linear functions (e.g., $\text PE_{pos+k}$​ can be derived from $\text PE_{pos}$)
    - you all know neural nets like linear functions! So it's helpful in ensuring a relationship that's understandable 
-![Positional Encoding](./images/positional_encoding.png)
+![Positional Encoding](/img/positional_encoding.png)
 
 #### Residual Connections and Normalization
 
@@ -379,7 +379,7 @@ In depth mathematical explanation below
 - **Why is any of this useful**:
    - Helps with gradient vanishing and exploding, and also ensures input stability
 
-![Self Attention Encoding](./images/summary_self_attention_encoding.png)
+![Self Attention Encoding](/img/summary_self_attention_encoding.png)
 
 #### Summary of Self Attention Encoding
 
@@ -415,14 +415,14 @@ In depth mathematical explanation below
 ___ 
 This diagram below shows one single encoding block using Self Attention
 
-![Self Attention Encoding](./images/summary_self_attention_encoding.png)
+![Self Attention Encoding](/img/summary_self_attention_encoding.png)
 
 #### Masked Self Attention
 - In Masked Self Attention, it's the same process as Self Attention except you mask a certain number of words so that the $ Q \cdot K $ results in 0 effectively removing it from attention scoring
     - In BERT training you mask a number of words inside of the sentence
     - In GPT2 training you mask all future words (right hand of sentence from any word)
    
-![Masked Self Attention](./images/masked_self_attention.png)
+![Masked Self Attention](/img/masked_self_attention.png)
 
 #### Context Size and Scaling Challenges
 
@@ -440,7 +440,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
 
 #### How Encoder-Decoder Attention Works
 
-![Encoder To Decoder Summary](./images/encoder_to_decoder.png)
+![Encoder To Decoder Summary](/img/encoder_to_decoder.png)
 
 1. **Encoder**:
    - The Encoder Portion is completely described by what you wrote above in [Summary of Self Attention Encoding](#summary-of-self-attention-encoding)
@@ -467,11 +467,11 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
    - Each block contains:
      - **Self Attention Layer**: Captures relationships within the input sequence
      - **Feed Forward Layer**: Processes each token independently
-    - ![Encoder Block](./images/summary_self_attention_encoding.png)
+    - ![Encoder Block](/img/summary_self_attention_encoding.png)
 
 
 2. **Decoder**:
-![Encoder to Decoder Summary](./images/encoder_to_decoder.png)
+![Encoder to Decoder Summary](/img/encoder_to_decoder.png)
    - The decoder generates the output sequence one token at a time, using both the encoder's output and its own previous outputs
    - **Input**:
       - The ***contextual embeddings*** output from the final Encoding Layer
@@ -529,7 +529,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
 
 3. **Final Decoder Output**:
    - The final decoder output is passed through a linear layer and softmax to produce the next token.
-![Encoder Decoder Step](./images/encoder_decoder_step.png)
+![Encoder Decoder Step](/img/encoder_decoder_step.png)
 
 #### Summary of Encoder-Decoder Attention
 
@@ -547,7 +547,7 @@ Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., transl
 
 4. **Training**:
    - The model is trained using [cross-entropy loss](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) and [KL divergence](/docs/training_and_learning/LOSS_FUNCTIONS.md#kl-divergence), with each token in the output sequence contributing to the loss.
-![EncoderDecoder Output](./images/encoder_decoder_output.png)
+![EncoderDecoder Output](/img/encoder_decoder_output.png)
 
 ## Vision Transformers (ViT)
 In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training

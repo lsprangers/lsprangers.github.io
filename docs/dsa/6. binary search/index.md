@@ -9,19 +9,52 @@ show_back_link: true
 
 ## Binary Search
 
-$O(\log n)$ lookup on sorted array!
+$O(\log n)$ lookup on sorted search space!
 
-The entirety of binary search is around being able to find something in $O(\log n)$ time because our data structure is sorted in some way - whether it's a Tree, a List, or the number line (integers)
+The entirety of binary search is around being able to find something in $O(\log n)$ time because our data structure is sorted in some way - whether it's a Tree, a List, or a generic search space like the number line (rate of X, number of Y, etc... are just integers that are sorted)
 
 At each step of the way you shrink the search space by half because you know the data structure is sorted in some way - if you were looking for a word in the dictionary that starts with D and you randomly flipped to the letters N, we'd look to the left
 
-Most of the time, BSearch is "faster" because it will beat out $O(n^2)$
+If you have some search space, lets say an array `arr` and there's an element `x`, then you can find the index `idx` of `x` in `arr` in $O(\log n)$ time and $O(1)$ space. Most of the time, searching via binary search is faster because it will beat out $O(n)$
 
-Why is it $\log(n)$? Mostly because if there are $n$ elements, and you are constantly splitting it in half, we'll do at most $\log(n)$ searches
-$\log(n) = x \rarr 2^x = n$ 
+Why is it $\log(n)$? Mostly because if there are $n$ elements, and you are constantly splitting it in half, then you'll do at most $\log(n)$ searches:
+$\log(n) = x \rarr 2^x = n$
 
 I guess that's just repeating the same thing twice - here's a photo:
 ![Binary Search](/img/bsearch.png)
+
+### Intuition
+If you have a sorted `arr`, and you have it's start and end indexes `left, right` you can continuously check the middle `mid = left + right // 2`, and based on `mid` relation to your target you can shrink the search space in half. If `mid > target`, that means you want to focus to the left and you'll change `right = mid - 1`, and if `mid < target`, that means you want to focus to the right and you'll change `left = mid + 1`
+
+In Java or Cpp you'd use `left + (right - left) / 2` so that, in case `right = INT_MAX`, you don't store something larger than it which would overflow
+
+The template in Python pretty much does  just that:
+```python
+def binary_search(arr, target):
+    left = 0
+    right = len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if check(mid, arr, target):
+            # do something
+            return
+        if arr[mid] > target:
+            right = mid - 1
+        else:
+            left = mid + 1
+    
+    # target is not in arr, but left is at the insertion point
+    return left
+
+def check(idx, arr, target):
+    return(
+        arr[idx] == target
+    )
+```
+
+The main difference is what you return, and how you update your search space:
+- If you want to return the exact index you can do that, or you can return an insertion point of where something new should be placed
+- You can update your search space based on finding any match, the unique exact match, the first match of some kind, or the last match of some kind
 
 ### Typical Problem Statements
 Some will outright say "find this value in a sorted list" which makes things easy, most won't
@@ -36,10 +69,11 @@ Other ways to describe it"
 Most of these solutions will involve a `check()` function, where you will propose some item in the search space, like an index or other value, and then quickly check if that value works
 
 For the capacity to ship packages problem, the `check()` function revolves around checking if the weight capacity can cover the shipping requirements - the `check()` funciton itself runs in $O(n)$ time so it seems slow, but ultimately it's still fast compared to other routes
+- In the above classic case, `check()` is just comparing the element at `arr[idx]` to `target`
 
 The reason this is "fast" is that in $O(\log(n))$ time you can propose capacity values, and then for each of them it takes $O(n)$ time to check so the overall solution is $O(n \cdot \log(n))$. This is faster than iterating from 1 to 2 to 3... capacity which would result in $O(n^2)$
 
-## Typical Patterns And Pitfalls
+### Typical Patterns And Pitfalls
 There are some typical patterns pitfalls that annoyingly come up in almost every review
 
 The main questions to ask:
@@ -47,9 +81,49 @@ The main questions to ask:
 - What does `check(mid)` mean?
 - What is the goal (min valid, max valid, exact match)?
     - This will alter the return
-- When is mid good/bad? Adjust low/high accordingly
-    - This will alter our `low = ` and `high =` updates
-- Do you return low, high, or mid?
+- When is mid good/bad? Adjust left/right accordingly
+    - This will alter our `left = ` and `right =` updates
+- Do you return left, right, or mid?
+
+### Duplicates
+If an input array has duplicates, then you need to tweak the `check()` function to try and find the first or last position of the desired target
+
+If you have `arr = [3, 4, 5, 5, 6, 7]`
+- `left = 0`
+- `right = 5`
+- `mid = 2`, therefore, `mid` points to the leftmost 5
+
+Need to now change `check()` to use `arr[mid] >= target` - If we want to find the left most value, i.e. the "first occurrence", and we find a `mid` that matches our target, what do we need to do? We need to move our search space to maximum mid, and keep searching the leftern side for move values - i.e. `right = mid`
+
+```python
+def binary_search(arr, target):
+    left = 0
+    right = len(arr)
+    while left < right:
+        mid = (left + right) // 2
+        if check(mid, arr, target):
+            right = mid
+        else:
+            left = mid + 1
+
+    return left
+
+def check(idx, arr, target):
+    return(
+        arr[idx] >= target
+    )
+```
+
+### Insertion vs Index
+If we are looking to find the insertion index, there's a slight tweak versus finding a specific index and it mostly comes down to how you alter the `check()` function...as usual...and then the pointer that's returned
+
+Insertion looks to:
+- Find the first index where `arr[idx] > target`, ***and so our `check()` function would be `arr[mid] > target`***
+- Find the first index where `arr[idx] >= target` (similar to `bisect_left`), ***and so `check()` function would be `arr[mid] >= target`***
+ 
+In either case, you would return `left` at the end which should give you the first entry in which target can be inserted so that the array is still sorted
+
+## Old
 
 | Goal / Pattern                              | `mid` Calc                          | `low` Update                       | `high` Update                      | Loop Condition      | Return  | Notes                                                                 |
 | ------------------------------------------- | ------------------------------------ | ------------------------------------ | ------------------------------------ | ------------------- | ------- | --------------------------------------------------------------------- |
@@ -57,6 +131,25 @@ The main questions to ask:
 | **Find first `x` such that condition(x)**   | `(low + high) // 2` (**bias left**)  | `low = mid + 1` if false             | `high = mid` if true                 | `while low < high`  | `low`   | **Lower bound** - shrink right side when mid is valid                 |
 | **Find last `x` such that condition(x)**    | `(low + high + 1) // 2` (**bias right**) | `low = mid` if true                  | `high = mid - 1` if false            | `while low < high`  | `low`   | **Upper bound** - shrink left side when mid is invalid; bias prevents infinite loop |
 
+### Intuition of Each Goal
+The 3 above goals are easy enough to memorize, but intuition is key for having to do this crap in an interview
+
+When an array is sorted and you want to find `x`, you know that if you land on some `y` and `y > x`, then `x` must be to the left of it, same thing with `y < x` meaning `x` is to the right
+
+That's really all we have to think about for classic binary search:
+- `mid`is the answer, so we return it
+- It's to the left `high = mid - 1`
+- It's to the right `low = mid + 1`
+
+We can do `while low <= high` because on the offchance `low = high` we are just checking that specific value, and if that fails then everything's broken and we can't find it so we return `-1`. At that point the ***`low` pointer would be at the index `x` is supposed to be inserted to keep the array sorted***
+
+The find first or find last methods are used where there's potentially more than one answer, there isn't an exact match, or there are duplicate elements
+
+To find the left most index, sometimes the "find first" or "find min that allows" type, when we shrink the search space we focus on `arr[mid] >= target`. If that's the case it means either:
+- It equals the target, which is great but there may still be more valid values to the left
+- It is greater than the target, so we want to restrict to the left 
+
+The main part to focus on is equals to - if the value is the only valid value, we'd want to return it, but we can't hardcode that into the solution so this handles both unique existence, and potential for another valid value to the left to exist
 
 
 ### Classic Binary Search
@@ -65,14 +158,21 @@ This will find the first exact match, and only returns `mid` if it finds it
 `mid + 1` because you just checked mid, and you know it's not involved, `mid - 1` because of the same logic
 
 ```python
-while low <= high:
-    mid = (low + high) // 2
-    if arr[mid] == target:
-        return mid
-    elif arr[mid] < target:
-        low = mid + 1
-    else:
-        high = mid - 1
+def binary_search(arr, target):
+    left = 0
+    right = len(arr) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            # do something
+            return
+        if arr[mid] > target:
+            right = mid - 1
+        else:
+            left = mid + 1
+    
+    # target is not in arr, but left is at the insertion point
+    return left
 ```
 
 #### Example 1: Even Number of Elements

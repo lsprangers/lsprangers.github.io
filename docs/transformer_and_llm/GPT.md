@@ -29,7 +29,7 @@ The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6
 
 The number of decoder blocks + context size is one of the distinguishing factors in GPT models as well
 
-![GPT Sizes](./images/gpt_sizes.png)
+![GPT Sizes](/img/gpt_sizes.png)
 
 While the largest T5 model has 11 billion parameters, GPT-3 has 175 billion parameters. Moreover, the training data set contains around 500 billion tokens of text, while the average young american child hears around 6 million words per year.
 
@@ -47,7 +47,7 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
     - ***Auto Regressive***:
         - The way these models actually work is that after each token is produced, that token is added to the sequence of inputs. And that new sequence becomes the input to the model in its next step.
         - This means that you don't encode everything from before and after, you can use the prompt as input and then each generated word is also included in the future generation
-        - ![AutoRegressive](./images/auto_regressive_generation.png)    
+        - ![AutoRegressive](/img/auto_regressive_generation.png)    
 - ***Output***:
     - Compare our output embedding, which has been attended to, with our vocabulary list to create probability distribution over all words
     - Use the `top_k` parameter and select words from the resulting sample set for our output generated word
@@ -72,14 +72,14 @@ Unlike the Decoder Block in Encoder-Decoder, the Decoder blocks in Decoder-Only 
     - Masked Self Attention
     - Feed Forward NN
 
-![Transformer Decoder Only Block](./images/decoder_only_block.png)
+![Transformer Decoder Only Block](/img/decoder_only_block.png)
 
 #### Logits Output
 After an embedding has gone through Masked Self Attention, and the Decoder(s) have output an attended to representation of the next word to generate, you must compare that to the known vocabulary you have
 
 In this step you multiple our embedded output vector by our vocabulary, and then get a numeric probability for each potential output word
 
-![Output Choice](./images/decoder_output_choice.png)
+![Output Choice](/img/decoder_output_choice.png)
 
 ##### Output Parameters
 - ***Top-K***: Choosing a set of words to sample from for our final output
