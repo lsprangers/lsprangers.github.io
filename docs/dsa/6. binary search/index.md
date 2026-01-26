@@ -274,7 +274,7 @@ The proof of why this is an insertion point is :
 - Imagine if `arr[mid] < target`
     - We know all `arr[:mid]` are also `< target`
     - So we update `left = mid + 1`
-- If `arr[mid] > target`, then all elemennts at indices `>= mid` are also `> target`
+- If `arr[mid] > target`, then all elements at indices `>= mid` are also `> target`
     - `right = mid - 1`
 - If we're at some `mid` such that `left > right`, then we will know that 
     - All elements to the left of `left` are `< target`
@@ -285,6 +285,7 @@ The proof of why this is an insertion point is :
         - `[1, 3, 5, 8, 9]`, if the target is `7`, the first `mid` index would be `0 + 5 // 2 = 2`, and `5 < 7` so `left = 3`. At this point every check will be between on numbers where the minimum range starts at index 3 which is 8
         - Left will never be updated again, right will continually scrunch down until it's less
 - Therefore, the reason left is the insertion point is the only way `left` is ever updated, is if we're sure everything `arr[:mid]` at some point is always less than it, and then we place left pointer one before. If it's the insertion point, we'll never find an answer and it'll just stay there forever
+
 
 ### Minimize
 In this scenario it all comes down to **Minimize k such that condition(k) is True**
@@ -313,6 +314,23 @@ while left < right:
         left = mid + 1
 return left
 ```
+
+Another point to mention here is setting `right = len(arr)` - there's a chance that `target` is greater than every single number in the `arr`. In that scenario we would continuously update `left = mid + 1`, and at some point either `left = right = len(arr)`, or `left = len(arr) - 1`:
+1. If `left = right = len(arr)`, then returning `left` is fine as we'd return 5 for the below array
+    - `[0, 1, 2, 3, 4]`
+    - The insertion point of this array truly is `idx = 5`, but that `idx` just doesn't exist
+2. If `left = len(arr) - 1`, then `left < right` still
+    - `mid = left + (right - left) // 2` $\rarr$ `len(arr) - 1 + (len(arr) - (len(arr) - 1)) // 2` $\rarr$ `2 * len(arr) // 2 = len(arr)`  so `mid = len(arr) = right`
+    - At this point `arr[mid]` would have an `ArrayIndexOutOfBounds` error
+        - `left = len(arr) - 1`
+        - `right = len(arr) = mid`
+        - `check(mid)` would fail
+- Nevermind, I'm wrong about portion 2.
+    - Weirdly enough `left` will never become `len(arr) - 1` in either even or odd situation here - at some point `mid` always becomes `len(arr) - 1`, and so when `left` updates it becomes `left = right = len(arr)` and so the loop returns 
+    - Intuition on why scenario 2 never happens during an open interval (`right = len(arr), left < right`) binary search:
+        - I screwed up the order of operations - `(right - low) // 2` would be evaluated before being added to `low`
+        - `len(arr) - (len(arr) - 1) // 2` $\rarr$ `1 // 2` which would truncate to 0, so `mid = len(arr) - 1`
+    - TODO: Update section 2 above and re-explain all this crap... f bsearch it's so stupid why didn't I just take notes in college
 
 #### Example: Find First Element $\ge$ Target
 
