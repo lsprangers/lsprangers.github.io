@@ -54,7 +54,7 @@ Lastly that'd pop off, it would return, and we'd get into backtrack(2, [1, 5]) -
 ### Indexes
 Using indexes is an easy way to loop through all permutations of some size $k$
 
-A good example where this fails is [Maximum Score Subsequence Size K](/docs/leetcode/python/maximumSubsequenceScore.md) where you go through all ${n \choose k} = {{n!} \over {k!} \cdot {(n-k)!}}$ possibilities and get a TLE exception
+A good example where this fails is [Maximum Score Subsequence Size K](/docs/leetcode_coderpad/leetcode/python/maximumSubsequenceScore.md) where you go through all ${n \choose k} = {{n!} \over {k!} \cdot {(n-k)!}}$ possibilities and get a TLE exception
 
 ```python
 def problem(self, arr: List[int], size: int):

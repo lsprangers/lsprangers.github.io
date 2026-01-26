@@ -33,7 +33,7 @@ Why this makes sense is because at any point you can "drag along" info from prev
 
 Substrings must be ***contiguous***, but since subsequences aren't there are times you may want to compare two different subsequences - that is typically done in the dynamic programming 2D chart arrangement
 
-[This Leetcode solution](/docs/leetcode/python/longestCommonSubsequence.md) showcases the below setup
+[This Leetcode solution](/docs/leetcode_coderpad/leetcode/python/longestCommonSubsequence.md) showcases the below setup
 - String A: `abcde`
 - String B: `acfe`
 - Matrix $M$ of rows $i$ and columns $j$ for $str_a$ and $str_b$
@@ -53,4 +53,4 @@ Substrings must be ***contiguous***, but since subsequences aren't there are tim
 | e | 0 | 1 | 2 | 2 | **3** | 
 
 
-[The Longest Increasing Subsequence](/docs/leetcode/python/longestIncreasingSubsequence.md) is another good problem showcasing subsequences and `dp` recurrence relations. In this there's even [a way to use binary search to make it $O(N \dot \log(N))$](/docs/leetcode/python/longestIncreasingSubsequence.md#binary-search)
+[The Longest Increasing Subsequence](/docs/leetcode_coderpad/leetcode/python/longestIncreasingSubsequence.md) is another good problem showcasing subsequences and `dp` recurrence relations. In this there's even [a way to use binary search to make it $O(N \dot \log(N))$](/docs/leetcode_coderpad/leetcode/python/longestIncreasingSubsequence.md#binary-search)

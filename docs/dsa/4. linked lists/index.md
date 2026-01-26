@@ -31,7 +31,7 @@ do_something_here(slow.next)
 return(resp.next)
 ```
 
-There's an example of [Deleting The Middle Node Of A Linked List](/docs/leetcode/python/deleteMiddleNodeOfLinkedList.md) that does just this!
+There's an example of [Deleting The Middle Node Of A Linked List](/docs/leetcode_coderpad/leetcode/python/deleteMiddleNodeOfLinkedList.md) that does just this!
 
 ### Reversal
 Reversing a Linked List involves using temporary node holders and then just swapping prev and next values along the way

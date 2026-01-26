@@ -1,11 +1,11 @@
 ---
-title: slidingWindowMaximum
+title: maxSlidingWindow
 category: Leetcode Solutions
 difficulty: Advanced
 show_back_link: true
 ---
 
-# slidingWindowMaximum
+# maxSlidingWindow
 
 Summary:
 - you use a monotonic decreasing deque, which implies that the first element is the maximum.

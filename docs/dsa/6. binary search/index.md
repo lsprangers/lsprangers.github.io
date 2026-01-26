@@ -66,7 +66,7 @@ Other ways to describe it"
 - Given a threshold k, what’s the minimum time each train / meal would take to finish
 - Find an element in an array that's been sorted, and then rotated
 - Capacity to ship packages within $D$ days (f' this one)
-    - [Solution](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md)
+    - [Solution](/docs/leetcode_coderpad/leetcode/python/capacityToShipPackagesWithinDDays.md)
 
 Most of these solutions will involve a `check()` function, where you will propose some item in the search space, like an index or other value, and then quickly check if that value works
 
@@ -155,7 +155,7 @@ class Solution:
     - All elements to the left of the index (`a[:i]`) are less than or equal to x
     - All elements to the right of the index (`a[:i]`) are greater than x
 
-The [Longest Subsequence With Prefix Sum Problem](/docs/leetcode/python/longestSubsequenceWithLimitedSum.md) utilizes `bisect_right` to find the length of the longest subsequence that's less than or equal to a certain query
+The [Longest Subsequence With Prefix Sum Problem](/docs/leetcode_coderpad/leetcode/python/longestSubsequenceWithLimitedSum.md) utilizes `bisect_right` to find the length of the longest subsequence that's less than or equal to a certain query
 - After calculating the prefix sum, the length of longest subsequence is equal to the last index of the prefix sum where we could insert the query 
 - If the pfx sum has `[1, 4, 7, 8]`, and our query is 6 or 7, we'd want to return 2
 
@@ -190,8 +190,8 @@ Statement 1. references the ability to quickly do things, as the `check()` funct
 Problems finding a min / max are actually searching for this magic threshold that separates possible from impossible, and that magic threshold is what we're trying to obtain as our output of binary search
 
 Establishing the solution space is typically the hardest part - if you're looking for a min/max rate, how can you decide what "max" is? 
-- In [Koko Eating Bananas](/docs/leetcode/python/kokoEatingBananas.md) Koko only eats a pile at a time maximum, and so the maximum rate can only be the maximum of the piles `max(piles)`
-- In [Capacity Planning](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md) you can ship as many packages as possible with a specific rate, but the most weight you could process in a single day is the entire weight, so the maximum rate is `sum(weights)`
+- In [Koko Eating Bananas](/docs/leetcode_coderpad/leetcode/python/kokoEatingBananas.md) Koko only eats a pile at a time maximum, and so the maximum rate can only be the maximum of the piles `max(piles)`
+- In [Capacity Planning](/docs/leetcode_coderpad/leetcode/python/capacityToShipPackagesWithinDDays.md) you can ship as many packages as possible with a specific rate, but the most weight you could process in a single day is the entire weight, so the maximum rate is `sum(weights)`
 
 The solution space can be defined by $k$ which represents the range of the solution space - sometimes it's $[0, k]$, sometimes it's $[\text{min}, \text{max}]$ where $k = \text{max} - \text{min}$, etc...
 
@@ -204,7 +204,7 @@ The entire intuition of when to do `left < right`, `left <= right`, `return left
 
 When returning minimums, you `return left` - why?
 
-When returning maximums, you `return right` - the [Find Divisor Problem](/docs/leetcode/python/findSmallestDivisorGivenAThreshold.md) is an example of that
+When returning maximums, you `return right` - the [Find Divisor Problem](/docs/leetcode_coderpad/leetcode/python/findSmallestDivisorGivenAThreshold.md) is an example of that
 
 When you want to check even if `left = right` you use `left <= right` - typically this is only used during exact matches, to find minimums or maximums you just do `left < right` - why?
 
@@ -449,7 +449,7 @@ else:
 because if you find the number 6, which is above the first element 4, you know our inflection point is still to the right of us
 
 ### Find A Rate
-There are some specific problems like [KoKo Eating Bananas](/docs/leetcode/python/kokoEatingBananas.md) and Elves on Package Line where you basically need to find a rate of something, and then check if that rate suffices
+There are some specific problems like [KoKo Eating Bananas](/docs/leetcode_coderpad/leetcode/python/kokoEatingBananas.md) and Elves on Package Line where you basically need to find a rate of something, and then check if that rate suffices
 
 Koko's eating rate, maybe it's 3 bananas-per-hour, and if that works then we'd look if a higher rate would suffice like 10-per-hour, etc...
 

@@ -320,7 +320,7 @@ This theoretical discussion is useful, but in large scale processing graph trave
 ### Maze
 Maze's are a special kind of graph where you essentially have a connected 2-D diagram
 
-Most common examples are [Finding The Nearest Exit](/docs/leetcode/python/nearestExitFromEntranceInMaze.md) or something similar, where you will use Breadth First Search to traverse outwards checking over the course of a structure
+Most common examples are [Finding The Nearest Exit](/docs/leetcode_coderpad/leetcode/python/nearestExitFromEntranceInMaze.md) or something similar, where you will use Breadth First Search to traverse outwards checking over the course of a structure
 
 ### UnionFind / Disjoint Set union
 - Union Find is a data structure that allows us to find a representation of clusters in a disconnected graph

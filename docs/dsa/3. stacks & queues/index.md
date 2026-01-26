@@ -14,18 +14,28 @@ Stacks are Last In First Out (LIFO) data structures, whose elements are only acc
 
 Typical Operations:
 - ***Push***: Add an element to the end
+    - Pushing in Python refers to `my_list.append(n)`, where you append to the end of a list
 - ***Pop***: Access, and remove, element at the end
+    - `last = my_list.pop()` will retrieve the last element and remove it from the list
 - ***Peek***: Look at / access element at the end
+    - `my_list[-1]` allows us to see latest element in stack
+    - `my_list.peek()` would also be a reference to `tail` if implemented as linked lists
 
 Most of the time you will use them in paired matching problems such as:
-- [Valid Parenthesis](/docs/leetcode/python/validParenthesis.md)
-- [Asteroid Collision](/docs/leetcode/python/asteroidCollision.md)
+- [Valid Parenthesis](/docs/leetcode_coderpad/leetcode/python/validParenthesis.md)
+- [Asteroid Collision](/docs/leetcode_coderpad/leetcode/python/asteroidCollision.md)
 
-You can usually tell which problems require a stack, because it'd require you to move pointers forward and backwards based on matching conditions to new items
+### Typical Problems
+You can usually tell which problems require a stack, because ***they require you to move pointers forward and backwards based on matching conditions to new items***
 
 Other typical problems include matching elements together, querying some property such as "how far is the next largest element", evaluating a mathematical equation given as a string, just comparing elements against each other, or any other abstract interaction
 
-Stacks and Recursion are highly linked, because Recursion is actually done using a Stack!
+String problems that require you to check on history, or traverse backwards with some pointer, are typically a good use for stacks - you'll generally compare the top of the stack with the current character at each iteration. The [Valid Parenthesis](/docs/leetcode_coderpad/leetcode/python/validParenthesis.md) problem will basically add a left parenthesis `[{(` to the stack whenever it see's it, and if any right parenthesis is encountered `)}]`, you compare it to the end of the stack via `.pop()` - if they don't match it's not valid
+
+These problems all follow a **LIFO** nature, where the most recent thing added to the stack is the first thing that needs to be acted upon
+
+### Recursion
+Stacks and recursion are highly linked, because recursion is actually done using a stack!
 
 If you are at A below, and you do `A.left` and `A.right`, that's equivalent to `[A, B, C]` - you have `[A]`, then when you call `A.left` you go to `[A, B]`, and then our current scope and callstack are at `B`
 
@@ -38,7 +48,7 @@ F
 ```
 
 ### Implementation
-Most stacks are implemented via[Doubly LinkedLists](/docs/dsa/4.%20linked%20lists/index.md) or Dynamic Arrays, so that you can have $O(1)$ implementations of Push, Pop, and Peek
+Most stacks are implemented via [Doubly Linked Lists](/docs/dsa/4.%20linked%20lists/index.md) or Dynamic Arrays, so that you can have $O(1)$ implementations of Push, Pop, and Peek
 
 With Dynamic Arrays, Push and Pop are amortized $O(1)$ because if there's a forced resize it would be $O(n)$, but these rarely happen in practice
 
@@ -104,31 +114,31 @@ Deque Typical Operations:
 
 The most typical use case of a Queue is [Breadth First Search (BFS)](/docs/dsa/8.%20trees%20&%20graphs/index.md)
 
-There are other examples, like [Sliding Window Rate Limiter Counters](/docs/leetcode/python/numberOfRecentCalls.md), a [Moving Average In DataStream](/docs/leetcode/python/movingAverageInDatastream.md), or really anything that involves moving sliding windows (that aren't solvable by [TwoPointers](/docs/dsa/1.%20arrays%20&%20strings/index.md#two-pointers)!)
+There are other examples, like [Sliding Window Rate Limiter Counters](/docs/leetcode_coderpad/leetcode/python/numberOfRecentCalls.md), a [Moving Average In DataStream](/docs/leetcode_coderpad/leetcode/python/movingAverageInDatastream.md), or really anything that involves moving sliding windows (that aren't solvable by [TwoPointers](/docs/dsa/1.%20arrays%20&%20strings/index.md#two-pointers)!)
 
 ## Monotonic
-A monotonic Stack or Queue is one whose elements are always ordered
+A monotonic Stack or Queue is one whose elements are arranged in such a way that it either never decreases, or never increases
 
-These are typically useful when you have some criteria to find the "next" greatest or less than element, or some sort of criteria
+These are typically useful when you have some criteria to find the "next" greatest or less than element, or some sort of criteria, or if you have a sliding window problem where you want to keep track of some max or min element as the window changes
 
-```stack = [1, 5, 8, 15, 23]`
+`stack = [1, 5, 8, 15, 23]`
 If you wanted to do `stack.push(14)`, we'd first need to pop off `[15, 23]`
 
 ```python
 stack = []
 for num in nums:
-    while stack.length > 0 and stack.top >= num:
+    while stack.length > 0 and stack.top > num:
         stack.pop()
     # Between the above and below lines, do some logic depending on the problem
     stack.push(num)
 ```
 
-A good example is [Daily Temperatures](/docs/leetcode/python/dailyTemperatures.md) where you continuously push items onto a stack until you come upon a larger one, and once you see that you pop items off stack that are smaller
+A good example is [Daily Temperatures](/docs/leetcode_coderpad/leetcode/python/dailyTemperatures.md) where you continuously push items onto a stack until you come upon a larger one, and once you see that you pop items off stack that are smaller
 
 If an item never gets off the stack, it's never seen a larger item (temperature)
 
 This monotonic way is just a good method to find ***"for any item in the array, find the next larger item after it"*** AKA "next greatest item"
 
-For a monotonic deque, the [Sliding Window Maximum](/docs/leetcode/python/slidingWindowMaximum.md) problem is a good example, but the reason you need a monotonic deque here is comparing "max", similar to temperature problem above, in a ranged window
+For a monotonic deque, the [Sliding Window Maximum](/docs/leetcode_coderpad/leetcode/python/slidingWindowMaximum.md) problem is a good example, but the reason you need a monotonic deque here is comparing "max", similar to temperature problem above, in a ranged window
 
 Because of that max comparison, you need a monotonic deque

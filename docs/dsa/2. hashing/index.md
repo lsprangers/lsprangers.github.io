@@ -50,7 +50,7 @@ A ***Hash Function $H(x)$*** of something is a function that turns an object fro
 ### Examples
 
 #### Counting and Sliding Windows
-<!-- [3Sum](/docs/leetcode/python) -->
+<!-- [3Sum](/docs/leetcode_coderpad/leetcode/python) -->
 These are scenarios where you slide through an array and check some sub-array logic, and during the sliding you will add values to a hashmap somewhere
 
 A good example is [Subarray Sum](/docs/dsa/1.%20arrays%20&%20strings/index.md#subarray-sum--k)
