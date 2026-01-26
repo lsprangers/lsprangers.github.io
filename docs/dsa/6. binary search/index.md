@@ -52,6 +52,8 @@ def check(idx, arr, target):
     )
 ```
 
+Using `len(arr) - 1` means your last valid index is included, and your valid search interval is `[left, right]`. In this you check `left <= right`
+
 The main difference is what you return, and how you update your search space:
 - If you want to return the exact index you can do that, or you can return an insertion point of where something new should be placed
 - You can update your search space based on finding any match, the unique exact match, the first match of some kind, or the last match of some kind
@@ -114,48 +116,105 @@ def check(idx, arr, target):
     )
 ```
 
+Using `len(arr)` means your right boundary is past the last valid index, and your valid search interval is `[left, right)`. In this you check `left < right`
+
+
 ### Insertion vs Index
 If we are looking to find the insertion index, there's a slight tweak versus finding a specific index and it mostly comes down to how you alter the `check()` function...as usual...and then the pointer that's returned
 
-Insertion looks to:
-- Find the first index where `arr[idx] > target`, ***and so our `check()` function would be `arr[mid] > target`***
-- Find the first index where `arr[idx] >= target` (similar to `bisect_left`), ***and so `check()` function would be `arr[mid] >= target`***
- 
-In either case, you would return `left` at the end which should give you the first entry in which target can be inserted so that the array is still sorted
+A very easy way to do this in python is via the `bisect.bisect_left(arr, target)` method - the below problem statement and python code shows it:
 
-## Old
+"Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order. You must write an algorithm with `O(log n)` runtime complexity."
+```python
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        return(bisect.bisect_left(nums, target))
+```
 
-| Goal / Pattern                              | `mid` Calc                          | `low` Update                       | `high` Update                      | Loop Condition      | Return  | Notes                                                                 |
-| ------------------------------------------- | ------------------------------------ | ------------------------------------ | ------------------------------------ | ------------------- | ------- | --------------------------------------------------------------------- |
-| **Search on value / exact match**           | `(low + high) // 2`                  | `low = mid + 1`                      | `high = mid - 1`                     | `while low <= high` | index or -1 | Classic binary search                                                 |
-| **Find first `x` such that condition(x)**   | `(low + high) // 2` (**bias left**)  | `low = mid + 1` if false             | `high = mid` if true                 | `while low < high`  | `low`   | **Lower bound** - shrink right side when mid is valid                 |
-| **Find last `x` such that condition(x)**    | `(low + high + 1) // 2` (**bias right**) | `low = mid` if true                  | `high = mid - 1` if false            | `while low < high`  | `low`   | **Upper bound** - shrink left side when mid is invalid; bias prevents infinite loop |
+- The `bisect_left(a, x, ...)` function takes a sorted list a and a value x and returns an index i such that: 
+    - All elements to the left of the index (`a[:i]`) are less than x
+    - All elements to the right of and at the index (`a[i:]`) are greater than or equal to x
 
-### Intuition of Each Goal
-The 3 above goals are easy enough to memorize, but intuition is key for having to do this crap in an interview
+Looking at the [bisect_left source code](github.com/python/cpython/blob/3.14/Lib/bisect.py#L74), it's exactly our template, except with many more error handling and good coding practices
+```python
+class Solution:
+    def searchInsert(self, nums: List[int], target: int) -> int:
+        left = 0
+        right = len(nums)
+        while left < right:
+            mid = left + (right - left) // 2
+            if nums[mid] < target:
+                left = mid + 1
+            else:
+                right = mid
+        
+        return(left)
+```
 
-When an array is sorted and you want to find `x`, you know that if you land on some `y` and `y > x`, then `x` must be to the left of it, same thing with `y < x` meaning `x` is to the right
+- `bisect_right` on the other hand will return an index i such that:
+    - All elements to the left of the index (`a[:i]`) are less than or equal to x
+    - All elements to the right of the index (`a[:i]`) are greater than x
 
-That's really all we have to think about for classic binary search:
-- `mid`is the answer, so we return it
-- It's to the left `high = mid - 1`
-- It's to the right `low = mid + 1`
+The [Longest Subsequence With Prefix Sum Problem](/docs/leetcode/python/longestSubsequenceWithLimitedSum.md) utilizes `bisect_right` to find the length of the longest subsequence that's less than or equal to a certain query
+- After calculating the prefix sum, the length of longest subsequence is equal to the last index of the prefix sum where we could insert the query 
+- If the pfx sum has `[1, 4, 7, 8]`, and our query is 6 or 7, we'd want to return 2
 
-We can do `while low <= high` because on the offchance `low = high` we are just checking that specific value, and if that fails then everything's broken and we can't find it so we return `-1`. At that point the ***`low` pointer would be at the index `x` is supposed to be inserted to keep the array sorted***
+So the main difference is where it would return an index based on where values are equal 
+- `bisect_left` finds the first occurrence of an item, or where it should be placed if there are none
+    - "All elements to the left of `a[:i]` are less than x"
+- `bisect_right` finds the last occurrence of an item, or where it should be placed if there are none
+    - "All elements to the right of `a[:i]` are greater than x"
+- So they mostly differ on how they handle equal to, and exact insertion point
+- If there was an array `arr = [1, 5, 6, 8]`
+    - `bisect_left(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_left(arr, 6)` would return 2 as it's the target, so less than or equal to
+    - `bisect_right(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_right(arr, 6)` would return 3 as all elements to the left must be less than or equal to 6
 
-The find first or find last methods are used where there's potentially more than one answer, there isn't an exact match, or there are duplicate elements
+### Solution Spaces
+Binary Search can also be used outside of arrays - generically it can be used on any solution space such as integers, some capacity, or anything else. A typical scenario of this is a problem asking "what is the min/max something can be done"
 
-To find the left most index, sometimes the "find first" or "find min that allows" type, when we shrink the search space we focus on `arr[mid] >= target`. If that's the case it means either:
-- It equals the target, which is great but there may still be more valid values to the left
-- It is greater than the target, so we want to restrict to the left 
+Ultimately, the only true criteria that need to be met for binary search are:
+1. You can quickly, in $O(n)$ or better time, verify if the task if possible for a given input `x`
+2. If the task if possible for an input `x`, and you are looking for:
+    - A maximum, then it's also possible for all inputs less than `x`
+    - A minimum, then it's also possible for all inputs greater than `x`
+3. If the task is not possible for an input `x`, and you are looking for:
+    - A maximum, then it's also impossible for all inputs greater than `x`
+    - A minimum, then it's also impossible for all inputs less than `x`
 
-The main part to focus on is equals to - if the value is the only valid value, we'd want to return it, but we can't hardcode that into the solution so this handles both unique existence, and potential for another valid value to the left to exist
+Statement 1. references the ability to quickly do things, as the `check()` function needs to be fast enough that we can do better than $O(n^2)$, and statements 2. and 3. revolve around the search space being able to be "shrunk" via mid updates - if we can't shrink the search space automatically because something's unsorted, or it doesn't make sense, then we cannot do binary search (i.e. we can't cut out that portion of solution space)
+
+![BSearch Zones](/img/bsearch_zones.png)
+
+Problems finding a min / max are actually searching for this magic threshold that separates possible from impossible, and that magic threshold is what we're trying to obtain as our output of binary search
+
+Establishing the solution space is typically the hardest part - if you're looking for a min/max rate, how can you decide what "max" is? 
+- In [Koko Eating Bananas](/docs/leetcode/python/kokoEatingBananas.md) Koko only eats a pile at a time maximum, and so the maximum rate can only be the maximum of the piles `max(piles)`
+- In [Capacity Planning](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md) you can ship as many packages as possible with a specific rate, but the most weight you could process in a single day is the entire weight, so the maximum rate is `sum(weights)`
+
+The solution space can be defined by $k$ which represents the range of the solution space - sometimes it's $[0, k]$, sometimes it's $[\text{min}, \text{max}]$ where $k = \text{max} - \text{min}$, etc...
+
+Once you have the $k$ figured out, ***the binary search time complexity becomes $O(n \log{k})$***
+- $n$ revolves around the time taken for a check function to run - typically a greedy function that could exhaust the entire input list
+- $\log{k}$ revolves around traversing the search space, where for each traversal we need to run the $O(n)$ `check()` function
+
+## Pointer Updates
+The entire intuition of when to do `left < right`, `left <= right`, `return left`, `return right`, `right = mid` and / or `left = mid + 1` revolves around pointers, solution spaces, duplicates, etc and while there are plenty of resources on templates for each of them, typically templates suck and intuition is the best method
+
+When returning minimums, you `return left` - why?
+
+When returning maximums, you `return right` - the [Find Divisor Problem](/docs/leetcode/python/findSmallestDivisorGivenAThreshold.md) is an example of that
+
+When you want to check even if `left = right` you use `left <= right` - typically this is only used during exact matches, to find minimums or maximums you just do `left < right` - why?
+
+When working with binary search, the heart of the algorithm is how you define your search space and how you update your pointers. The classic question is: do you return left or right? Do you use left < right or left <= right? The answer depends on what you’re searching for - minimums, maximums, or exact matches - and how you want to handle duplicates
+
+Imagine you’re searching for the minimum value that satisfies a condition. As you narrow your search space, you want to make sure you never skip over a possible answer. This means, whenever your check function says “yes, this works,” you move your right pointer to mid, keeping mid in the search space. When the loop ends, left will be at the smallest index that works, so you return left
 
 
-### Classic Binary Search
-This will find the first exact match, and only returns `mid` if it finds it
-
-`mid + 1` because you just checked mid, and you know it's not involved, `mid - 1` because of the same logic
+### Some Exact Match
+In this one, we want to find something somewhere in an array, and the target must exist for us to return the index, otherwise you return insertion point
 
 ```python
 def binary_search(arr, target):
@@ -180,10 +239,10 @@ def binary_search(arr, target):
 Array: [2, 4, 6, 8, 10, 12]  
 Target: 8
 
-| Step | low | high | mid | arr[mid] | Comparison | Action               |
+| Step | left | right | mid | arr[mid] | Comparison | Action               |
 |------|-----|------|-----|----------|------------|----------------------|
-| 1    | 0   | 5    | 2   | 6        | 6 < 8      | low = mid + 1 (=3)   |
-| 2    | 3   | 5    | 4   | 10       | 10 > 8     | high = mid - 1 (=3)  |
+| 1    | 0   | 5    | 2   | 6        | 6 < 8      | left = mid + 1 (=3)   |
+| 2    | 3   | 5    | 4   | 10       | 10 > 8     | right = mid - 1 (=3)  |
 | 3    | 3   | 3    | 3   | 8        | 8 == 8     | return mid (=3)      |
 
 
@@ -192,25 +251,67 @@ Target: 8
 Array: [1, 3, 5, 7, 9]  
 Target: 5
 
-| Step | low | high | mid | arr[mid] | Comparison | Action           |
+| Step | left | right | mid | arr[mid] | Comparison | Action           |
 |------|-----|------|-----|----------|------------|------------------|
 | 1    | 0   | 4    | 2   | 5        | 5 == 5     | return mid (=2)  |
 
 
+#### Example 3: Insertion Point
 
-### Lower Bound (First Valid X)
-For lower bound you strive to find the first element that satisfies some condition like $\leq$ target or $\ge$ target
+Suppose the array is `[2, 4, 6, 8, 10, 12]` and the target is `7` (which does not exist in the array)
 
-In these ones, you now must figure out which condition to not decrement, such as `high = mid`, because in this scenario `mid` may have the correct answer at some point, and you need to reduce search space to left to see if there's another one beforehand
+| Step | left | right | mid | arr[mid] | Comparison | Action               |
+|------|------|-------|-----|----------|------------|----------------------|
+| 1    | 0    | 5     | 2   | 6        | 6 < 7      | left = mid + 1 (=3)  |
+| 2    | 3    | 5     | 4   | 10       | 10 > 7     | right = mid - 1 (=3) |
+| 3    | 3    | 3     | 3   | 8        | 8 > 7      | right = mid - 1 (=2) |
+
+At this point, `left = 3` and `right = 2`, so the loop ends. The function returns `left = 3`, which is the index where `7` would be inserted to keep the array sorted. This matches the behavior of `bisect_left([2, 4, 6, 8, 10, 12], 7)`, which also returns `3`.
+
+
+The below is very repetitive, but it is true
+The proof of why this is an insertion point is :
+- Imagine if `arr[mid] < target`
+    - We know all `arr[:mid]` are also `< target`
+    - So we update `left = mid + 1`
+- If `arr[mid] > target`, then all elemennts at indices `>= mid` are also `> target`
+    - `right = mid - 1`
+- If we're at some `mid` such that `left > right`, then we will know that 
+    - All elements to the left of `left` are `< target`
+    - All elements to right of `left` are `> target`
+    - At some point `left = mid + 1`, or `left = 0`
+        - If it was ever updated to `mid + 1`, that means we know at some point `arr[mid] < target`
+        - Therefore, the update it made is at some index where everything to the left of it is `< target`
+        - `[1, 3, 5, 8, 9]`, if the target is `7`, the first `mid` index would be `0 + 5 // 2 = 2`, and `5 < 7` so `left = 3`. At this point every check will be between on numbers where the minimum range starts at index 3 which is 8
+        - Left will never be updated again, right will continually scrunch down until it's less
+- Therefore, the reason left is the insertion point is the only way `left` is ever updated, is if we're sure everything `arr[:mid]` at some point is always less than it, and then we place left pointer one before. If it's the insertion point, we'll never find an answer and it'll just stay there forever
+
+### Minimize
+In this scenario it all comes down to **Minimize k such that condition(k) is True**
+
+The reason we set `right = mid` is that we are looking to minimize `k`, and at any point if a condition is actually met, that just means we know it's included in the search space. `k` might be the actual min, and so we can't do `right = mid - 1` like we did above
+
+The reason `right = mid - 1` worked above is that if the condition `arr[mid] == target` wasn't true, and `arr[mid] > target`, we knew for a fact that `mid` wasn't in the search space. `mid - 1` might be, but `mid` for sure wasn't. In the minimize situation, if `condition(k)` is True, then `k` still may be in the search space
+
+`left` starts as the minimum of the search space (maybe 0 for array indexes), if we ever make an update to `left = mid + 1`, that means that the `condition(mid)` failed, and we know for sure that `mid` is outside of the search space and can't possibly be a minimum candidate
+- `left = 0`, and that's the min
+- `left` was updated to `mid + 1`, and `mid` for sure wasn't an answer, so `left` (which is `mid + 1`) is now the current min of the search space
+    - It may never be updated again, and then it's the same as the first point
+
+How do we know `left` is the minimum `k` ***that satisfies the condition***? I always get caught up with "what if nothing in the search space satisfies the condition" for things like exact matches, but returning `left` at the end means we return insertion point of where it should be
+- We setup search space to ensure any answer satisfies a condition
+- If `left` is never upadted, it must be the min of the search space, so it's definitely the min that satisfies the condition!
+- If `left` was updated, same logic as stated above
+- If we truly need an exact match, and we end up with `left` but `arr[left] != target` we should return `-1` and not `left`
 
 ```python
-while low < high:
-    mid = (low + high) // 2
-    if condition(mid):  # go left
-        high = mid
+while left < right:
+    mid = (left + right) // 2
+    if condition(mid):  # go left to mid
+        right = mid
     else:               # go right
-        low = mid + 1
-return low
+        left = mid + 1
+return left
 ```
 
 #### Example: Find First Element $\ge$ Target
@@ -219,12 +320,12 @@ Array: [1, 3, 5, 7, 9, 11]
 Target: 6  
 Goal: Find the first index where arr[i] $\ge$ 6
 
-| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 6? | Action             |
+| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 6? | Action             |
 |------|-----|------|-----|----------|---------------|--------------------|
-| 1    | 0   | 5    | 2   | 5        | No            | low = mid + 1 (=3) |
-| 2    | 3   | 5    | 4   | 9        | Yes           | high = mid (=4)    |
-| 3    | 3   | 4    | 3   | 7        | Yes           | high = mid (=3)    |
-| 4    | 3   | 3    | -   | -        | -             | End, return low=3  |
+| 1    | 0   | 5    | 2   | 5        | No            | left = mid + 1 (=3) |
+| 2    | 3   | 5    | 4   | 9        | Yes           | right = mid (=4)    |
+| 3    | 3   | 4    | 3   | 7        | Yes           | right = mid (=3)    |
+| 4    | 3   | 3    | -   | -        | -             | End, return left=3  |
 
 Result: Returns index 3 (arr[3]=7), which is the first element $\ge$ 6.
 
@@ -236,12 +337,12 @@ Array: [1, 2, 3, 4, 5]
 Target: 10  
 Goal: Find the first index where arr[i] $\ge$ 10
 
-| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 10? | Action             |
+| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 10? | Action             |
 |------|-----|------|-----|----------|----------------|--------------------|
-| 1    | 0   | 4    | 2   | 3        | No             | low = mid + 1 (=3) |
-| 2    | 3   | 4    | 3   | 4        | No             | low = mid + 1 (=4) |
-| 3    | 4   | 4    | 4   | 5        | No             | low = mid + 1 (=5) |
-| 4    | 5   | 4    | -   | -        | -              | End, return low=5  |
+| 1    | 0   | 4    | 2   | 3        | No             | left = mid + 1 (=3) |
+| 2    | 3   | 4    | 3   | 4        | No             | left = mid + 1 (=4) |
+| 3    | 4   | 4    | 4   | 5        | No             | left = mid + 1 (=5) |
+| 4    | 5   | 4    | -   | -        | -              | End, return left=5  |
 
 Result: Returns index 5 (out of bounds), meaning no element $\ge$ 10 exists.
 
@@ -253,61 +354,47 @@ Array: [2, 3, 4, 5, 6]
 Target: 2  
 Goal: Find the first index where arr[i] $\ge$ 2
 
-| Step | low | high | mid | arr[mid] | arr[mid] $\ge$ 2? | Action             |
+| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 2? | Action             |
 |------|-----|------|-----|----------|---------------|--------------------|
-| 1    | 0   | 4    | 2   | 4        | Yes           | high = mid (=2)    |
-| 2    | 0   | 2    | 1   | 3        | Yes           | high = mid (=1)    |
-| 3    | 0   | 1    | 0   | 2        | Yes           | high = mid (=0)    |
-| 4    | 0   | 0    | -   | -        | -             | End, return low=0  |
+| 1    | 0   | 4    | 2   | 4        | Yes           | right = mid (=2)    |
+| 2    | 0   | 2    | 1   | 3        | Yes           | right = mid (=1)    |
+| 3    | 0   | 1    | 0   | 2        | Yes           | right = mid (=0)    |
+| 4    | 0   | 0    | -   | -        | -             | End, return left=0  |
 
 Result: Returns index 0 (arr[0]=2), which is the first element $\ge$ 2.
 
 ### Upper Bound (Last Valid X)
-This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario you set `low = mid` and `high = mid - 1` 
+This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario you set `left = mid` and `right = mid - 1` 
 
 This is because there can be multiple `mid` that satisfy the result, but you want to find the last one so you keep shrinking / dragging search space to the right
 
-mid calculation being `low + high + 1` also ***prevents an infinite loop, and is vital***
+mid calculation being `left + right + 1` also ***prevents an infinite loop, and is vital***
 
 ```python
-while low < high:
-    mid = (low + high + 1) // 2  # Bias right
+while left < right:
+    mid = (left + right + 1) // 2  # Bias right
     if condition(mid):  # go right
-        low = mid
+        left = mid
     else:               # go left
-        high = mid - 1
-return low
+        right = mid - 1
+return left
 ```
 
 ### Search On Answer
 Search On Answer problems usually mean changing the search space, and then finding the [Lower Bound](#lower-bound-first-valid-x) or [Upper Bound](#upper-bound-last-valid-x) based on problem statement
 
 ```python
-low = max(weights)
-high = sum(weights)
+left = max(weights)
+right = sum(weights)
 
-while low < high:
-    mid = (low + high) // 2
+while left < right:
+    mid = (left + right) // 2
     if can_ship_in_days(mid):
-        high = mid
+        right = mid
     else:
-        low = mid + 1
-return low
+        left = mid + 1
+return left
 ```
-
-
-### What To Define
-For any BS problem:
-- What is the search space?
-- What does check(mid) mean?
-- What is the goal (min valid, max valid, exact match)?
-- When is mid good/bad? Adjust low/high accordingly.
-- Do you return low, high, or mid?
-
-### Answer Space
-The discussion in [Capacity To Ship Packages](/docs/leetcode/python/capacityToShipPackagesWithinDDays.md) showcases the need to rigorously define answer spaces in the correct way
-
-If you are checking potential answers outside of this space, they may return false positives / negatives that would ruin our entire check!
 
 ## ATypical
 There are some weird ones thrown in as well, especially rotating lists, a weird search space, or "guessing" at a condition
@@ -333,7 +420,7 @@ Therefore, what you need to search for is an index $i : i > i + 1$ which would c
 
 Therefore, `check` becomes:
 ```
-mid = low + high // 2
+mid = left + right // 2
 if check(mid):
     return(mid)
 elif mid > first element of array:
@@ -356,23 +443,23 @@ Otherwise, you just continuously check the rate instead of "smart searching" usi
 Lists and Tree's are typically the data structures that you see with Binary Search
 
 ### Lists
-There's some gotchas for list, mostly around defining high and low, and different $\le$ vs $\leq$, but altogether the pseudocode is pretty easy
+There's some gotchas for list, mostly around defining right and left, and different $\le$ vs $\leq$, but altogether the pseudocode is pretty easy
 Pseudocode for list:
 ```python
 # list of 10 nums
 nums = sorted(list)
 val_to_find = get_num()
 
-low = 0
-high = len(nums)
+left = 0
+right = len(nums)
 
-while low <= high:
+while left <= right:
     # 0 + (10 - 0) // 2 = 5 // 2 = 2
-    mid = low + (high - low) // 2
+    mid = left + (right - left) // 2
     if check(val):
-        low = mid + 1 # or low = mid
+        left = mid + 1 # or left = mid
     else:
-        high = mid - 1 # or high = mid
+        right = mid - 1 # or right = mid
         
 
 return(-1)
