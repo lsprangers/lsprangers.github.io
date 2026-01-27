@@ -20,7 +20,7 @@ In this scenario you chose to create a distributed, sharded KV store with node r
 Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
 
 #### In Memory Implementation
-Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/kv_store_with_transactions.md)
+Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/leetcode_coderpad/coderpad_implementations/kv_store_with_transactions.md)
 
 ### Isolation Levels
 Before going into other areas, the [isolation levels](./ISOLATION_LEVELS.md) and read/write levels will come back continually throughout the discussion, especially for distributed systems
