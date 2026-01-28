@@ -139,6 +139,6 @@ If an item never gets off the stack, it's never seen a larger item (temperature)
 
 This monotonic way is just a good method to find ***"for any item in the array, find the next larger item after it"*** AKA "next greatest item"
 
-For a monotonic deque, the [Sliding Window Maximum](/docs/leetcode_coderpad/leetcode/python/slidingWindowMaximum.md) problem is a good example, but the reason you need a monotonic deque here is comparing "max", similar to temperature problem above, in a ranged window
+For a monotonic deque, the [Sliding Window Maximum](/docs/leetcode_coderpad/leetcode/python/maxSlidingWindow.md) problem is a good example, but the reason you need a monotonic deque here is comparing "max", similar to temperature problem above, in a ranged window
 
 Because of that max comparison, you need a monotonic deque

@@ -135,7 +135,7 @@ class Solution:
     - All elements to the left of the index (`a[:i]`) are less than x
     - All elements to the right of and at the index (`a[i:]`) are greater than or equal to x
 
-Looking at the [bisect_left source code](github.com/python/cpython/blob/3.14/Lib/bisect.py#L74), it's exactly our template, except with many more error handling and good coding practices
+Looking at the [bisect_left source code](https://github.com/python/cpython/blob/3.14/Lib/bisect.py#L74), it's exactly our template, except with many more error handling and good coding practices
 ```python
 class Solution:
     def searchInsert(self, nums: List[int], target: int) -> int:
