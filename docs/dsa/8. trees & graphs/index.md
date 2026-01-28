@@ -14,6 +14,14 @@ A binary tree is simply a hierarchical tree that has at most 2 children for any 
 
 A Graph would mean any number of connections for a node, and there are similarities there, but binary (2) means at most 2 children and 1 parent
 
+```python
+class TreeNode:
+    def __init__(self, val, left, right):
+        self.val = val
+        self.left = left
+        self.right = right
+```
+
 Binary Tree's are both specific types of Graphs, and so are Linked Lists actually
 
 ### Binary Search Tree

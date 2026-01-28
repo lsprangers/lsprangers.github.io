@@ -208,7 +208,7 @@ When returning maximums, you `return right` - the [Find Divisor Problem](/docs/l
 
 When you want to check even if `left = right` you use `left <= right` - typically this is only used during exact matches, to find minimums or maximums you just do `left < right` - why?
 
-When working with binary search, the heart of the algorithm is how you define your search space and how you update your pointers. The classic question is: do you return left or right? Do you use left < right or left <= right? The answer depends on what you’re searching for - minimums, maximums, or exact matches - and how you want to handle duplicates
+When working with binary search, the heart of the algorithm is how you define your search space and how you update your pointers. The classic question is: do you return left or right? Do you use `left < right` or `left <= right`? The answer depends on what you’re searching for - minimums, maximums, or exact matches - and how you want to handle duplicates
 
 Imagine you’re searching for the minimum value that satisfies a condition. As you narrow your search space, you want to make sure you never skip over a possible answer. This means, whenever your check function says “yes, this works,” you move your right pointer to mid, keeping mid in the search space. When the loop ends, left will be at the smallest index that works, so you return left
 

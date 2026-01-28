@@ -334,6 +334,12 @@ Two Towers will also generate embeddings for users and items, similar to Matrix 
 ![TT Songs](./images/twotowers_songs.png)
 
 The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/transformer_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where you compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
+- Below can all help find an approximate top-k items (from a large pool of item embeddings) for a user:
+    - SCaNN
+    - Faiss
+    - Approx NN 
+
+To be clear, in a two tower approach where there's a single item and user output at the end, it's simply to check if those 2 things have affinity, and there are other ways to pull out large scale top-k representations from embedding matrices
 
 This will allow us to bypass the cold start problem, and the static embedding problem, but increases our latency as you need to use another DNN call in our Ranking service
 
