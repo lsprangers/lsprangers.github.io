@@ -31,6 +31,8 @@ Binary Search Tree's are tree's who, for any node, have:
 
 The reason these are different from regular Binary Tree's are this specific relationship - at each step you can reduce the total search space by half, resulting in $O(\log n)$ search time
 
+You can reduce it because there's a specific relationship $gt$, $lt$
+
 ### Self-Balancing Binary Search Tree
 - Self Balancing BST's have the same property as Binary Search Tree's, except they will balance themselves out via different methods
 - The reason for this balancing is that Binary Search Tree's worst case lookup time degrades to $O(n)$ if the tree represents a Linked List
@@ -45,7 +47,7 @@ A segment tree is a Binary Tree where each node represents an interval, and each
 
 Most of the time it's segements / indexes of an array, and the total sum, count, or some aggregation over them, which allows us to find a certain aggregation over a range of data in potentially $O(\log n)$ time
 
-![LeetCode Segment Tree](./images/lc_segment_tree.png)
+![LeetCode Segment Tree](/img/lc_segment_tree.png)
 
 - Typically the root holds the entire interval of data we're interested in traversing
 - Each leaf of the tree represents a range of just one single element
@@ -93,7 +95,7 @@ void buildSegTree(vector<int>& arr, int treeIndex, int lo, int hi)
 There is just one thing that is particular for the binary tree...there are two ways to go forward - to the left and to the right
 
 To keep parent->child direction, you shouldn't blend prefix sums from the left and right subtrees in one hashmap
-![Tree Path Prefix Sum](./images/tree_pfxsum.png)
+![Tree Path Prefix Sum](/img/tree_pfxsum.png)
 
 So to do this for Binary Tree you start off by defining some global variables
 ```
@@ -160,6 +162,135 @@ class Solution:
         return(resp)
 
 ```
+
+## Traversal Types
+
+### Depth First Search
+Depth first search (DFS) prioritizes searching as far as possible along a single route in one direction until reaching a leaf node before considering another direction
+
+DFS is typically only used in tree traversals, as graphs have circles and odd structures - tree's you can "go to the end" meaning a leaf node in a reasonable fashion
+
+DFS utilizes a similar template structure to binary tree's above, but in DFS you choose what operations you do with the nodes themselves
+```python
+def dfs(node):
+    if node == None:
+        return
+
+    dfs(node.left)
+    dfs(node.right)
+    return
+```
+
+There are 3 main types of DFS, and all of them relate to where you engage with the root node:
+- **Inorder** traversal is left, root, right
+- **Preorder** traversal is root, left, right
+- **Postorder** traversal is left, right, root
+
+```python
+def dfs(node):
+    if node == None:
+        return
+
+    # operation(root) - preorder
+    dfs(node.left)
+    # opertaion(root) - inorder
+    dfs(node.right)
+    # operation(root) - postorder
+    return
+```
+
+![DFS Traversal Types](/img/dfs_traversal_types.png)
+
+#### Recursion Stack
+Each function call to `dfs()` solves and returns the answer ot the original problem (in the call stack) as if the subtree rooted at the current node was the input
+
+Most use cases of DFS utilize recursion, and underneath the hood recursion is simply a [stack](/docs/dsa/3.%20stacks%20&%20queues/index.md#stacks)
+
+In the below tree, if we ran an inorder traversal the output would be `3, 1, 0, 4, 2, 5`
+```python
+    0
+   / \
+  1   2
+ /   / \
+3   4   5
+
+def dfs(node):
+    if node == None:
+        return
+
+    dfs(node.left)
+    print(root) - inorder
+    dfs(node.right)
+    return
+```
+
+Looking at the call stack we would see:
+- `call_stack = []`
+- `dfs(root) --> call_stack = [dfs(0)]`
+  - Inside of `dfs(0)`
+    - Call `dfs(0.left) --> call_stack = [dfs(0), dfs(1)]`
+      - Inside of `dfs(1)`
+        - Call `dfs(1.left) --> call_stack = [dfs(0), dfs(1), dfs(3)]`
+          - Inside of `dfs(3)`
+            - Call `dfs(3.left) --> call_stack = [dfs(0), dfs(1), dfs(3), dfs(None)]`
+              - Inside of `dfs(None) --> return None`
+              - `call_stack = [dfs(0), dfs(1), dfs(3)]`
+            - Call `print(root) --> 3`
+            - Call `dfs(3.right) --> call_stack = [dfs(0), dfs(1), dfs(3), dfs(None)]`
+              - Inside of `dfs(None) --> return None`
+              - `call_stack = [dfs(0), dfs(1), dfs(3)]`
+            - Exit `dfs(3)`
+        - Call `print(root) --> 1` (at this point output is 3, 1)
+        - Call `dfs(1.right) --> call_stack = [dfs(0), dfs(1), dfs(None)]`
+            - Inside of `dfs(None) --> return None`
+            - `call_stack = [dfs(0), dfs(1)]`    
+- And so on, and so forth!
+
+The `call_stack` is just a stack that's pushe and popped to by the actual underlying python recursion, and this feature is available in basically every language. For DFS you can also implement this yourself, and it becomes an ***Iterable DFS*** solution where no recursion is involved - you simply do all of the stack calls yourself
+
+Preorder is the cleanest implementation of this, and inorder and postorder are a bit tricky
+
+```python
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution:
+  def maxDepth(self, root: Optional[TreeNode]) -> int:
+    if not root:
+      return 0
+
+    stack = [(root, 1)]
+    ans = 1
+
+    while stack:
+      curr_node, curr_depth = stack.pop()
+
+      # preorder operation(root)
+      ans = max(ans, curr_depth)
+
+      # dfs(left)
+      if curr_node.left:
+        stack.append((curr_node.left, curr_depth + 1))
+      # dfs(right)
+      if curr_node.right:
+        stack.append((curr_node.right, curr_depth + 1))      
+```
+
+In this way, you never leave the initial `maxDepth` call, and you just implement everything on a stack yourself
+
+Time complexity - there are $n$ nodes, so we are guaranteed to do $O(n)$ work 
+  - Typically `operation(root)` is an $O(1)$ operation, but it may also be some other $O(k)$
+  - If it's $O(1)$ then the entire thing is $O(n)$, if it's $O(k)$ then $O(n \times k)$
+  - Altogether, the time complexity is $O(n \times k)$, where $k = 1$ is typical
+
+Space complexity is 
+  - Usually $O(n)$ in the worst case, as you're placing all of these calls onto a stack and if the tree is straight up and down (linked list) you can reach $O(n)$
+  - If the tree is perfectly balanced, space complexity becomes $O(\log n)$
+
+### Breadth First Search
 
 ## Graphs
 At it's core a Graph is a data structure consisting of two components - vertices (or nodes) $V$ and edges (connections between nodes) $E$
@@ -369,7 +500,7 @@ A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connec
 In my opinion it seems similar to a Span in a Vector Space which describes all of the orthonormal basis vectors that can be combined to create any vector in that space, but it's really not
 
 The pink edges below show the ST
-![ST](./images/st.png)
+![ST](/img/st.png)
 
 A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, you ideally can find the ST with the smallest total weight
 
@@ -377,7 +508,7 @@ An undirected graph can have multiple ST's and MST's
 
 A ***cut*** in Graph Theory is a way to split up the Vertices and Edges in a Graph into 2 distinct sets, essentially cutting it to create 2 disjoint subsets
 
-![Cut](./images/cut.png)
+![Cut](/img/cut.png)
 
 So the ***cut property***, which will help us run different algorithms, says for any Cut $C$ of the Graph $G$, if the weight of an Edge $E$ in a Cut-Set $C_s$ is strictly less than all other Edges in $C_s$, then $E$ belongs to all MST's of $G$
 
@@ -435,7 +566,7 @@ return(T)
 
 #### Edge Relaxation
 The ***Edge Relaxation Property*** is the general property describing that although a path might take more hops, the weights on it might be smaller. In the below example `A -> C -> D` has a total weight of 2, while `A -> D` has a weight of 3
-![Edge Relaxation Example](./images/relaxation.png)
+![Edge Relaxation Example](/img/relaxation.png)
 
 #### Djikstra
 Djikstra's Algorithm can help solve the shortest path problem for graphs with ***non-negative weights***
@@ -477,6 +608,20 @@ Since you are only iterating over edges and vertexes and doing increment / decre
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
 | $O(V + E)$         | $O(V + E)$         |
+
+
+You can also utilize straight up [DFS for topological sort](/docs/leetcode_coderpad/coderpad_implementations/python_files/dependencyGraph.py) in some dependency graph problems by utilizing the 3-color masking method. Ultimately this relates to tracking state along the call stack, and if something is currently in the stack (lookup in `state = defaultdict(int)` dict) with `state = 1`, then it's a loop as you'll eventually form a cycle
+
+```python
+state[u] = 1
+for v in deps[u]:
+    dfs(v)
+state[u] = 2
+order.append(u)
+```
+
+You need to do postorder traversal for this to work, as for any node you need to go completely explore all of the nodes it depends on - so you'll need some sort of dictionary like `services_depends_on` where each key is a specific node, and each item in the value list is another node that it will depend on. Once you go through all of those, and eventually add them to your `order` response, it'll be a topologically sorted array
+
 
 ## Graphs In the Wild
 

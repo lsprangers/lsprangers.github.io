@@ -1,5 +1,5 @@
 ---
-title: In Memory Rate Limiter
+title: Rate Limiter
 category: Implementations
 difficulty: Advanced
 show_back_link: true
