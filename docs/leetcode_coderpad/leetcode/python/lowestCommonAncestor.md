@@ -46,10 +46,10 @@ class Solution:
             return(root)
         
         # if we've only found left, send it up
-        if right:
-            return(right)
+        if left:
+            return(left)
         
         # otherwise we either found right, or we send up None
-        return(left)
+        return(right)
 
 ```
