@@ -427,8 +427,52 @@ Louvain and Leiden are greedy modularity based algorithms, where Laplacian spect
 
 This can be extended into the Ratio Cut problem which attempts to balance the number of edges cut by the partition, and the size of the resulting partitions - ultimately finding a set of well balanced neighborhoods
 
+
+## Graph Convolutional Networks
+Graph Convolutional Networks (GCN's) were first introduced as a method for applying NN's to graph structured data
+
+Graph convolutional networks (GCNs) can efficiently learn a differentiable mapping over graph structured data, leading to better representations of graph data
+
+Differential mapping over graph data enables the learning of node and graph representations by applying differentiable operations that aggregate information from neighbors while preserving the graph structure. This is similar to the invariance describes above, but essentially saying the invariant functions are differentiable. This approach allows for end-to-end training, capturing both local and global relationships, and scales well to large, dynamic graphs. It has provided a significant advantage in graph learning by improving performance on tasks such as node classification, link prediction, and graph-based recommendations, without the need for manual feature engineering
+
+The simplest GCN's had three operators:
+- Graph convolution
+- Linear layer
+- Nonlinear activation
+
+The operations were also typically done in that order, and the Node Embedding example above showcases a similar ordering
+- Aggregate local neighbors (convolution)
+- Apply linear transformation (linear layer)
+- Use a nonlinear $\sigma$ activation for more robust relationships
+
+The initial workflow above inspired GraphSAGE
+
+### GraphSAGE Idea
+GraphSAGE is a representation learning technique for dynamic graphs - this, in english, means that it can create node embeddings on new (previously unseen) nodes, which makes it inductive and useful for dynamic or growing graphs
+
+The intuition is that GraphSAGE learns vector representations (embeddings) for nodes by repeatedly sampling a node's neighbors, aggregating their features (permutation invariant function), combining that with it's own features, and passing through neural layers - this is exactly what we saw above in the Node Embedding portion, and it allows generalization to new (previously unseen) nodes in the graph because it utilizes sampling and doesn't require the full adjacency matrix to compute a node's embedding. This means it doesn't require *all* of a node's neighbors (full adjacency matrix), and can create embeddings based on local samples
+
+Simple Neighborhood Aggregation:
+$$
+h_k^{(v)} = \sigma(W_k \sum_{u \in N(v)} {h_u^{(k-1)} \over {|N(v)|}} + B_k h_k^{(k-1)}) 
+$$
+
+GraphSAGE:
+$$
+h_k^{(v)} = \sigma([W_k \cdot \text{Agg}(\{h_u^{(k-1)} : u \in N(v)\}), B_k h_k^{(k-1)}])
+$$
+
+- Generalized aggregation method: $ \text{Agg}(\{h_u^{(k-1)} : u \in N(v)\})$
+    - Literally just mentions any aggregation on layers before it, in it's neighborhood
+    - Other options outside of typical weighted average include
+        - **Pooling**: Transform each neighbor embedding with a NN, then apply element-wise max-pooling
+            - $\text{Agg}(\{h_u^{(k-1)} \space \forall u \in N(v)\}) = \max_{u \in N(v)} \sigma(W_{\text{pool}} h_u^{(k-1)} + b_{\text{pool}})$
+        - **LSTM**: Use a unidirectional LSTM to aggregate neighbor embeddings (requires imposing an order on neighbors, which is not inherently defined in graphs)
+            - $\text{Agg}(\{h_u^{(k-1)} \space \forall u \in N(v)\}) = \text{LSTM}(\{h_u^{(k-1)} \space \forall u \in N(v)\})$
+- Concatenate neighbor embedding and self embedding via the $+$ in the simple neighborhood aggregation, but you can do any other combination operation (specified as "," in the GraphSAGE equation)
+
 ## Message Passing
-Neural message passing is a crucial part of most GNN architectures because it enables infromation exchange and aggregation among nodes in a graph
+Neural message passing is a crucial part of most GNN architectures because it enables information exchange and aggregation among nodes in a graph. It allows graph learning models to compute more complicated functions over graph data by facilitating message passing instead of enforcing invariant functions
 
 [GraphX](/docs/other_concepts/graph_processing/index.md#graphx) or [Pregel](/docs/other_concepts/graph_processing/PREGEL.md) utilize super-steps where at any node you have a message you can pass to any other immediately adjacent node, and each node in each step has a `receive()` and / or `aggregate()` function that can ingest one or many messages from multiple neighbors
 
@@ -527,6 +571,7 @@ Neighborhood aggregation is a fundamental operation in Graph Neural Networks (GN
 - **LSTM-based Aggregation**: This method uses a Long Short-Term Memory (LSTM) network to aggregate neighbor features, allowing for more complex interactions among neighbors
     - $$ m_v^{(k)} = \text{LSTM}(\{h_u^{(k-1)} : u \in N(v)\}) $$
 
+
 Each of these methods has its own advantages and trade-offs, and the choice of aggregation method may depend on the specific application and characteristics of the graph data being used
 
 Another important topic is how to handle nodes with varying degrees (number of neighbors) during aggregation. Techniques such as neighbor sampling (e.g., GraphSAGE) or normalization can help mitigate issues arising from high-degree nodes dominating the aggregation process.Neighbor normalization can be done by dividing the aggregated message by the degree of the node, ensuring that nodes with more neighbors do not disproportionately influence the aggregation. This is particularly important in graphs with a power-law degree distribution, where a few nodes may have a very high degree compared to others, and so we don't want them to dominate the aggregation process
@@ -537,6 +582,7 @@ The below script shows how to implement skip connections in a GNN layer, allowin
 <!-- Collapsible Python snippet -->
 <details>
     <summary>Show Python Code with Skip Connections</summary>
+
 ```python
 class GNN(nn.Module):
     def __init__(self, input_dim, hidden_dim, output_dim):
@@ -555,41 +601,3 @@ class GNN(nn.Module):
         return h_updated
 ```
 </details>
-
-## Graph Convolutional Networks
-Graph Convolutional Networks (GCN's) were first introduced as a method for applying NN's to graph structured data
-
-The simplest GCN's had three operators:
-- Graph convolution
-- Linear layer
-- Nonlinear activation
-
-The operations were also typically done in that order, and the Node Embedding example above showcases a similar ordering
-- Aggregate local neighbors (convolution)
-- Apply linear transformation (linear layer)
-- Use a nonlinear $\sigma$ activation for more robust relationships
-
-The initial workflow above inspired GraphSAGE
-
-### GraphSAGE Idea
-GraphSAGE is a representation learning technique for dynamic graphs - this, in english, means that it can create node embeddings on new (previously unseen) nodes, which makes it inductive and useful for dynamic or growing graphs
-
-The intuition is that GraphSAGE learns vector representations (embeddings) for nodes by repeatedly sampling a node's neighbors, aggregating their features (permutation invariant function), combining that with it's own features, and passing through neural layers - this is exactly what we saw above in the Node Embedding portion, and it allows generalization to new (previously unseen) nodes in the graph because it utilizes sampling and doesn't require the full adjacency matrix to compute a node's embedding. This means it doesn't require *all* of a node's neighbors (full adjacency matrix), and can create embeddings based on local samples
-
-Simple Neighborhood Aggregation:
-$$
-h_k^{(v)} = \sigma(W_k \sum_{u \in N(v)} {h_u^{(k-1)} \over {|N(v)|}} + B_k h_k^{(k-1)}) 
-$$
-
-GraphSAGE:
-$$
-h_k^{(v)} = \sigma([W_k \cdot \text{Agg}(\{h_u^{(k-1)} : u \in N(v)\}), B_k h_k^{(k-1)}])
-$$
-- Generalized aggregation method: $ \text{Agg}(\{h_u^{(k-1)} : u \in N(v)\})$
-    - Literally just mentions any aggregation on layers before it, in it's neighborhood
-    - Other options outside of typical weighted average include
-        - **Pooling**: Transform each neighbor embedding with a NN, then apply element-wise max-pooling
-            - $\text{Agg}(\{h_u^{(k-1)} \space \forall u \in N(v)\}) = \max_{u \in N(v)} \sigma(W_{\text{pool}} h_u^{(k-1)} + b_{\text{pool}})$
-        - **LSTM**: Use a unidirectional LSTM to aggregate neighbor embeddings (requires imposing an order on neighbors, which is not inherently defined in graphs)
-            - $\text{Agg}(\{h_u^{(k-1)} \space \forall u \in N(v)\}) = \text{LSTM}(\{h_u^{(k-1)} \space \forall u \in N(v)\})$
-- Concatenate neighbor embedding and self embedding via the $+$ in the simple neighborhood aggregation, but you can do any other combination operation (specified as "," in the GraphSAGE equation)

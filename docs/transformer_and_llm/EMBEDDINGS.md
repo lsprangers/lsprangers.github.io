@@ -205,7 +205,8 @@ The generic framework proposed in [initial papers](https://arxiv.org/abs/1406.10
 - Encoder RNN processes the input sequence of length $n_{x}$ to compute a fixed length context vector $C$
     - This context vector is usually just the final hidden state of the encoder, or some function of the hidden states if that's desired
     - This context vector is supposed to encode all relevant information, signals, etc about the input vector
-- Decoder RNN process uses the context vector to produce a target sequence of length $n_{y}$ 
+- Decoder RNN process uses the context vector to produce a target sequence of length $n_{y}$
+    - The context is passed to every hidden state of the decoder, the decoder RNN uses this information to produce the target sequence of length $n_{y}$, which can of course vary from $n_{x}$
 
 ![Encoder Decoder Freehand Specific](/img/encoder_decoder_freehand_specific.png)
 
@@ -392,12 +393,14 @@ If the predicted sequence is the same as the target sequence, the BLEU score is 
 ### BERT
 [BERT](/docs/transformer_and_llm/BERT.md#bert) architecture, training, and fine tuning is descirbed in another page, but given all of that is read through you discuss below how to get useful embeddings out of BERT!
 
+BERT uses encoder architecture above along with [attention](/docs/transformer_and_llm/ATTENTION.md)
+
 Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it through multiple Encoders, and would send it through an output layer at the end - this output layer tyipcally isn't useful by itself for Word Embeddings, so you would need to go back through the hidden state values and aggregate these in some way to produce Word, Sentence, or Document embeddings
 
 #### BERT Word Embeddings
 - [Another reference link](https://mccormickml.com/2019/05/14/BERT-word-embeddings-tutorial/#history)
 - Most use cases of word embeddings can come straight out of a pre-trained core BERT model
-- you could send a single word through and it would most likely just be a representation of the WordPiece Embedding layer at the start
+- You could send a single word through and it would most likely just be a representation of the WordPiece Embedding layer at the start
 - If you send multiple words through (a sentence) then you could try and reconstruct each individual words new embedding that was altered from the self-attention layers
     - `bank` in the sentence `the large and sandy river bank` will be attended to, and ultimately different, from `the countries central bank` because it's surrounding context words are different!
     - Typically you would send through the sentence and then pull back each $T_i$, or some mixture of $H_{a, b}$ hidden states, for each $w_i$ and that would represent your finalized word embedding that was attended to / altered from contextual self-attention!

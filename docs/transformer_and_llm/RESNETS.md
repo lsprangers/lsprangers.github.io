@@ -1,16 +1,47 @@
 ---
 layout: technical
-title: ResNets
+title: CNN - ResNet and DenseNet
 category: NLP, CV, and Transformers
 difficulty: Advanced
-description: Discussions around GPT LLMs
+description: CNN ResNet and DenseNet Architectures
 show_back_link: true
 ---
 
+## CNN Background
+CNN's work well on image data - typical NN's will take an image, flatten it, and just pass it through a network. This is fine, but it doesn't generalize well across objects inside of images. Typical NN's aren't ***translationally invariant***, but CNN's are!
+
+### Translational Invariance
+Translational invariance is the property of a system that remains unchanged when its position or input data is shifted in space. It's important because generally we're more interested in the presence of a feature versus where it's actually at - once a CNN is trained to detect things in an image, changing the position of that thing in an image won't prevent the CNN's ability to detect it
+
+### CNN Layers
+There are multiple layer types in CNN's that are discussed elsewhere:
+- Convolutional layers take sliding windows (filters / kernels) over pixels to extract local features like edges and textures. Each filter produces a feature map by aggregating pixels in it's window
+- Pooling layers will reduce the actual spatial size of feature maps by sliding a window and applying an aggregate function (max, avg, etc) to that region
+- Dense layers (fully connected layers) have each neuron connected to another next layers neurons, and these are for combining features from above layers
+- Activation layers look to take these other layers and look for features by utilizing non-linear functions such as ReLU, sigmoid, tanh, etc to introduce non-linearity inside of the network
+
+![Basic CNN Layers](/img/basic_cnn_layers.png)
+
+Instead of flattening inputs, CNN's apply filters by utilizing convolutional and pooling layers. These filters stride over the entire input image or hidden layers
+
+![CNN FIlter Example](/img/cnn_filter_example.png)
+
+ReLU layers also allow CNN's to find edges, textures, etc because color gradients will change from -1 to 0 and other features, and pooling layers inbetween help reduce the size of the problem space as it grows. All of this ends up being passed into final softmax layers and other things to predict image classes, output bounding boxes, etc.
+
 ## ResNets
-ResNets were presented as an answer to "can stacking more layers enable the network to learn better" - the obstacle up to that point was vanishing / ***exploding gradients***, and they were primarily solved for by ***normalized initialization and intermediate normalization layers*** which enabled networks with tens of layers to start converging for [stochastic gradient descent](/docs/training_and_learning/TRAINING_OPTIMIZATIONS.md#stochastic-gradient-descent-sgd) with backprop. Degredation also proved to be an issue, where as network depth increased there was a saturation, and then rapid decrease, in accuracy. Adding more layers to a suitably deep model led to higher training error, and overfitting was not caused by this degredation. A shallower architecture was suggested, and using auxiliary layers consisting of identity mappings and others shallow model layers, but in practice this didn't help. Later on Deep Residual Learning took the charge.
+Learning better networks isn't as easy as just simply stacking more and more of those above layers on! Unlike NLP, where more attention layers allow for better embedding representations, CNN's showed diminishing returns and sometimes complete degredation when stacking more of these layers together
+
+ResNets were presented as an answer to "can stacking more layers enable the network to learn better" - the obstacle up to that point was vanishing / ***exploding gradients***, and they were primarily solved for by ***normalized initialization and intermediate normalization layers*** which enabled networks with tens of layers to start converging for [stochastic gradient descent](/docs/training_and_learning/TRAINING_OPTIMIZATIONS.md#stochastic-gradient-descent-sgd) with backprop. Degredation also proved to be an issue, where as network depth increased there was a saturation, and then rapid decrease, in accuracy. Adding more layers to a suitably deep model led to higher training error, and overfitting was not caused by this degredation. A shallower architecture was suggested, and using auxiliary layers consisting of identity mappings and others shallow model layers, but in practice this didn't help. Later on Deep Residual Learning took the charge, and utilized normalization / residual layers to help fix the problems of degredation
+
+
+Parameters early on in CNN architectures sometimes don't receive meaningful gradient updates (vanishing gradients), sometimes the gradients are huge and chaotic (exploding gradients), the layers may not capture meaningful representations (just bad NN), or extra layers may degrade useful features in hidden layers (degredation)
+
+![Vanishing Gradient](/img/vanishing_gradient_gif.png)
+
+ResNets are an architecture that show promise in fixing many of the above issues, ultimately preserving gradients and allowing features to pass through downstream layers
 
 ### ResNet Theory / Background
+
 ### ResNet Architecture
 
 ## Deep Residual Learning

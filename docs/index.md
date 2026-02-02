@@ -146,4 +146,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Confluent Michael Noll Kafka Blog Pt 2](https://www.confluent.io/blog/kafka-streams-tables-part-4-elasticity-fault-tolerance-advanced-concepts/)
 - [Rebalancing Protocol Medium Article](https://medium.com/streamthoughts/apache-kafka-rebalance-protocol-or-the-magic-behind-your-streams-applications-e94baf68e4f2)
 - [Oreilly Multi Tenancy Book - Building Multi Tenant SaaS](https://learning.oreilly.com/library/view/building-multi-tenant-saas/9781098140632/)
+- [Comet CNN Blog](https://www.comet.com/site/blog/an-intuitive-guide-to-convolutional-neural-networks/)
 ---

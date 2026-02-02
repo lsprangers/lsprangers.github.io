@@ -9,6 +9,8 @@ show_back_link: true
 ## Pregel
 Pregel, and Pregel based SDK's like [Spark Graph-X](https://spark.apache.org/docs/latest/graphx-programming-guide.html), are used for traversing graphs using super-steps and message passing
 
+[Pregel Lecture Paper](/arxiv_papers/PregelLectureMarkedUp.pdf) is another good discussion point that shows how pregel is setup and used on Spark, and some of the actual implementations for Basic Linear Algebra Support (BLAS) operations
+
 ### Why It's Needed
 The main reason I've used this in the past is that our Data Warehouse wrote things to [Parquet or Delta](/docs/architecture_components/databases%20&%20storage/Disk%20Based/PARQUET.md) format on Disk, and so our entire data model that was graph based had no actual way of traversing
 

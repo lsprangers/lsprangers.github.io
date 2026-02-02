@@ -50,6 +50,12 @@ description: Architecting a Distributed KV Store Solution
 - Hash based if there’s more data for the data points mapped to a partition
 
 #### Consistent Hashing
+[Relatively okay in-memory walkthrough of this](/docs/leetcode_coderpad/coderpad_implementations/consistent_hashing_service.md) from coderpad interviews. Helped to realize the tradeoffs of less data shuffle for non-uniformity, and how virtual nodes are randomly assigned throughout rings to help actual underlying servers be less skewed. Nodes get many virtual positions on the ring—e.g., 100–300 per node which smooths out randomness statistically
+- Instead of one big chunk per node, you break workload into many micro-shards
+- When a node joins, it takes 100 small micro-shards, not one huge region
+- Randomness averages out → distribution becomes roughly uniform
+
+Rest of below is from courses + books
 - ***Consistent Hashing*** assigns each server or item in a distributed hash table a place on an abstract circle, called a ring, irrespective of the number of servers on the circle
     - Allows servers and objects to scale without compromising overall performance
     - When an area of the ring becomes overused / Hot Spot you have to rebalance the partitions on the ring
@@ -68,6 +74,7 @@ description: Architecting a Distributed KV Store Solution
 - Keeping track of everything as data is constantly moves will strain our ability to handle reads / writes
         - ***Proportional Partitions*** – Is when you set the number of partitions to be proportional to the number of nodes, and each node has a fixed number of partitions
 - In this case the number of nodes remains fairly constant, and the partitions re-size themselves
+
 ##### Consistent Hashing Example
 - Consistent Hashing, again
     - you have a circular buffer / ring from 0 to n-1 where n is the number of available hash values

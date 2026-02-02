@@ -10,11 +10,11 @@ show_back_link: true
 ## GPT-2
 GPT-2 was one of the first, and most notable GPT models!
 
-GPT models are ***Decoder Only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input
+GPT models are ***Decoder Only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input. They can be used as generators to fine-tune their probability of predicting the next word conditioned on the previous words. The models are suitable for tasks similar to the training, including any type of dialogue and document summarization
 
 In [Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) BERT was discussed to show how you can "attend to" embeddings, and the Self Attention encoder portion was a way to contextualize ***an entire sentence, before and after a word***, but GPT isn't "allowed" to do that
 
-***Use Case***: Original Encoder-Decoder Transformers like BART were great for *machine translation*, but that isn't the use case for GPT! GPT is used for things like next word prediction, auto-complete, etc...
+BERT can be seen as stacked encoders, T5 aims to combine the good parts of encoders and decoders, while GPT are stacked decoders
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
@@ -23,11 +23,7 @@ The first good comparison I can think of is to a really good auto-complete where
 ### History
 [Generative Pre-Training](https://gwern.net/doc/www/s3-us-west-2.amazonaws.com/d73fdc5ffa8627bce44dcda2fc012da638ffb158.pdf) as a paper came out in 2018, and basically did away with the encoder in [BERT](/docs/transformer_and_llm/BERT.md)
 
-GPT-2 was trained on a 40GB dataset known as WebText by OpenAI
-
-The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6.5GB, showing the difference in overall parameter sizes
-
-The number of decoder blocks + context size is one of the distinguishing factors in GPT models as well
+GPT-2 was trained on a 40GB dataset known as WebText by OpenAI. The smallest GPT-2 variant took up ~500MB of storage, and the largest one was ~6.5GB, showing the difference in overall parameter sizes. The number of decoder blocks + context size is one of the distinguishing factors in GPT models as well
 
 ![GPT Sizes](/img/gpt_sizes.png)
 
@@ -39,7 +35,7 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
 
 - ***Input***:
     - The [section on BERTs input sequence](/docs/transformer_and_llm/BERT.md#input-sequence) basically describes what the input would be here as well
-        - you embed our initial words, similar to BERT it uses WordPiece Embeddings
+        - Embed our initial words, similar to BERT it uses WordPiece Embeddings
         - Positional encoding is also used
 - ***Decoder Only***:
     - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention) which allows for constrained left-to-right self attention

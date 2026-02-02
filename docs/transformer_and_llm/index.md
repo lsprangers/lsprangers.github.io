@@ -31,11 +31,11 @@ These examples have even been shown to hold across languages, where youc can map
 
 ![High Level Attention](/img/high_level_attention.png)
 
-
-
 ***Transformers*** were born from attention, and do not have to process input data sequentially like RNN's. Currently this is still the dominant paradigm in NLP, and greatly increased the demand for GPU's as a majority of their calculations can be done in parallel. Transformer Architectures like [BERT](/docs/transformer_and_llm/BERT.md)), T5, [GPT](/docs/transformer_and_llm/GPT.md), and BART are pre-trained on a large text corpus and then can be fine-tuned for down stream specific language tasks. One of the most useful topics is getting more data without human supervision, and this is the core topic of [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) which has helped these models greatly improve accuracy and reliability
 
 Outside of BERT, there are other models like ***T5 (Text-To-Text Transfer Transformer)*** which takes a number of insights from emperical studies to create a model fit for transfer learning as a whole. It was trained on the Colossal Clean Crawled Corpus (C4). It's best fit objective was span corruption, which is when different length word groups (spans) are replaced with unique placeholders, and the model tries to decode them. However, the decoder is still a language modelling task. T5 allows for unified text-to-text format for transfer learning for all NLP tasks where all inputs and outputs consist of text strings - this means the model, the same weights, hyperparams, etc, can be used for all NLP tasks. So while not multi-model, T5 was the first "single model multi-task" by simply viewing all inputs and outputs as strings - even regression tasks it can output "0.5"!
+
+BERT can be seen as stacked encoders, T5 aims to combine the good parts of encoders and decoders, while GPT are stacked decoders
 
 ![T5](/img/t5.png)
 

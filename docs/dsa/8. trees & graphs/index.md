@@ -291,6 +291,57 @@ Space complexity is
   - If the tree is perfectly balanced, space complexity becomes $O(\log n)$
 
 ### Breadth First Search
+Breadth First Search (BFS) is another way to traverse tree's and graphs, but is different from DFS in that it checks row by row instead of traversing down left, right, etc depth wise
+
+The real difference between the 2 lies in their efficiencies on problems:
+- BFS is better if the node is higher up, or if the logic requires level based logic
+- DFS is better if the node is easily found traversing depth wise, or if the logic requires it!
+- DFS space complexity, in typical cases, revolves around height of the tree and ends up being $O(\log n)$, but BFS is based on the largest span of the tree, and in a perfectly balanced tree would result in $O(n)$ as the bottom row would have $n \over 2$ nodes in it
+- Time complexity they're usually equivalent, unless the tree structure and problem statement are weird enough to cause them to deviate
+  - Using underlying deque data structure is required, as using a list wil cause time complexity to explode with inserts
+
+```python
+from collections import deque
+
+def print_all_nodes(root):
+    queue = deque([root])
+    while queue:
+        nodes_in_current_level = len(queue)
+        # do some logic here for the current level
+
+        for _ in range(nodes_in_current_level):
+            node = queue.popleft()
+            
+            # do some logic here on the current node
+            print(node.val)
+
+            # put the next level onto the queue
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+```
+
+## Binary Search Tree
+In a binary search tree, there's some special properties where, for any Vertex V, it's right child is greater than it's value, and its left child is less than it's value
+
+Ultimately it's just a way to restructure a Linked List so that search is in $O(\log n)$ time - this entire concept is the idea of [Self-Balancing Binary Search Trees](/docs/dsa/6.%20binary%20search/SELF_BALANCING.md) such as [B-Tree's](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md). Self balancing tree's have less efficient writes (since they need to find where to place nodes and do some restructuring), but the idea is that reads are much more efficient
+
+A Binary Search Tree has similar code structure to Lists
+
+```python
+def search_bst(root, target):
+    while root is not None:
+        if root.val == target:
+            return True
+        elif target < root.val:
+            root = root.left
+        else:
+            root = root.right
+    return False
+```
+
+BST's follow similar time and space complexity to [Binary Search](/docs/dsa/6.%20binary%20search/index.md), but when you traverse a BST itself you use recursion / DFS for the actual recursion, and you'd simply choose `left` or `right` instead of going down both paths
 
 ## Graphs
 At it's core a Graph is a data structure consisting of two components - vertices (or nodes) $V$ and edges (connections between nodes) $E$

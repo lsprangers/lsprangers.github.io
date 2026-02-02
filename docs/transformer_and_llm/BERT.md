@@ -14,6 +14,8 @@ BERT is technically an ***Encoder Only Model*** even though it has a decoder sta
 
 ***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for BERT! Encoder only helps us with transfer learning for a variety of contextual embedding use cases
 
+BERT can be seen as stacked encoders, T5 aims to combine the good parts of encoders and decoders, while GPT are stacked decoders
+
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
 Therefore, if you look into [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
@@ -23,8 +25,6 @@ BERT doesn't generate text, but it produces token embeddings that are great for 
 ***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) respectively
 
 ***Transfer Learning*** is the idea that the semi-supervised training of of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers tacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
-
-After learning more about it, BERT is a specific case of [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) and most of the discussion around that learning style can be applied here - self supervised, generalized embeddings, with transfer learning and evaluation as core target in downstream tasks
 
 BERT training has a similar setup to Word2Vec where you use a certain context size to help us model a specific word, but the embeddings can't necessarily be saved because the output layer (embedding) depdends on the hidden layers...therefore you need to pass a word through with context to get an embedding
 
@@ -47,7 +47,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 ## Training
 - BERT is designed to pre-train deep (large context) bi-directional (forwards and backwards) representations from unlabeled text by jointly conditioning on left and right context in each layer
     - This basically means that throughout the layers of BERT you use the context words to left and right of current word to update our weights
-    - Difference from [Word2Vec](#word2vec) is that ***BERT keeps word positioning and context***
+    - Difference from [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) is that ***BERT keeps word positioning and context***
 - Once this is complete, BERT can be ***fine-tuned*** with just one single output layer to be used as a State of The Art (SOTA) model for multiple different NLP tasks
 
 ### Base Models
@@ -69,7 +69,6 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - $P_i$ is our positional encoding which represents the learned positional embedding for our token in it's specific sentence of any size
     - $S_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
         - In our inference time examples for embeddings most people just fill it with `0's` or `1's` depending on which sentence it's apart of
-
 - Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
   - I used to believe BERT also uses Bahdanau attention, but that's in encoder-decoder architectures, where decoder computes attention over encoder outputs to select relevant context for each generated token
   - ***BERT HAS NO DECODER*** - there's no secondary sentence like output / target to attend over! you simply just attend to our input WordPiece embeddings
@@ -200,9 +199,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
     - *Output:* Objective is to find $i, j : j >= i$ meaning you just want to find the right indexes in the passage that answer the question
 
 ## So Why Does BERT Work
-The results of transformer-based models clearly show that they deliver successful results. However, it is less clear why. 
-
-The thought process goes - since BERT is small (relatively), and BERT has attention weights that can directly identify relationships, you can use it to analyze transformers and why they work.
+The results of transformer-based models clearly show that they deliver successful results. However, it is less clear why. The thought process goes - since BERT is small (relatively), and BERT has attention weights that can directly identify relationships, you can use it to analyze transformers and why they work
 
 BERT representations are hierarchical rather than linear, and they include information about parts of speech, syntactic chunks, and roles. This mostly means that output vectors of BERT capture multiple levels of linguistic information, rather than just a flat out sequential context. 
 - Each layer of BERT encodes different "types" of information, lower layers tend to capture more basic features, and higher layers capture more abstract, global, and semantic features like relationships

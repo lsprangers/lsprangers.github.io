@@ -10,21 +10,27 @@ show_back_link: true
 ## Attention
 Attention is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
 
-Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results
+Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results. Attention helps to fix the **bottleneck problem** in [RNN encoder (and RNN encoder-decoder) models](/docs/transformer_and_llm/EMBEDDINGS.md#encoder-decoder) - Due to their design, the encoding of the source sentence is a single vector representation $C$ (context vector). The problem is that this state must compress all information about the source sentence in a single vector and this is commonly referred to as the bottleneck problem. There was a desire to not "squish" everything into one single context vector, and instead to utilize the input embeddings dynamically when decoding, and to utilize the context on the fly - this is known as *align and translate jointly*
 
-you need to remember that the embedding for "bank" *is always the same embedding in the metric space* in these scenario's, but by attending to it with Attention, you can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
+![Align and Translate Jointly](/img/align_and_translate_jointly.png)
+
+The embedding for "bank" *is always the same embedding in the metric space* in static scenario's like [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec), but by attending to it with Attention, you can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
 
 How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention - most useful / used are Self Attention, Encoder-Decoder Attention, and Masked Self Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
 
 In the days before Attention, there would be Encoders that take input sentence and write it to a fixed size embedding layer, and then a separately trained Decoder that would take the embedding and output a new sentence - this architecture for Seq2Seq tasks is fine for short sequences, but degrades with longer sequences you try to "stuff into" a fixed size embedding layer 
 
-Therefore, Attention helps us to remove this fixed size constraint between encoders and decoders
+Therefore, Attention helps us to remove this fixed size constraint between encoders and decoders, but attention does no more than weighted averaging, and so without neural network layer functions it's strictly weighted averaging. Transformers help change this and add in non-linear layers
 
 All of these Attention mechanisms are tunable matrices of weights - they are learned and updated through the model training process, and it's why you need to "bring along the model" during inference...otherwise you can't use the Attention!
 
 Below shows an example of how an embedding like creature would change based on surrounding context
-<!-- ![Bert, GPT, BART](/img/bert_gpt_bart.png) -->
+
 ![Fluffy Blue Attention](/img/fluffy_blue_creature.png)
+
+Or showcasing how adjective / adverb positions are different between languages
+
+![Adjective Positions](/img/adjective_positions.png)
 
 ### Keys, Queries, and Values Intuition
 Lots of the excerpts here are from the [D2L AI Blog on Attention](https://d2l.ai/chapter_attention-mechanisms-and-transformers/queries-keys-values.html)
@@ -33,7 +39,9 @@ Consider a K:V database, it may have tuples such as `('Luke', 'Sprangers'), ('Do
 
 If you allow for approximate matches, you might get `['Sprangers', 'Skywalker']` 
 
-Therefore, our Queries and our Keys have a relationship! They can be exact, or they can be similar (Luke and Puke are similar), and based on those similarities, you may or may not want to return a Value
+Therefore, our Queries and our Keys have a relationship! They can be exact, or they can be similar (Luke and Puke are similar), and based on those similarities, you may or may not want to return a Value. Thinking of self-attention as an approximate hash table eases understanding its intuition. To look up a value, queries are compared against keys in a table. In a hash table, which is shown on the left side of image below, there is exactly one key-value pair for each query (hash). In contrast, in self-attention, each key is matched to varying degrees by each query. Thus, a sum of values weighted by the query-key match is returned
+
+![Q, K, V Hash Table](/img/q_k_v_hash_table.png)
 
 What if you wanted to return a portion of the Value, based on how similar our Query was to our Key? Luke and Luke are 1:1, so you fully return Sprangers, but Luke and Puke are slightly different, so what if you returned something like `intersect / total` * Value, or 75% of the Value?
 
@@ -228,9 +236,13 @@ Where the best probability is usually found using beam search - at each step of 
 ## Transformer Attention
 The above RNN discussion is useful, as it shows how you can utilize the building blocks of forward and backwards passes, and even achieve attention mechnisms using basic building blocks
 
-However, RNN's eventually fail with long term dependencies - the sentence "he was near the large stadium with Sarah and was named Cam", you would need to keep track of every word between "he" and "Cam" to have the word "he" have any sort of effect on Cam. A direct consequence of this is the inability to train in parallel on GPU's because future hidden states cannot be computed in full before past hidden states have completed.
+***RNN's are linear, and therefore have trouble with parallel processing and fully utilizing GPU's - Transformers aimed to make this alignment fully parallelized***
+
+RNN's also fail with long term dependencies - the sentence "he was near the large stadium with Sarah and was named Cam", you would need to keep track of every word between "he" and "Cam" to have the word "he" have any sort of effect on Cam. A direct consequence of this is the inability to train in parallel on GPU's because future hidden states cannot be computed in full before past hidden states have completed.
 
 Attention also helps to alleviate the bottleneck problem, where all context is "shoved" into a singular vector. Attention allows all encoded infromation to help influence the context and decoding during each step, and helps to alleviate the vanishing gradient problem from long sentences that end up multiplying multiple numbers $\lt$ 1.0 throughout numerous steps. 
+
+Attention does no more than weighted averaging, and so without neural network layer functions it's strictly weighted averaging. Transformers help change this and add in non-linear layers. That's why transformer architectures eventually use multiple layers of self-attention (parallelized), with non-linear and other activation layers (feed forward, residual connections, etc), and potential future masking strategies. All of these different choices help to ensure transformers tackle a vast set of NLP problems
 
 The rest of the discussion is around Attention blocks in Transformer Architectures, primarily using a similar encoder-decoder structure "on steroids"
 
@@ -285,14 +297,13 @@ Lastly, there are still limitations to Attention, and Attention is not "all you 
 - Bidirectionality may not always be desired (this is covered more in [Masked Self Attention](#masked-self-attention))
 - Self Attention by itself does not keep word position, and so it's essentially a bag-of-words once again
 
-All of the above are solved via the Transformer Architecture itself outside of Self Attention! This is why rtansformer encoder and decoder architecture consists of multiple layers of self attention with a feed forward network and positional encodings!
+All of the above are solved via the Transformer Architecture itself outside of Self Attention! This is why transformer encoder and decoder architecture consists of multiple layers of self attention with a feed forward network and positional encodings!
 - Residual connections pass "raw" embeddings directly through next layers which helps to prevent forgetting or misrepresenting information
 - Layer normalization helps to relieve parameters of given layer shifting because of layers beneath it
    - This ultimately reduces uninformative variation and normalizes each layer to mean zero and standard deviation of one
 - Scaling down the dot product helps to stop the dot product from taking on extreme, unbounded values because of this variance scaling
 
-#### Example
-Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning.
+Consider the phrase "fluffy blue creature." The embedding for "creature" is updated by attending to "fluffy" and "blue," which contribute the most to its contextual meaning
 
 ![Fluffy Blue Attention](/img/fluffy_blue_creature.png)
 
@@ -300,7 +311,7 @@ Consider the phrase "fluffy blue creature." The embedding for "creature" is upda
 TLDR;
 - The Query vector $Q_i$ represents the current word
 - The Key vector is an embedding representing every other word $K_j \forall  \left\{j \neq i\right\} $
-    - you multiply the Query by every Key to find out how "similar", or "attended to" each Query should be by each Key $Q_i \cdot K_j$
+    - Multiply the Query by every Key to find out how "similar", or "attended to" each Query should be by each Key $Q_i \cdot K_j$
 - Then you softmax it to find the percentage each Key should have on the Query
 - Finally you multiply that softmaxed representation by the Value vector, which is the input embedding multipled by Value matrix, and ultimately allow each Key context word to attend to our Query by some percentage
 - At the end, you sum together all of the resulting value vectors, and ***this resulting SUM of weighted value vectors is our attended to output embedding***
@@ -357,6 +368,34 @@ In depth mathematical explanation below
      Z = \text{Concat}(O^{(head_1)}, O^{(head_2)}, \dots) \cdot W_O
      $
 ![Multi Headed Attention](/img/multi_attn.png)
+
+### Other Layers
+Other layers outside of attention based layers in transformers help to extend the problems to a wider set of real world scenario's:
+- Non-linearity (feed forward + residual layers)
+- Gradient issues (Normalization)
+- Distribution shift (normalization, skip layers)
+- etc..
+
+Below blurb helps to showcase some of the reasons why all of these layers and architectures are added into the "attention only" architectures (i.e. attention isn't all you need, and below explains why)
+
+<div style={{
+  margin: "2em auto",
+  maxWidth: 600,
+  background: "#f5f7fa",
+  borderLeft: "4px solid #4f8cff",
+  padding: "1.5em 2em",
+  borderRadius: 8,
+  textAlign: "left"
+}}>
+  <em>
+One of them is to pass the "raw" embeddings directly to the next layer, which prevents forgetting or misrepresent important information as it is passed through many layers. This process is called residual connections and is also believed to smoothen the loss landscape. Additionally, it is problematic to train the parameters of a given layer when its inputs keep shifting because of layers beneath. Reducing uninformative variation by normalizing within each layer to mean zero and standard deviation to one weakens this effect. Another challenge is caused by the dot product tending to take on extreme values because of the variance scaling with increasing dimensionality $d_k$. It is solved by Scaled Dot Product Attention, which consists of computing the dot products of the query with its keys, dividing them by the dimension of keys, and applying the softmax function next to receive the weights of the values.
+
+Attention learns where to search for relevant information. Surely, attending to different types of information in a sentence at once delivers even more promising results. To implement this, the idea is to have multiple attention heads per layer. While one attention head might learn to attend to tense information, another might learn to attend to relevant topics. s
+  </em>
+</div>
+
+![Freehand Transformer Arch](/img/freehand_transformer_arch.png)
+
 
 #### Positional Encoding
 
