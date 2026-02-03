@@ -58,7 +58,7 @@ High       | Low           | This word is rare throughout the other documents, b
 | Low  | High | This word is a common word, and it's not even showing up much in this document | Low Score |
 | Low | Low | This word isn't very common, but it's also not apart of this document, so it's not very relevant | Low but closer to mean | 
 
-![General Architecture of TFIDF](./images/inverted_index_tfidf.png)
+![General Architecture of TFIDF](/img/inverted_index_tfidf.png)
 
 #### BM25
 - ***Description***: An extension of TF-IDF that considers term frequency saturation and document length normalization.

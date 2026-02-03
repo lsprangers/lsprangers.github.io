@@ -17,6 +17,8 @@ It's a structured dump of stuff I've pulled out of old word files and tweaked in
 
 ## Highlights
 Some of the better displays on here:
+- Arxiv Papers
+  - [Youtube DNN Recommendation System](/arxiv_papers/DNNYoutubeRecsMarkedUp.pdf) and [Facebook Embedding Paper](/arxiv_papers/Facebook%20Embedding%20Search%20MarkedUp.pdf) are referenced and explained in [Search System Discussion](/docs/design_systems/search_system/index.md)
 - [Typical reusable resources](/docs/architecture_components/typical_reusable_resources/index.md) which are examples of architecture components built from ground up
   - In memory implementations
   - Distributed implementations
@@ -31,8 +33,6 @@ Some of the better displays on here:
 ## Architecture and Systems Design Examples
 
 This section focuses on building specific systems, often inspired by technical interviews or real-world use cases. Examples include URL shorteners, YouTube Search, Top K Heavy Hitters, and more.
-
-
 
 ## Architecture Components
 To implement these systems, you'll find notes under Architecture Components about databases, messaging, calculations, and other essential components.
@@ -82,6 +82,8 @@ This is a dump of LC problems and comments
 
 ## Arxiv
 These are just papers I've read marked up with highlighter - my old iPad died and brought these here
+
+[Youtube DNN Recommendation System](/arxiv_papers/DNNYoutubeRecsMarkedUp.pdf) and [Facebook Embedding Paper](/arxiv_papers/Facebook%20Embedding%20Search%20MarkedUp.pdf) are referenced and explained in [Search System Discussion](/docs/design_systems/search_system/index.md)
 
 ---
 

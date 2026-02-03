@@ -57,7 +57,9 @@ As we stated above, Kafka Brokers only seeing raw bytes makes them "dumb", but t
   textAlign: "left"
 }}>
   <em>
-In event streaming and similar distributed data processing systems, lots of CPU cycles are spent on mere serialization/deserialization of data. If you ever had to paint a room, you may have experienced that the preparation (moving furniture, protecting the floor with drop cloths, convincing your significant other that olive green is doubtlessly a more suitable color than that horrible yellow, etc.) can consume more time than the actual painting. Fortunately, brokers don’t need to deal with any of that!
+
+  In event streaming and similar distributed data processing systems, lots of CPU cycles are spent on mere serialization/deserialization of data. If you ever had to paint a room, you may have experienced that the preparation (moving furniture, protecting the floor with drop cloths, convincing your significant other that olive green is doubtlessly a more suitable color than that horrible yellow, etc.) can consume more time than the actual painting. Fortunately, brokers don’t need to deal with any of that!
+  
   </em>
 </div>
 

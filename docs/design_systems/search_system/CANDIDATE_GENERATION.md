@@ -61,7 +61,7 @@ To find recommendations, you compare the query (User embedding) to all Item embe
 This example from Google shows how if you have $m$ Playlists who have $n$ songs you can use this co-occurrence matrix, factorize it, and then find similar Playlists. Factorizing these into $k$ dimensions allows us to find the ***Top-K Latent Features*** of each playlist, and ultimately to compare it to other playlists using geometric vector distance. 
 
 This is similar to factorizing a `User x Item` matrix, and then doing a dot product with $n$ items to find what ones would be useful to User. It's a bit odd because we're saying you can compare Track Embeddings to Playlist Embeddings, but ultimately we're calculating the interaction score / goodness score of adding a new Track to a Playlist
-![Google Songs](./images/google_songs.png)
+![Google Songs](/img/google_songs.png)
 
 ### Item Content Filtering 
 - Recommends items to a user based on the similarity between items
@@ -258,7 +258,7 @@ Below you will get into different objective functions, but a good visualization 
 - Observed only means you only focus on user-item interactions that have occurred
 - Weighted will allow us to utilize unseen user-item interactions, weighted to a certain degree $w_0$
 - SVD at the end is how you actually compute "differences" for our objective functions
-![Matrix Factorization Objectives](./images/matrix_factorization_objectives.png)
+![Matrix Factorization Objectives](/img/matrix_factorization_objectives.png)
 
 ##### Singular Value Decomposition (SVD)
 Singular Value Decomposition, as shown above, is a way to solve for the 2 types of objective functions you setup - regardless of if you use Weighted or Only Observed
@@ -287,7 +287,7 @@ Where:
     - Another way this is done is by weighting $w_{i,j}$ carefully, and disregarding the regularization parameter entirely
 
 Solving for this equation:
-- you can use [Stochastic Gradient Descent (SGD)](/docs/training_and_learning/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/training_and_learning/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
+- You can use [Stochastic Gradient Descent (SGD)](/docs/training_and_learning/LOSS_FUNCTIONS.md#stochastic-gradient-descent) or [Weighted Alternating Least Squares (WALS)](/docs/training_and_learning/LOSS_FUNCTIONS.md#weighted-alternating-least-squares)
     - SGD is more generic, but is battle tested and true
     - WALS is more specific and helpful for this specific objective
     - WALS is most likely the ideal function since both matrices you solve for are quadratic
@@ -327,11 +327,11 @@ That being said, there are methods to incrementally update these models:
 DNN allows us to reduce latency during serving time by decoupling Query Embedding and Item Embedding creation, but you are still using DNN instead of Matrix lookup so overall it might be slower. you can pre-compute Candidates (Items), and then store them in a Vector Type Database for quick lookup
 
 Here's an example of architecture from Google's Blog
-![Two Towers Example from Google](./images/google_twotowers.png)
+![Two Towers Example from Google](/img/google_twotowers.png)
 
 ### Two Towers
 Two Towers will also generate embeddings for users and items, similar to Matrix Factorization, except in this scenario there's one tower for Queries (Users), and one tower for Items. If you ran Two Towers for the same Factorization problem above about Playlist and Tracks it'd look like this
-![TT Songs](./images/twotowers_songs.png)
+![TT Songs](/img/twotowers_songs.png)
 
 The Two Towers will allow us to create Dynamic, and maybe even [attended to](/docs/transformer_and_llm/EMBEDDINGS.md#attention) embeddings, which is different from static embeddings created via Filtering & Matrix Factorization. At the end to get a recommendation it's a similar option where you compute similarity of Query to all Items (maybe using [ScaNN (Scalable Nearest Neighbors)](https://github.com/google-research/google-research/tree/master/scann)) and find Top K
 - Below can all help find an approximate top-k items (from a large pool of item embeddings) for a user:

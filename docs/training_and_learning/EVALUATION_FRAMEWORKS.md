@@ -68,7 +68,7 @@ Typically, offline metrics revolve around calculating accuracy metrics like
 ![Precision / Recall](/img/precision_recall.png)
 
 
----
+#### At K Metrics
 There are other more advanced metrics that involve ranking such as:
 - @k Metrics
     - $Precision@k = {{(TP)@k} \over {(TP + FP)}@k}$
