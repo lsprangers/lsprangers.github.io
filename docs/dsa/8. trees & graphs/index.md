@@ -661,7 +661,7 @@ Since you are only iterating over edges and vertexes and doing increment / decre
 | $O(V + E)$         | $O(V + E)$         |
 
 
-You can also utilize straight up [DFS for topological sort](/docs/leetcode_coderpad/coderpad_implementations/python_files/dependencyGraph.py) in some dependency graph problems by utilizing the 3-color masking method. Ultimately this relates to tracking state along the call stack, and if something is currently in the stack (lookup in `state = defaultdict(int)` dict) with `state = 1`, then it's a loop as you'll eventually form a cycle
+You can also utilize straight up [DFS for topological sort](/docs/leetcode_coderpad/coderpad_implementations/dependency_graph.md) in some dependency graph problems by utilizing the 3-color masking method. Ultimately this relates to tracking state along the call stack, and if something is currently in the stack (lookup in `state = defaultdict(int)` dict) with `state = 1`, then it's a loop as you'll eventually form a cycle
 
 [Leaves Of A Binary Tree](/docs/leetcode_coderpad/leetcode/python/findLeavesOfBinaryTree.md) also has implementations for DFS, better DFS, and topological sort (BFS)
 
