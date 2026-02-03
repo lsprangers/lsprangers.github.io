@@ -12,7 +12,7 @@ Allows us to compare a users string query to a large corpus of documents
 
 ***This is not frequently used in things like User-Item recommendations, it's more-so used in free text similarity scoring***
 
-![A Simple Inverted Index Architecture](images/simple_inverted_index.png)
+![A Simple Inverted Index Architecture](/img/simple_inverted_index.png)
 
 Inverted Indexes are great because there's no training, you can generate large pools using n-grams, and it can be distributed for fast lookup
 
