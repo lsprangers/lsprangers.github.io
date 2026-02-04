@@ -441,22 +441,6 @@ Maze's are a special kind of graph where you essentially have a connected 2-D di
 
 Most common examples are [Finding The Nearest Exit](/docs/leetcode_coderpad/leetcode/python/nearestExitFromEntranceInMaze.md) or something similar, where you will use Breadth First Search to traverse outwards checking over the course of a structure
 
-### UnionFind / Disjoint Set union
-- Union Find is a data structure that allows us to find a representation of clusters in a disconnected graph
-  - It allows us to find connectivity of 2 nodes, i.e. if they're in the same component, in $O(1)$ time
-  - Optimizations:
-    - ***Path Compression:*** So that root / parent identification will be updated as you traverse down a graph
-    - ***Union by Rank:*** So that our tree's don't become unbalanced over time
-- For the time complexities below, $\alpha(n)$ is the *Inverse Achermann Function*, which "grows slowly and is effectively constant for all practical inputs"
-- An [Implementation](/docs/dsa/implementations/optimized_unionfind.md) in C++ can be reviewed for actual runtime info
-
-| Operation        | Average Complexity |
-|------------------|--------------------|
-| Union (Put)      | $O(\alpha(V))$     |
-| Find (Get)       | $O(\alpha(V))$     |
-| Delete           | Not Applicable     |
-| Traverse / Search| $O(n)$             |
-
 ### Connected Components
 - Connected Components is a way for us to find all of the clusters in a graph, where connectivity can be *weak*, *strong*, or a few other types like *unilaterally*
   - *Weak* connected components can be thought of as *undirected* connected components, so that edges are just generic edges
@@ -468,6 +452,307 @@ Most common examples are [Finding The Nearest Exit](/docs/leetcode_coderpad/leet
     - Continue the traversal until all nodes in the connected component of $node_i$ are visited
     - Repeat for all unvisited nodes to find all connected components.
   - ***UnionFind*** above will have the `root` vector at the end corresponding to all of the unique connected component ID's
+
+
+### Disjoint Set
+Given the vertices and edges of a graph, how can we quickly check whether two vertices are connected? Is there a data structure that can help us identify if 2 nodes are apart of the same [connected component](#connected-components)? Yes! By utilizing the ***disjoint set (AKA union-find) data structure***
+
+The primary purpose of this data structure is to answer queries on the connectivity of 2 nodes in a graph in $O(1)$ time
+
+The optimized version is shown below
+
+```python
+# UnionFind class
+class UnionFind:
+    def __init__(self, size):
+        self.root = [i for i in range(size)]
+        # Use a rank array to record the height of each vertex, i.e., the "rank" of each vertex.
+        # The initial "rank" of each vertex is 1, because each of them is
+        # a standalone vertex with no connection to other vertices.
+        self.rank = [1] * size
+
+    # The find function here is the same as that in the disjoint set with path compression.
+    def find(self, x):
+        if x == self.root[x]:
+            return x
+	# Some ranks may become obsolete so they are not updated
+        self.root[x] = self.find(self.root[x])
+        return self.root[x]
+
+    # The union function with union by rank
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            if self.rank[rootX] > self.rank[rootY]:
+                self.root[rootY] = rootX
+            elif self.rank[rootX] < self.rank[rootY]:
+                self.root[rootX] = rootY
+            else:
+                self.root[rootY] = rootX
+                self.rank[rootX] += 1
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+
+# Test Case
+uf = UnionFind(10)
+# 1-2-5-6-7 3-8-9 4
+uf.union(1, 2)
+uf.union(2, 5)
+uf.union(5, 6)
+uf.union(6, 7)
+uf.union(3, 8)
+```
+
+#### Terminologies
+- **Parent node**: The direct parent of a node of a vertex
+- **Root node**: A node without a parent node; it can be viewed as the parent node of itself
+
+#### Base Implementation
+To implement disjoint set there are 2 main functions that need to get covered:
+- **Find** function finds the root node of a given vertex
+- **Union** function unions two vertices and makes their root nodes the same
+- **isConnected** function will just call find for 2 nodes and return if they're equal
+
+From these 2 functions, there's actually 2 basic implementations based on what you need:
+- Quick find will have find as $O(1)$, but the union function is $O(n)$
+- Quick union will have an overall better runtime complexity for union, but find is worse
+  - They didn't actually mention runtimes here, idk
+
+##### Quick Find
+
+| Union Find Constructor        |       Find         | Union        |       Complexity         |
+|------------------|--------------------|------------------|--------------------|
+| $O(N)$      | $O(1)$     | $O(N)$      | $O(1)$     |
+
+- Find: `self.root` just acts as an $O(1)$ lookup array for each node, so finding the root of any node $n_i$ at index $i$ if just `self.root[i]`
+- Union: To union 2 nodes $n_x$ and $n_y$, `x, y` you need to:
+  - Check if they have the same parent, if so exit
+  - If not, then you need to pick one of the two nodes parents, in our implementation we choose `root[x]`, and update all of the other nodes parents to that
+    - i.e. for each node in `self.root` that is equal to `root[y]`, change it to `root[X]`
+
+So it's pretty simple - keep a single array `self.root` that has an $O(1)$ mapping from each index $i$ to it's parent, and on Union update nodes by looping over the array and altering the mapping
+
+```python
+# UnionFind class
+class UnionFind:
+    def __init__(self, size):
+        self.root = [i for i in range(size)]
+
+    def find(self, x):
+        return self.root[x]
+		
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            for i in range(len(self.root)):
+                if self.root[i] == rootY:
+                    self.root[i] = rootX
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+
+# Test Case
+uf = UnionFind(10)
+# 1-2-5-6-7 3-8-9 4
+uf.union(1, 2)
+uf.union(2, 5)
+uf.union(5, 6)
+uf.union(6, 7)
+uf.union(3, 8)
+uf.union(8, 9)
+print(uf.connected(1, 5))  # true
+print(uf.connected(5, 7))  # true
+print(uf.connected(4, 9))  # false
+# 1-2-5-6-7 3-8-9-4
+uf.union(9, 4)
+print(uf.connected(4, 9))  # true
+```
+
+##### Quick Union
+Quick union is generally more efficient overall than quick find:
+- Find:
+  - `self.root` will hold the immediate parent nodes for any node, but parent nodes themselves may be children so there has to be an actual traversal up `self.root` during find
+    - This condition should end once we've reached `x = self.root[x]` which refers to a ***root node***
+  - $N$ is the number of vertices in the graph, and so in the worst case scenario the number of operations to reach the root vertex is $H$ which represents the height of the tree 
+    - In a linked list $H = N$ (worst case)
+    - In a perfect binary tree $H = \log N$
+  - Worst case $O(N)$ if it's a perfectly linked list, and you start at the bottom and need to reach root
+  - Best case $O(1)$ if each node is independent
+  - Space complexity still $O(N)$ storing array
+- Union: Simply choose one of the parents, and make it the others parent
+  - There's a stopping point if `rootX == rootY`, but honestly this isn't necessary...just update on the fly and return would have the same results with an unnecessary index alteration
+- Checking connectivity in this case is equal to the `find` operation time complexity
+
+
+```python
+# UnionFind class
+class UnionFind:
+    def __init__(self, size):
+        self.root = [i for i in range(size)]
+
+    def find(self, x):
+        while x != self.root[x]:
+            x = self.root[x]
+        return x
+		
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            self.root[rootY] = rootX
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+
+# Test Case
+uf = UnionFind(10)
+# 1-2-5-6-7 3-8-9 4
+uf.union(1, 2)
+uf.union(2, 5)
+uf.union(5, 6)
+uf.union(6, 7)
+uf.union(3, 8)
+uf.union(8, 9)
+print(uf.connected(1, 5))  # true
+print(uf.connected(5, 7))  # true
+print(uf.connected(4, 9))  # false
+# 1-2-5-6-7 3-8-9-4
+uf.union(9, 4)
+print(uf.connected(4, 9))  # true
+```
+
+#### Optimizations
+Both of the above implementations have 2 fatal flaws:
+- Union in [quick find](#quick-find) will ***always*** take $O(N)$ time
+- If union in [quick union](#quick-union) accidentally forms a perfectly linked list, which can happen if we go from independent nodes and connect them sequentially to their neighbor, then find will be in $O(N)$ as well
+
+Both of these can be helped by 2 specific optimizations:
+- [Path compression](#path-compression) helps to remove the recursive calls in `find`
+- [Union by rank](#union-by-rank) is a self-balancing metric to avoid perfectly linked lists and ensure the height of the tree is at most $\log N$
+
+
+| Operation        | Average Complexity |
+|------------------|--------------------|
+| Union (Put)      | $O(\alpha(V))$     |
+| Find (Get)       | $O(\alpha(V))$     |
+| Delete           | Not Applicable     |
+| Traverse / Search| $O(n)$             |
+
+##### Union By Rank
+To fix the linked list problem in quick union, we can utilize ***union by rank***, which is a sort of [self balancing](/docs/dsa/6.%20binary%20search/SELF_BALANCING.md) graph concept so that we avoid creating perfectly linked lists:
+- Rank here refers to how we choose which parent to utilize during union operation
+  - In past implementations, we just randomly hard coded either `root[X]` or `root[Y]`, but this can be done smarter
+  - ***Rank refers to the height of each vertex***, and so when we union 2 vertices, we choose the root with the larger rank
+- Merging the shorter tree under the taller tree will essentially cause the taller tree to widen. If we added the taller tree to the shorter tree, it would cause the shorter tree to lengthen, which is bad
+
+- Union will now utilize the `self.rank` array to continuously judge unions of components
+  - Union needs to call `find` here to find the root node, so time complexity the same as `find`
+- Find still traverses recursively, but what's changed is that $H = N$ cannot occur anymore since we are constantly unioning by largest rank
+  - Best case with each node as it's own parent it'll be $O(1)$ find
+  - Medium / worst case, ideally worst case is close to a balanced tree, $H \approx \log N$
+    - Actually, after googling this, in the worst-case scenario when we repeatedly union components of equal rank, the tree height will at most become $\log(N) + 1$, so the find operation in the worst scenario is $O(\log N)$
+
+```python
+# UnionFind class
+class UnionFind:
+    def __init__(self, size):
+        self.root = [i for i in range(size)]
+        self.rank = [1] * size
+
+    def find(self, x):
+        while x != self.root[x]:
+            x = self.root[x]
+        return x
+		
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            # If rootX "deeper", set rootY to X
+            if self.rank[rootX] > self.rank[rootY]:
+                self.root[rootY] = rootX
+            # If rootY deeper, set rootX to it
+            elif self.rank[rootX] < self.rank[rootY]:
+                self.root[rootX] = rootY
+            # else pick one, and then we know it's rank has increases
+            #   - above, the rank doesn't increase because the lesser rank appended
+            else:
+                self.root[rootY] = rootX
+                self.rank[rootX] += 1
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+
+# Test Case
+uf = UnionFind(10)
+# 1-2-5-6-7 3-8-9 4
+uf.union(1, 2)
+uf.union(2, 5)
+uf.union(5, 6)
+uf.union(6, 7)
+uf.union(3, 8)
+uf.union(8, 9)
+print(uf.connected(1, 5))  # true
+print(uf.connected(5, 7))  # true
+print(uf.connected(4, 9))  # false
+# 1-2-5-6-7 3-8-9-4
+uf.union(9, 4)
+print(uf.connected(4, 9))  # true
+```
+
+##### Path Compression
+Path compression can ideally help with the recursive nature of the `find` function - in all previous iterations, we constantly had to traverse `self.root` parent nodes to find the root node
+
+If we search for the same root node again, we repeat the same operations, is there any good way to cache this result or something? Yes! After finding the root node, simply bring it back and ***update all nodes in `self.root` to point at that root node instead of their parent nodes***
+
+- The only major change in the implementation below, is that we update `self.root[x] = self.find(self.root[x])` if we don't see `x = self.root[x]`
+  - i.e. we update `self.root` on the fly, and once we find the actual root node we can return it back down the stack to update each entry of `self.root`
+ 
+```python
+# UnionFind class
+class UnionFind:
+    def __init__(self, size):
+        self.root = [i for i in range(size)]
+
+    def find(self, x):
+        if x == self.root[x]:
+            return x
+        self.root[x] = self.find(self.root[x])
+        return self.root[x]
+		
+    def union(self, x, y):
+        rootX = self.find(x)
+        rootY = self.find(y)
+        if rootX != rootY:
+            self.root[rootY] = rootX
+
+    def connected(self, x, y):
+        return self.find(x) == self.find(y)
+
+
+# Test Case
+uf = UnionFind(10)
+# 1-2-5-6-7 3-8-9 4
+uf.union(1, 2)
+uf.union(2, 5)
+uf.union(5, 6)
+uf.union(6, 7)
+uf.union(3, 8)
+uf.union(8, 9)
+print(uf.connected(1, 5))  # true
+print(uf.connected(5, 7))  # true
+print(uf.connected(4, 9))  # false
+# 1-2-5-6-7 3-8-9-4
+uf.union(9, 4)
+print(uf.connected(4, 9))  # true
+```
 
 #### Map Reduce Connected Componenets
 Pregel is a way to do generic BFS and Graph Traversals in the MapReduce world, and there are ways to implement Connected Components via BFS using Pregel framework
