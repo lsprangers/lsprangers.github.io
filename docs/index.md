@@ -149,4 +149,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Rebalancing Protocol Medium Article](https://medium.com/streamthoughts/apache-kafka-rebalance-protocol-or-the-magic-behind-your-streams-applications-e94baf68e4f2)
 - [Oreilly Multi Tenancy Book - Building Multi Tenant SaaS](https://learning.oreilly.com/library/view/building-multi-tenant-saas/9781098140632/)
 - [Comet CNN Blog](https://www.comet.com/site/blog/an-intuitive-guide-to-convolutional-neural-networks/)
+- [Lena Voita Seq2Seq Website](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#main_content)
 ---

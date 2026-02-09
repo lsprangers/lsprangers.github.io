@@ -76,6 +76,18 @@ Some typical neural network techniques:
 - **Adversarial Examples**: How can you fool the neural network?
 - **Influential Instances**: How influential was a training data point for a given prediction?
 
+### Probing Classifiers
+Reading about [Attention and Transformers](/docs/transformer_and_llm/ATTENTION.md) there's so much going on it's hard to figure out which parts of the black box are doing what
+
+The components throughout these architectures are model specific, but we can use ***model-agnostic*** frameworks like ***Probing Classifiers*** to uncover what these mdoels are doing in certain regards. So what are probing classifiers?
+- Feed data into a network and get vector representations of this data
+    - From middle hidden layers, output layers, decoder text, etc
+- Train a classifier to predict some linguistic labels from these representations
+- Use the classifiers accuracy as a measure of how well the representations encode labels
+
+This is essentially taking the vector representations and running a transfer learning classifier on top, and using that as a probe to how well the underlying models latently learned representations. If our transfer learning model is accurate, then there must be features in the base foundational transformer models that it is utilizing
+
+The [BERT sentence embedding](/docs/transformer_and_llm/EMBEDDINGS.md#bert-sentence-embeddings) is a good example of the above. I don't really believe this is an accurate method for interpretability, and it's more-so a way to measure transfer learning abilities and coverage. There are a few papers that discuss how this is a sub-optimal interpretability, and accuracy, gauge, but it's useful history 
 
 ### Sparse Autoencoders
 

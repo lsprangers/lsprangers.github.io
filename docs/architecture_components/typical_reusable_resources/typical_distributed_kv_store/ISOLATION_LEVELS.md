@@ -16,6 +16,7 @@ This document describes everything around transactions, isolation levels, and ho
 - *Phantom Read*: A transaction reads a set of rows that satisfy a condition, and another transaction inserts / deletes some of the rows satisfying that condition, then if the initial transaction re-reads those rows it see's the new "phantom" updates
     - Basically just means concurrent write affects a read
     - Is typically around ***a set of rows***
+    - Locking a set of rows around a `where` clause is extremely expensive, so preventing phantom reads around sets of rows is difficult (full scan of DBase)
 - *Non-Repeatable Read*: Occurs when a transaction A reads a single row, and another transaction B modifies / deletes that row, then the first transaction A when re-reading the data sees new updates
 - *Dirty Read*: Simply allows reads on data in flight of transactions or uncommitted data
 
@@ -35,7 +36,7 @@ Phantom reads can still occur because the set of rows in a query can't all be lo
 
 ### Isolation Level Spectrum
 There's a spectrum below, from strictest to least strict, in performant availability (fast response) vs consistency (write and updates are shown in reads):
-- **Linearizable** means the transactions that occur appear ***linear***, meaning sequential, meaning things acts like the "old days". But this means you need consensus and consistency, maybe using something like [RAFT](https://github.com/lsprangers/raft-course/blob/main/index.md) which slows things down (less availability) but guarantees consistency
+- **Linearizable** means the transactions that occur appear ***linear***, meaning sequential, meaning things acts like the "old days". This means you need consensus and consistency, maybe using something like [RAFT](https://github.com/lsprangers/raft-course/blob/main/index.md) which slows things down (less availability) but guarantees consistency
     - *Causal Consistency* is around consensus and consistency where the nodes affected by writes will see all nodes that need to see them (typically happens with quorum based systems)
 - **Serializable** is in the same vein as linearizable, where the transactions on a database appear to occur as sequential updates. Allows for execution to happen concurrently, but the outcome appears to be sequential. ***However, it does not guarantee the order of the transactions***
     - *Snapshot Isolation* is a form/implementation of serializability, and updates things serially on snapshots of data. It allows for more concurrency but also leads to some weird anomalies
@@ -45,13 +46,15 @@ There's a spectrum below, from strictest to least strict, in performant availabi
 - **Read Uncommitted** lets transactions read uncommitted data, allowing dirty reads.
 
 ### Summary of Isolation Levels
-- **Read Uncommitted**: Allows dirty reads.
-- **Read Committed**: Prevents dirty reads.
-- **Repeatable Read**: Prevents dirty and non-repeatable reads but allows phantom reads.
-- **Serializable**: Prevents dirty, non-repeatable, and phantom reads; highest isolation level.
+- **Read Uncommitted**: Allows dirty reads
+- **Read Committed**: Prevents dirty reads
+- **Repeatable Read**: Prevents dirty and non-repeatable reads but allows phantom reads
+    - Locks rows that it reads in to scan...therefore, its reads are repeatable and consistent!
+- **Serializable**: Prevents dirty, non-repeatable, and phantom reads; highest isolation level
+    - Takes snapshots and acts on those snapshots, full scans to get rows, but no other transaction can affect current transaction while it's in progress
 - **Snapshot Isolation**: Prevents dirty, non-repeatable, and phantom reads; allows higher concurrency
     - In systems like MongoDB this is done by taking entire copies / snapshots of data, and allowing transactions to act on that data
-    - Therefore, if transaction1 is reading and updating rows `[1, 3, 5, 7]` and transaction2 updates `[1, 5]`, transaction1 will not see the changes made by transaction2 until transaction1 completes
-    - If multiple transactions affect the same rows, let's say both transaction1 and transaction2 read `row1.attribute = a` and transaction1 changes it to `row1.attribute = b`, and transaction2 changes it to `row1.attribute = c`. Whichever one commits first will succeed, and anything after would fail
+    - Therefore, if `transaction1` is reading and updating rows `[1, 3, 5, 7]` and `transaction2` updates `[1, 5]`, `transaction1` will not see the changes made by `transaction2` until `transaction1` completes
+    - If multiple transactions affect the same rows, let's say both `transaction1` and transaction2 read `row1.attribute = a` and `transaction1` changes it to `row1.attribute = b`, and transaction2 changes it to `row1.attribute = c`. Whichever one commits first will succeed, and anything after would fail
         - This is known as ***first-committer-wins***
-- **Linearizability**: Strong consistency, global order of operations.
+- **Linearizability**: Strong consistency, global order of operations

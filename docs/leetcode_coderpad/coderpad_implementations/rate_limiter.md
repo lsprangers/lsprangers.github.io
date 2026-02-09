@@ -102,3 +102,108 @@ True
 rl.userDict
 defaultdict(<class 'collections.deque'>, {'A': deque([2000, 11000])})
 ```
+
+## Systems Design
+Design a distributed rate-limiting service that enforces:
+
+- Limit: 100 requests per user per minute
+- Across multiple API servers  
+- Global consistency required
+- p99 latency < 10ms for allow() check
+- System must scale to 50M requests/sec total
+
+
+### High Level requirements
+- Must work across many stateless API servers
+- Must enforce the limit globally, not per node
+- Users may hit different servers for sequential requests
+- Failover and partial network partitions are expected
+- The service must not dramatically degrade during Redis/DB failures
+- Cost efficiency matters
+
+#### API Surface
+```
+allow(userId, timestamp) → true/false
+```
+
+#### Clarifying Questions
+- Is this rate limiter for one specific backend service, or are we checking multiple users across multiple services?
+    - One centralized rate limiting service used by many backend API's
+    - Rate limiter must enforce limits per user globally, regardless of downstream service
+- How strict / consistent does this need to be? In terms of timing, counts, etc is it absolutely required that 100 cannot be stopped over any minute period?
+    - Strict. A user must never successfully exceed 100 true responses in any sliding 60 second window
+        - Occasional false negatives (deny when should allow) are acceptable
+        - False positive (allow when >100) should never happen
+    - Strong enforcement
+- "User may hit different servers for sequential requests", can you explain this requirement more? It seems like a strange requirement
+    - There are many API GW / Edge servers that are routing requests to this rate limiter service
+    - Users traffic isn't sticky to any of these API GW services
+    - Rate limit must still be correct
+- How are clients identified?
+    - `userId` is reliable, and each incoming request to rate limiter receives `(userId, timetamp)`
+
+#### System Constraints
+The rate limiting service needs to track a users total request count over a sliding window of 60 seconds, and the requests are coming in from many different API GW and edge servers at 50M req / second, we must respond with <10ms p99 latency, even in the face of network failures or partition failures. The system must continue even if backend redis / database failures occur, and the system has strict allow rules meaning a user should never be allowed > 100 requests per minute, with the occasional false positive being acceptable
+
+#### Identify Core Challenges
+The challenges here are going to be
+- Accepting this many requests coming in (50M / second), and updating a data structure that also allows for fault tolerance, while replying within 10ms 99% of the time
+- Achieving horizontal scaling, consistency (hard deny), and failover across partitions means we can't have a single point of failure for any user / group of users
+- Keeping a time based data structure in memory that allows for <10ms response is difficult, especially given we will be receiving requests, updating a data structure, and then using that data structure to respond. This data structure must be ordered for time, or bucketed in some way that allows for time based queries in an efficient manner
+    - Sliding windows are usually used in these scenario's
+- The hard deny also means that any node that returns a response must have all available information, because if a new request comes in while the current one is being processed (at the edge case of 100), we may return `allow` when it should be `deny` - that is if at time `t` the current counter is at 99, and we receive a check so we're at 100, and we reply at time `t + s`, then if another check call occurs at time `t* < t + s`, we would return `allow` when that should be deny
+    - This concurrency discussion is of key importance on how we handle users and partitions
+- Single node per user is required for strictly consistent correctness, which creates a challenge for high availability, and for split-brain scenario's during re-booting or re-partitioning
+    - Given potential network partitions, downtimes, reboots, etc our system, if it doesn't receive a response from the API GW, should respond `deny`
+
+#### Starter Architecture
+To achieve the above we should focus on:
+- Scalable routing - getting requests efficiently to authoritative nodes requires consistent hashing, even in the face of rebalances, node outages, etc
+    - Rebalances could potentially affect which underlying VM is actually accepting the request for a specific `userId`
+    - Node outages mean the router needs to have some sort of timeout period for responses
+    - This router needs to scale to 50M requests per second, and also handle sending the response back (in most scenario's)
+    - Partitioning should be done based on `userId` as it was stated in spec that's a stable parameter
+    - Routing should be done by a distributed load balancer, and would have to be at L7 layer given the `userId` comes in as a header. There's ways to switch to network load balancing, but it would require is to make assumptions around IP addresses and ports, so we'll stick to L7 ALB with hashing based on `userId`
+        - The routing service needs to implement ring based consistent hashing so that rebalances don't enforce full shuffle of data across nodes
+        - The routing service should handle hashing of `userId`, passing to consistent hashing component / service, and that should then route the request to a specific node
+        - Consistent hashing depends on binary search, so it will be $O(\log n_nodes)$
+        - This can be avoided with caching, but cache invalidation would need to happen if any rebalance occurs. The routing service can handle that as well
+            - Caching should make request routing ultimately $O(1)$
+- User state data structure - this data structure needs to handle time bounded request information to ensure we can always deny over-using users. There can be no edge cases where a user gets 101 requests in a time window. This data structure needs to be optimized to add on new requests, to identify stale requests, and to get the number of current requests
+    - In memory sliding window structures can handle these scenario's efficiently, they can be stored per-user generically across all API's
+        - This sliding window is an event deque, where items on the left are new, and items on the right are oldest. We pop from the right and append to the left, each of these operations are $O(1)$ via linked list operations, and length is also $O(1)$
+            - Storing this in memory is expensive - we should follow up on average number of users, average number of user requests per minute, etc for an idea on if this storage is even possible
+- Fault tolerance, consistency, and high availability
+    - There's a large tradeoff between these items, and the spec is clear that consistency and strict deny is the most important, so each node must have all information about the user if it is ever to respond `allow`
+    - Availability, consistency, and latency:
+        - If we have highly available replicas, that means the leader node must replicate it's data structure on each followers, which could be an issue for the strict <10 ms latency. These replicas would need to be in consensus if they are to serve future reads if a leader goes down
+        - If we choose latency over availability, and a node goes down, we would need to assume the worst on node start (user at saturation), and start collecting checks during that period and counting, while responding `deny` until we have a full minutes worth of information
+        - Immediate recommendation would be to choose latency over availability, and if a node shuts down we would `deny` while a new node comes up
+            - If this is incorrect, and we need to have immediate restore, then we will need an active replica and the leader will need to route each request to a linearizable backend database. This means transactions, acknowledgements, etc - when we respond `allow` to a request we need to guarantee that makes it to the backend database, so our response cycle now includes a round trip to a database and commit level transaction semantics
+    - Fault tolerance
+        - Each piece of this architecture has the same tradeoffs of latency, availability, and consistency
+            - The router needs to be highly available with failover, and must record some state around `userId --> VM` mapping
+            - The authoritative user nodes were described above
+
+Flow:
+Typical:
+    request --> Routing service (ALB + cache) O(1) --> VM accepts --> Drains deque, checks length --> responds
+
+Failure:
+    request --> Routing service (ALB + cache) O(1) --> VM internal 5XX error --> routing service invalidates cache --> respond deny
+
+Node reboot on failure
+    Spin up --> identify to routing service --> restart cache
+
+
+
+
+#### Real Architecture
+Specifics on partition keys, algorithms for completing the functionality, and actual solid opinionated choices
+
+Draw diagram while explaining
+
+#### Component Deep Dive
+Usually one or two, picked by interviewer or you know to dive into them
+
+Potentially pseucode or pseudo architecture

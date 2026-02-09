@@ -21,7 +21,7 @@ These examples have even been shown to hold across languages, where youc can map
 
 ![Language Embedding Mapping](/img/language_embedding_mapping.png)
 
-***Encoder-Decoder (Seq2Seq)*** made it possible to map input sequences to output sequences of different lengths, because "I want a coffee with milk" and "Yo quiero cafe con leche" have different total lengths of words (even if it's just "a"). This also allowed for taking in entire photos, and outputting a text representation (video captioning), outputting bounding box anchors of objects (object detection), and many other future architectures.
+[***Encoder-Decoder (Seq2Seq)***](/docs/transformer_and_llm/SEQ2SEQ.md) made it possible to map input sequences to output sequences of different lengths, because "I want a coffee with milk" and "Yo quiero cafe con leche" have different total lengths of words (even if it's just "a"). This also allowed for taking in entire photos, and outputting a text representation (video captioning), outputting bounding box anchors of objects (object detection), and many other future architectures.
 
 ![Encoder-Decoder High Level](/img/enc_dec_high_level.png)
 

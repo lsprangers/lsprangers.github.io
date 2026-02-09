@@ -8,15 +8,23 @@ show_back_link: true
 ---
 
 ## Attention
-Attention is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
+[Seq2Seq Models](/docs/transformer_and_llm/SEQ2SEQ.md) with encoder-decoder architectures looked to encode the entire context into a singular vector $c$ that got passed to each decoder step, which led to bottlenecks, inefficiencies, etc
 
-Attention stemmed from NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results. Attention helps to fix the **bottleneck problem** in [RNN encoder (and RNN encoder-decoder) models](/docs/transformer_and_llm/EMBEDDINGS.md#encoder-decoder) - Due to their design, the encoding of the source sentence is a single vector representation $C$ (context vector). The problem is that this state must compress all information about the source sentence in a single vector and this is commonly referred to as the bottleneck problem. There was a desire to not "squish" everything into one single context vector, and instead to utilize the input embeddings dynamically when decoding, and to utilize the context on the fly - this is known as *align and translate jointly*
+Attention, as an embedding concept, is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
+
+Transformers as an architecture helped to make attention a parallelizable function, ultimately allowing for context to spread in a way that no longer bottlenecked infromation into a context vector, and allowed for large scale SIMD type of parallel processing
+
+![Seq2Seq VS Transformer](/img/seq2seq_vs_transformer.png)
+
+NLP Seq2Seq Tasks like next word prediction, and translation where using the surrounding context of the word was one of the major breakthroughs in achieving better Seq2Seq results. Attention helps to fix the **bottleneck problem** in [RNN encoder (and RNN encoder-decoder) models](/docs/transformer_and_llm/EMBEDDINGS.md#encoder-decoder) - Due to their design, the encoding of the source sentence is a single vector representation $C$ (context vector). The problem is that this state must compress all information about the source sentence in a single vector and this is commonly referred to as the bottleneck problem. There was a desire to not "squish" everything into one single context vector, and instead to utilize the input embeddings dynamically when decoding, and to utilize the context on the fly - this is known as *align and translate jointly*
 
 ![Align and Translate Jointly](/img/align_and_translate_jointly.png)
 
 The embedding for "bank" *is always the same embedding in the metric space* in static scenario's like [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec), but by attending to it with Attention, you can change it's position! It's as simple as that, so at the end of attending to the vector, the vector for bank in river bank may point in a completely different direction than the vector for bank in bank vault - just because of how the other words add or detract from it geometrically in its metric space. Bank + having river in sentence moves vector in matrix space closer to a sand dune, where Bank + teller in sentence moves it closer to a financial worker
 
 How is this done? Attention mechanisms in our DNN models. There are multiple forms of Attention - most useful / used are Self Attention, Encoder-Decoder Attention, and Masked Self Attention - each of them help to attend to a current query word / position based on it's surroundings. A single head of this Attention mechanism would only update certain "relationships", or attended to geometric shifts, but mutliple different Attention mechanisms might be able to learn a dynamic range of relationships
+
+![Attention High Level Zoom In](/img/attention_high_level_with_zoom_in.png)
 
 In the days before Attention, there would be Encoders that take input sentence and write it to a fixed size embedding layer, and then a separately trained Decoder that would take the embedding and output a new sentence - this architecture for Seq2Seq tasks is fine for short sequences, but degrades with longer sequences you try to "stuff into" a fixed size embedding layer 
 
@@ -272,7 +280,38 @@ This setup allows us to create a paradigm of:
 
 These matrices are learned during training and updated via backpropagation
 
+### Tokenization
+Tokenization is actually a fairly large part that gets looked over for Transformers - authors and creators of most models have utilized ***Sub-Word Tokenization*** to reduce overall vocabulary size and ensure out-of-vocabulary tokens are handled well. Instead of replcaing with `[UNK]` or something else, splitting up the entire vocabulary into different character chunks allows for reusability between `##ing` for `dining` and `banking`
+
+***Byte Pair Encoding*** is also utilized as a compression technique which iteratively replaces the most frequent pair of bytes in a sequence with a single, unused byte. Instead of merging together frequent pairs of bbytes, the tokenization algorithms will merge together characters or sub-word character sequences that are frequent. That's how the model learns to pull out `##ing` as a sub-word, because it's quite frequent!
+
+#### Training
+This model needs actual training to be done on it to learn these frequency word pairings. The algorithm needs to build merge tables and vocabulary of tokens that ultimately will be updated across epochs to create an optimized set of sub-words to tokenize in the future
+
+Training here isn't really on probabilistic modeling, it's actually a greedy approach based on heuristics and counts in the data, but ***a new tokenizer would be needed for an inherently unique document set***. Doctor shorthand wouldn't be tokenized properly compared to APA structured student essays
+
+The initial vocabulary consists of characters and an empty merge table, at this exact intro step each word is segmented as a sequence of characters, and then the algorithm below is continuously ran:
+- Count pairs of symbols - how many times does each pair occur together in the training data
+- Find the most frequent pair of symbols
+- Merge that pair together in the merge table, and add the new token to the vocabulary
+
+The main parameter to set is the maximum number of merges desired in output merge table, as it ensures you don't over-do merging and lose out on information
+
+![Building Merge Table GIF](/img/build_merge_table.gif)
+
+The above shows how a vocabulary of cats, mats, mate, ate, etc get turned into merged words separated by the `@@` symbols which represent concatenation. In most tokenizers today the separator is `##`
+
+#### Inferece
+After learning BPE rules, the merge table is the main artifact output that is reused across inference. The algorithm will segment new words into sequence of characters, and after that iteratively runs over the word running below steps until no other merge is possible:
+- Among all possible merges, find highest in merge table
+- Run that merge
+- Stop if no new merge is able to be found
+
+So inference is just constantly replacing merges over time, and hypothetically could replace an entire word with a compressed single token in some cases
+
 ### Encoding Blocks
+Once we have tokenized inputs relating to some sort of static embedding, we focus on encoding 
+
 The main layer you focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
 #### Self Attention
@@ -368,6 +407,13 @@ In depth mathematical explanation below
      Z = \text{Concat}(O^{(head_1)}, O^{(head_2)}, \dots) \cdot W_O
      $
 ![Multi Headed Attention](/img/multi_attn.png)
+
+#### Pruning
+There's an entire section in some Transformer papers talking about pruning of heads. Ultiamtely this is because not every head is needed, and some generally won't have any useful features in some datasets
+
+Pruning allows the model to run faster, perform less computations, and potentially do this without any loss of quality! Most of the time it's a pruning + speed / accuracy tradeoff where you can prune up to certain elbow thresholds where the return on pruning starts to decrease compared to decrease on accuracy
+
+The model needs to be trained with all possible heads being updated, but afterwards pruning is a typical optimization step for production models
 
 ### Other Layers
 Other layers outside of attention based layers in transformers help to extend the problems to a wider set of real world scenario's:
