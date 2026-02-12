@@ -55,6 +55,7 @@ You may assume:
     - Worst case we'd store all operations in `base_queue` until it's drained, but `top` is called frequently so it'd drain frequently
     - `add` and `reset` are intermingled with `top` so it'd be ideal to not have those block nearly as much
  
+Walked through [Redis ZSets for Priority Queue's](/docs/architecture_components/databases & storage/Redis/ZSETS.md)
 
 ### Implementation
 ```python

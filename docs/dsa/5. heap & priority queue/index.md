@@ -78,3 +78,8 @@ def buildMaxHeap(A):
 
 `maxHeapify` is $O(\log n)$
 `buildMaxHeap` is $O(n)$
+
+### Redis Based ZSets
+Walked through [Redis ZSets for Priority Queue's](/docs/architecture_components/databases & storage/Redis/ZSETS.md)
+
+Redis can be used as a non-local priority queue that has different memory restrictions, and is potentially more optimized than a local implementation, while giving the overall same time complexities and operations

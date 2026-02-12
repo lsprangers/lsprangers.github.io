@@ -207,3 +207,48 @@ Draw diagram while explaining
 Usually one or two, picked by interviewer or you know to dive into them
 
 Potentially pseucode or pseudo architecture
+
+#### Background
+The generic response is to use Lua Scripting with a Redis cluster, but this incurs a network hop, serialization, and general dependencies on Redis that mean there's a hard-deny or hard-accept if Redis ends up going down. Furthermore we need an entire Redis cluster that's sharded by `userId`, which comes with extra issues around user routing, rebalancing, and downtimes. Redis does cover the "Fault Tolerance" portion where things are written to disk, but probably doesn't cover the `5p99 <10ms` latency part, which is an extremely fast SLA + turnaround time. Utilizing Redis also means concurrency limitations and semantics, which is what we are asking for given the hard deny (absolutely nothing > 100 requests), and again that kills the p99 latency discussion
+
+“If we require zero false positives under partitions, then the system must fail closed and sacrifice availability or throughput. If we require 50M rps with <10ms latency, then we must accept either approximate limits or false negatives.”
+
+- Option A — Central Redis-based:
+    - Centralized state
+    - Atomic Lua scripts
+    - Scales to millions rps
+    - Fails closed or open
+    - Simpler ops
+- Option B — Shard-by-user, local memory (strict correctness)
+    - Single writer per user
+    - No false positives
+    - Fail closed on uncertainty
+    - Availability loss under failures
+    - Harder ops
+- Option C — Approximate / token bucket
+    - Local counters
+    - Gossip / eventual sync
+    - High throughput
+    - Occasional false positives
+    - Best UX
+
+The whole point is to gauge the spec, talk through architecture and what's desired, and start going abck and forth on what can be done, what's harder to implement, and the trade-offs involved
+
+#### Other References
+Implementing a rate limiter can be done easily in memory with a sliding window, but becomes increasingly complex when ***we hit the scale of millions of requests per minute*** (millions of entries in a list will explode local memory) and have ***to start distributing requests and keeping some sort of (eventually) consistent counter***
+
+There's another document talking about [Redis ZSets that includes rate limiting](/docs/architecture_components/databases%20&%20storage/Redis/ZSETS.md#rate-limiter)
+
+The main trade-offs on strict consistency, memory limitations, and distribution lead to a wide range of solutions, and a fair amount of them are backed by Redis:
+- Sliding window can be achieved with ZSets
+    - Fixed window counters are more efficient on memory, but can lead to edge cases where more than allowed requests get through
+        - `INCR` and `EXPIRE` calls used to track based on fixed windows, but if there's 10 requests at 1:59, and 10 more at 2:01, we effectively allow 20 calls in 2 seconds
+    - Strict sliding windows can be implemented with ZSets, but expirey calls must be performed as an API call, so they can only occur on `GET` requests, or as a background process
+        - If background process, need to ensure it also occurs during `GET` to ensure no concurrency issues
+    - `ZRANGEBYSCORE` and deletions `ZREMRANGEBYSCORE` run efficiently in Redis
+        - Expiry issues still matter, and periodic cleanup is needed. That being said, the range scores will ensure we check a strict range, and that old values aren't included in count
+- Token bucket can be achieved with counters based on fixed windows, or using `INCR` and `EXPIRE` as a generic counter (bucket)
+    - Incrementing can only be done on check calls, or by a background process, so some calculations are needed to refill based on last timestamp called
+    - Lua scripting can be used to ensure consistency and concurrency issues are mitigated, but it's at the cost of latency and potential blocking
+
+Background removal of old scores can be done via `ZREMRANGEBYSCORE`, and this can be done during `GET` or as a backhround process, but `ZRANGEBYSCORE` should still count only active values even if old ones exist

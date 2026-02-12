@@ -1,5 +1,5 @@
 ---
-title: Template
+title: Transactional Ledger With Holds
 category: Implementations
 difficulty: Advanced
 show_back_link: true

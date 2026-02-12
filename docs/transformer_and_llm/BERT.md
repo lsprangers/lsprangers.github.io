@@ -155,6 +155,15 @@ Most companies don't actually use BERT out of the box, most companies will fine-
         - Fine Tuning models, such as ***Open AI's GPT (Generative Pre-Trained Transformer)*** models, introduce minimal task specific parameters and is trained on the downstream task by *fine-tuning all of the pre-trained models parameters*
     - The training objectives of both of these types is equivalent during pre-training, but the actual extension during transfer learning is where they diverge
 
+
+The core idea of this encoder only model is that if you input a sequence of length $X$ that is converted into $128$ dimensional embeddings, each token inside of the sequence will be attended to via the encoder, and then the final output layer is a tensor of shape $(batch_size, X, H)$. $H$ is the size of the hidden state of BERT, and so the final output is generally the same "length" as the input sequence, with a few special tokens like `[CLS]`, and then the transfer learning layer on top of that is based on whatever the task is!
+- In token level tasks like Named Entity Recognition, the hidden state of each token is used individually
+    - The idea would be to map the final hidden layer size $H$ to the output number of classes $y$
+    - A linear dense layer on top of $(batch_size, X, H)$, that maps $(H, y)$
+    - Output is a logit vector of shape (batch_size, y)$
+- a a linear layer and put that into a classifier of some sort
+
+
 #### Fine Tuning Architecture
 - The architecture of our fine-tuning (or feature-based) tasks largely rely on creating a new output layer on top of our existing pre-trained models
 - you can model single sentence, or sentence pairs, in our fine-tuning step, because BERT's self-attention mechanism allows for context to come through at each step

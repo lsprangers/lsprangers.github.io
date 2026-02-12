@@ -1,5 +1,5 @@
 ---
-title: Template
+title: Organization Chart Service
 category: Implementations
 difficulty: Advanced
 show_back_link: true

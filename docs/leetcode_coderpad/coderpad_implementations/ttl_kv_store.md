@@ -1,5 +1,5 @@
 ---
-title: Template
+title: TTL KV Store
 category: Implementations
 difficulty: Advanced
 show_back_link: true

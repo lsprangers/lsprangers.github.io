@@ -150,4 +150,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Oreilly Multi Tenancy Book - Building Multi Tenant SaaS](https://learning.oreilly.com/library/view/building-multi-tenant-saas/9781098140632/)
 - [Comet CNN Blog](https://www.comet.com/site/blog/an-intuitive-guide-to-convolutional-neural-networks/)
 - [Lena Voita Seq2Seq Website](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#main_content)
+- [OneUpTime ZSets + Rate Limiters](https://oneuptime.com/blog/post/2026-01-25-redis-sliding-window-rate-limiting/view?utm_source=chatgpt.com#python-implementation)
 ---
