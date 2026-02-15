@@ -41,7 +41,7 @@ limiter.allow("A", 11000); // true (window has slid)
     - Treat each call to allow as an independent request, even if timestamps are equal. No deduplication. If a user sends multiple requests at the same timestamp, they all count
 - Is the interval closed? Meaning if we have `[1_000, 2_000, 11_000]` does that count as 3? `11_000 - 1_000 = 10_000`
     - The window is inclusive of the lower bound and exclusive of anything strictly older
-    - In practice: a request at time t should consider previous requests with timestamps > t - windowMillis
+    - In practice: a request at time t should consider previous requests with timestamps $\gt$ t - windowMillis
         - Therefore, `11_000` should only consider requests with `timestamp > 11_000 - 10_000 = 1_000`
             - `timestamp > 1_000`, not inclusive
 - "requests may interleave across users" - we don't have a `user_id` portion of rate limiter class, is one instance of rate limiter assigned to one single user?
@@ -109,7 +109,7 @@ Design a distributed rate-limiting service that enforces:
 - Limit: 100 requests per user per minute
 - Across multiple API servers  
 - Global consistency required
-- p99 latency < 10ms for allow() check
+- p99 latency $\lt$ 10ms for allow() check
 - System must scale to 50M requests/sec total
 
 
@@ -133,7 +133,7 @@ allow(userId, timestamp) → true/false
 - How strict / consistent does this need to be? In terms of timing, counts, etc is it absolutely required that 100 cannot be stopped over any minute period?
     - Strict. A user must never successfully exceed 100 true responses in any sliding 60 second window
         - Occasional false negatives (deny when should allow) are acceptable
-        - False positive (allow when >100) should never happen
+        - False positive (allow when $\gt$100) should never happen
     - Strong enforcement
 - "User may hit different servers for sequential requests", can you explain this requirement more? It seems like a strange requirement
     - There are many API GW / Edge servers that are routing requests to this rate limiter service
@@ -143,13 +143,13 @@ allow(userId, timestamp) → true/false
     - `userId` is reliable, and each incoming request to rate limiter receives `(userId, timetamp)`
 
 #### System Constraints
-The rate limiting service needs to track a users total request count over a sliding window of 60 seconds, and the requests are coming in from many different API GW and edge servers at 50M req / second, we must respond with <10ms p99 latency, even in the face of network failures or partition failures. The system must continue even if backend redis / database failures occur, and the system has strict allow rules meaning a user should never be allowed > 100 requests per minute, with the occasional false positive being acceptable
+The rate limiting service needs to track a users total request count over a sliding window of 60 seconds, and the requests are coming in from many different API GW and edge servers at 50M req / second, we must respond with $\lt$ 10ms p99 latency, even in the face of network failures or partition failures. The system must continue even if backend redis / database failures occur, and the system has strict allow rules meaning a user should never be allowed $\gt$ 100 requests per minute, with the occasional false positive being acceptable
 
 #### Identify Core Challenges
 The challenges here are going to be
 - Accepting this many requests coming in (50M / second), and updating a data structure that also allows for fault tolerance, while replying within 10ms 99% of the time
 - Achieving horizontal scaling, consistency (hard deny), and failover across partitions means we can't have a single point of failure for any user / group of users
-- Keeping a time based data structure in memory that allows for <10ms response is difficult, especially given we will be receiving requests, updating a data structure, and then using that data structure to respond. This data structure must be ordered for time, or bucketed in some way that allows for time based queries in an efficient manner
+- Keeping a time based data structure in memory that allows for $\lt$10ms response is difficult, especially given we will be receiving requests, updating a data structure, and then using that data structure to respond. This data structure must be ordered for time, or bucketed in some way that allows for time based queries in an efficient manner
     - Sliding windows are usually used in these scenario's
 - The hard deny also means that any node that returns a response must have all available information, because if a new request comes in while the current one is being processed (at the edge case of 100), we may return `allow` when it should be `deny` - that is if at time `t` the current counter is at 99, and we receive a check so we're at 100, and we reply at time `t + s`, then if another check call occurs at time `t* < t + s`, we would return `allow` when that should be deny
     - This concurrency discussion is of key importance on how we handle users and partitions
@@ -176,7 +176,7 @@ To achieve the above we should focus on:
 - Fault tolerance, consistency, and high availability
     - There's a large tradeoff between these items, and the spec is clear that consistency and strict deny is the most important, so each node must have all information about the user if it is ever to respond `allow`
     - Availability, consistency, and latency:
-        - If we have highly available replicas, that means the leader node must replicate it's data structure on each followers, which could be an issue for the strict <10 ms latency. These replicas would need to be in consensus if they are to serve future reads if a leader goes down
+        - If we have highly available replicas, that means the leader node must replicate it's data structure on each followers, which could be an issue for the strict $\lt$10 ms latency. These replicas would need to be in consensus if they are to serve future reads if a leader goes down
         - If we choose latency over availability, and a node goes down, we would need to assume the worst on node start (user at saturation), and start collecting checks during that period and counting, while responding `deny` until we have a full minutes worth of information
         - Immediate recommendation would be to choose latency over availability, and if a node shuts down we would `deny` while a new node comes up
             - If this is incorrect, and we need to have immediate restore, then we will need an active replica and the leader will need to route each request to a linearizable backend database. This means transactions, acknowledgements, etc - when we respond `allow` to a request we need to guarantee that makes it to the backend database, so our response cycle now includes a round trip to a database and commit level transaction semantics
@@ -209,9 +209,9 @@ Usually one or two, picked by interviewer or you know to dive into them
 Potentially pseucode or pseudo architecture
 
 #### Background
-The generic response is to use Lua Scripting with a Redis cluster, but this incurs a network hop, serialization, and general dependencies on Redis that mean there's a hard-deny or hard-accept if Redis ends up going down. Furthermore we need an entire Redis cluster that's sharded by `userId`, which comes with extra issues around user routing, rebalancing, and downtimes. Redis does cover the "Fault Tolerance" portion where things are written to disk, but probably doesn't cover the `5p99 <10ms` latency part, which is an extremely fast SLA + turnaround time. Utilizing Redis also means concurrency limitations and semantics, which is what we are asking for given the hard deny (absolutely nothing > 100 requests), and again that kills the p99 latency discussion
+The generic response is to use Lua Scripting with a Redis cluster, but this incurs a network hop, serialization, and general dependencies on Redis that mean there's a hard-deny or hard-accept if Redis ends up going down. Furthermore we need an entire Redis cluster that's sharded by `userId`, which comes with extra issues around user routing, rebalancing, and downtimes. Redis does cover the "Fault Tolerance" portion where things are written to disk, but probably doesn't cover the `5p99 <10ms` latency part, which is an extremely fast SLA + turnaround time. Utilizing Redis also means concurrency limitations and semantics, which is what we are asking for given the hard deny (absolutely nothing $\gt$ 100 requests), and again that kills the p99 latency discussion
 
-“If we require zero false positives under partitions, then the system must fail closed and sacrifice availability or throughput. If we require 50M rps with <10ms latency, then we must accept either approximate limits or false negatives.”
+“If we require zero false positives under partitions, then the system must fail closed and sacrifice availability or throughput. If we require 50M rps with $\lt$10ms latency, then we must accept either approximate limits or false negatives.”
 
 - Option A — Central Redis-based:
     - Centralized state
