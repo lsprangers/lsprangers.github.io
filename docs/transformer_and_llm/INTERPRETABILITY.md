@@ -77,7 +77,7 @@ Some typical neural network techniques:
 - **Influential Instances**: How influential was a training data point for a given prediction?
 
 ### Probing Classifiers
-Reading about [Attention and Transformers](/docs/transformer_and_llm/ATTENTION.md) there's so much going on it's hard to figure out which parts of the black box are doing what
+Reading about [Attention and Transformers](/docs/transformer_and_llm/TRANSFORMERS.md) there's so much going on it's hard to figure out which parts of the black box are doing what
 
 The components throughout these architectures are model specific, but we can use ***model-agnostic*** frameworks like ***Probing Classifiers*** to uncover what these mdoels are doing in certain regards. So what are probing classifiers?
 - Feed data into a network and get vector representations of this data

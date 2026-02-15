@@ -12,7 +12,10 @@ show_back_link: true
 
 Most Seq2Seq models are a combination of conditional language models with long range encoders that build up context, and auto-regressive decoders for generating text outputs. These decoders can be greedy and simply choose the most likely token, or then can perform general search over future text outputs as well
 
-![Encoder Decoder GIF](/img/enc_dec_prob_idea.mp4)
+<video controls width="100%" height="auto">
+  <source src="/video/enc_dec_prob_idea.mp4" type="video/mp4" />
+  Enc Dec Idea
+</video>
 
 ## Encoder Decoder
 Over time word embeddings and sentence embeddings were gaining traction, but things became awkward when there wasn't a fixed length 1:1 mapping from input to output. "My name is Luke" $\rarr$ "Me llamo Luke" isn't a 1:1 mapping, and so machine translation and other similar tasks started hitting these ***sequence-to-sequence*** roadblocks
@@ -89,7 +92,7 @@ class Seq2SeqEncoder(d2l.Encoder):  #@save
     
 
 ### Decoder
-The decoder is a much more interesting part to focus on, as it starts to incorporate many new architectures that will eventually underpin things like [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) and contextual embeddings
+The decoder is a much more interesting part to focus on, as it starts to incorporate many new architectures that will eventually underpin things like [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) and contextual embeddings
 
 At a high level, the decoder will typically focus on the 3 things below:
 - Feed source and previously generated target words into a network
@@ -184,7 +187,11 @@ Formally for training, assume:
 - The standard loss for probability comparisons is [cross entropy](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy)
 
 These target instances are from cleaned web scraped content, human reviewed content, etc
-![Seq2Seq Training Loop](/img/seq2seq_training_with_target.mp4)
+
+<video controls width="100%" height="auto">
+  <source src="/video/seq2seq_training_with_target.mp4" type="video/mp4" />
+  Seq2Seq
+</video>
 
 ### Inferece
 Inference and generating actual output tokens is an expensive task. The output probability distributions the model outputs aren't the end result - they need to have a word chosen from them!

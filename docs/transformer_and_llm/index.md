@@ -25,7 +25,7 @@ These examples have even been shown to hold across languages, where youc can map
 
 ![Encoder-Decoder High Level](/img/enc_dec_high_level.png)
 
-[***Attention***](/docs/transformer_and_llm/ATTENTION.md) enabled models to actively shift their "focus" depending on different words in different locations. "The bank teller was weak" and "The river bank was weak" are almost identical sentences with 2 completely different meanings. It also allowed for decoders to directly see the source sequence that was encoded, which meant state didn't have to get passed around like in RNN's - the bottleneck of "state" was removed, and thus helped with the vanishing gradient problem. Attention also helps to alleviate the bottleneck problem, where all context is "shoved" into a singular vector. Attention allows all encoded infromation to help influence the context and decoding during each step, and helps to alleviate the vanishing gradient problem from long sentences that end up multiplying multiple numbers $\lt$ 1.0 throughout numerous steps. 
+[***Attention***](/docs/transformer_and_llm/TRANSFORMERS.md) enabled models to actively shift their "focus" depending on different words in different locations. "The bank teller was weak" and "The river bank was weak" are almost identical sentences with 2 completely different meanings. It also allowed for decoders to directly see the source sequence that was encoded, which meant state didn't have to get passed around like in RNN's - the bottleneck of "state" was removed, and thus helped with the vanishing gradient problem. Attention also helps to alleviate the bottleneck problem, where all context is "shoved" into a singular vector. Attention allows all encoded infromation to help influence the context and decoding during each step, and helps to alleviate the vanishing gradient problem from long sentences that end up multiplying multiple numbers $\lt$ 1.0 throughout numerous steps. 
 
 "You shall know a word by the company it keeps", an adage by linguist John Rupert Firth from 1957 goes. Even earlier, in 1935, he stated that "... the complete meaning of a word is always contextual, and no study of meaning apart from a complete context can be taken seriously"
 
@@ -87,7 +87,7 @@ Some of the main issues in CV revolve around
 
 One of the most useful topics is getting more data without human supervision, and this is the core topic of [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) which has helped these models greatly improve accuracy and reliability. The framework for CV is currently SlimCLR, and this has outperformed most work up to the 2020's, showing that more robust models can be created with larger / more comprehensive training datasets - the Contrastive Learning framework helps to generate that more robust and comprehensive data from open source datasets.
 
-[Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) in CV can also be used (they were made famous in NLP) by combining CNN-like architectures which were able to replace some convolutions entirely.
+[Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) in CV can also be used (they were made famous in NLP) by combining CNN-like architectures which were able to replace some convolutions entirely.
 
 ## Merge
 Over time, merging of modalities happened and now there are multiple models that can handle multiple modalities! Meaning one single model can handle multiple objectives, embedding output, and downstream tasks for both text and images. The "Hello World" of this is generating captions from images, or generating images from captions, which is what DALL-E 2 showcased in it's release. At the end of the day this is taking information from one modality, and making it available in a separate modality.
@@ -97,4 +97,8 @@ Finding datasets for multi-modality are increasingly difficult, BERT itself is p
 ### Evaluation
 Finally, there's evaluation - which is the hardest part of any ML framework
 
-Most evaluation frameworks in product based companies have more clear expectations, and revolve around making the company more money, engaging it's users, or ultimately some objective function. In multi-modal outputs, the text description could vary widely, and you need humans to give their subjective review of the input and output.
+Most evaluation frameworks in product based companies have more clear expectations, and revolve around making the company more money, engaging it's users, or ultimately some objective function. In multi-modal outputs, the text description could vary widely, and you need humans to give their subjective review of the input and output
+
+
+## Coding, Complexities, and Runtimes
+This area is mostly theory and architecture, there's more code, theory, GPU optimizations, etc in the [LLM Systems, Hardware, and Code Section](/docs/llm_systems/index.md)

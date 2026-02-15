@@ -18,7 +18,7 @@ Some key reasons:
     - Inference and training
 - Real time applications for chat-bots and other service industries
 
-The main crux focused on is the [Self-Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) piece which is $O(n^2)$ by nature, along with some other on-device updates like FlashAttention which I'm not smart enough to even try to read
+The main crux focused on is the [Self-Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) piece which is $O(n^2)$ by nature, along with some other on-device updates like FlashAttention which I'm not smart enough to even try to read
 
 ### Self Attention Optimization Methods
 - ***Fixed Patterns*** are patterns with set or "rigid" changes to self attention

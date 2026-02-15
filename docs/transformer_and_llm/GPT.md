@@ -18,7 +18,7 @@ BERT can be seen as stacked encoders, T5 aims to combine the good parts of encod
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
-The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) to help us generate the next words in our SoftMax output layer
+The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) to help us generate the next words in our SoftMax output layer
 
 ### History
 [Generative Pre-Training](https://gwern.net/doc/www/s3-us-west-2.amazonaws.com/d73fdc5ffa8627bce44dcda2fc012da638ffb158.pdf) as a paper came out in 2018, and basically did away with the encoder in [BERT](/docs/transformer_and_llm/BERT.md)
@@ -38,7 +38,7 @@ One of the most notable aspects of GPT models is their emergent properties. Emer
         - Embed our initial words, similar to BERT it uses WordPiece Embeddings
         - Positional encoding is also used
 - ***Decoder Only***:
-    - Uses [Masked Self Attention](/docs/transformer_and_llm/ATTENTION.md#masked-self-attention) which allows for constrained left-to-right self attention
+    - Uses [Masked Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#masked-self-attention) which allows for constrained left-to-right self attention
         - Allows us to use newly generated words throughout our next prediction
     - ***Auto Regressive***:
         - The way these models actually work is that after each token is produced, that token is added to the sequence of inputs. And that new sequence becomes the input to the model in its next step.
@@ -59,7 +59,7 @@ Tokenize our sentence input into Word Pieces
     - Will have some words get split into tokens like `embeddings -> [em, ###bed, ###ding, ###s]`
     - Allows us to still embed words you may not have seen before
 
-you also include [Positional Encoding](./ATTENTION.md#positional-encoding)
+you also include [Positional Encoding](./TRANSFORMERS.md#positional-encoding)
 
 **The very first word generated will get the special start token `<s>` along with the prompt
 

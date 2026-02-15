@@ -46,7 +46,7 @@ Helps to expose model to different perspectives of the same instance. Some commo
 ![Common Augmentations](/img/common_augmentations.png)
 
 ### Architecture
-Architecture is going to be similar to an Encoder Only Transformer model, similar to [BERT](/docs/transformer_and_llm/BERT.md) which relies on components like [Attention in Encoders](/docs/transformer_and_llm/ATTENTION.md#encoding-blocks) and others to alter then input into a latent representation space
+Architecture is going to be similar to an Encoder Only Transformer model, similar to [BERT](/docs/transformer_and_llm/BERT.md) which relies on components like [Attention in Encoders](/docs/transformer_and_llm/TRANSFORMERS.md#encoding-blocks) and others to alter then input into a latent representation space
 
 #### Encoder Network
 After Data Augmentation the step would be training an encoder network 

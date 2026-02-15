@@ -11,7 +11,7 @@ show_back_link: true
 Yann Lecun!
 “If intelligence is a cake, the bulk of the cake is self-supervised learning, the icing on the cake is supervised learning, and the cherry on the cake is reinforcement learning (RL).”
 
-Self Supervised Learning was a large part of the NLP movement in the beginning with [Word Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) - it gave rise to Word2Vec, Glove, ELMO, BERT and many other models that learned underlying representations of words by self supervising learning of existing text
+Self Supervised Learning was a large part of the NLP movement in the beginning with [Word Embeddings](/docs/transformer_and_llm/EMBEDDINGS.md) and [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) - it gave rise to Word2Vec, Glove, ELMO, BERT and many other models that learned underlying representations of words by self supervising learning of existing text
 
 Supervised learning itself requires a humongous amount of labeled data, and in most cases you just cannot create that level of human labeled data for text and image classification / embeddings, and even if you could it would be outdated after a week or so 
 

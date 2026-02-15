@@ -18,17 +18,17 @@ BERT can be seen as stacked encoders, T5 aims to combine the good parts of encod
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
-Therefore, if you look into [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/ATTENTION.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
+Therefore, if you look into [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
 BERT doesn't generate text, but it produces token embeddings that are great for Classification, Sentence Similarity, Sentiment Analysis, and NER / Token Level Tasks
 
-***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) respectively
+***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) respectively
 
 ***Transfer Learning*** is the idea that the semi-supervised training of of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers tacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
 
 BERT training has a similar setup to Word2Vec where you use a certain context size to help us model a specific word, but the embeddings can't necessarily be saved because the output layer (embedding) depdends on the hidden layers...therefore you need to pass a word through with context to get an embedding
 
-***Bidirectionality*** is the big buzz word throughout this paper, and the paper mentioned OpenAI's GPT models multiple times discussing how they only have unidirectional architecture in the [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) layers which ultimately restricts it's abilities in some downstream tasks like sentence classification and question answering
+***Bidirectionality*** is the big buzz word throughout this paper, and the paper mentioned OpenAI's GPT models multiple times discussing how they only have unidirectional architecture in the [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) layers which ultimately restricts it's abilities in some downstream tasks like sentence classification and question answering
 
 BERT itself is...useless? Meaning the model out of the box doesn't have an exact perfect use case (outside of word / sentence embeddings) and for most successful NLP projects it needs to have a final layer trained (this is false too, a lot of good sentence embedding can be done OOTB)
 
@@ -45,10 +45,10 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 | Re-Ranking | Cross-encoder (CLS output) &rarr; Score |
 
 ## Training
-- BERT is designed to pre-train deep (large context) bi-directional (forwards and backwards) representations from unlabeled text by jointly conditioning on left and right context in each layer
-    - This basically means that throughout the layers of BERT you use the context words to left and right of current word to update our weights
-    - Difference from [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) is that ***BERT keeps word positioning and context***
-- Once this is complete, BERT can be ***fine-tuned*** with just one single output layer to be used as a State of The Art (SOTA) model for multiple different NLP tasks
+BERT is designed to pre-train deep (large context) bi-directional (forwards and backwards) representations from unlabeled text by jointly conditioning on left and right context in each layer (this basically means that throughout the layers of BERT you use the context words to left and right of current word to update our weights). The main difference from [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) is that ***BERT keeps word positioning and context, along with self-attention***
+
+
+Once this is complete, BERT can be ***fine-tuned*** with just one single output layer to be used as a State of The Art (SOTA) model for multiple different NLP tasks
 
 ### Base Models
 - A base model in this sense means a model that isn't necessarily trained for a specific task, but is trained to create useful parameters and weights that can be used later on
@@ -59,17 +59,26 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 - ***Training Objective:*** To use bi-directional language models to learn general language representations
 
 #### Base Model Architecture
+The base model will include a sequence of size $S$, which has a number of tokens $t_i$, and each of these tokens will go through a static embedding layer to create input embeddings of size $E$ (typically 128). After this, the $S$ embeddings of size $E$ will all go through multiple layers of normalization, dropout, and self-attention to produce output hidden states. These output hidden states are of size $H$ (typically 512), and there would still be $s$ final states, one for each input. These final hidden states are labeled $T_i$
+
 - Parameters:
     - $L$ layers / encoder blocks
     - $H$ is the size of the hidden states
+        - 256 is typical size of hidden state dimension
     - $A$ attention heads per layer
-    - $E$ represents the input embedding
+        - Typically 6 attention heads
+    - $E$ represents the input embedding dimension
+        - 128 is typical embedding dimension
     - $C \in \real^H$ represents the final hidden vector (of size $H$) of our `[CLS]` token (i.e. our "final" hidden layer for our sentence)
     - $T_i \in \real^H$ as the final hidden state for a specific input token $w_i$
     - $P_i$ is our positional encoding which represents the learned positional embedding for our token in it's specific sentence of any size
-    - $S_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
+    - $I_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
         - In our inference time examples for embeddings most people just fill it with `0's` or `1's` depending on which sentence it's apart of
-- Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](/docs/transformer_and_llm/ATTENTION.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
+
+
+    
+##### Attention Style
+- Based on bi-directional Transformer encoder architecture released in Viswani 2017, which uses [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) mechanisms like self-attention to allow contextual information to flow into encoder states
   - I used to believe BERT also uses Bahdanau attention, but that's in encoder-decoder architectures, where decoder computes attention over encoder outputs to select relevant context for each generated token
   - ***BERT HAS NO DECODER*** - there's no secondary sentence like output / target to attend over! you simply just attend to our input WordPiece embeddings
   - Other transformers like TP, BART, and some GPT models do have cross-attention which is similar to Bahdanau
@@ -79,7 +88,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 ##### Input Sequence
 - The input token sequence can be either a single sentence or a pair of sentences, which allows for MLM and NSP tasks mentioned above
 - ***WordPiece Embeddings are used with a 30k vocab size to represent the input sequence words as numeric embeddings***
-    - This is an initial part of how BERT and Word2Vec are similar
+    - [Tokenizers themselves must be trained](/docs/transformer_and_llm/TRANSFORMERS.md#tokenization)
     - WordPiece is similar to Word2Vec except it will chunk out words to lower the overall space, so that words are represented like `['em', '##bed', '##ding', '##s']`
         - In this way you can reuse the embedding for the word "embeddings", which will save space over time
         - `em` in this scenario is the same as the one in "go get em" because it's at the start, but `###bed` is not equivalent to `bed` in the sentence `I went to bed`
@@ -90,7 +99,7 @@ Most companies don't actually use BERT out of the box, most companies will fine-
             - It should have all of hte info of the sentence, and would be the feature input to our classification layer
     - `[SEP]` marks the separation of two sentences
         - you utilize this with a *learned embedding vector* to update embeddings whether they're in sentence A or B
-            - This is just another piece of [Attention](/docs/transformer_and_llm/ATTENTION.md#attention), except here the attended to portion is sentence placement, which would affect our tokens vector by updating it with sentence A or B context
+            - This is just another piece of [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention), except here the attended to portion is sentence placement, which would affect our tokens vector by updating it with sentence A or B context
 - Our input representation is created by summing the token, segment, and positional embeddings - $SUM(T_i, S_i, P_i)$
     - Basically it's a representation of our token's actual word embedding, it's sentence, and it's position in the sentence
     - TODO: `[CLS]` token is just at the front - I thought this wold be at the end? Why would you use the final hidden layer of the first token?

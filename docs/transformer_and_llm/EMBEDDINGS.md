@@ -70,7 +70,7 @@ Text embeddings can be seen as a static form of transfer learning, where models 
 
 - Training Word2Vec and BERT both involved semi self-supervised training where they take online corpus as input and basically use contextual words $w_{i-k,i+k}$ to try and create an embedding for a current word $w_i$
 - [Word2Vec](#word2vec) was one of the original ideas for text embeddings - it essentially acts as an autoencoder to create ***static embeddings*** for each word in a dictionary
-- [BERT](/docs/transformer_and_llm/BERT.md#bert) on the other hand, through [attention](/docs/transformer_and_llm/ATTENTION.md#attention), can create ***contextual*** embeddings for words, sentences, and entire documents
+- [BERT](/docs/transformer_and_llm/BERT.md#bert) on the other hand, through [attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention), can create ***contextual*** embeddings for words, sentences, and entire documents
 - [GPT](#gpt-3) is an autoregressive transformer model in the same transformer "family" as [BERT](/docs/transformer_and_llm/BERT.md#bert), but it is ***unidirectional*** where BERT is ***bidirectional*** (which is constantly repeated in the paper)
     - GPT is good for text-to-text tasks like question answering, but like BERT you can pull from the middle hidden layers during it's self-attention steps to find word embeddings
 
@@ -198,7 +198,7 @@ These frameworks helped to setup underlying generative language models, and the 
 ### BERT
 [BERT](/docs/transformer_and_llm/BERT.md#bert) architecture, training, and fine tuning is descirbed in another page, but given all of that is read through you discuss below how to get useful embeddings out of BERT!
 
-BERT uses encoder architecture above along with [attention](/docs/transformer_and_llm/ATTENTION.md)
+BERT uses encoder architecture above along with [attention](/docs/transformer_and_llm/TRANSFORMERS.md)
 
 Since BERT is an ***Encoder Only Model***, it basically takes an input, runs it through multiple Encoders, and would send it through an output layer at the end - this output layer tyipcally isn't useful by itself for Word Embeddings, so you would need to go back through the hidden state values and aggregate these in some way to produce Word, Sentence, or Document embeddings
 
