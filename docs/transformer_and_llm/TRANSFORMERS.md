@@ -823,7 +823,7 @@ The decoder generates the output sequence one token at a time, using both the en
    - The final decoder layer produces a vector of floats for each token, which is passed through:
      - A linear layer to expand the vector to the vocabulary size
      - A softmax layer to produce a probability distribution over the vocabulary for the next token
-   
+
 ##### Decoder Complexity
 The decoder is more complicated than the encoder!
 
@@ -879,6 +879,60 @@ $$O((T+S)d)$$
 4. **Training**:
    - The model is trained using [cross-entropy loss](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) and [KL divergence](/docs/training_and_learning/LOSS_FUNCTIONS.md#kl-divergence), with each token in the output sequence contributing to the loss.
 ![EncoderDecoder Output](/img/encoder_decoder_output.png)
+
+### Transformer Optimizations
+There's a number of optimizations in this architecture that a lot of production systems use to speed up inference, saturate GPU utilization, and reduce overall size and runtime of the models after training has been completed
+- [Pruning](#pruning) was already covered where you remove some of the heads in multi-head attention, and this can be done after training with an evaluation set to see if a majority of variance is covered in distinct heads (removing heads 1 and 4 in a set of 12)
+- [KV Caching](#kv-caching) is an inference only optimization that caches the results from $KV$ multiplication during the auto-regressive phase in decoding inference, ultimately allowing to skip all historic $KV$ calculations for already output words for all future words
+- Quantization reduces the overall precision of the data types from `float32` to lesser numbers like `float16` or `float8`. The rationale is that during training the extra precision helps with gradient stability, accuracy, and convergence - especially since we are multiplying thousands of numbers in such small ranges (potentially all between `[0.00, 1.00]`) the extra precision helps to ensure there's no loss of information. Once training is done, and the numbers have converged to allow for latent features, some architectures are able to reduce these data points total size and keep a majority of features and variance preserved  
+   - Mixed Precision Training is another "flavor" of this where you use lower precision for most computations while keeping critical parameters as higher precision
+- Gradient Clipping caps the gradient to prevent exploding gradients during training - most transformers try and tackle this with residual layer, normalization layer, identity layers, dropouts, etc and gradient clipping is another common tool if gradients start to explode
+- [Sparse Attention](#sparse-attention) reduces the quadratic complexity of self-attention by attending to only a subset of tokens 
+   - Go from $O(n^2)$ comparisons to $O(n \cdot k)$ where $k$ is the length of the subset of tokens we are performing self-attention on
+   - Architectures will use local tokens, stored global tokens, random sampling, sliding windows, and skip-token self-attention layers to reduce memory and hopefully preserve context needed for self-attention variance
+- [Flash Attention](#flash-attention) implements memory-efficient attention by computing attention in chunks to reduce memory overhead instead of putting the entire $O(n^2)$ matrix into memory. Should ultimately help GPU utilization and reduce memory bottlenecks for sequences because the context doesn't grow with generation
+   - Similar to [Sparse Attention](#sparse-attention) where you focus on a local context of tokens
+
+#### KV Caching
+KV Caching comes up in a lot of areas, and interviews, especially around "The GPU is at 90% utilization, but it's FLOPS utilization is stagnant around 30%, what is the first potential cause of this?" where you should dive into memory overheads on GPU's and try and see if there's redundant memory bottlnecks on a GPU that's causing too much shuffle and not allowing SIMD operations to run. One way to alleviate this issue is with KV Caching, where you reuse a number of the $KV$ operations computed in the auto-regressive decoder inference portion of LLM modeling
+
+As a sentence moves forward, the input is `[prompt]`, and over time more and more output words are computed - `[prompt] + y_1`,  `[prompt] + y_1 + y_2`, ... so on. Each of the new output tokens `y_1, y_2` will continuously be involved in both cross-attention and self-attention $KV$ operations, and so during this phase we can cache these results over each inference period in GPU cache and reuse them until we are complete with a round of inference
+
+![KV Cache](/img/kv_cache.png)
+
+This will utilize GPU Buffers, which are essentially dedicated blocks of memory used for storing WORM based vectors - sometimes they are write-once, other times they can be overwritten, but typically in caching you don't want to be continuously writing to them. If they aren't present, simply store them on the fly and continue
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+def forward(self, x, use_cache=False):
+    b, num_tokens, d_in = x.shape
+​
+    keys_new = self.W_key(x)  # Shape: (b, num_tokens, d_out)
+    values_new = self.W_value(x)
+    queries = self.W_query(x)
+    #...
+​
+    if use_cache:
+        if self.cache_k is None:
+            self.cache_k, self.cache_v = keys_new, values_new
+        else:
+            self.cache_k = torch.cat([self.cache_k, keys_new], dim=1)
+            self.cache_v = torch.cat([self.cache_v, values_new], dim=1)
+        keys, values = self.cache_k, self.cache_v
+    else:
+        keys, values = keys_new, values_new
+```
+
+</details>
+
+#### Sparse Attention
+TODO:
+
+#### Flash Attention
+TODO:
 
 ## Vision Transformers (ViT)
 In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training
