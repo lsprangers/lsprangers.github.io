@@ -358,6 +358,8 @@ The rest of the discussion is around Attention blocks in Transformer Architectur
 - $d_k$ = $d$ / $h$
 - Projection matrices $W_Q$, $W_K$, $W_V \in \real^{d \times d}$
 
+![Transformers High Level](/img/transformers_high_level.png)
+
 ### Key, Query, and Value Matrices
 Self-Attention and K,Q,V go hand in hand - the intuition for K,Q,V can be seen from an approximate hash table:
 - To lookup a value, queries are compared against keys in a table

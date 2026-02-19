@@ -18,6 +18,8 @@ BERT can be seen as stacked encoders, T5 aims to combine the good parts of encod
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
+![BERT vs GPT](/img/bert_vs_gpt.png)
+
 The first good comparison I can think of is to a really good auto-complete where you could have 3-4 words in a message already typed out, and those words would be the queries and keys in [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) to help us generate the next words in our SoftMax output layer
 
 ### History

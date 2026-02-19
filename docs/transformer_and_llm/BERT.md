@@ -18,6 +18,8 @@ BERT can be seen as stacked encoders, T5 aims to combine the good parts of encod
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
+![BERT vs GPT](/img/bert_vs_gpt.png)
+
 Therefore, if you look into [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
 BERT doesn't generate text, but it produces token embeddings that are great for Classification, Sentence Similarity, Sentiment Analysis, and NER / Token Level Tasks
