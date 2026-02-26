@@ -289,7 +289,7 @@ $cSum[index_j] - cSum[index_i] = \sum_{k=i + 1}^{j} x_k$  (inclusive of $j$, exc
 
 $cSum[j] - cSum[i] = x_{i+1} + x_{i+2} + ... + x_j$
 
-```
+```python
 # nums =    [1, 2, 4, -2], t = 4
 # pfxSum =  [1, 3, 7, 5]
 # for any num, j, we'd look for i such that difference of j - i
@@ -310,9 +310,40 @@ for num in nums[1:]:
     resp += pfxMap[cumulSum - t]
     pfxMap[cumulSum] += 1
     
-            
-
 return(resp)
+```
+
+```python
+class LongestSubarraySumK:
+    def __init__(self, k: int):
+        self.k = k
+        self.nums = []
+        self.pfxSum = []
+        self.lookups: Dict[int, int] = int
+
+    def add(self, x: int) -> int:
+        """
+        Add next value from the stream.
+        Returns the best (max) length seen so far
+        """
+        self.nums.append(x)
+        if len(self.pfxSum) < 1:
+            self.pfxSum.append(x)
+            self.lookups[x] = 0
+            return(1 if x == self.k else 0)
+
+        self.pfxSum.append(self.pfxSum[-1] + x)
+        # add index of this pfxSum entry
+        #   if it exists, no need to track this for now - we want oldest, 
+        #   and we don't purge atm
+        if self.pfxSum[-1] not in self.lookups.keys():  
+            self.lookups[self.pfxSum[-1]] = len(self.pfxSum) - 1
+        
+        counterpart = self.pfxSum[-1] - self.k
+        if counterpart in self.lookups.keys():
+            # len of subarray is further index - older index
+            return(len(self.pfxSum) - 1 - self.lookups[counterpart])
+
 ```
 
 #### Kadane

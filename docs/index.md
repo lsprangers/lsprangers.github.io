@@ -152,4 +152,6 @@ These are some of the resources I frequently use and reference throughout this r
 - [Comet CNN Blog](https://www.comet.com/site/blog/an-intuitive-guide-to-convolutional-neural-networks/)
 - [Lena Voita Seq2Seq Website](https://lena-voita.github.io/nlp_course/seq2seq_and_attention.html#main_content)
 - [OneUpTime ZSets + Rate Limiters](https://oneuptime.com/blog/post/2026-01-25-redis-sliding-window-rate-limiting/view?utm_source=chatgpt.com#python-implementation)
+- [Chronon Medium Article](https://medium.com/airbnb-engineering/chronon-a-declarative-feature-engineering-framework-b7b8ce796e04)
+- [asOfJoin Example](https://semyonsinchenko.github.io/ssinchenko/post/fs_asof_problem_pyspark/)
 ---
