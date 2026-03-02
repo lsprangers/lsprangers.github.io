@@ -677,8 +677,7 @@ The smallest GPT-2 model has 12 attention heads and `d_out` of 768, while the la
 
 ***These attention mechanisms transform input elements into enhanced context vector representations that incorporate information about all inputs***
 
-
-### Decoder Only Transformer Blocks
+### Decoder Transformer Blocks
 Decoder only models like [GPT-3](/docs/transformer_and_llm/GPT.md) only use the decoder portion, and are trained on massive datasets using solely a next word prediction task
 
 They still focus on auto-regressive decoder-only architecture, and ultimately utilizing the next word / sentence prediction means the 400 billion token input dataset can be re-used almost infinitely
@@ -779,10 +778,16 @@ print("Output shape:", logits.shape)
 print(logits)
 ```
 
+At the end, the idea is to combine all of the below layers to create ***transformer blocks***. Ultimately, the tokens input into the model are sent through these transformer blocks to transform these input vectors in a way that preserves dimensionality and allows us to predict the next token! Attention mechnisms identity and analyze relationships between elements in the input sequence, feed forward blocks modified individual data points at each position, and skip connections ensure gradients don't vanish. This enables more nuanced understanding from the model, and allows the model to have an overall larger capacity for handling complex data patterns. Preserving dimensionality allows stacking of multiple blocks on top of each other without having to manually tweak any parameters or dimensions
+
+![GPT Transformer Blocks](/img/gpt_transformer_blocks.png)
+
 #### Normalization Layers
 During training there are often issues with vanishing and exploding gradients - these are created by multiplying together hundreds, thousands, or millions of floating point numbers together which will either explode outwards, or converge to 0 (vanishing). Overall it's just from unstable training dynamics which make it difficult for the network to effectively adjust its weights over time, and so minimizing the loss function is incredibly slow or sometimes impossible
 
 The main goal of ***layer normalization*** is to adjust the activations (outputs) of a NN layer to have a mean of 0 and variance of 1, i.e. unit variance. This ultimately just speeds up convergence to effective weights by ensuring consiste, reliable distributions. Doing this is just subtracting mean and dividing by square root of variance
+
+Layer normalization is different from batch normalization which normalizes across the batch dimension. Layer norm normalizes across the feature dimension. LLM's have a huge amount of computational overhead, and so hardware / memory constraints may reduce the overall batch size - layer normalization can ensure normal distributions in a single row or in a batch, independent of batch size
 
 ```python
 class LayerNorm(nn.Module):
@@ -804,6 +809,146 @@ class LayerNorm(nn.Module):
 These layers are typically applied before and after multi-head attention modules
 
 ![Layer Normalization](/img/layer_normalization.png)
+
+#### GELU Activations
+Historically ReLU activation functions were used due to simplicity and effectiveness, but ***Gaussian Error Linear Unit*** (GeLU) was chosen in a large number of modern day LLM's. They are more complex, smoother, and offer improved performance for deep learning models. The "sharpness" of ReLU can lead to some issues with optimizations, and GeLU will allow for a small non-zero output for negative values which still allows these neurons to contribute to training process
+
+Theoretically it should be implemented as:
+$$\text{GELU}(x) = x \cdot \phi (x)$$
+
+Where $\phi(x)$ is the cumulative distribution function of standard gaussian - there's a much cheaper implementation specified in GPT-2 paper
+
+```python
+class GELU(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+    def forward(self, x):
+        return 0.5 * x * (1 + torch.tanh(
+            torch.sqrt(torch.tensor(2.0 / torch.pi)) * 
+            (x + 0.044715 * torch.pow(x, 3))
+        ))
+```
+
+#### Feed Forward Network
+GeLU layers are often combined with `LinearLayer` that can double or triple the size of the embeddings. This is mostly used to ensure uniformity in dimensions (inputs and outputs of linear blocks are same size for stacking multiple blocks) while allowing for an overall larger and "richer" feature space for the model to use
+
+![Feed Forward Mini Example](/img/ff_mini_example.png)
+
+#### Shortcut Connections
+Shortcut connections, AKA residual or skip connections, were first introduced in [Residual CNN Networks, AKA Resnets](/docs/transformer_and_llm/RESNETS.md). They allow information from earlier layers to be reused in downstream layers, and ultimately are used as a way to help solve for vanishing gradient problems. They allow the larger gradients to pass through where they may have been lost with all of the small floating point operations
+
+![Deep NN Shortcut Connections](/img/deep_nn_shortcut_connections_additions.png)
+
+As an example, if you create a small NN with a few Feed Forward layers without skip connections and you print out the gradient at each layer via `.backward()` call paired with loss, you can see it decrease over each layer...with enough layers you get vanishing gradients. Skip connections are proven time after time to keep these layers gradients larger, which may lose some information / be inefficient, but ensures gradients don't vanish. Thinking through it, if we pass in gradients from the initial layer it means we are just taking those gradients as "true" and letting them flow down even though gradients partial derivatives may be more nuanced at the further layers...it's definitely a trade-off, but the nuanced further layers do alter the gradient themselves so they aren't lost completely
+
+
+### GPT Model
+At this point implementing a GPT-2 style model can be done with most of the layers defined above!
+
+![GPT Transformer Blocks Model](/img/gpt_transformer_blocks_stacked_into_model.png)
+
+An overview of the GPT model architecture showing the flow of data through the GPT model. Starting from the bottom, tokenized text is first converted into token embeddings, which are then augmented with positional embeddings. This combined information forms a tensor that is passed through a series of transformer blocks shown in the center (each containing multi-head attention and feed forward neural network layers with dropout and layer normalization), which are stacked on top of each other and repeated 12 times
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Real GPT-2 Model</summary>
+
+```python
+class TransformerBlock(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.att = MultiHeadAttention(
+            d_in=cfg["emb_dim"],
+            d_out=cfg["emb_dim"],
+            context_length=cfg["context_length"],
+            num_heads=cfg["n_heads"], 
+            dropout=cfg["drop_rate"],
+            qkv_bias=cfg["qkv_bias"])
+        self.ff = FeedForward(cfg)
+        self.norm1 = LayerNorm(cfg["emb_dim"])
+        self.norm2 = LayerNorm(cfg["emb_dim"])
+        self.drop_shortcut = nn.Dropout(cfg["drop_rate"])
+
+    def forward(self, x):
+        shortcut = x
+        x = self.norm1(x)
+        x = self.att(x)
+        x = self.drop_shortcut(x)
+        x = x + shortcut
+
+        shortcut = x
+        x = self.norm2(x)
+        x = self.ff(x)
+        x = self.drop_shortcut(x)
+        x = x + shortcut
+        return x
+
+class GPTModel(nn.Module):
+    def __init__(self, cfg):
+        super().__init__()
+        self.tok_emb = nn.Embedding(cfg["vocab_size"], cfg["emb_dim"])
+        self.pos_emb = nn.Embedding(cfg["context_length"], cfg["emb_dim"])
+        self.drop_emb = nn.Dropout(cfg["drop_rate"])
+
+        self.trf_blocks = nn.Sequential(
+            *[TransformerBlock(cfg) for _ in range(cfg["n_layers"])])
+
+        self.final_norm = LayerNorm(cfg["emb_dim"])
+        self.out_head = nn.Linear(
+            cfg["emb_dim"], cfg["vocab_size"], bias=False
+        )
+
+    def forward(self, in_idx):
+        # embeddings
+        batch_size, seq_len = in_idx.shape
+        tok_embeds = self.tok_emb(in_idx)
+
+        # device id just sets CPU or GPU
+        pos_embeds = self.pos_emb(
+            torch.arange(seq_len, device=in_idx.device)
+        )
+        x = tok_embeds + pos_embeds
+        x = self.drop_emb(x)
+
+        # pass input through transformer blocks
+        x = self.trf_blocks(x)
+
+        # final last norm
+        x = self.final_norm(x)
+
+        # logits represent probabilities of words
+        #  - should be size vocab
+        logits = self.out_head(x)
+        return logits
+
+torch.manual_seed(123)
+model = GPTModel(GPT_CONFIG_124M)
+
+out = model(batch)
+print("Input batch:\n", batch)
+print("\nOutput shape:", out.shape)
+print(out)
+```
+</details>
+
+#### GPT-2 Specific Choices
+There are some specific nuanced choices GPT-2 makes:
+- *Weight tying* reuses the initial token embedding weights in the final output layer, as the `~50k` vocab size is a large part of memory
+    - This is worse off in terms of accuracy and training, but creates a smaller model memory footprint
+
+### Choosing A Next Token - Generating Text
+The output of the model above is `~50k` logit probabilities - how can we choose the actual next word?
+
+![GPT choose next word](/img/gpt_choose_next_word.png)
+
+[Greedy decoding](/docs/transformer_and_llm/SEQ2SEQ.md#greedy-decoding), i.e. picking the "most probably" is a valid option, but typically isn't the most accurate long term. Most models have some sort of [beam search](/docs/transformer_and_llm/SEQ2SEQ.md#beam-search) portion that let's the model follow a `top-k` generative output path to see which one results in the best sequence
+
+Maximizing the probability of the final sequence isn't equivalent to maximizing the probability of the next best token
+
+$$
+{\text{argmax}_ {y}} \prod_{t=1}^{n} p(y_{t} | y_{\lt t}, x) \neq \prod_{t=1}^{n} {\text{argmax}_ {y}} p(y_{t} | y_{\lt t}, x)
+$$
 
 ## Architectures
 Multiple architectures, all used for diff things and probably covered elsewhere
