@@ -21,7 +21,7 @@ There are plenty of feature stores that allow for creating the below lambda arch
 
 Partity between offline and online is known as online-offline parity, and an extension of that around as-of timestamps is known as training-serving skew, and refers to coming to the same feature calculation results with offline batch processing like Spark and online pipelines in streaming setups like [Flink / Spark Streaming](/docs/architecture_components/messaging/Kafka Broker/STREAM_PROCESSING.md). These are two completely separate systems with two completely separate primitives, and so keeping them in parity is fairly difficult, and adding in timestamps, as-of semantics, and real time serving adds additional complexity that needs to be sorted out
 
-![Chronon Event To Sink Flow](/img/chronon_event_to_sink_flow.png)
+![Chronon Event To Sink Flow](/img/fs_chronon_event_to_sink_flow.png)
 
 Most feature stores are focused on user-website, user-item, or some sort of user interactions where the features are "clicks in last 5 minutes", "website visits in last 90 days", etc, and these are much harder to keep in check compared to fairly static features like address or yearly spend
 
@@ -134,10 +134,10 @@ Slowly changing dimensions Type 2 is a commonly used data modeling technique tha
 
 | user_id | message                        | cdc_type |
 |---------|--------------------------------|----------|
-|1        | {'address_name': '100 Main St', 'timestamp': 01}| INSERT   |
-|1        | {'address_name': '200 Main St', 'timestamp': 100}| UPDATE   |
-|2        | {'address_name': '150 East Road', 'timestamp': 05} | INSERT   |
-|2        | {'address_name': 'TOMBSTONE', 'timestamp': 40} | DELETE   |
+|1        | `{'address_name': '100 Main St', 'timestamp': 01}`| INSERT   |
+|1        | `{'address_name': '200 Main St', 'timestamp': 100}`| UPDATE   |
+|2        | `{'address_name': '150 East Road', 'timestamp': 05}`| INSERT   |
+|2        | `{'address_name': 'TOMBSTONE', 'timestamp': 40}`| DELETE   |
 
 With the above append only log, we can get to a table like:
 
@@ -188,7 +188,7 @@ Chronon will maintain partial aggregates internally and combine them to produce 
 ### Orchestrating
 There's actually a very nice excalidraw on the [Chronon.ai](https://chronon.ai/setup/Overview.html) website!
 
-![Chronon Excalidraw](/img/fs_chronon_excalidraw)
+![Chronon Excalidraw](/img/fs_chronon_excalidraw.png)
 
 All of the configurations and queries are stored in a repo and deployed to an airflow / some orchestrator instance, and from there all of the actual jobs and joins are deployed on compute engine runtimes. It's very similar to running a "DAG of DAGs" in Airflow, where you setup 4-5 spark jobs to run in Airflow and it sends those jobs to run on Spark executors. In terms of streaming jobs, airflow can submit the `SparkStreamingJob` to spark and return, but it won't continuously poll the Spark cluster itself. The submit and return pattern, and then checking if exists and exiting in the future, is most likely the best route to ensure all orchestration can live on Airflow without exhausting resources polling a long lived job
 
