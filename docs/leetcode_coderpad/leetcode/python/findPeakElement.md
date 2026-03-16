@@ -8,23 +8,41 @@ show_back_link: true
 # findPeakElement
 
 ```python
-#  162
+# If this element happens to be lying in a descending sequence of numbers. 
+# or a local falling slope(found by comparing nums[i] to its right neighbour), 
+# it means that the peak will always lie towards the left of this element. 
+# Thus, we reduce the search space to the left of mid(including itself) and 
+# perform the same process on left subarray.
+# If the middle element, mid lies in an ascending sequence of numbers, 
+# or a rising slope(found by comparing nums[i] to its right neighbour), 
+# it obviously implies that the peak lies towards the right of this element. 
+# Thus, we reduce the search space to the right of mid and perform the same 
+# process on the right subarray.
+
+
 class Solution:
     def findPeakElement(self, nums: List[int]) -> int:
-        if len(nums) < 2:
-            return(0)
-            
-        for idx, num in enumerate(nums):
-            if idx == 0:
-                if num > nums[idx + 1]:
-                    return(idx)
-            elif idx == len(nums) - 1:
-                if num > nums[idx - 1]:
-                    return(idx)
-            
+        low = 0
+        high = len(nums) - 1
+        while low < high:
+            midIdx = low + (high - low) // 2
+            mid = nums[midIdx]
+            left = -float("inf")   
+            right = -float("inf")     
+
+            if midIdx < len(nums) - 1:
+                right = nums[midIdx + 1]
+            if midIdx > 0:
+                left = nums[midIdx - 1]
+                
+            if mid > left and mid > right:
+                return(midIdx)
+            # if ascending, we don't need mid anymore it can't be a peak
+            elif right >= left:
+                low = midIdx + 1
+            # if descending, include mid as it could be a peak
             else:
-                if num > nums[idx - 1] and num > nums[idx + 1]:
-                    return(idx)
+                high = midIdx
         
-        return(-1)
+        return(low)
 ```
