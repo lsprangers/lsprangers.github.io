@@ -393,7 +393,7 @@ Missed a lot of things in QnA about Control Tower, but it's basically a way to q
     - No more VPC peering and crap
     - Pretty much all of our Cloud Teams Platforming can be removed, but they did it for physical separation so I don't take all IP's frmo coworker
     - There's probably ways to apply an SCP for that, but that's too many IAM rules
-- Prefix List: Predefined list of CIDR's you can share with Secutity Groups, other accounts, etc...
+- Prefix List: Predefined list of CIDR's you can share with Security Groups, other accounts, etc...
     - Allow us to centrally manage prefixes
 - Route53 Outbound Resolver: Allows us to share our forwarding rules of our DNS services, so you can share this with other accounts so that if you update a DNS list in one account it moves to all other accounts
 

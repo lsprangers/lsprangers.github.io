@@ -51,5 +51,30 @@ class Solution:
         
         # otherwise we either found right, or we send up None
         return(right)
+```
 
+```python
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        self.resp = root
+
+        def dfs(root: 'TreeNode', p: 'TreeNode', q: 'TreeNode'):
+            if not root:
+                return(0)
+            
+            n_left = dfs(root.left, p, q)
+            n_right = dfs(root.right, p, q)
+            resp = n_left + n_right
+
+            if root == p or root == q:
+                resp += 1
+            
+            if resp >= 2:
+                self.resp = root
+            
+            # don't return resp, return just 1
+            return n_left or n_right or resp
+        
+        dfs(root, p, q)
+        return(self.resp)
 ```

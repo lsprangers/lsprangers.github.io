@@ -122,6 +122,11 @@ Using `len(arr)` means your right boundary is past the last valid index, and you
 ### Insertion vs Index
 If we are looking to find the insertion index, there's a slight tweak versus finding a specific index and it mostly comes down to how you alter the `check()` function...as usual...and then the pointer that's returned
 
+The bisect modules figure out where an element should be inserted to ensure the ordering of the list stays true, while having different semantics for arrays with repeated elements:
+- `bisect_left` returns the index where x should be inserted to maintain the sorted order of the list
+- `bisect_right` (or equivalently `bisect(arr, x)`) returns the index where x should be inserted to maintain the sorted order of the list
+- Inserting at a position moves the item in that position **to the right**
+
 A very easy way to do this in python is via the `bisect.bisect_left(arr, target)` method - the below problem statement and python code shows it:
 
 "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order. You must write an algorithm with `O(log n)` runtime complexity."
@@ -131,7 +136,7 @@ class Solution:
         return(bisect.bisect_left(nums, target))
 ```
 
-- The `bisect_left(a, x, ...)` function takes a sorted list a and a value x and returns an index i such that: 
+- The `bisect_left(a, x, ...)` function takes a sorted list a and a value x and returns an index i such that after insertion:
     - All elements to the left of the index (`a[:i]`) are less than x
     - All elements to the right of and at the index (`a[i:]`) are greater than or equal to x
 
@@ -151,7 +156,7 @@ class Solution:
         return(left)
 ```
 
-- `bisect_right` on the other hand will return an index i such that:
+- `bisect_right` on the other hand will return an index i such that after insertion:
     - All elements to the left of the index (`a[:i]`) are less than or equal to x
     - All elements to the right of the index (`a[:i]`) are greater than x
 

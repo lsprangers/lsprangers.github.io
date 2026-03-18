@@ -39,6 +39,27 @@ class Solution:
 
 ```
 
+``python
+class Solution:
+    def successfulPairs(self, spells: List[int], potions: List[int], success: int) -> List[int]:
+        # sorting potions makes this O(p log(p) + s * log(p))
+        # Leaving is unsorted leaves it as O(s * p)
+        potions.sort()
+        resp = []
+
+        for sIdx, spell in enumerate(spells):
+            need = math.ceil(success / spell)
+            # bisect left means everything to the left is less than need
+            # bisect right means everything to the right is greater than need
+            # [2, 4, 5, 7, 8, 9, 10] - need 7 
+            # bisect_left --> 3
+            # bisect_right -> 4
+            pIdx = bisect.bisect_left(potions, need)
+            resp.append(len(potions) - pIdx)
+        
+        return(resp)
+```
+
 
 Using `bisect_left`
 - The bisect_left(a, x, ...) function takes a sorted list a and a value x and returns an index i such that: 
