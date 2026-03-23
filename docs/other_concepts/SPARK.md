@@ -183,7 +183,6 @@ TODO: More on heap and on machine in RAM, disk + spill, and efficient caching
     - $executor-cores = node-vCPU-count / (num-executors + 1 / num-nodes) = 15 / (18/6) = 15 / 3 = 5$
   - `executor-memory`: 19GB (63GB per node ÷ 3 executors, minus 7% overhead)
 
-
 ## 5 S's
 The 5 S's of Spark are:
 - ***Spill***: When data has to go off volative RAM onto local disk because it's too large
@@ -282,9 +281,105 @@ TODO - metadata, storage, column families, row families, skipping, etc...
   - Avoid collecting unnecessary stats on long strings
   - Optimize partition sizes to minimize serialization overhead
 
-## Kubernetes Architecture
-TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, will use cloud provider block storage devices for disk. Spark-submit done via API Controller
-![Spark on Kubernetes](./images/spark_kubernetes_generic.png)
+## PySpark
+PySpark has always been weird to me as you have an entire framework built on Scala in the JVM, and then randomly it seems you can just "use" Python in it which is an entirely different language with different runtimes, concurrency limitations, compiled vs interpreted, etc
+
+PySpark is one of the more common frameworks used in Analytics / ML, so understanding it is important to ensure `model.predict(pd.Series)` runs appropriately in a distributed fashion in a batch pipeline
+
+The general idea of running this is to take RDD Partitions, and for any task that's going to run over them, serialize the underlying spark dataframe on each executor (JVM process), and pass the serialized data to a local Python process also running on that executor. In doing so, ideally the entire dataframe is serialized and passed at once, and then the Python process can deserialize it and run operations over that data. All that needs to be structured / configured is the actual serialization and de-serialization across data types that are in Scala and Python, along with the opposite route from Python back to Scala. Overall Spark is developed in Scala and the JVM is started at the underlying layer, while PySpark is a Python sub-process started by the PythonRDD object in Scala (i.e. PySpark is started by Scala as a sub-process). Py4J is used for communication between Python and JVM, and Java objects in JVM can be dynamically accessed through Py4J Python using the Linux pipe
+
+![PySpark Pipe](/img/pyspark_pipe.png)
+
+Any Python functions, libraries, etc are all loaded into the executor, and the actual Python process is the same as running a local Python instance that's tied to a specific executor (JVM Process). Therefore, when you do something like `os.path....` it will run that in the context of the local VM, and specifically the executor that the Python process is tied to
+
+`spark.executor.memoryOverhead` is the main spark configuration that manages that JVM Heap space, and the local Python process is also tied to this - therefore, when the local Spark dataframe is serialized it's brought entirely into the Python process, and so this memory issuance alongside the Python process needs to be able to manage this entire dataframe at once without spilling to disk / hitting an OOM error
+
+Runnning Python in a distributed, parallelized manner is typically done utilizing Pandas UDF's:
+```python
+import pandas as pd
+
+from pyspark.sql.functions import pandas_udf
+
+@pandas_udf("col1 string, col2 long")  # type: ignore[call-overload]
+def func(s1: pd.Series, s2: pd.Series, s3: pd.DataFrame) -> pd.DataFrame:
+    s3['col2'] = s1 + s2.str.len()
+    return s3
+```
+
+"A Pandas UDF transfers Spark DataFrame in JVM to Python through Arrow to generate Pandas DataFrame and executes the UDF for definition. Currently, two types are available: Scalar and Grouped Map."
+
+Where the input is `pd.Series` which is a specific column / set of columns, and then the output is ideally another `pd.Series` or `pd.DataFrame` that can include all typical Types, Structs, Objects, etc. You can also utilize `Iterators`, but those would force a serialization + deserialization for each specific Row in the Spark DataFrame, pass it to Pandas / Python, act upon it, and then call `Iterator.next` once it's ready to bring it back into Spark. This isn't entirely true - `Iterators` will actually stream in row-by-row in batches, and then the entire batch is (de)serialized into Arrow formats
+
+Data serialization between Spark and Python is typically done utilizing **Arrow**, which is an efficient columnar stored binary representation that runs in Python and allows Pandas to run over it, and so converting Scala JVM data into Python ready data is much more efficient when utilizing Arrow. These are different from Arrow Python UDF's, which run things row-by-row, and are decorated as `udf()` only - these are inefficient compared to `pandas_udf()` which runs a vectorized (SIMD - A Vectorized UDF works on a subset of rows instead of one row at a time) operation over the input rows via batches of serialized data that is transferred via Arrow
+
+Arrow itself is actually an [overall efficient binary representation of data with API's in a large variety of platforms and languages](https://www.alibabacloud.com/blog/use-apache-arrow-to-assist-pyspark-in-data-processing_595299) - ensuring that the same binary data can be utilized by both Python, JVM (Scala), and a number of other languages without being forced to copy all data over
+
+![Arrow Columnar Format](/img/arrow_columnar_format.png)
+
+The source code has surely changed since Spark 2.4, but at that time the source included:
+```python
+    ...
+    batches = self._collectAsArrow()
+    if len(batches) > 0:
+        table = pyarrow.Table.from_batches(batches)
+        pdf = table.to_pandas()
+        pdf = _check_dataframe_convert_date(pdf, self.schema)
+        return _check_dataframe_localize_timestamps(pdf, timezone)
+
+    def _collectAsArrow(self):
+        """
+        Returns all records as a list of ArrowRecordBatches, pyarrow must be installed
+        and available on driver and worker Python environments.
+
+        .. note:: Experimental.
+        """
+        with SCCallSiteSync(self._sc) as css:
+            sock_info = self._jdf.collectAsArrowToPython()
+        return list(_load_from_socket(sock_info, ArrowStreamSerializer()))
+```
+
+From the Alibaba Blog:
+"It can be seen that, after the JVM converts the memory data structure set up according to the Arrow specification into column-based structure, the Python layer does not need any reverse sequence process, but directly reads the data, which is also one of the reasons why Arrow is efficient."
+
+Therefore, in total, data in Spark sits in schema enforced RDD's known as Spark Dataframes. That data is serialized into Python accessible binary encodings via Arrow, and the entire DataFrame isn't taken at once, Arrow does batching via `spark.sql.execution.arrow.maxRecordsPerBatch`, and that number of Rows are serialized and brought into binary Arrow format, which then allow the vectorized `pandas_udf` to run over them in Python, and then finally re-serialize the results back into a format ready for the JVM
+
+Most of the time in analytics / ML scenario's groups will pass an ML Model somehow to each of the Python processes, and this can be loaded during the actual call of the `pandas_udf`, which is usually the best route. The main driver program needs to find the actual model and then broadcast it out to each executor, and then each executor should be able to utilize it in Python
+
+Broadcasting an ML model would allow each executor to access the model from the broadcast variable which means there isn't redundant data transfer - the model is sent exactly once to executors, but the model must therefore fit into the memory on each executor. If the model is updated (backwards propogation during training), it'd need to be re-broadcasted, so it's not the best fit for distributed training
+```python
+from pyspark.sql.functions import pandas_udf
+import pandas as pd
+
+# Broadcast the model to all executors
+from pyspark.context import SparkContext
+sc = SparkContext.getOrCreate()
+from sklearn.externals import joblib
+model = joblib.load("/path/to/model.pkl")  # Load model on the driver
+broadcast_model = sc.broadcast(model)
+
+@pandas_udf("col1 string, col2 double")
+def broadcast_udf(s1: pd.Series) -> pd.DataFrame:
+    # Access the broadcasted model
+    model = broadcast_model.value
+    predictions = model.predict(s1)
+    return pd.DataFrame({"col1": s1, "col2": predictions})
+```
+
+Lazy loading an ML model on the other hand allows the model to be loaded within the `pandas_udf` context by the actual Python process itself - completely separate from Spark JVM processing. It ensures the model's only loaded when needed, but also means the model is re-loaded for each `pandas_udf` call, which may be many batches or partitions across an executor - potentially tens of hundreds of partitions will pass through an executor for a task
+```python
+from pyspark.sql.functions import pandas_udf
+import pandas as pd
+
+@pandas_udf("col1 string, col2 double")
+def lazy_load_udf(s1: pd.Series) -> pd.DataFrame:
+    # Load the model lazily within the UDF
+    from sklearn.externals import joblib
+    model = joblib.load("/path/to/model.pkl")  # Load model locally on each executor
+    predictions = model.predict(s1)
+    return pd.DataFrame({"col1": s1, "col2": predictions})
+```
+
+So, for the most part, when I've seen PySpark used it's in the context of ML / analytics when groups want to run Python based ML models over tabular distributed data. Ensuring the memory overhead, serialization, and vectorization of commands is done appropriately ensures that things actually work efficiently versus just "throwing things at Python"
 
 ## Spark Streaming
 Our [Streaming sub-document](STREAM_PROCESSING.md) goes into more detail on the concepts and architectures of streaming, but here you will focus on Spark Streaming
@@ -389,3 +484,8 @@ Spark Streaming has many workers, each running on different computes potentially
   - **Checkpoint Directory**: A directory for storing metadata and data checkpoints
   - **Monitoring Tools**: Tools for monitoring the performance and health of the Spark Streaming application
   - **Logging Configuration**: Configuration for logging application events and errors
+
+
+## Kubernetes Architecture
+TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, will use cloud provider block storage devices for disk. Spark-submit done via API Controller
+![Spark on Kubernetes](./images/spark_kubernetes_generic.png)

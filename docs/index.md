@@ -154,4 +154,6 @@ These are some of the resources I frequently use and reference throughout this r
 - [OneUpTime ZSets + Rate Limiters](https://oneuptime.com/blog/post/2026-01-25-redis-sliding-window-rate-limiting/view?utm_source=chatgpt.com#python-implementation)
 - [Chronon Medium Article](https://medium.com/airbnb-engineering/chronon-a-declarative-feature-engineering-framework-b7b8ce796e04)
 - [asOfJoin Example](https://semyonsinchenko.github.io/ssinchenko/post/fs_asof_problem_pyspark/)
+- [Alibaba PySpark Blog](https://www.alibabacloud.com/blog/use-apache-arrow-to-assist-pyspark-in-data-processing_595299)
+
 ---
