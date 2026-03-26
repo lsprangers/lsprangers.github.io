@@ -155,5 +155,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [Chronon Medium Article](https://medium.com/airbnb-engineering/chronon-a-declarative-feature-engineering-framework-b7b8ce796e04)
 - [asOfJoin Example](https://semyonsinchenko.github.io/ssinchenko/post/fs_asof_problem_pyspark/)
 - [Alibaba PySpark Blog](https://www.alibabacloud.com/blog/use-apache-arrow-to-assist-pyspark-in-data-processing_595299)
-
+- [NVIDIA Triton Servers](https://resources.nvidia.com/en-us-ai-inference-content/accelerated-inference)
 ---

@@ -14,6 +14,8 @@ Various training datasets are used, mostly around sourced web content from socia
 
 LLM pipelines still rely heavily on [tokenization models](/docs/transformer_and_llm/TRANSFORMERS.md#tokenization), [embeddings](/docs/transformer_and_llm/EMBEDDINGS.md), [attention mechanisms](/docs/transformer_and_llm/TRANSFORMERS.md#attention), encoder-decoder interactions (or encoder / decoder only), and some regularization, dropout, and residual layers to ensure models are trained appropriately. Outside of that model evaluation utilizing BLEU scores
 
+The general rule of thumb during training is **16GB of VRAM per 1 billion parameters**
+
 ![LLM Training Pipeline](/img/high_level_llm_training_pipeline.png)
 
 ## General Pipeline

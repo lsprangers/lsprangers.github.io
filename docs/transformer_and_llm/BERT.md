@@ -46,6 +46,9 @@ Most companies don't actually use BERT out of the box, most companies will fine-
 | Retrieval | Dual encoders (query / doc) &rarr; VectorDB |
 | Re-Ranking | Cross-encoder (CLS output) &rarr; Score |
 
+
+There's a great [example of utilizing an event loop in Python / Go and C++ infrence process on GPU's in a monolithic way to have 8 models running on a single VM to handle a high concurrency and low latency inference system in a monolith](/docs/event_driven_architecture/event_driven_software/EVENT_LOOP.md#low-latency-monolith-deployment). This ties into showcasing [Triton](https://github.com/triton-inference-server/server/tree/main/docs/user_guide), which is an open source NVIDIA software package that handles all of this for us on NVIDIA GPU's
+
 ## Training
 BERT is designed to pre-train deep (large context) bi-directional (forwards and backwards) representations from unlabeled text by jointly conditioning on left and right context in each layer (this basically means that throughout the layers of BERT you use the context words to left and right of current word to update our weights). The main difference from [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) is that ***BERT keeps word positioning and context, along with self-attention***
 

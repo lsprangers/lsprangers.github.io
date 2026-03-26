@@ -11,6 +11,8 @@ show_back_link: true
 
 In the [transformer and llm](/docs/transformer_and_llm/index.md) section, we cover the theory behind LLM's, [Transformers and Attention](/docs/transformer_and_llm/TRANSFORMERS.md), and specific models like [BERT](/docs/transformer_and_llm/BERT.md) and [GPT](/docs/transformer_and_llm/GPT.md). In this section, we cover the systems, hardware, and code that make it possible to train and run LLM's at scale, and talk about some of the systems behind them like training, inference, optimizations, and more
 
+There's a great [example of utilizing an event loop in Python / Go and C++ infrence process on GPU's in a monolithic way to have 8 models running on a single VM to handle a high concurrency and low latency inference system in a monolith](/docs/event_driven_architecture/event_driven_software/EVENT_LOOP.md#low-latency-monolith-deployment). This ties into showcasing [Triton](https://github.com/triton-inference-server/server/tree/main/docs/user_guide), which is an open source NVIDIA software package that handles all of this for us on NVIDIA GPU's
+
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
 ![BERT vs GPT](/img/bert_vs_gpt.png)

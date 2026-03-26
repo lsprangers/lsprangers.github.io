@@ -171,3 +171,73 @@ Now you make in depth choices on literally everything, and draw the entire thing
 Usually one or two, picked by interviewer or you know to dive into them
 
 Potentially pseucode or pseudo architecture
+
+
+## Second Attempt
+Implement
+```python
+class MergedIterator:
+    def __init__(self, iterators):
+        ...
+    def has_next(self) -> bool:
+        ...
+    def next(self) -> int:
+        ...
+```
+
+Each underlying iterator supports:
+```python
+has_next() -> bool
+next() -> int
+```
+
+Your `MergedIterator` should return all values across all iterators in globally sorted order.
+
+Interview expectations:
+- clarify assumptions
+- give approach
+- complexity
+- code
+- edge cases
+
+### Implementation
+```python
+from typing import List
+
+class SortedIterator:
+    def __init__(self):
+        self.iterator = ...
+    
+    def has_next(self) -> bool:
+        ...
+    
+    def next(self) -> int:
+        ...
+    
+
+# Assumptions:
+#   - Once a sorted iterator `has_next()` returns `False`, it's permanently exhausted
+import heapq
+
+class MergedIterator:
+    def __init__(self, iterators: List[SortedIterator]):
+        # reference it, make available
+        self.iterators = iterators
+        self.next_vals = []
+        for _iter in self.iterators:
+            if _iter.has_next():
+                heapq.heappush(self.next_vals, (_iter.next(), _iter))
+
+    def has_next(self) -> bool:
+        return(len(self.next_vals) > 0)
+
+    def next(self) -> int:
+        if not self.has_next():
+            raise StopIteration("Nothing left to exhaust")
+
+        min_iter, min_iter_val = heapq.heappop(self.next_vals)
+        if min_iter.has_next():
+            heapq.heappush(self.next_vals, (_iter.next(), _iter))
+        
+        return(min_iter_val)
+```

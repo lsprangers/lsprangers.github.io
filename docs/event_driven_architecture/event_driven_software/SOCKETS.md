@@ -1,5 +1,5 @@
 ---
-title: Python Sockets and Async
+title: Python Sockets
 category: Other Concepts
 difficulty: Advanced
 description: Python Sockets and Async

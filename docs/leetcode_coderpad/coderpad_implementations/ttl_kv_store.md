@@ -170,3 +170,157 @@ Now you make in depth choices on literally everything, and draw the entire thing
 Usually one or two, picked by interviewer or you know to dive into them
 
 Potentially pseucode or pseudo architecture
+
+
+
+## Second Attempt
+Implement this:
+```python
+class TTLKVStore:
+    def set(self, key: str, value: str, ttl_ms: int, now_ms: int) -> None:
+        ...
+    
+    def get(self, key: str, now_ms: int) -> str | None:
+        ...
+    
+    def delete(self, key: str) -> None:
+        ...
+```
+
+### Requirements
+- `set(key, value, ttl_ms, now_ms)` stores the value with expiration at `now_ms + ttl_ms`
+- `get(key, now_ms)` returns `None` if the key does not exist or is expired
+- `delete(key)` removes the key if present
+- assume:
+    - many keys
+    - many expired entries
+    - get should be efficient
+    - expired keys do not need to be removed exactly at expiration time, but must never be returned after expiration
+- discuss:
+    - data structures
+    - time complexity
+    - how you avoid stale expiration entries causing bugs
+    - what changes if this becomes thread-safe
+    - what changes if this must work across multiple machines
+
+### Implement
+- Can the expiration be lazily evaluated, or should there be some background process removing things?
+    - On lazy evaluation we would just need to "clear" the old data during `get` requests before actually looking into the keys
+- Storing this data would need to be done utilizing a priority queue for timestamps and keys so that clearing out up to a specific timestamp means we just need to pop off of the priority queue up to `now_ms`
+    - Inserting into the priority queue is $O(log k)$ where $k$ is the number of keys
+    - Deleting / popping off is also $O(log k)$ as we need to rebalance the priority queue underlying tree
+    - Given there might be multiple live values for a key, we also need to store versions of each K:V pair so that we don't delete an older K:V that's still in the PQ
+    - The actual key stored in our K:V store would be `key: [value, expiry_ts, version]`, and we would also need to place `[(expiry_ts, key, version)]` into the priority queue
+        - Use expiration time `(now_ms + ttl_ms, key, version)`
+- Clearing the data on get should ensure we have no expired keys in the K:V store, which means we can return `None` during `get`, and then `set` just needs to increment the version and add the entry to the priority queue
+    - `set` is $O(log k)$
+    - `get` is $O(log k)$ for each pop less than `now_ms`
+    - `delete` can be $O(1)$ if we just directly remove it from the K:V store, then during the clearing out in `get` we can ignore the key if it doesn't exist
+
+```python
+import heapq
+class TTLKVStore:
+    def __init__(self):
+        self.kv_store = {}
+        self.pq = []
+        self.last_seen_version = {}
+
+    def _evict_expired(self, now_ms) -> None:
+        # storing [expiry_ts, key, version]
+        while self.pq and self.pq[0][0] <= now_ms:
+            old_entry_expiry_ts, old_entry_key, old_entry_version = heapq.heappop(self.pq)
+            # storing [value, expiry_ts, version] in KV
+            # Delete entry only if it's the key exists and it's the version specified in the heapq expired entry
+            if old_entry_key in self.kv_store and self.kv_store[old_entry_key][2] == old_entry_version:
+                del self.kv_store[old_entry_key]
+        
+        return
+
+
+    def set(self, key: str, value: str, ttl_ms: int, now_ms: int) -> None:
+        # should check if later version exists, but assumption stated it's monotonically increasing
+        # there may be an edge case where we store a version in the KV store that's deleted, and get would need to get a lower
+        #   version
+        # This should still mean we get a latest version based on last, and to avoid any edge cases we'll store another dict for now
+        if key in self.last_seen_version:
+            new_version = self.last_seen_version[key] + 1
+            self.last_seen_version[key] = new_version
+        else:
+            self.last_seen_version[key] = 0
+            new_version = 0
+
+        expiry_ts = now_ms + ttl_ms
+
+        # Just return and don't set anything at all
+        if expiry_ts <= now_ms:
+            return
+        
+        # need to sort on expiry_ts, [expiry_ts, key, version]
+        pq_entry = [expiry_ts, key, new_version]
+        heapq.heappush(self.pq, pq_entry)
+
+        self.kv_store[key] = [value, expiry_ts, new_version]
+        return
+    
+    def get(self, key: str, now_ms: int) -> str | None:
+        self._evict_expired(now_ms)
+        
+        if key in self.kv_store:
+            # [value, expiry_ts, version]
+            return(self.kv_store[key][0])
+        else:
+            return(None)
+
+    def delete(self, key: str) -> None:
+        if key in self.kv_store:
+            del self.kv_store[key]
+
+
+if __name__ == "__main__":
+    test_class = TTLKVStore()
+    test_class.set('a', '1', 10, 0)
+    test_class.set('b', '2', 5, 1)
+    # simple
+    assert test_class.get('b', 2) == '2'
+    test_class.delete('a')
+    assert test_class.get('a', 3) == None
+
+    # simulate an odd case of ttl
+    test_class.set('c', '3', 10, 5) # expire at 15
+    test_class.set('c', '4', 1, 7) # expire at 8
+
+    assert test_class.get('c', 8) == None
+    test_class.set('d', '5', 5, 9) #expire at 14
+    test_class.set('d', '6', 5, 10) #expire at 15
+    assert test_class.get('d', 12) == '6'
+    assert test_class.get('d', 14) == '6'
+
+"""
+Time:
+- set is O(log k) from heapq push
+- get is O(log m) where m is the number of expired heap entries removed in that call
+    - _evict_expired is amortized O(log k), it only touches each key at most once, and that operation is O(log k)
+    - Each actual entry is pushed once and popped once
+- delete is O(1)
+
+Space:
+- Storing each key in KV and PQ - O(n)
+
+Thread safety:
+- This is currently thread safe in one process in Python. If we create multiple threads it's still thread safe due to GIL lock in Python
+    - In another language we would need some mutexes on pq and kv_store during the actual entry updates, deletes, and heapq push / pop
+
+Distributed Machine:
+- Pull out both the priority queue and KV store into separate distributed stores, and the set/get/delete logic would need to get a distributed mutex to make the
+    state change in those distributed databases to ensure consistency
+"""
+```
+
+
+#### Follow Up
+`def count_unexpired(self, now_ms: int) -> int:`
+It should return the number of currently unexpired keys
+
+Constraints:
+- many expired entries may still be sitting in the heap
+- do not scan all keys on every call unless you choose that deliberately and justify it
