@@ -164,6 +164,9 @@ class Solution:
 ```
 
 ## Traversal Types
+BFS explores all transformations level by level, and so the first time it reaches a node, it's ***guaranteed** to be the shortest path from the source node
+
+DFS explores paths as deep as possible, and so much longer paths can be found reaching a node before the shortest one. Therefore, in scenario's where you use a `seen` or `visited` set, there's a chance you visited the node in a longer path before the shorter one, and so you'll skip over the shortest calculation
 
 ### Depth First Search
 Depth first search (DFS) prioritizes searching as far as possible along a single route in one direction until reaching a leaf node before considering another direction

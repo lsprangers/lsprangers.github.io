@@ -26,6 +26,16 @@ show_back_link: true
     - Insert or pop from end means you just remove that last storage location, and wouldn't be affected by size of the array
 
 ## Common Algorithms
+TLDR;
+- Stacks are very useful for reversing strings!
+- Subarrays where you have to find something of a certain size, or a certain sum, etc > some target, use sliding windows
+    - "If a problem has explicit constraints like `sum greater than or less than k`, or `limits on what is contained, such as max of k unique elements`, and it also asks for `min/max length`, `# of subarrays`, or `max or min sum`, consider **sliding windows**"
+    - The size of a subarray between `i` and `j` (inclusive) is `j - i + 1`. This is also the number of subarrays that end at `j`, starting from `i` or later
+    - Sliding windows can use `left, right`, or they can just do `for right in range(k, len(s))`
+- Prefix sum gives sum of subarrays
+    - If we want the sum of the subarray from `i` to `j` (inclusive), then the answer is `prefix[j] - prefix[i - 1]`
+
+[Reverse Prefix Word](/docs/leetcode_coderpad/leetcode/python/reversePrefixWord.md)
 
 ### Two Pointers
 - Typically useful when you have two pointers, left and right, and you either increment or decrement them based on some criteria
@@ -217,6 +227,7 @@ Off the bat, the number of subarrays in an array of length $N$ is $\sum_{i=1}^{i
     - ...
     - `[right - 1, right]`
     - From here you see there are `right - left + 1` arrays that ***end at right***
+
 ```
 def numSubarrayProductLessThanK(self, nums: List[int], k: int) -> int:
     # Handle edge cases where k is 0 or 1 (no subarrays possible)
@@ -262,20 +273,31 @@ function fn(arr, k):
 ```
 
 ### Prefix Sum
-- A prefix sum array allows us to get the ***sum of subarrays*** throughout a problem
-- Typically this is done by building an array that holds the cumulative sum up to a certain point, and then doing `pfxSum[right] - pfxSum[left - 1]` or `pfxSum[right] - pfxSum[left] + nums[left]` which would get us the sum between [left, right] inclusive
-- It costs $O(n)$ to build, and then access is random so it's $O(1)$ to find sum of subarray gives it's 2 indexes
-- The Prefix Sum also comes up in [Tree Traversal](/docs/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) because you can use it during a tree traversal technique to find things like 
+A prefix sum array allows us to get the ***sum of subarrays*** throughout a problem. Many array problems are actually about turning a subarray condition into a relationship between two prefixes - the core identity is:
+- Let `prefix[i]` be the sum of elements from `0..i`
+- Then the sum of a subarray `l..r` if `prefix[r + 1] - prefix[l]`, or `prefix[r] - prefix[l - 1]` but that confuses me
+    - `prefix[r + 1] - prefix[l]` avoids the whole "`left = 0` is special"
+- The length of a subarray `nums[l..r]` is `(r + 1) - l`, or `r - l + 1` in the other convention
+
+Below, there are multiple hash maps used - `freq`, `first`, `count`, etc.. These will always store information about an earlier prefix `l`. Since most of them are initialized with `{0:..}`, they are using the `right + 1` convention where we'd start storing prefixes with `pfxSum = [0]`. Therefore, at any current position we would be at in `for idx, num in enumerate(nums):`, we can still utilize `prefix - freq[l]` to figure out sum or length between `prefix`, or `idx` and the count of index stored in the hashmaps...it's fucky, but it works out fine
+
+```python
+arr =    [1, 3, -2, 5]
+pfx = [0, 1, 4,  2, 7]
+```
+To find the sum of subarrays from `1 --> 3` you can do `pfx[4] - pfx[1] = 6`, which is the same as `arr[1] + arr[2] + arr[3]`
+
+"What earlier prefix would I need so that the difference between these two points gives me what I want". Usually if there are differences, total counts of items, or conditions, using a prefix sum is thew ay to go. Prefix Sum also comes up in [Tree Traversal](/docs/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) because you can use it during a tree traversal technique to find things like 
     - *Total number of paths that sum to X*
     - *Total number of paths less than or equal to X*
     - etc
     - The same "problems" that Prefix Sum solves for Arrays it can solve for in Trees as well
 
-### Example
 
 One dimensional Prefix Sum is easy, it's just a cumulative sum!
 ![1D Array](./images/oned_pfxsum.png)
 
+To get the total from `x1` to `x3` we need `prefix[x3] - prefix[x0]`
 
 2D Prefix sums are harder because you need to keep track of adjacent cells, however this is useful in Arrays, [Dynamic Programming](/docs/dsa/10.%20dynamic%20programming/index.md), and some [Graph](/docs/dsa/8.%20trees%20&%20graphs/index.md#graphs) problems 
 ![2D Array](./images/twod_pfxsum.png)
@@ -283,68 +305,104 @@ One dimensional Prefix Sum is easy, it's just a cumulative sum!
 There are even [tree path prefix](/docs/dsa/8.%20trees%20&%20graphs/index.md#prefix-sum) sums!
 
 
-#### Subarray Sum = k
-Mostly goes off the fact that given a Prefix Sum / Cumulative Sum, at any point 
-$cSum[index_j] - cSum[index_i] = \sum_{k=i + 1}^{j} x_k$  (inclusive of $j$, exclusive of $i$) which just means you can find some target $t$ by using a hashmap
+#### Subarray Sum = K
+Counting the number of subarrays with `sum = k`, determining the longest subarray with `sum = k`, etc all revolve around the same setup with different tracking of `resp`
 
-$cSum[j] - cSum[i] = x_{i+1} + x_{i+2} + ... + x_j$
+Utilizing `{0: 1}` is critical to represent the empty prefix - before any processing is done, there is at least one single prefix sum that is 0 which is `[]`. After that, is there's a `prefix = k` exactly equal to `k` somewhere out there, it means the length is equal to starting at the initial empty prefix list
+
 
 ```python
-# nums =    [1, 2, 4, -2], t = 4
-# pfxSum =  [1, 3, 7, 5]
-# for any num, j, we'd look for i such that difference of j - i
-# j - i = t i.e. j = t + i
-# if i = 1, we'd be looking for 4 + 1 = 5
-# if i = 3 we'd be looking for 4 + 3 = 7
-# [1, 2, 3] t = 3
-# [1, 3, 6]
-# {1: [0], 3: [1], 6: [2]}
-# 1 look for 4, 3 look for 3, 6 look for -3
-resp = 0
+def subarraySum(nums, k):
+    n_subarrays = 0
 
-pfxSum = [nums[0]]
-pfxMap = defaultdict(int)
-for num in nums[1:]:
-    cumulSum = num + pfxSum[-1]
-    pfxSum.append(cumulSum)
-    resp += pfxMap[cumulSum - t]
-    pfxMap[cumulSum] += 1
-    
-return(resp)
+    # freq {0: 1} is critical, because if a specific
+    #   prefix value is equal to k, then it's the length
+    #   of the entire array
+    freq = {0: 1}
+
+    prefix = 0
+    for idx, num in enumerate(nums):
+        prefix += num
+        n_subarrays += freq.get(prefix - k, 0)
+        freq[prefix] = freq.get(prefix, 0) + 1
+"""
+[1, 3, 0,  6,  2]
+[1, 4, 4, 10, 12]
+k = 4
+freq = {
+  0: 1,
+  1: 1,
+  4: 2,
+  10: 1
+  12: 1
+"""
 ```
 
+
+#### Longest Subarray Sum = k
+To get the longest one, you'd just have to store the first index of a prefix found instead of total count of them. To find the shortest you need to store the last found prefix instead
+
+The new way to start `first = {0: -1}` is the same idea as `{0: 1}` - the empty prefix. However in this scenario, if we have a prefix sum list like below:
+```
+arr = [1, 3, -2, 0, 4, 3, -2, -3]
+pfx = [1, 4,  2, 2, 6, 9,  7   4]
+```
+If we are looking for the longest subarray with `k=4`, the length of it is going to be the entire subarray of length 8. If we use `for idx, num in enumerate(nums)`, the actual index at the end of the array will be `7`, and so utilizing `first = {0: -1}` accounts for the fact that the length is `+1` the index of a 0-indexed array. The entire TLDR is that the length of the subarray if it's an exact `prefix = k` match is the current 0-indexed index plus 1
+
+For anything not equal to the entire subarray, like from index `2 -> 4` or `3 -> 4`, the length is going to be equal to `idx - first[prefix - k]`. In this example it would be `4 - 2 = 2` which is the size of the subarray `[0, 4]`
+
+The length is similar - we still need to utilize `r + 1` and `l`, so we can achieve length = `r + 1 - l`, which is much cleaner to think about versus other indexing options.
+
+
 ```python
-class LongestSubarraySumK:
-    def __init__(self, k: int):
-        self.k = k
-        self.nums = []
-        self.pfxSum = []
-        self.lookups: Dict[int, int] = int
+def longestSubarray(nums, k):
+    longest = 0
+    first = {0: -1}
 
-    def add(self, x: int) -> int:
-        """
-        Add next value from the stream.
-        Returns the best (max) length seen so far
-        """
-        self.nums.append(x)
-        if len(self.pfxSum) < 1:
-            self.pfxSum.append(x)
-            self.lookups[x] = 0
-            return(1 if x == self.k else 0)
-
-        self.pfxSum.append(self.pfxSum[-1] + x)
-        # add index of this pfxSum entry
-        #   if it exists, no need to track this for now - we want oldest, 
-        #   and we don't purge atm
-        if self.pfxSum[-1] not in self.lookups.keys():  
-            self.lookups[self.pfxSum[-1]] = len(self.pfxSum) - 1
+    prefix = 0
+    for idx, num in enumerate(nums):
+        prefix += num
+        need = prefix - k
+        if need in first:
+            longest = max(
+                longest,
+                idx - first[need]
+            )
         
-        counterpart = self.pfxSum[-1] - self.k
-        if counterpart in self.lookups.keys():
-            # len of subarray is further index - older index
-            return(len(self.pfxSum) - 1 - self.lookups[counterpart])
+        if prefix not in first:
+            first[prefix] = idx
 
+    return(longest)
 ```
+
+#### Modulo / Remainder Variants
+These are around counting subarrays whose sum is divisible by `k`, or whose sum has a remainder `r`, or something else similar. The main identity here is that:
+If `(prefix[r + 1] - prefix[l]) % k == 0`, $/rarr$ `prefix[r + 1] % k == prefix[l] % k`, and so if we simply store the remainders throughout the `freq` hash map, it's fine for us to come up with the same result. We're not looking for `freq[prefix - k]`, we're looking for `freq[remainder]`
+
+```python
+def subarraysDivByK(nums, k):
+    count = 0
+    prefix = 0
+    freq = {0: 1}
+
+    for x in nums:
+        prefix += x
+        rem = prefix % k
+        count += freq.get(rem, 0)
+        freq[rem] = freq.get(rem, 0) + 1
+
+    return count
+```
+
+#### Weird Variants
+There are some other weird patterns / variants that are just prefix sum in disguise:
+
+##### Count Subarrays With Equal Number Of 0 And 1
+You can just transform all 0 to -1, and keep 1 as 1, and then the problem becomes "count subarrays with sum 0"
+
+##### Count Subarrays With Exactly K Odd Numbers 
+Same thing as above - transform even to -1, and odd to 1, and then count subarrays with sum of 0
+
 
 #### Kadane
 Kadane's algorithm is used to find the maximum sum of a contiguous subarray

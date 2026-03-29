@@ -23,17 +23,49 @@ $\log(n) = x \rarr 2^x = n$
 I guess that's just repeating the same thing twice - here's a photo:
 ![Binary Search](/img/bsearch.png)
 
+### Templates
+There are two common templates:
+- Inclusive `[left, right]` which utilizes `<=`
+- Exclusive open interval `[left, right)` which utilizes `<`
+
+Setting these means the developer decides what the search space means - if you utilize `len(arr)` you know that it can't actually be apart of the search space - that'd lead to an indexing error. So you're actively choosing to have a search space of `[left, right)`. Left is a candidate, right is not. `[left, right)` is *non-empty exactly when `left < right`*, and if the dumb developer utilizes `left <= right`, they're allowing for `len(arr)` to creep in which is wrong. If `left == right`, `left < right` is empty and nothing happens
+
+Same argument for `[left, right]` then
+
+Going to try and utilize the below template as much as possible throughout the doc. This template is 1:1 with [`bisect_left` python implementation, which is a standard function we can also use](https://github.com/python/cpython/blob/main/Lib/bisect.py#L93)
+
+```python
+def bs(nums, target):
+    left = 0
+    right = len(arr)
+
+    while left < right:
+        mid = left + (right - left) // 2
+
+        # if our number is less
+        if nums[mid] < x:
+            left = mid + 1
+        
+        # greater than or equal to - keep mid for equal to
+        else:
+            right = mid
+    
+    return(left)
+```
+
+There are some cases where `left` and `right` updates differ, and it's all dependent on what `check()` looks for and returns. Sometimes we want to keep items in the search space, other times we `+1` and `-1` to remove them from the search space when there's absolutely no reason for them
+
 ### Intuition
 If you have a sorted `arr`, and you have it's start and end indexes `left, right` you can continuously check the middle `mid = left + right // 2`, and based on `mid` relation to your target you can shrink the search space in half. If `mid > target`, that means you want to focus to the left and you'll change `right = mid - 1`, and if `mid < target`, that means you want to focus to the right and you'll change `left = mid + 1`
 
 In Java or Cpp you'd use `left + (right - left) / 2` so that, in case `right = INT_MAX`, you don't store something larger than it which would overflow
 
-The template in Python pretty much does  just that:
+The template in Python pretty much does just that, but this one is looking for an exact match we expect to be in the array:
 ```python
 def binary_search(arr, target):
     left = 0
-    right = len(arr) - 1
-    while left <= right:
+    right = len(arr)
+    while left < right:
         mid = (left + right) // 2
         if check(mid, arr, target):
             # do something
@@ -52,7 +84,9 @@ def check(idx, arr, target):
     )
 ```
 
-Using `len(arr) - 1` means your last valid index is included, and your valid search interval is `[left, right]`. In this you check `left <= right`
+Using `len(arr) - 1` means your last valid index is included, and your valid search interval is `[left, right]`
+
+Using `len(arr)` means your last valid index is excluded, and your valid search interval is `[left, right)`
 
 The main difference is what you return, and how you update your search space:
 - If you want to return the exact index you can do that, or you can return an insertion point of where something new should be placed
@@ -103,8 +137,12 @@ def binary_search(arr, target):
     right = len(arr)
     while left < right:
         mid = (left + right) // 2
+
+        # In the check here, if this "works", we still keep mid involved in the search space
         if check(mid, arr, target):
             right = mid
+        
+        # if it absolutely doesn't work, there's no need to keep mid in search space
         else:
             left = mid + 1
 
@@ -119,13 +157,21 @@ def check(idx, arr, target):
 Using `len(arr)` means your right boundary is past the last valid index, and your valid search interval is `[left, right)`. In this you check `left < right`
 
 
-### Insertion vs Index
+### Insertion Vs Index And Bisect Functions
 If we are looking to find the insertion index, there's a slight tweak versus finding a specific index and it mostly comes down to how you alter the `check()` function...as usual...and then the pointer that's returned
 
 The bisect modules figure out where an element should be inserted to ensure the ordering of the list stays true, while having different semantics for arrays with repeated elements:
-- `bisect_left` returns the index where x should be inserted to maintain the sorted order of the list
-- `bisect_right` (or equivalently `bisect(arr, x)`) returns the index where x should be inserted to maintain the sorted order of the list
 - Inserting at a position moves the item in that position **to the right**
+- `bisect_left` finds the first occurrence of an item, or where it should be placed if there are none
+    - "All elements to the left of `a[:i]` are less than x"
+- `bisect_right` finds the last occurrence of an item, or where it should be placed if there are none
+    - "All elements to the right of `a[:i]` are greater than x"
+- So they mostly differ on how they handle equal to, and exact insertion point
+- If there was an array `arr = [1, 5, 6, 8]`
+    - `bisect_left(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_left(arr, 6)` would return 2 as it's the target, so less than or equal to
+    - `bisect_right(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_right(arr, 6)` would return 3 as all elements to the left must be less than or equal to 6
 
 A very easy way to do this in python is via the `bisect.bisect_left(arr, target)` method - the below problem statement and python code shows it:
 
@@ -164,17 +210,6 @@ The [Longest Subsequence With Prefix Sum Problem](/docs/leetcode_coderpad/leetco
 - After calculating the prefix sum, the length of longest subsequence is equal to the last index of the prefix sum where we could insert the query 
 - If the pfx sum has `[1, 4, 7, 8]`, and our query is 6 or 7, we'd want to return 2
 
-So the main difference is where it would return an index based on where values are equal 
-- `bisect_left` finds the first occurrence of an item, or where it should be placed if there are none
-    - "All elements to the left of `a[:i]` are less than x"
-- `bisect_right` finds the last occurrence of an item, or where it should be placed if there are none
-    - "All elements to the right of `a[:i]` are greater than x"
-- So they mostly differ on how they handle equal to, and exact insertion point
-- If there was an array `arr = [1, 5, 6, 8]`
-    - `bisect_left(arr, 7)` would return 3 as the 2nd index has a value less than it's target
-    - `bisect_left(arr, 6)` would return 2 as it's the target, so less than or equal to
-    - `bisect_right(arr, 7)` would return 3 as the 2nd index has a value less than it's target
-    - `bisect_right(arr, 6)` would return 3 as all elements to the left must be less than or equal to 6
 
 ### Solution Spaces
 Binary Search can also be used outside of arrays - generically it can be used on any solution space such as integers, some capacity, or anything else. A typical scenario of this is a problem asking "what is the min/max something can be done"
