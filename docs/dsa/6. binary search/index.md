@@ -55,6 +55,28 @@ def bs(nums, target):
 
 There are some cases where `left` and `right` updates differ, and it's all dependent on what `check()` looks for and returns. Sometimes we want to keep items in the search space, other times we `+1` and `-1` to remove them from the search space when there's absolutely no reason for them
 
+#### Open Interval Template
+Utilizing the open interval template is usually the best for a large majority of problems:
+- `[left, right)`, where the `right` indexes are no longer apart of the search space
+    - This ***does not mean they're out of the answer space***
+- `while left < right` ensures we never have `mid` never equal to `right` during an update
+    - If `left = right - 1` (i.e. we're in an interval where left and right are right next to each other), then the update happens below: 
+    ```python
+    mid = (right - 1) + (right - (right - 1)) // 2
+    = (right - 1) + 1 // 2
+    = (right - 1) + 0
+    = right - 1
+    ```
+    - So we will always have `left <= mid < right`
+
+This allows us to utilize the `right = mid` and `left = mid + 1` update logic for most of the typical, and some atypical, cases below
+
+Altogether:
+- In `[left, right)`, `right` is outside the current search space
+- `mid` is always inside the current search space, with `left <= mid < right`
+- The interval shrinks until `left == right`
+- For boundary-finding problems like first valid item, that final boundary is the answer, so returning left is correct
+
 ### Intuition
 If you have a sorted `arr`, and you have it's start and end indexes `left, right` you can continuously check the middle `mid = left + right // 2`, and based on `mid` relation to your target you can shrink the search space in half. If `mid > target`, that means you want to focus to the left and you'll change `right = mid - 1`, and if `mid < target`, that means you want to focus to the right and you'll change `left = mid + 1`
 
@@ -70,9 +92,13 @@ def binary_search(arr, target):
         if check(mid, arr, target):
             # do something
             return
+        
+        # mid for sure isn't in it, so close search space
+        #   based on [left, mid) interval
         if arr[mid] > target:
-            right = mid - 1
+            right = mid
         else:
+            # the search space is now surely [mid + 1, right)
             left = mid + 1
     
     # target is not in arr, but left is at the insertion point
@@ -86,7 +112,7 @@ def check(idx, arr, target):
 
 Using `len(arr) - 1` means your last valid index is included, and your valid search interval is `[left, right]`
 
-Using `len(arr)` means your last valid index is excluded, and your valid search interval is `[left, right)`
+Using `len(arr)` means your last valid index is excluded, and your valid search interval is `[left, right)`. The update procedure is `high = mid` in this scenario if `arr[mid] > target` because we want to keep the left side in tact. `high = mid` ***still removes mid from the search space***, because our interval is `[left, right)`
 
 The main difference is what you return, and how you update your search space:
 - If you want to return the exact index you can do that, or you can return an insertion point of where something new should be placed
@@ -160,20 +186,7 @@ Using `len(arr)` means your right boundary is past the last valid index, and you
 ### Insertion Vs Index And Bisect Functions
 If we are looking to find the insertion index, there's a slight tweak versus finding a specific index and it mostly comes down to how you alter the `check()` function...as usual...and then the pointer that's returned
 
-The bisect modules figure out where an element should be inserted to ensure the ordering of the list stays true, while having different semantics for arrays with repeated elements:
-- Inserting at a position moves the item in that position **to the right**
-- `bisect_left` finds the first occurrence of an item, or where it should be placed if there are none
-    - "All elements to the left of `a[:i]` are less than x"
-- `bisect_right` finds the last occurrence of an item, or where it should be placed if there are none
-    - "All elements to the right of `a[:i]` are greater than x"
-- So they mostly differ on how they handle equal to, and exact insertion point
-- If there was an array `arr = [1, 5, 6, 8]`
-    - `bisect_left(arr, 7)` would return 3 as the 2nd index has a value less than it's target
-    - `bisect_left(arr, 6)` would return 2 as it's the target, so less than or equal to
-    - `bisect_right(arr, 7)` would return 3 as the 2nd index has a value less than it's target
-    - `bisect_right(arr, 6)` would return 3 as all elements to the left must be less than or equal to 6
-
-A very easy way to do this in python is via the `bisect.bisect_left(arr, target)` method - the below problem statement and python code shows it:
+A very easy way to do this in python is via the `bisect.bisect_left(arr, target)` method - the below problem statement and python code shows it
 
 "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order. You must write an algorithm with `O(log n)` runtime complexity."
 ```python
@@ -182,9 +195,20 @@ class Solution:
         return(bisect.bisect_left(nums, target))
 ```
 
+The bisect modules figure out where an element should be inserted to ensure the ordering of the list stays true, while having different semantics for arrays with repeated elements:
+- Inserting at a position moves the item in that position **to the right**
 - The `bisect_left(a, x, ...)` function takes a sorted list a and a value x and returns an index i such that after insertion:
     - All elements to the left of the index (`a[:i]`) are less than x
     - All elements to the right of and at the index (`a[i:]`) are greater than or equal to x
+- `bisect_right` on the other hand will return an index i such that after insertion:
+    - All elements to the left of the index (`a[:i]`) are less than or equal to x
+    - All elements to the right of the index (`a[:i]`) are greater than x
+- So they mostly differ on how they handle equal to, and exact insertion point
+- If there was an array `arr = [1, 5, 6, 8]`
+    - `bisect_left(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_left(arr, 6)` would return 2 as it's the target, so less than or equal to
+    - `bisect_right(arr, 7)` would return 3 as the 2nd index has a value less than it's target
+    - `bisect_right(arr, 6)` would return 3 as all elements to the left must be less than or equal to 6
 
 Looking at the [bisect_left source code](https://github.com/python/cpython/blob/3.14/Lib/bisect.py#L74), it's exactly our template, except with many more error handling and good coding practices
 ```python
@@ -202,14 +226,11 @@ class Solution:
         return(left)
 ```
 
-- `bisect_right` on the other hand will return an index i such that after insertion:
-    - All elements to the left of the index (`a[:i]`) are less than or equal to x
-    - All elements to the right of the index (`a[:i]`) are greater than x
-
 The [Longest Subsequence With Prefix Sum Problem](/docs/leetcode_coderpad/leetcode/python/longestSubsequenceWithLimitedSum.md) utilizes `bisect_right` to find the length of the longest subsequence that's less than or equal to a certain query
 - After calculating the prefix sum, the length of longest subsequence is equal to the last index of the prefix sum where we could insert the query 
 - If the pfx sum has `[1, 4, 7, 8]`, and our query is 6 or 7, we'd want to return 2
 
+The intuition for pointer updates can be shown at the end of the [minimize K section](#minimize--first-acceptable-x)
 
 ### Solution Spaces
 Binary Search can also be used outside of arrays - generically it can be used on any solution space such as integers, some capacity, or anything else. A typical scenario of this is a problem asking "what is the min/max something can be done"
@@ -239,204 +260,77 @@ Once you have the $k$ figured out, ***the binary search time complexity becomes 
 - $n$ revolves around the time taken for a check function to run - typically a greedy function that could exhaust the entire input list
 - $\log{k}$ revolves around traversing the search space, where for each traversal we need to run the $O(n)$ `check()` function
 
-## Pointer Updates
-The entire intuition of when to do `left < right`, `left <= right`, `return left`, `return right`, `right = mid` and / or `left = mid + 1` revolves around pointers, solution spaces, duplicates, etc and while there are plenty of resources on templates for each of them, typically templates suck and intuition is the best method
+## ATypical
+There are some weird ones thrown in as well, especially rotating lists, a weird search space, or "guessing" at a condition
+The important alternate patterns are:
+- first / last acceptable value
+- minimize or maximize `k` subject to a condition
+- searching over an answer space instead of array values
+- special structures like rotated arrays, duplicates, and peak finding
 
-When returning minimums, you `return left` - why?
+### Minimize / First Acceptable X
+This still must hold the binary search criteria of "if valid for X, then is valid for all `y > x` - meaning the underlying search space must be ***monotonic***
+Typical examples:
+- first bad version
+- search insert position / lower bound
+- minimum feasible speed / capacity / threshold
+- integer square root as “first too large,” then return one less
 
-When returning maximums, you `return right` - the [Find Divisor Problem](/docs/leetcode_coderpad/leetcode/python/findSmallestDivisorGivenAThreshold.md) is an example of that
+The main idea is to search for the boundary, where we go from `False` to `True`. In these scenario's there can be multiple `mid` that satisfy the result, but you want to find the first / last one so you keep shrinking / dragging search space based on `check(mid)`:
+- If `check(mid)` is `True`, then `mid` may be the already valid answer, and we know the structure is monotonic, so everything above `mid` is also `True`
+    - Can shrink space via `right = mid` so that our search space turns into `[left, right)`
+- If `check(mid)` is `False`, we know that for sure `mid` isn't used in our search space. `mid + 1` might be, it's the least thing we could update to, and our left interval is closed so we update `left = mid + 1` to `[mid + 1, right)`
 
-When you want to check even if `left = right` you use `left <= right` - typically this is only used during exact matches, to find minimums or maximums you just do `left < right` - why?
-
-The classic question is: do you return left or right? Do you use `left < right` or `left <= right`? The answer depends on what you’re searching for - minimums, maximums, or exact matches - and how you want to handle duplicates
-
-Imagine you’re searching for the minimum value that satisfies a condition. As you narrow your search space, you want to make sure you never skip over a possible answer. This means, whenever your check function says “yes, this works,” you move your right pointer to mid, keeping mid in the search space. When the loop ends, left will be at the smallest index that works, so you return left
-
-
-### Some Exact Match
-In this one, we want to find something somewhere in an array, and the target must exist for us to return the index, otherwise you return insertion point
-
-```python
-def binary_search(arr, target):
-    left = 0
-    right = len(arr) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if arr[mid] == target:
-            # do something
-            return
-        if arr[mid] > target:
-            right = mid - 1
-        else:
-            left = mid + 1
-    
-    # target is not in arr, but left is at the insertion point
-    return left
-```
-
-#### Example 1: Even Number of Elements
-
-Array: [2, 4, 6, 8, 10, 12]  
-Target: 8
-
-| Step | left | right | mid | arr[mid] | Comparison | Action               |
-|------|-----|------|-----|----------|------------|----------------------|
-| 1    | 0   | 5    | 2   | 6        | 6 < 8      | left = mid + 1 (=3)   |
-| 2    | 3   | 5    | 4   | 10       | 10 > 8     | right = mid - 1 (=3)  |
-| 3    | 3   | 3    | 3   | 8        | 8 == 8     | return mid (=3)      |
-
-
-#### Example 2: Odd Number of Elements
-
-Array: [1, 3, 5, 7, 9]  
-Target: 5
-
-| Step | left | right | mid | arr[mid] | Comparison | Action           |
-|------|-----|------|-----|----------|------------|------------------|
-| 1    | 0   | 4    | 2   | 5        | 5 == 5     | return mid (=2)  |
-
-
-#### Example 3: Insertion Point
-
-Suppose the array is `[2, 4, 6, 8, 10, 12]` and the target is `7` (which does not exist in the array)
-
-| Step | left | right | mid | arr[mid] | Comparison | Action               |
-|------|------|-------|-----|----------|------------|----------------------|
-| 1    | 0    | 5     | 2   | 6        | 6 < 7      | left = mid + 1 (=3)  |
-| 2    | 3    | 5     | 4   | 10       | 10 > 7     | right = mid - 1 (=3) |
-| 3    | 3    | 3     | 3   | 8        | 8 > 7      | right = mid - 1 (=2) |
-
-At this point, `left = 3` and `right = 2`, so the loop ends. The function returns `left = 3`, which is the index where `7` would be inserted to keep the array sorted. This matches the behavior of `bisect_left([2, 4, 6, 8, 10, 12], 7)`, which also returns `3`.
-
-
-The below is very repetitive, but it is true
-The proof of why this is an insertion point is :
-- Imagine if `arr[mid] < target`
-    - We know all `arr[:mid]` are also `< target`
-    - So we update `left = mid + 1`
-- If `arr[mid] > target`, then all elements at indices `>= mid` are also `> target`
-    - `right = mid - 1`
-- If we're at some `mid` such that `left > right`, then we will know that 
-    - All elements to the left of `left` are `< target`
-    - All elements to right of `left` are `> target`
-    - At some point `left = mid + 1`, or `left = 0`
-        - If it was ever updated to `mid + 1`, that means we know at some point `arr[mid] < target`
-        - Therefore, the update it made is at some index where everything to the left of it is `< target`
-        - `[1, 3, 5, 8, 9]`, if the target is `7`, the first `mid` index would be `0 + 5 // 2 = 2`, and `5 < 7` so `left = 3`. At this point every check will be between on numbers where the minimum range starts at index 3 which is 8
-        - Left will never be updated again, right will continually scrunch down until it's less
-- Therefore, the reason left is the insertion point is the only way `left` is ever updated, is if we're sure everything `arr[:mid]` at some point is always less than it, and then we place left pointer one before. If it's the insertion point, we'll never find an answer and it'll just stay there forever
-
-
-### Minimize
-In this scenario it all comes down to **Minimize k such that condition(k) is True**
-
-The reason we set `right = mid` is that we are looking to minimize `k`, and at any point if a condition is actually met, that just means we know it's included in the search space. `k` might be the actual min, and so we can't do `right = mid - 1` like we did above
-
-The reason `right = mid - 1` worked above is that if the condition `arr[mid] == target` wasn't true, and `arr[mid] > target`, we knew for a fact that `mid` wasn't in the search space. `mid - 1` might be, but `mid` for sure wasn't. In the minimize situation, if `condition(k)` is True, then `k` still may be in the search space
-
-`left` starts as the minimum of the search space (maybe 0 for array indexes), if we ever make an update to `left = mid + 1`, that means that the `condition(mid)` failed, and we know for sure that `mid` is outside of the search space and can't possibly be a minimum candidate
-- `left = 0`, and that's the min
-- `left` was updated to `mid + 1`, and `mid` for sure wasn't an answer, so `left` (which is `mid + 1`) is now the current min of the search space
-    - It may never be updated again, and then it's the same as the first point
-
-How do we know `left` is the minimum `k` ***that satisfies the condition***? I always get caught up with "what if nothing in the search space satisfies the condition" for things like exact matches, but returning `left` at the end means we return insertion point of where it should be
-- We setup search space to ensure any answer satisfies a condition
-- If `left` is never upadted, it must be the min of the search space, so it's definitely the min that satisfies the condition!
-- If `left` was updated, same logic as stated above
-- If we truly need an exact match, and we end up with `left` but `arr[left] != target` we should return `-1` and not `left`
+The above is still the standard half open template!
 
 ```python
-while left < right:
-    mid = (left + right) // 2
-    if condition(mid):  # go left to mid
-        right = mid
-    else:               # go right
-        left = mid + 1
-return left
+# The isBadVersion API is already defined for you.
+# def isBadVersion(version: int) -> bool:
+
+class Solution:
+    def firstBadVersion(self, n: int) -> int:
+        left = 1
+        right = n
+        
+        while left < right:
+            mid = left + (right - left) // 2
+            
+            # mid is definitely bad, so we want to keep it
+            #   in search space
+            # we are looking for first valid X though, so 
+            #   want to bring left up as much as possible
+            # "all versions after a bad version are bad"
+            if isBadVersion(mid):
+                right = mid
+            # if it's not a bad version, we know 
+            else:
+                left = mid + 1
+        
+        return(left)
+
+# [good, good, bad, bad, bad]
+# 0, 2, 5
+# update right = 2
+# 0, 1, 2
+# update left = 2
+
+# [good, bad, bad, bad, bad]
+# 0, 2, 5
+# update right = 2
+# 0, 1, 2
+# update right = 1
+# left = 1
 ```
 
-Another point to mention here is setting `right = len(arr)` - there's a chance that `target` is greater than every single number in the `arr`. In that scenario we would continuously update `left = mid + 1`, and at some point either `left = right = len(arr)`, or `left = len(arr) - 1`:
-1. If `left = right = len(arr)`, then returning `left` is fine as we'd return 5 for the below array
-    - `[0, 1, 2, 3, 4]`
-    - The insertion point of this array truly is `idx = 5`, but that `idx` just doesn't exist
-2. If `left = len(arr) - 1`, then `left < right` still
-    - `mid = left + (right - left) // 2` $\rarr$ `len(arr) - 1 + (len(arr) - (len(arr) - 1)) // 2` $\rarr$ `2 * len(arr) // 2 = len(arr)`  so `mid = len(arr) = right`
-    - At this point `arr[mid]` would have an `ArrayIndexOutOfBounds` error
-        - `left = len(arr) - 1`
-        - `right = len(arr) = mid`
-        - `check(mid)` would fail
-- Nevermind, I'm wrong about portion 2.
-    - Weirdly enough `left` will never become `len(arr) - 1` in either even or odd situation here - at some point `mid` always becomes `len(arr) - 1`, and so when `left` updates it becomes `left = right = len(arr)` and so the loop returns 
-    - Intuition on why scenario 2 never happens during an open interval (`right = len(arr), left < right`) binary search:
-        - I screwed up the order of operations - `(right - low) // 2` would be evaluated before being added to `low`
-        - `len(arr) - (len(arr) - 1) // 2` $\rarr$ `1 // 2` which would truncate to 0, so `mid = len(arr) - 1`
-    - TODO: Update section 2 above and re-explain all this crap... f bsearch it's so stupid why didn't I just take notes in college
+In these solutions the open interval concept `[left, right)` still holds, but there's a chance that when we set `right = mid` and have `[left, mid)` that `mid` is actually the true last valid version. That's fine - if `right` is truly the last valid bound, then:
+- `left < right` will continue happening and `left = mid + 1` will eventually occur
+    - If `left < right`, does that guarantee that `mid` is never equal to right via `mid = left + (right - left) // 2`? It would be bad if `mid = right` in some scenario and we do `left = mid + 1 = right + 1 = answer + 1` and we return a version above the answer
 
-#### Example: Find First Element $\ge$ Target
+This is slightly different from the typical exact search semantics where `if arr[mid] > target` then `mid` is definitely not involved. We still set `right = mid` here, but in exact search the search space is equivalent to the answer space, and so in that update we would be removing `mid` from the answer space. In the minimize scenario's, `if check(mid)` is `True` `mid` may still be the answer, but we can still do `right = mid` which removes it from the search space but keeps it in the answer space
 
-Array: [1, 3, 5, 7, 9, 11]  
-Target: 6  
-Goal: Find the first index where arr[i] $\ge$ 6
+At the end we do `return(left)` which is valid, `left == right` means that's where the search collapsed on the boundary index between `[.., False, True, ...]`
 
-| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 6? | Action             |
-|------|-----|------|-----|----------|---------------|--------------------|
-| 1    | 0   | 5    | 2   | 5        | No            | left = mid + 1 (=3) |
-| 2    | 3   | 5    | 4   | 9        | Yes           | right = mid (=4)    |
-| 3    | 3   | 4    | 3   | 7        | Yes           | right = mid (=3)    |
-| 4    | 3   | 3    | -   | -        | -             | End, return left=3  |
-
-Result: Returns index 3 (arr[3]=7), which is the first element $\ge$ 6.
-
----
-
-#### Edge Case: All Elements Less Than Target
-
-Array: [1, 2, 3, 4, 5]  
-Target: 10  
-Goal: Find the first index where arr[i] $\ge$ 10
-
-| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 10? | Action             |
-|------|-----|------|-----|----------|----------------|--------------------|
-| 1    | 0   | 4    | 2   | 3        | No             | left = mid + 1 (=3) |
-| 2    | 3   | 4    | 3   | 4        | No             | left = mid + 1 (=4) |
-| 3    | 4   | 4    | 4   | 5        | No             | left = mid + 1 (=5) |
-| 4    | 5   | 4    | -   | -        | -              | End, return left=5  |
-
-Result: Returns index 5 (out of bounds), meaning no element $\ge$ 10 exists.
-
----
-
-#### Edge Case: First Element Satisfies Condition
-
-Array: [2, 3, 4, 5, 6]  
-Target: 2  
-Goal: Find the first index where arr[i] $\ge$ 2
-
-| Step | left | right | mid | arr[mid] | arr[mid] $\ge$ 2? | Action             |
-|------|-----|------|-----|----------|---------------|--------------------|
-| 1    | 0   | 4    | 2   | 4        | Yes           | right = mid (=2)    |
-| 2    | 0   | 2    | 1   | 3        | Yes           | right = mid (=1)    |
-| 3    | 0   | 1    | 0   | 2        | Yes           | right = mid (=0)    |
-| 4    | 0   | 0    | -   | -        | -             | End, return left=0  |
-
-Result: Returns index 0 (arr[0]=2), which is the first element $\ge$ 2.
-
-### Upper Bound (Last Valid X)
-This is the flip scenario of [Lower Bound](#lower-bound-first-valid-x), and so in this scenario you set `left = mid` and `right = mid - 1` 
-
-This is because there can be multiple `mid` that satisfy the result, but you want to find the last one so you keep shrinking / dragging search space to the right
-
-mid calculation being `left + right + 1` also ***prevents an infinite loop, and is vital***
-
-```python
-while left < right:
-    mid = (left + right + 1) // 2  # Bias right
-    if condition(mid):  # go right
-        left = mid
-    else:               # go left
-        right = mid - 1
-return left
-```
+This is the exact intuition for ***first-valid / lower bound / insertion-point*** style problems
 
 ### Search On Answer
 Search On Answer problems usually mean changing the search space, and then finding the [Lower Bound](#lower-bound-first-valid-x) or [Upper Bound](#upper-bound-last-valid-x) based on problem statement
@@ -454,9 +348,6 @@ while left < right:
 return left
 ```
 
-## ATypical
-There are some weird ones thrown in as well, especially rotating lists, a weird search space, or "guessing" at a condition
-
 ### Rotating Lists
 Problem Statement:
 Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array `nums = [0,1,2,4,5,6,7]` might become:
@@ -466,18 +357,24 @@ Suppose an array of length n sorted in ascending order is rotated between 1 and 
 
 Notice that rotating an array `[a[0], a[1], a[2], ..., a[n-1]]` 1 time results in the array `[a[n-1], a[0], a[1], a[2], ..., a[n-2]]`
 
-In these scenarios, the `condition(mid)` function needs to change to figure out if you should go left or right
-
-If an array isn't sorted, then you know for sure last element at end $\geq$ first element at 0
-
-However, if an array is rotated, then the last element would be smaller than the first element - seeing this pattern you can realize there's a place, an ***Inflection Point*** where you can figure out where the real start was
-
-Therefore, what you need to search for is an index $i : i > i + 1$ which would correspond to the old start and end
+If an array isn't rotated, then you know for sure last element at end $\geq$ first element at 0. However, if an array is rotated, then the last element would be smaller than the first element - seeing this pattern you can realize there's a place, an ***inflection point*** where you can figure out where the real start was
 
 ![Inflection Point](/img/inflection_point.png)
 
-Therefore, `check` becomes:
-```
+`arr = [4, 5, 6, 7, 0, 1, 2, 3]`
+Our inflection point above is 4 - this means we have 2 arrays:
+- `arr[inflection: ]` which is `[0, 1, 2, 3]`
+- `arr[0: inflection]` which is `[4, 5, 6, 7]`
+- Both of these are sorted arrays! We can run regular ol' binary search on these 2 arrays, but we need to figure out:
+    - Where the inflection point is
+    - If our target is in the left `arr[0: inflection]` array, or the right `arr[inflection: ]`
+    - Looping over array to find the inflection point is $O(n)$, and so problems that say "You must write an algorithm with $O(log n)$ runtime complexity." make this a bit trickier
+
+***We can find the inflection point in $O(log n)$!***
+```python
+left = 0
+right = len(arr)
+...
 mid = left + right // 2
 if check(mid):
     return(mid)
@@ -486,7 +383,135 @@ elif mid > first element of array:
 else:
     search to the left
 ```
-because if you find the number 6, which is above the first element 4, you know our inflection point is still to the right of us
+because if you find the number 6, which is above the first element 4, you know our inflection point is still to the right of us, but if you find `0, 1, 2, 3`, we know it's to the left
+
+***So in total there are 2 binary searches in these types of problems***:
+- Finding the inflection point
+- Splitting up the array based on inflection point and target, and running a typical binary search there
+
+```python
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        if len(nums) < 2:
+            return(0 if nums[0] == target else -1)
+        
+        # find inflection point
+        left = 0
+        right = len(nums)
+
+        # [4, 5, 6, 7, 0, 1, 2, 3]
+        while left < right:
+            mid = left + (right - left) // 2
+            
+            # we know inflection is to the right
+            # left being mid could still be the right one though
+            if nums[mid] >= nums[0]:
+                left = mid + 1         # [mid, right)
+            
+            # inflection point to the left
+            else:
+                right = mid
+            
+        inf_point = left if left < len(nums) else 0
+        
+        if inf_point != 0 and target < nums[0]:
+            left, right = inf_point, len(nums)
+        else:
+            left, right = 0, inf_point if inf_point != 0 else len(nums)
+        
+        while left < right:
+            mid = left + (right - left) // 2
+            if nums[mid] == target:
+                return(mid)
+            elif nums[mid] > target:
+                right = mid
+            else:
+                left = mid + 1
+        
+        return(-1)
+```
+
+#### Rotating List Without Initial Pivot Search
+There is an actual way to run binary search on a rotated array without initially finding the pivot and splitting
+
+```python
+from typing import List
+
+class Solution:
+    def search(self, nums: List[int], target: int) -> int:
+        left, right = 0, len(nums) - 1   # closed interval [left, right]
+
+        while left <= right:
+            mid = left + (right - left) // 2
+
+            if nums[mid] == target:
+                return mid
+
+            # left half is sorted
+            if nums[left] <= nums[mid]:
+                if nums[left] <= target < nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+
+            # right half is sorted
+            else:
+                if nums[mid] < target <= nums[right]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+
+        return -1
+```
+
+### Peaks
+Finding peak elements can be seen as a form of binary search where you are looking for some bounday `[inc, inc inc, dec]` where on the left there's an increasing sequence, and on the right there's a decreasing sequence - you could have an array similar to `[1,2,3,4,3,5,6,7]` where `4` is a peak, but you can't necessarily tell unless you're exactly at that index
+
+There's a nuance to most of these problems in the stated assumptions - "You may imagine that `nums[-1] = nums[n] = -inf`. In other words, an element is always considered to be strictly greater than a neighbor that is outside the array."
+
+Therefore, the update logic would need to be based on if we're currently in an index in an increasing sequence or not:
+- If a certain index `mid` is sitting in a descending sequence of numbers, i.e. a local falling slope, it means the peak will always lie to the left of this element
+- Therefore, we can reduce the search space to the left of this element via `right = mid`
+- If `mid` lies in an ascending sequence of numbers, it implies the peak element lies towards the right of this element, with our typical `left = mid + 1` update
+
+```python
+class Solution:
+    def findPeakElement(self, nums: List[int]) -> int:
+        if len(nums) <= 1:
+            return(0)
+        
+        left = 0
+        right = len(nums)
+        
+        while left < right:
+            mid = left + (right - left) // 2
+            
+            # if we can safely check both indexes around us
+            if 0 < mid < len(nums) - 1:
+                if nums[mid - 1] < nums[mid] > nums[mid + 1]:
+                    return(mid)
+                # means we're in an increasing sequence
+                elif nums[mid - 1] < nums[mid]:
+                    left = mid + 1
+                # we're in decreasing
+                else:
+                    right = mid
+            
+            # we're at one of the ends - logic here is screwy with short arrays like [1,2], and [2,1]
+            elif mid == 0:
+                if nums[mid] > nums[mid + 1]:
+                    return(mid)
+                else:
+                    left = mid + 1
+            else:
+                if nums[mid - 1] < nums[mid]:
+                    return(mid)
+                else:
+                    right = mid - 1
+        
+        return(left)
+```
+
 
 ### Find A Rate
 There are some specific problems like [KoKo Eating Bananas](/docs/leetcode_coderpad/leetcode/python/kokoEatingBananas.md) and Elves on Package Line where you basically need to find a rate of something, and then check if that rate suffices

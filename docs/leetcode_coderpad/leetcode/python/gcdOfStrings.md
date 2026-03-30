@@ -18,4 +18,5 @@ class Solution:
         # if there's a pattern, get the length of it
         pattern_length = gcd(len(str1), len(str2))
 
-        return str1[0 : pattern_length]```
+        return str1[0 : pattern_length]
+```

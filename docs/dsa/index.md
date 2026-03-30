@@ -13,8 +13,8 @@ This is a dump of all the DSA notes I had from school, coursework, and interview
     - at-most constraints, character frequency windows, and sum constraints on nonnegative arrays
     - count valid subarrays with `right - left + 1`
 - Prefix-sum init: 
-    - freq = {0: 1} for counting 
-    - first = {0: -1} for longest length
+    - `freq = {0: 1}` for counting 
+    - `first = {0: -1}` for longest length
     - usually keep only a running sum, not a full prefix array
 - If negatives exist, standard sum-based sliding window is usually wrong; prefix sums still work
 

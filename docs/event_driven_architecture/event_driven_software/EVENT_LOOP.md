@@ -181,7 +181,7 @@ There are a few languages / options we can utilize with different pros / cons:
 
 
 ### Low Latency Monolith Deployment
-The best setup for low latency (<40ms) inference with concurrency will start with a monolith split up between an orchestration process (Go, Python, etc) and GPU based inference processes (C++, Python calling C++) where inter-process communication (IPC) happens via gRPC or low level sockets / pipes. For this example we'll stick with Python as the AsyncI/O framework, and C++ as the inference process that interacts with NVIDIA A100 GPU's on a device
+The best setup for low latency ($\lt$ 40ms) inference with concurrency will start with a monolith split up between an orchestration process (Go, Python, etc) and GPU based inference processes (C++, Python calling C++) where inter-process communication (IPC) happens via gRPC or low level sockets / pipes. For this example we'll stick with Python as the AsyncI/O framework, and C++ as the inference process that interacts with NVIDIA A100 GPU's on a device
 
 We'll host BART-large on each GPU which requires:
 - 413 MB of VRAM to load in float16 precision for inference
@@ -231,6 +231,6 @@ Given no one wants to write any of the above code ever again, the best bet is to
     - Can serve any model with custom configs, and has pre-sets for ONNX, Tensorflow, PyTorch, etc
     - This specifically allows for multi-GPU clusters
 - Ray Serve is a useful framework for distributed processing, potentially semi real-time, but more useful for non real-time scenario's that need distributed compute and processing
-    - Pipelines, reinforcement learning, enqueue'd distributed serving (<1s), etc
+    - Pipelines, reinforcement learning, enqueue'd distributed serving ($\lt$ 1s), etc
     - Work with both GPU or CPU workers
 - Tensorflow Serve is useful for Tensorflow only, and somewhere inbetween Triton and Ray Serve

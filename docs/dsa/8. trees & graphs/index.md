@@ -26,12 +26,59 @@ Binary Tree's are both specific types of Graphs, and so are Linked Lists actuall
 
 ### Binary Search Tree
 Binary Search Tree's are tree's who, for any node, have:
-- All left children $\lt$ node value
-- All right children $\gt$ node value
+- All nodes in left subtree $\lt$ node value
+- All nodes in right subtree $\gt$ node value
 
 The reason these are different from regular Binary Tree's are this specific relationship - at each step you can reduce the total search space by half, resulting in $O(\log n)$ search time
 
-You can reduce it because there's a specific relationship $gt$, $lt$
+The properties above ensure that there's never a grandchild node that's potentially larger than it's grandparent:
+```
+     12
+    /  \
+   8    15
+    \
+     13
+```
+
+With this property ensured, we can then completely remove sub-tree's based on a current node's value:
+```python
+if node.val > key:
+  node = node.left
+elif node.val < key:
+  node = node.right
+else:
+  # node is val
+```
+
+#### Insertion
+All new nodes are inserted as leaf nodes, and the inherent properties of BST's ensure that the tree remains valid - if we look to insert 12 into the tree below
+```python
+#   10
+# 8   15
+
+def insertIntoBST(root: Optional[TreeNode], val: int) -> Optional[TreeNode]:
+    if not root:
+        return(TreeNode(val))
+    
+    if val > root.val:
+        root.right = insertIntoBST(root.right, val)
+    else:
+        root.left = insertIntoBST(root.left, val)
+    
+    return(root)
+
+insertIntoBST(root, 12)
+#   10
+# 8   15
+#    12
+
+```
+
+Since we are forced to traverse to the end and create a new leaf node, every insertion is always $O(h)$ time complexity where $h$ is the height of the tree
+
+#### Deletion
+
+
 
 ### Self-Balancing Binary Search Tree
 - Self Balancing BST's have the same property as Binary Search Tree's, except they will balance themselves out via different methods

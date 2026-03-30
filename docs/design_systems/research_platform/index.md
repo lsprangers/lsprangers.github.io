@@ -54,7 +54,7 @@ Components:
             - Columns:
                 - dataset_id: int
                 - name: str
-                - schema: struct<col_name, type>
+                - schema: struct[col_name, type]
                 - owner: str
                 - vendor: str
                 - date_input: date
@@ -78,7 +78,7 @@ Components:
                 - pipeline_id: int
                 - pipeline_name: str
                 - pipeline_owner: str
-                - conxn_info: struct<str, str>
+                - conxn_info: struct[str, str]
                 - schedule_id: int
                 - ...
         - Schedule
