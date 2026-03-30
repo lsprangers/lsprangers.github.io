@@ -209,7 +209,7 @@ The actual gRPC API that handles accepting new inference calls can be modeled af
 Actual inference is then handled in [Triton Core Repo](https://github.com/triton-inference-server/core/)
 - The [Dynamic Batch Scheduler](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc) covers dynamic batching of new gRPC requests
     - This will [create and enqueue a request](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L185)
-        - Potentially do a [cache lookup if enabled](github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218)
+        - Potentially do a [cache lookup if enabled](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218)
     - If not dynamic batching, [immediately send the request](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218)
     - Otherwise [add to batcher](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218), [enqueue it](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218) into schedulers internal priority queue, [decide to wake up batching thread](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#L218), and if woken up start the actual call with [`cv_notify`](https://github.com/triton-inference-server/core/blob/main/src/dynamic_batch_scheduler.cc#284)
 - Every new gRPC request becomes an `InferenceRequest`, and is added to the scheduler via `Enqueue()`

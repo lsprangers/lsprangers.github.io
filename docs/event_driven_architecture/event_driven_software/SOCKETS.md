@@ -141,15 +141,15 @@ To achieve concurrency in Python there's multiple options, and most overlap with
 
 These are just a few ways of actually packaging up concurrent work, but communication between these threads or processes can involve files, queue's, inter-process queue's, local network socket communication, and other options
 
-The scope of discussing all of this is beyond here, and a fair amount is talked through in the RAFT project and [Building Async From Scratch Section](/docs/other_concepts/PYTHON_SOCKET_ASYNCIO.md#building-async-from-scratch)
+The scope of discussing all of this is beyond here, and a fair amount is talked through in the RAFT project and [Building Async From Scratch Section](/docs/event_driven_architecture/event_driven_software/SOCKETS.md#building-async-from-scratch)
 
 So, to get back to handling multiple connections, we can utilize anything above, and usually it involves higher level interfaces for handling multiple clients and using concurrent asynchronous workers
 
-Instead of using [select](/docs/other_concepts/PYTHON_SOCKET_ASYNCIO.md#select) ourselves, you can usually just write `asyncIO` based functions and they handle the multiple communication problem for you
+Instead of using [select](/docs/event_driven_architecture/event_driven_software/SOCKETS.md#select) ourselves, you can usually just write `asyncIO` based functions and they handle the multiple communication problem for you
 
 Even higher level interfaces like `gevent`, `fastAPI`, and some other 3rd party packages make this even easier
 
-Lastly, we build out a [multi-connection server](/docs/other_concepts/PYTHON_SOCKET_ASYNCIO.md#select-multi-connection-example) under the select section
+Lastly, we build out a [multi-connection server](/docs/event_driven_architecture/event_driven_software/SOCKETS.md#select-multi-connection-example) under the select section
 
 Most of the driving is done by the `sel.select()`, as it's blocking, waiting at the top of the loop for events, and is responsible for implementing the core event loop to wake up when read and write events are ready to be processed
 
