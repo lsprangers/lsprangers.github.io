@@ -30,9 +30,9 @@ The number of subarrays between `left, right` is `right - left + 1`
     - `mid = left + (right - left) // 2`
     - Initialize with `left = 0`, `right = len(arr)`
     - Loop with `while left < right`
-    - If mid is good, do `right = mid`; otherwise do `left = mid + 1`
+    - `if check(mid): right = mid else: left = mid + 1`
     - return `left` as first valid position or insertion point
 - For last valid X, need to switch to:
     - `mid = left + right + 1 // 2`
-    - `left = mid`
-    - `right = mid - 1`
+    - `if check(mid): left = mid + 1`
+    - `else: right = mid - 1`

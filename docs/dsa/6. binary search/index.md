@@ -338,12 +338,27 @@ This is the opposite of the template above where if `check(mid)` is `True`, then
 This does lead to a potential infinite loop where `mid == left` via `left + (right - left) // 2` because we aren't forcing `left = mid - 1`, and so the `mid` calculation logic needs to change to `left + right + 1 // 2` which will guarantee that `left < mid <= right`
 
 ```python
-left = 4
-right = 5
-mid = left + (right - left) // 2 = 4 + (1) // 2 = 4
+while left < right:
+    mid = (left + right + 1) // 2
+    if check(mid):
+        left = mid
+    else:
+        right = mid - 1
+return left
+```
 
-check(4) # --> True, left = 4 would result in an infinite look
-left = mid + 1 # --> 
+```python
+left = 0
+right = len(nums) - 1
+
+while left <= right:
+    mid = (left + right + 1) // 2
+    if check(mid):
+        left = mid + 1
+    else:
+        right = mid - 1
+
+return(right)
 ```
 
 ### Search On Answer
