@@ -503,8 +503,52 @@ Most common examples are [Finding The Nearest Exit](/docs/leetcode_coderpad/leet
     - Repeat for all unvisited nodes to find all connected components.
   - ***UnionFind*** above will have the `root` vector at the end corresponding to all of the unique connected component ID's
 
+#### Cycles + Connected Components In Undirected Graph
+Undirected graphs make cycles a confusing topic - if we are traversing the graph on node `0` and we go to `4`, there's going to be a neighbor in `adj_list[4]` that points to `0`. We can remove the parent from 4's adjacency list, but it's easier just to track the original node that was used to traverse to any other node (i.e. it's parent)
 
-### Disjoint Set
+![Undirected Graph Cycle](/img/undirected_graph_cycle.png)
+
+```python
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -> bool:
+        if len(edges) != n-1:
+            return(False)
+        
+        neighbors = [[] for _ in range(n)]
+        for e1, e2 in edges:
+            neighbors[e1].append(e2)
+            neighbors[e2].append(e1)
+
+        parent = {0: -1}
+        stack = [0]
+
+        while stack:
+            curr = stack.pop()
+            for neighbor in neighbors[curr]:
+                if neighbor == parent[curr]:
+                    continue
+                
+                # This equates to a cycle. We want to ensure
+                #   the cycle in an undirected graph of neighbors
+                #   isn't tripping this up, but if we find this 
+                #   node that isn't our direct neighbor / parennt
+                #   then it's a cycle
+                if neighbor in parent:
+                    return(False)
+                parent[neighbor] = curr
+                stack.append(neighbor)
+        
+        return(len(parent) == n)
+```
+
+There's a further invariant in graph theory:
+"""
+For the graph to be a valid tree, it must have exactly `n - 1` edges. Any less, and it can't possibly be fully connected. Any more, and it has to contain cycles. Additionally, if the graph is fully connected and contains exactly `n - 1` edges, it can't possibly contain a cycle, and therefore must be a tree!
+"""
+
+Which boils this problem down to "is the graph fully connected, and contains `n-1` edges", which further boils down to "is it a single connected component with `n-1` edges", which can utilize the [disjoint set](#disjoint-set) algorithm to check for a singular connected component, and then just count the edges
+
+#### Disjoint Set
 Given the vertices and edges of a graph, how can we quickly check whether two vertices are connected? Is there a data structure that can help us identify if 2 nodes are apart of the same [connected component](#connected-components)? Yes! By utilizing the ***disjoint set (AKA union-find) data structure***
 
 The primary purpose of this data structure is to answer queries on the connectivity of 2 nodes in a graph in $O(1)$ time
@@ -525,7 +569,7 @@ class UnionFind:
     def find(self, x):
         if x == self.root[x]:
             return x
-	# Some ranks may become obsolete so they are not updated
+	      # Some ranks may become obsolete so they are not updated
         self.root[x] = self.find(self.root[x])
         return self.root[x]
 
@@ -534,6 +578,9 @@ class UnionFind:
         rootX = self.find(x)
         rootY = self.find(y)
         if rootX != rootY:
+            # tree at rootX is "deeper" than Y, if we append
+            #   X tree to Y it will be larger than if we 
+            #   appended Y to X
             if self.rank[rootX] > self.rank[rootY]:
                 self.root[rootY] = rootX
             elif self.rank[rootX] < self.rank[rootY]:
@@ -917,6 +964,8 @@ A key property is ***acyclic*** meaning there are no cycles in the graph! It wou
   - ...
 
 The main algorithm for this is ***Kahn's Algorithm*** where you will basically iterate over all vertexes that have `indegree = 0`, and do something with them, and then decrement their downstream vertexes. This ultimately creates "levels" where multiple classes or jobs could be ran at the same time, and once they're all done you should be ready for our downstream vertexes (decrement indegree)
+
+The most common problem is the [Dependent Course Problem](/docs/leetcode_coderpad/leetcode/python/parallelCourses.md) where you need to build a DAG of pre-requisite courses and then figure out how many semesters it would take to complete all courses
 
 Since you are only iterating over edges and vertexes and doing increment / decrement, our space and time complexities are $O(V + E)$
 
