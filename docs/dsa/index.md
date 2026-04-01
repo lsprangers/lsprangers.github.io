@@ -20,13 +20,19 @@ This is a dump of all the DSA notes I had from school, coursework, and interview
 
 The number of subarrays between `left, right` is `right - left + 1`
 
-- Use binary search on answer when the output is a min/max value and you can write a monotonic can(mid)
-- If `can(x)` is true, then all smaller values are also true, or all larger values are also true
+- Use binary search on answer when the output is a min/max value and you can write a monotonic `check(mid)`
+- If `check(x)` is true, then all smaller values are also true, or all larger values are also true
 - Search the answer space, not the array: 
     - capacity, speed, sweetness, threshold, minimum/maximum feasible value
-- Main job is not coding binary search; it is proving the monotonicity and writing `can(mid)` correctly
+- Main job is not coding binary search; it is proving the monotonicity and writing `check(mid)` correctly
 - Use half-open interval: search space is `[left, right)`
-- Initialize with `left = 0`, `right = len(arr)`
-- Loop with `while left < right`
-- If mid is good, do `right = mid`; otherwise do `left = mid + 1`
-- return `left` as first valid position or insertion point
+- For most problems, half open will work
+    - `mid = left + (right - left) // 2`
+    - Initialize with `left = 0`, `right = len(arr)`
+    - Loop with `while left < right`
+    - If mid is good, do `right = mid`; otherwise do `left = mid + 1`
+    - return `left` as first valid position or insertion point
+- For last valid X, need to switch to:
+    - `mid = left + right + 1 // 2`
+    - `left = mid`
+    - `right = mid - 1`

@@ -332,6 +332,20 @@ At the end we do `return(left)` which is valid, `left == right` means that's whe
 
 This is the exact intuition for ***first-valid / lower bound / insertion-point*** style problems
 
+### Maximize / Last Acceptable X
+This is the opposite of the template above where if `check(mid)` is `True`, then `check(smaller)` is also `True`. We're looking for the threshold of `[True, True, True, False, False]` where `True` turns into `False`. In this case if we come across some `True`, then `mid` may be the correct answer so we want to keep it in `[left, right)`
+
+This does lead to a potential infinite loop where `mid == left` via `left + (right - left) // 2` because we aren't forcing `left = mid - 1`, and so the `mid` calculation logic needs to change to `left + right + 1 // 2` which will guarantee that `left < mid <= right`
+
+```python
+left = 4
+right = 5
+mid = left + (right - left) // 2 = 4 + (1) // 2 = 4
+
+check(4) # --> True, left = 4 would result in an infinite look
+left = mid + 1 # --> 
+```
+
 ### Search On Answer
 Search On Answer problems usually mean changing the search space, and then finding the [Lower Bound](#lower-bound-first-valid-x) or [Upper Bound](#upper-bound-last-valid-x) based on problem statement
 
@@ -433,6 +447,13 @@ class Solution:
 
 #### Rotating List Without Initial Pivot Search
 There is an actual way to run binary search on a rotated array without initially finding the pivot and splitting
+
+In the rotated array problems there are 3 indices we need to utilize at every step:
+- `left`
+- `mid`
+- `right`
+
+We need all 3 of these to be real and index-able, because we are using them in comparisons to find a specific number. These usually aren't boundary problems, so you can do safe updates like `mid - 1` and `mid + 1` as well. Therefore, it's usually more beneficial to utilize a closed interval template so that all of the indexes exist, and we are fully able to make greedy updates to the search space
 
 ```python
 from typing import List
