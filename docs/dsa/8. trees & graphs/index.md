@@ -492,16 +492,20 @@ Maze's are a special kind of graph where you essentially have a connected 2-D di
 Most common examples are [Finding The Nearest Exit](/docs/leetcode_coderpad/leetcode/python/nearestExitFromEntranceInMaze.md) or something similar, where you will use Breadth First Search to traverse outwards checking over the course of a structure
 
 ### Connected Components
-- Connected Components is a way for us to find all of the clusters in a graph, where connectivity can be *weak*, *strong*, or a few other types like *unilaterally*
-  - *Weak* connected components can be thought of as *undirected* connected components, so that edges are just generic edges
-  - *Strongly* connected components would require *directed* edges between all ***pairs of vertices*** meaning there has to be a way to get to any node, NodeA, from any other node in the component NodeB
+Connected Components is a way for us to find all of the clusters in a graph, where connectivity can be *weak*, *strong*, or a few other types like *unilaterally*
+- *Weak* connected components can be thought of as *undirected* connected components, so that edges are just generic edges
+- *Strongly* connected components would require *directed* edges between all ***pairs of vertices*** meaning there has to be a way to get to any node, NodeA, from any other node in the component NodeB
 - Algorithms:
-  - ***Breadth First Search***:
-    - For all nodes, start a BFS traversal as long as they aren't marked as already visited
-    - Traverse all neighbors $node_{j's}$ of $node_i$, marking them as visited
-    - Continue the traversal until all nodes in the connected component of $node_i$ are visited
-    - Repeat for all unvisited nodes to find all connected components.
-  - ***UnionFind*** above will have the `root` vector at the end corresponding to all of the unique connected component ID's
+- ***Breadth First Search***:
+  - For all nodes, start a BFS traversal as long as they aren't marked as already visited
+  - Traverse all neighbors $node_{j's}$ of $node_i$, marking them as visited
+  - Continue the traversal until all nodes in the connected component of $node_i$ are visited
+  - Repeat for all unvisited nodes to find all connected components.
+- ***UnionFind*** above will have the `root` vector at the end corresponding to all of the unique connected component ID's
+
+There are a few "typical" methods for finding connected components:
+- Loop over every possible node and run [DFS](#depth-first-search) to saturate a `seen()` set. Count number of dfs calls started as the number of connected components which is shown [here](/docs/leetcode_coderpad/leetcode/python/numberOfConnectedComponentsInUndirectedGraph.md#loop-dfs)
+- Utilize [disjoint set union find](#disjoint-set) and count the number of unique parents
 
 #### Cycles + Connected Components In Undirected Graph
 Undirected graphs make cycles a confusing topic - if we are traversing the graph on node `0` and we go to `4`, there's going to be a neighbor in `adj_list[4]` that points to `0`. We can remove the parent from 4's adjacency list, but it's easier just to track the original node that was used to traverse to any other node (i.e. it's parent)
@@ -553,7 +557,12 @@ Given the vertices and edges of a graph, how can we quickly check whether two ve
 
 The primary purpose of this data structure is to answer queries on the connectivity of 2 nodes in a graph in $O(1)$ time
 
-The optimized version is shown below
+The [earliest moment everyone becomes friends](/docs/leetcode_coderpad/leetcode/python/earliestMomentWhenEveryoneBecomesFriends.md) social network problem is a good showcase of this where we continuously connect groups based on new edges and allow for $O(1)$ lookups to check if nodes are already in the same component
+
+The optimized version is shown below:
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 # UnionFind class
@@ -570,6 +579,18 @@ class UnionFind:
         if x == self.root[x]:
             return x
 	      # Some ranks may become obsolete so they are not updated
+        # self.root = [0, 0, 1, 2]
+        # self.find(3) --> self.root[3] = self.find(2)
+        #   self.find(2) --> self.root[2] = self.find(1)
+        #     self.find(1) --> self.root[1] = self.find(0)
+        #     returns(0)
+        #     self.root[1] = 0
+        #   returns so self.root[2] = 0
+        # returns so self.root[3] = 0
+        # self.root = [0, 0. 0, 0]
+
+        # This hits an infinite loop if we accidentally do
+        #   self.root[x] = self.find(x)
         self.root[x] = self.find(self.root[x])
         return self.root[x]
 
@@ -603,11 +624,14 @@ uf.union(6, 7)
 uf.union(3, 8)
 ```
 
-#### Terminologies
+</details>
+
+
+##### Terminologies
 - **Parent node**: The direct parent of a node of a vertex
 - **Root node**: A node without a parent node; it can be viewed as the parent node of itself
 
-#### Base Implementation
+##### Base Implementation
 To implement disjoint set there are 2 main functions that need to get covered:
 - **Find** function finds the root node of a given vertex
 - **Union** function unions two vertices and makes their root nodes the same
@@ -724,7 +748,7 @@ uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
 
-#### Optimizations
+##### Optimizations
 Both of the above implementations have 2 fatal flaws:
 - Union in [quick find](#quick-find) will ***always*** take $O(N)$ time
 - If union in [quick union](#quick-union) accidentally forms a perfectly linked list, which can happen if we go from independent nodes and connect them sequentially to their neighbor, then find will be in $O(N)$ as well
@@ -741,7 +765,7 @@ Both of these can be helped by 2 specific optimizations:
 | Delete           | Not Applicable     |
 | Traverse / Search| $O(n)$             |
 
-##### Union By Rank
+###### Union By Rank
 To fix the linked list problem in quick union, we can utilize ***union by rank***, which is a sort of [self balancing](/docs/dsa/6.%20binary%20search/SELF_BALANCING.md) graph concept so that we avoid creating perfectly linked lists:
 - Rank here refers to how we choose which parent to utilize during union operation
   - In past implementations, we just randomly hard coded either `root[X]` or `root[Y]`, but this can be done smarter
@@ -804,7 +828,7 @@ uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
 
-##### Path Compression
+###### Path Compression
 Path compression can ideally help with the recursive nature of the `find` function - in all previous iterations, we constantly had to traverse `self.root` parent nodes to find the root node
 
 If we search for the same root node again, we repeat the same operations, is there any good way to cache this result or something? Yes! After finding the root node, simply bring it back and ***update all nodes in `self.root` to point at that root node instead of their parent nodes***
@@ -852,9 +876,9 @@ print(uf.connected(4, 9))  # true
 ```
 
 #### Map Reduce Connected Componenets
-Pregel is a way to do generic BFS and Graph Traversals in the MapReduce world, and there are ways to implement Connected Components via BFS using Pregel framework
+[Pregel](/docs/other_concepts/graph_processing/PREGEL.md) is a way to do generic BFS and Graph Traversals in the MapReduce world, and there are ways to implement Connected Components via BFS using Pregel framework
 
-you discuss Pregel in other areas, but it's useful to note here as some popular large scale data processing engines use this
+
 
 ### Minimum Spanning Tree
 A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connected by the minimum number of edges

@@ -8,6 +8,11 @@ show_back_link: true
 # template
 This one utilizes [DFS](/docs/dsa/8.%20trees%20&%20graphs/index.md#depth-first-search) where the other problem [lcaBinaryTree](/docs/leetcode_coderpad/leetcode/python/lcaBinaryTree.md) uses a queue, seems they are different problems with the same name
 
+This question shows up friggin everywhere - the `return n_left or n_right or resp` is what allows recursion. `resp` can never be 2 without `n_left` or `n_right` also having a value, so we set `self.resp = root` if currently `resp = 2`, and then we return `n_left, n_right, OR resp` up the chain:
+- If we have found both, then either `n_left` or `n_right` will move up the chain
+- If we've only found one, then one of the 3, including `resp`, would move up the chain
+- If none are found, `resp = 0` moves up the chain
+
 ```python
 #236
 # Definition for a binary tree node.

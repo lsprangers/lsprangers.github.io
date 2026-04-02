@@ -103,9 +103,9 @@ These are some of the resources I frequently use and reference throughout this r
   - [Google Two Tower Article](https://cloud.google.com/blog/products/ai-machine-learning/scaling-deep-retrieval-tensorflow-two-towers-architecture)
 - [Hello Interview](https://www.hellointerview.com): Great for Systems Design interview preparation.
 - [Programiz](https://www.programiz.com): Excellent for DSA implementations and complexity analysis.
-- [Medium Articles]
+- Medium Articles
   - [NVIDIA Recommender Systems](https://medium.com/nvidia-merlin/recommender-systems-not-just-recommender-models-485c161c755e)
-- [Spark]
+- Spark
   - [Spark on Cloudera 1](https://blog.cloudera.com/how-to-tune-your-apache-spark-jobs-part-1/)
   - [Spark on Cloudera 2](https://blog.cloudera.com/how-to-tune-your-apache-spark-jobs-part-2/)
   - [Spark on Cloudera 3](https://queirozf.com/entries/apache-spark-architecture-overview-clusters-jobs-stages-tasks)
@@ -156,4 +156,5 @@ These are some of the resources I frequently use and reference throughout this r
 - [asOfJoin Example](https://semyonsinchenko.github.io/ssinchenko/post/fs_asof_problem_pyspark/)
 - [Alibaba PySpark Blog](https://www.alibabacloud.com/blog/use-apache-arrow-to-assist-pyspark-in-data-processing_595299)
 - [NVIDIA Triton Servers](https://resources.nvidia.com/en-us-ai-inference-content/accelerated-inference)
+- [Another Pregel Page](https://medium.com/data-science/spark-graphx-pregel-its-not-so-complex-as-it-sounds-d196da246c73)
 ---
