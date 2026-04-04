@@ -548,6 +548,7 @@ class Solution:
         
         return(len(parent) == n)
 ```
+</details>
 
 There's a further invariant in graph theory:
 """
@@ -1065,7 +1066,6 @@ Yold the state of our source vertex to each other vertex in the graph, and you h
   <summary>Show Python Script</summary>
 
 ```python
-
 def dijkstra(graph, source):
     """
     Dijkstra's Algorithm to find the shortest path from a source to all other vertices.
@@ -1124,6 +1124,25 @@ def reconstruct_path(previous_nodes, target):
 #### Bellman-Ford
 Bellman-Ford can help solve shortest path for all graph types ***including negative weights***
 
+2 theorem's that are used to get there:
+- "In a graph with no negative-weight cycles with $N$ vertices, the shortest path between any two vertices is at most $N-1$ edges
+  - Even if the direct link between 2 nodes is not the shortest, if every weight is non-negative, then we can only add on more distance if we go over $N-1$
+  - If we do use $N-1$ we've "used all the weights", and so there's no way adding on more could result in less distance, as everything is non-negative
+- "In a graph with negative weight cycles there is no shortest path"
+  - We can continuously reduce distance in a cycle by looping around forever
+
+![Positive vs Negative Weight Cycle](/img/positive_vs_negative_weight_cycle.png)
+
+Using the two theorems above you can setup a table where rows are vertices $[1, ..., N-1]$ that represent the number of edges allows, and columns are the $[0, ... , N]$ vertices. We know it can only be up to $N-1$. Bellman-Ford can't detect shortest path with negative weight cycles, but it can detect if there's a negative weight cycle, and then return early with impossible
+- Initiate tabel at `[0, 0]`
+- Go through each row which represents the number of edges allowed 
+  - Utilize the row above to find the minimum distance to any of the potential neighbors
+  - For example `[1, 3]` represents distance of `200` which is using 1 row to get from source 0 to node 3, and then from 3 we can reach node 2 with weight `-150` so we can add `-150 + 200 = 50 < +inf`
+
+![Bellman Ford DP Table](/img/bellman_ford_dp_table.png)
+
+Can optimize this further by realizing it only needs to store the last row above, representing the shortest path from source if at most $K-1$ edges are used, or by using the current row which represents shortest path from source if at most $K$ edges are used
+
 ### Topological Sorting / Kahns Algorithm
 Topological Sorting can help us traversing graphs when there are dependencies in directed acyclic graph's (DAGs), which is different from the above undirected weighted graphs
 
@@ -1144,6 +1163,40 @@ Since you are only iterating over edges and vertexes and doing increment / decre
 |--------------------|--------------------|
 | $O(V + E)$         | $O(V + E)$         |
 
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+    in_degree = {i: 0 for i in range(vertices)}
+    adjacency_list = defaultdict(list)
+
+    for u, v in edges:
+        adjacency_list[u].append(v)
+        in_degree[v] += 1
+
+    # Step 2: Collect nodes with in-degree 0
+    zero_in_degree = deque([node for node in in_degree if in_degree[node] == 0])
+
+    # Step 3: Perform topological sort
+    topo_order = []
+    while zero_in_degree:
+        current = zero_in_degree.popleft()
+        topo_order.append(current)
+
+        # Reduce in-degree of neighbors
+        for neighbor in adjacency_list[current]:
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                zero_in_degree.append(neighbor)
+
+    # If topo_order doesn't contain all vertices, there is a cycle
+    if len(topo_order) != vertices:
+        raise ValueError("The graph contains a cycle and cannot be topologically sorted.")
+```
+
+</details>
 
 You can also utilize straight up [DFS for topological sort](/docs/leetcode_coderpad/coderpad_implementations/dependency_graph.md) in some dependency graph problems by utilizing the 3-color masking method. Ultimately this relates to tracking state along the call stack, and if something is currently in the stack (lookup in `state = defaultdict(int)` dict) with `state = 1`, then it's a loop as you'll eventually form a cycle
 
