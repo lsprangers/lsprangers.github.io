@@ -512,6 +512,10 @@ Undirected graphs make cycles a confusing topic - if we are traversing the graph
 
 ![Undirected Graph Cycle](/img/undirected_graph_cycle.png)
 
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
 ```python
 class Solution:
     def validTree(self, n: int, edges: List[List[int]]) -> bool:
@@ -656,6 +660,10 @@ From these 2 functions, there's actually 2 basic implementations based on what y
 
 So it's pretty simple - keep a single array `self.root` that has an $O(1)$ mapping from each index $i$ to it's parent, and on Union update nodes by looping over the array and altering the mapping
 
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
 ```python
 # UnionFind class
 class UnionFind:
@@ -693,6 +701,7 @@ print(uf.connected(4, 9))  # false
 uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
+</details>
 
 ##### Quick Union
 Quick union is generally more efficient overall than quick find:
@@ -709,6 +718,9 @@ Quick union is generally more efficient overall than quick find:
   - There's a stopping point if `rootX == rootY`, but honestly this isn't necessary...just update on the fly and return would have the same results with an unnecessary index alteration
 - Checking connectivity in this case is equal to the `find` operation time complexity
 
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 # UnionFind class
@@ -747,6 +759,7 @@ print(uf.connected(4, 9))  # false
 uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
+</details>
 
 ##### Optimizations
 Both of the above implementations have 2 fatal flaws:
@@ -778,6 +791,10 @@ To fix the linked list problem in quick union, we can utilize ***union by rank**
   - Best case with each node as it's own parent it'll be $O(1)$ find
   - Medium / worst case, ideally worst case is close to a balanced tree, $H \approx \log N$
     - Actually, after googling this, in the worst-case scenario when we repeatedly union components of equal rank, the tree height will at most become $\log(N) + 1$, so the find operation in the worst scenario is $O(\log N)$
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 # UnionFind class
@@ -827,6 +844,7 @@ print(uf.connected(4, 9))  # false
 uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
+</details>
 
 ###### Path Compression
 Path compression can ideally help with the recursive nature of the `find` function - in all previous iterations, we constantly had to traverse `self.root` parent nodes to find the root node
@@ -835,7 +853,11 @@ If we search for the same root node again, we repeat the same operations, is the
 
 - The only major change in the implementation below, is that we update `self.root[x] = self.find(self.root[x])` if we don't see `x = self.root[x]`
   - i.e. we update `self.root` on the fly, and once we find the actual root node we can return it back down the stack to update each entry of `self.root`
- 
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
 ```python
 # UnionFind class
 class UnionFind:
@@ -874,6 +896,7 @@ print(uf.connected(4, 9))  # false
 uf.union(9, 4)
 print(uf.connected(4, 9))  # true
 ```
+</details>
 
 #### Map Reduce Connected Componenets
 [Pregel](/docs/other_concepts/graph_processing/PREGEL.md) is a way to do generic BFS and Graph Traversals in the MapReduce world, and there are ways to implement Connected Components via BFS using Pregel framework
@@ -882,35 +905,67 @@ print(uf.connected(4, 9))  # true
 
 ### Minimum Spanning Tree
 A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connected by the minimum number of edges
-
-In my opinion it seems similar to a Span in a Vector Space which describes all of the orthonormal basis vectors that can be combined to create any vector in that space, but it's really not
-
 The pink edges below show the ST
 ![ST](/img/st.png)
 
-A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, you ideally can find the ST with the smallest total weight
+A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, you ideally can find the ST with the smallest total weight. An undirected graph can have multiple ST's and MST's
 
-An undirected graph can have multiple ST's and MST's
-
-A ***cut*** in Graph Theory is a way to split up the Vertices and Edges in a Graph into 2 distinct sets, essentially cutting it to create 2 disjoint subsets
+A ***cut*** in Graph Theory is a way to split up the Vertices and Edges in a Graph into 2 distinct sets, essentially cutting it to create 2 disjoint subsets. A ***crossing edge*** is an edge that connects a vertex in one set with a vertex in another set
 
 ![Cut](/img/cut.png)
 
-So the ***cut property***, which will help us run different algorithms, says for any Cut $C$ of the Graph $G$, if the weight of an Edge $E$ in a Cut-Set $C_s$ is strictly less than all other Edges in $C_s$, then $E$ belongs to all MST's of $G$
+So the ***cut property***, which will help us run different algorithms, says for any cut $C$ of the graph $G$, if the weight of an edge $E$ in a cut-set $C_s$ is strictly less than all other edges in $C_s$, then $E$ belongs to all MST's of $G$
 
 The [proof above would rely on contradiction](https://stackoverflow.com/questions/3327708/minimum-spanning-tree-what-exactly-is-the-cut-property) and goes something along the lines of "well if you didn't have that edge, $E$ in the MST, then you could add it and create a cycle that crosses the cut at least twice (first and newly added edge), and then if you removed the other Edge $E^`$ greater than it, it would result in a MST less than the original one"
 
-MST algorithms are useful to find solutions to things like "min number of vertices to connect all points" similar to traveling salesman
+MST algorithms are useful to find solutions to things like "min number of vertices to connect all points" similar to traveling salesman and finding paths between towns
 
 #### Kruskal
 Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses sorting and [UnionFind](#unionfind--disjoint-set-union) to solve for MST 
+Kruskal's Algorithm will:
+- Sort all edges, taking $O(E \times log(E))$ time using a typical sorting algorithm
+- Create all connected components via [UnionFind](#unionfind--disjoint-set-union) 
+- Starting smallest, for each edge:
+  - Check if the vertices of the edge are in the same connected component, if not add the edge to the MST
+    - Union find `.union(x, y)` function will return `False` if they're in same component, and `True` if they aren't. If they aren't in the same component it'll ensure that they are afterwards
+  - *Adding an edge where 2 vertices are in the same connected component is equivalent to creating a cycle*
+- Once you reach $V - 1$ edges we've constructed our MST 
+  - We know it's minimal because we're using the smallest of edges and greedily choosing at each point
+  - We know it's connected because we're only picking ones that connected disconnected components
 
-- Kruskal's Algorithm will:
-  - Sort all edges, taking $O(E \times log(E))$ time using a typical sorting algorithm
-  - Starting smallest, for each edge:
-    - Check if the vertices of the edge are in the same connected component - which can be done via [UnionFind](#unionfind--disjoint-set-union) and takes $O(\alpha(V))$ lookup and add time
-      - This essentially shows us if it would create a cycle / unnecessary edge
-    - Once you reach $V - 1$ edges we've constructed our MST
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+def kruskal_mst(vertices, edges):
+    """
+    Kruskal's MST Algorithm
+    :param vertices: Number of vertices in the graph
+    :param edges: List of edges (u, v, weight)
+    :return: List of edges in the MST and the total weight
+    """
+    # Step 1: Sort edges by weight
+    edges.sort(key=lambda x: x[2])
+
+    # Step 2: Initialize Union-Find and MST
+    uf = UnionFind(vertices)
+    mst = []
+    total_weight = 0
+
+    # Step 3: Process edges
+    for u, v, weight in edges:
+        if uf.union(u, v):  # If u and v are not in the same component
+            mst.append((u, v, weight))
+            total_weight += weight
+
+            # Stop if you have V - 1 edges in the MST
+            if len(mst) == vertices - 1:
+                break
+
+    return mst, total_weight
+```
+</details>
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
@@ -919,13 +974,51 @@ Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-
 #### Prim
 Prim's Algorithm is another algorithm for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses 2 sets to solve for MST
 
-- Start with `MST = set()` empty set, and `NVisited = set(all_V)` full of every vertex
-- Start with an arbitrary vertex
-  - For each step find all edges that connect `MST <--> NVisited` and take the minimum edge, and add that Vertex into MST
-    - *Remember - The edge that connects two disjoint sub-graphs is a ***cut***
-      - Time complexity is all around building min-heap, and then after that you are simply traversing unvisited nodes which is at most $O(V)$ so the min-heap building will dominate time complexity
-      - Inserting into min-heap is $O(log V)$, and you do that for all edges $E$
-  - So at each step find the minimum edge crossing the cut, add the Vertexes to MST, and remove them from NVisited
+Prim's algorithm adds edges to a min-heap for all neighbors of a node. Essentially Prim's algorithm starts at an arbitrary node and performs DFS over all neighbors, adding the edge weight to the min-heap. It skips all visited nodes if it encounters them in the min heap, and will continuously add nodes to the MST via the first seen edge until it has $V-1$ edges
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+def prim_mst(vertices, graph):
+    """
+    Prim's MST Algorithm
+    :param vertices: Number of vertices in the graph
+    :param graph: Adjacency list representation of the graph
+    :return: List of edges in the MST and the total weight
+    """
+    # Initialize
+    mst = []
+    total_weight = 0
+    visited = [False] * vertices
+    min_heap = []
+
+    # Start from arbitrary vertex
+    visited[0] = True
+    for neighbor, weight in graph[0]:
+        heapq.heappush(min_heap, (weight, 0, neighbor))  # (weight, from, to)
+
+    # Process the priority queue
+    # This will start with smallest weighted edge that you found from 0
+    while min_heap:
+        weight, u, v = heapq.heappop(min_heap)
+
+        if not visited[v]:
+            # Add edge to MST
+            visited[v] = True
+            mst.append((u, v, weight))
+            total_weight += weight
+
+            # Add all edges from the new vertex to the heap
+            for neighbor, edge_weight in graph[v]:
+                if not visited[neighbor]:
+                    heapq.heappush(min_heap, (edge_weight, v, neighbor))
+
+    return mst, total_weight
+```
+
+</details>
 
 Finding all the edges that connect the 2 sets is the majority of complexity here, and typically is solved using
 
@@ -933,22 +1026,10 @@ Finding all the edges that connect the 2 sets is the majority of complexity here
 |--------------------|--------------------|
 | $O(E \times log(V))$ | $O(V)$             |
 
-Python Code
 
-Pseudocode:
-$U$ is the set of visited Vertices, $V - U$ is the set of unvisited Vertices
-```
-T = ∅;
-U = { 1 };
-while (U ≠ V)
-    let (u, v) be the lowest cost edge such that u ∈ U and v ∈ V - U;
-    T = T ∪ {(u, v)}
-    U = U ∪ {v}
-return(T)
-```
 
 ### Shortest Path
-[Breadth First Search](#graph-traversal) can help us find the shortest path between 2 nodes ***in an unweighted graph***, but it can't help when the graph is weighted because there are so many more options!
+[Breadth First Search](#graph-traversal) can help us find the shortest path between 2 nodes ***in an unweighted graph***, but it can't help when the graph is weighted because there are so many more options! BFS in an unweighted scenario goes out one-by-one for each level, and so we know if we reach any node $N$ from our origin node $O$, that we've found the shortest path, but in a weighted graph there may be a "longer" route over more edges that's actually shorter given weights
 
 #### Edge Relaxation
 The ***Edge Relaxation Property*** is the general property describing that although a path might take more hops, the weights on it might be smaller. In the below example `A -> C -> D` has a total weight of 2, while `A -> D` has a weight of 3
@@ -957,13 +1038,18 @@ The ***Edge Relaxation Property*** is the general property describing that altho
 #### Djikstra
 Djikstra's Algorithm can help solve the shortest path problem for graphs with ***non-negative weights***
 
-It solves the shortest path problem for a single Vertex, to all other Vertices
+It solves the shortest path problem for a single vertex, to all other vertices:
+- Start with shortest path as `+inf` for every other node
+- Traverse outwards via DFS or BFS
+  - Mark a node as visited only after you've traversed all of it's neighbors
+  - Do not mark a node as visited if it's a neighbor
+- Update any node's shortest distance as `min(curr, new_edge + edge)`
 
-you also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases you can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
+You also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases you can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
 
 Djikstra's algorithm is greedy, and essentially starts from a central point `u` and expands outwards, continually getting the min from the seen vertices to find shortest path to other vertices, it uses a min-heap to continuously select the vertex with the smallest known distance
 
-you hold the state of our source vertex to each other vertex in the graph, and you hold "previous vertex" and length information in this table which will help us traverse recursively if you needed to rebuild the path. you can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex you need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since you need to store visited node info)
+Yold the state of our source vertex to each other vertex in the graph, and you hold "previous vertex" and length information in this table which will help us traverse recursively if you needed to rebuild the path. you can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex you need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since you need to store visited node info)
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
@@ -973,6 +1059,67 @@ you hold the state of our source vertex to each other vertex in the graph, and y
   - Network delay times from source to all sinks
   - Traveling salesman that needs to cover all houses
   - ...
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+
+def dijkstra(graph, source):
+    """
+    Dijkstra's Algorithm to find the shortest path from a source to all other vertices.
+    :param graph: Adjacency list representation of the graph {node: [(neighbor, weight), ...]}
+    :param source: The starting vertex
+    :return: A tuple (distances, previous_nodes)
+             distances: Dictionary of shortest distances from the source to each vertex
+             previous_nodes: Dictionary to reconstruct the shortest path
+    """
+    # Initialize distances and priority queue
+    distances = {vertex: float('inf') for vertex in graph}
+    # store distance from source to vertex
+    distances[source] = 0
+    # store the node we used to get to this vertex (to reconstruct path later)
+    previous_nodes = {vertex: None for vertex in graph}
+    min_heap = [(0, source)]  # (distance, vertex)
+
+    while min_heap:
+        # O(log V)
+        current_distance, current_vertex = heapq.heappop(min_heap)
+
+        # Skip if the current distance is not optimal
+        if current_distance > distances[current_vertex]:
+            continue
+
+        # Explore neighbors
+        for neighbor, weight in graph[current_vertex]:
+            distance = current_distance + weight
+
+            # If a shorter path is found
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous_nodes[neighbor] = current_vertex
+                # O(log V)
+                heapq.heappush(min_heap, (distance, neighbor))
+
+    return distances, previous_nodes
+
+
+def reconstruct_path(previous_nodes, target):
+    """
+    Reconstruct the shortest path from the source to the target.
+    :param previous_nodes: Dictionary of previous nodes from Dijkstra's algorithm
+    :param target: The target vertex
+    :return: List of vertices representing the shortest path
+    """
+    path = []
+    while target is not None:
+        path.append(target)
+        target = previous_nodes[target]
+    return path[::-1]  # Reverse the path
+
+```
+</details>
 
 #### Bellman-Ford
 Bellman-Ford can help solve shortest path for all graph types ***including negative weights***
