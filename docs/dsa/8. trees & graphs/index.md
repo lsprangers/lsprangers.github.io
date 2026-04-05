@@ -905,8 +905,7 @@ print(uf.connected(4, 9))  # true
 
 
 ### Minimum Spanning Tree
-A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connected by the minimum number of edges
-The pink edges below show the ST
+A ***Spanning Tree (ST)*** is a connected subgraph where all vertices are connected by the minimum number of edges. The pink edges below show the ST
 ![ST](/img/st.png)
 
 A ***Minimum Spanning Tree (MST)*** is when there are weights in a graph, you ideally can find the ST with the smallest total weight. An undirected graph can have multiple ST's and MST's
@@ -1088,6 +1087,8 @@ def dijkstra(graph, source):
         current_distance, current_vertex = heapq.heappop(min_heap)
 
         # Skip if the current distance is not optimal
+        #   if equal continue on to potentially find shorter
+        #   paths for other nodes
         if current_distance > distances[current_vertex]:
             continue
 
@@ -1171,12 +1172,20 @@ def bellman_ford(self, n: int, v: int, edges: List[List[int]]) -> List[int]:
   distances = [float("inf")] * n
   d[v] = 0
   for level in range(n-1):
+    tmp = distances[:]
+
     for edge in edges:
-      if edge[0] < float("inf"):
-        distances[edge[1]] = min(
-          distances[edge[1]],
+      if distances[0] < float("inf"):
+        tmp[edge[1]] = min(
+          tmp[edge[1]],
+
+          # we need to check based on currently known distances
+          #   otherwise we may traverse a graph in a single iteration
+          #   that's not supposed to be updated
           distances[edge[0]] + edge[2]
         )
+    
+    distances = tmp
 ```
 </details>
 

@@ -1,5 +1,5 @@
 ---
-title: 0. Data Structure Implementations
+title: 12. Data Structure Implementations
 category: Implementations
 difficulty: Advanced
 show_back_link: true

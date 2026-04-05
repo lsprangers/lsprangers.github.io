@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: 4.. Linked Lists
+title: 4. Linked Lists
 category: Data Structures & Algorithms
 difficulty: Advanced
 description: Linked Lists
