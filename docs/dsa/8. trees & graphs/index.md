@@ -1122,7 +1122,9 @@ def reconstruct_path(previous_nodes, target):
 </details>
 
 #### Bellman-Ford
-Bellman-Ford can help solve shortest path for all graph types ***including negative weights***
+Bellman-Ford works for all graph types that ***are not negative cyclical*** - meaning even if there's a positive weight cycle, we are still able to find shortest path between 2 nodes
+
+The official problem statement from [competitive programming bellman ford](https://cp-algorithms.com/graph/bellman_ford.html) is "Suppose that we are given a weighted directed graph  $G$  with  $n$  vertices and  $m$  edges, and some specified vertex  $v$ . You want to find the length of shortest paths from vertex  $v$  to every other vertex."
 
 2 theorem's that are used to get there:
 - "In a graph with no negative-weight cycles with $N$ vertices, the shortest path between any two vertices is at most $N-1$ edges
@@ -1142,6 +1144,145 @@ Using the two theorems above you can setup a table where rows are vertices $[1, 
 ![Bellman Ford DP Table](/img/bellman_ford_dp_table.png)
 
 Can optimize this further by realizing it only needs to store the last row above, representing the shortest path from source if at most $K-1$ edges are used, or by using the current row which represents shortest path from source if at most $K$ edges are used
+
+##### Bellman-Ford Implementation
+Setup:
+- $n$ vertices and $m$ edges
+- There will be at most $n-1$ edges 
+- Source vertex $v$
+- Initialize distance array $d[0, ... n-1]$
+  - This will hold the answer at the end for the shortest weighted total from $v$ to each $n-1$
+  - $d[v] = 0$, and the rest will be `inf` at the start
+- At each step we only need to host the shortest distance seen so far for any node $x$ as $d[x]$
+  - We loop over each edge in the graph $e = (x, y)$ having weight $c$, and try to produce **relaxation** 
+  - Relaxation is an attempt to improve $d[y]$ using value $d[x] + c$
+    - In this way, we only need to host the shortest distance so far to $d[x]$
+- $n-1$ phases are sufficient to correctly calculate the lengths of all shortest paths in the graph (as long as there aren't any negative cycles) as unreachable vertices will remain `inf`
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+# List of edges is an easier structure to utilize given we
+#   have to loop over all edges in each iteration
+def bellman_ford(self, n: int, v: int, edges: List[List[int]]) -> List[int]:
+  # Edges = [ [from_x, to_y, weight] ]
+  distances = [float("inf")] * n
+  d[v] = 0
+  for level in range(n-1):
+    for edge in edges:
+      if edge[0] < float("inf"):
+        distances[edge[1]] = min(
+          distances[edge[1]],
+          distances[edge[0]] + edge[2]
+        )
+```
+</details>
+
+So ultimately we're just tracking the min distance we've seen at any node and utilizing that plus any of it's outbound edges to calculate a min distance for another node
+
+If we want to also retrieve the path we can store a `previous_node` lookup table similar to [djikstra](#djikstra) 
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+# List of edges is an easier structure to utilize given we
+#   have to loop over all edges in each iteration
+def bellman_ford(self, n: int, v: int, edges: List[List[int]]) -> List[int]:
+  # Edges = [ [from_x, to_y, weight] ]
+  distances = [float("inf")] * n
+  d[v] = 0
+  paths = [-1] * n
+
+  for level in range(n-1):
+    early_stop = True
+    for edge in edges:
+      if edge[0] < float("inf"):
+        if distances[edge[1]] > distances[edge[0]] + edge[2]:
+          early_stop = False
+          paths[edge[1]] = edge[0]
+          distances[edge[1]] = distances[edge[0]] + edge[2]
+    
+    # no work was done
+    if early_stop:
+      break
+  
+  # no path exists
+  if d[v] == float("inf"):
+    return(-1)
+  
+  resp = []
+  target = v
+  while target != -1:
+    resp.append(target)
+    # get previoous node
+    target = paths[taret]
+
+  return(resp[::-1])
+```
+</details>
+
+##### Bellman-Ford With Negative Cycle
+All of the above revolves around there being absolutely no possibility of a negative cycle, which isn't always true. If there is a negative cycle we can detect it in a few ways - the easiest one being if there's another potential relaxation after the $N-1$ cycle, then we're in a forever loop negative cycle and we should return immediately. In the presence of a negative cycle, and node in the same component should have a total distance of `-inf` as you could loop around forever in that negative cycle infinite times, and then go traverse to some reachable node
+
+To implement negative cycle detection + negative cycle path retrieval we use `neg_cycle_flg`
+- If any edge can still be relaxed, i.e. `distances[edge[1]] > distances[edge[0]] + c`, then `neg_cycle_flg` is set to the destination node `edge[0]`
+- If we run all $N-1$ iterations, and then we're still able to relax something, it means there's a negative cycle
+- So we loop backwards $N$ times from current node to ensure we move back into the negative cycle on a node `y`
+- Then continuously reconstruct the path until we reach `y` again 
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+# List of edges is an easier structure to utilize given we
+#   have to loop over all edges in each iteration
+def bellman_ford(self, n: int, v: int, edges: List[List[int]]) -> List[int]:
+  # Edges = [ [from_x, to_y, weight] ]
+  distances = [float("inf")] * n
+  d[v] = 0
+  paths = [-1] * n
+
+  # This is changed to n, which would allow another
+  #   iteration to check for a relaxation possibility
+  for level in range(n):
+    early_stop = True
+    neg_cycle_flg = -1
+
+    for edge in edges:
+      if edge[0] < float("inf"):
+        if distances[edge[1]] > distances[edge[0]] + edge[2]:
+          early_stop = False
+          paths[edge[1]] = edge[0]
+          distances[edge[1]] = distances[edge[0]] + edge[2]
+          neg_cycle_flg = edge[1]
+    
+    # no work was done
+    if early_stop:
+      break
+  
+  # negative cycle detected
+  if neg_cycle_flg != -1:
+
+    # ensure y is in negative cycle
+    #   following it back n times guarantees
+    #   we end at a node in the cycle
+    y = neg_cycle_flg
+    for i in range(n):
+      y = paths[y]
+    
+    bad_path = []
+    curr = y
+    while curr != y:
+      bad_path.append(curr)
+      curr = paths[curr]
+
+```
+</details>
 
 ### Topological Sorting / Kahns Algorithm
 Topological Sorting can help us traversing graphs when there are dependencies in directed acyclic graph's (DAGs), which is different from the above undirected weighted graphs
