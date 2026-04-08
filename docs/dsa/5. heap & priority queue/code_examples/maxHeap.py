@@ -12,7 +12,7 @@ class maxHeap:
     def heapify(self):
         """Heapify a tree, it will start at root unless specified
         """
-        # n is first non-leaf node, and you basically will loop backwards from it up to root.
+        # node_idx is first non-leaf node, and you basically will loop backwards from it up to root.
         # Inside of _heapify_node you will recurse down through the subtree, so if you do end
         #   up swapping something on this node we'll be sure this subtree is heapified.
         # Meaning that as you go from first non-leaf node up to root, you know the subtree is 
@@ -79,14 +79,14 @@ class maxHeap:
         if num_idx < size:
             self._heapify_node(num_idx)       
         
-
-heap = maxHeap()
-heap.heap_list = [3, 9, 2, 1, 4, 5]
-heap.heapify()
-print(heap.heap_list)
-heap.insert(100)
-heap.insert(50)
-heap.insert(60)
-print(heap.heap_list)
-heap.deleteNode(50)
-print(heap.heap_list)
+if __name__ == "__main__":
+    heap = maxHeap()
+    heap.heap_list = [3, 9, 2, 1, 4, 5]
+    heap.heapify()
+    print(heap.heap_list)
+    heap.insert(100)
+    heap.insert(50)
+    heap.insert(60)
+    print(heap.heap_list)
+    heap.deleteNode(50)
+    print(heap.heap_list)

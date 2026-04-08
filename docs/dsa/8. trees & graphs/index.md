@@ -24,6 +24,17 @@ class TreeNode:
 
 Binary Tree's are both specific types of Graphs, and so are Linked Lists actually
 
+### Complete and Perfect Binary Tree
+A complete binary tree is a special binary tree where all the levels of the tree are filled completely except the lowest level nodes, which are filled from the left
+
+![Complete Binary Tree](/img/complete_binary_tree.png)
+
+Some useful properties:
+- Some complete binary tree's are ***Perfect Binary Tree's***, which means there's the maximum number of nodes at each level, but the bottom level of a complete binary tree may not be perfect
+- In a perfect binary tree, the number of nodes at depth $d$ is $2^d$
+- In a complete binary tree with $n$ nodes, the height of the tree is $\log(n + 1)$
+
+
 ### Binary Search Tree
 Binary Search Tree's are tree's who, for any node, have:
 - All nodes in left subtree $\lt$ node value

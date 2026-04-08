@@ -25,9 +25,13 @@ You can think of these items as a sorted array, except arrays require $O(n)$ shu
 
 
 ### Implementation
-Requirements:
+A Heap is a tree where the root element is the minimum of all elements. It's also a [complete binary tree](/docs/dsa/8.%20trees%20&%20graphs/index.md#complete-and-perfect-binary-tree)
+
+
+Requirements of Max Heap:
 - For any node `A` that's a parent of `B`, it must be that `A.val >= B`
     - Directly implies root node is the largest node
+    - Min Heap would be the opposite
 - The tree must be **complete**, which means every level, except possibly the last, is completely filled
     - Ensures balanced tree to guarantee $O(\log n)$
 
@@ -35,8 +39,11 @@ Requirements:
 
 The typical implementation is done via arrays that are able to utilize index arithmetic to access nodes and parent / child relationships
 - `i` is the current node
-- `2i+1` is the left child
-- `2i+2` is the right child
+- `(2i)+1` is the left child
+- `(2i)+2` is the right child
+- `(i-1)//2` is parent
+    - `2i + 2 - 1 == 2i + 1` and `// 2` gives `i`
+    - `2i // 2 = i`
 
 So above max heap can be stored as `arr = [25, 17, 20, 10, 8, 12, 15, 3, 9]`
 
@@ -80,6 +87,6 @@ def buildMaxHeap(A):
 `buildMaxHeap` is $O(n)$
 
 ### Redis Based ZSets
-Walked through [Redis ZSets for Priority Queue's](/docs/architecture_components/databases & storage/Redis/ZSETS.md)
+Walked through [Redis ZSets for Priority Queues](/docs/architecture_components/databases%20&%20storage/Redis/ZSETS.md)
 
 Redis can be used as a non-local priority queue that has different memory restrictions, and is potentially more optimized than a local implementation, while giving the overall same time complexities and operations
