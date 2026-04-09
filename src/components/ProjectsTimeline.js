@@ -6,7 +6,7 @@ const projects = [
     title: 'RAFT',
     description: 'The RAFT consensus algorithm from scratch',
     details: 'Implemented the RAFT consensus algorithm from scratch using core OS libraries only, which is used for managing a replicated log in distributed systems.',
-    link: 'https://github.com/lsprangers/raft-course',
+    link: '/docs/projects/raft/index.md',
   },
   {
     title: 'BYO Cloud',

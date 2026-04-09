@@ -55,7 +55,7 @@ Most of the above is handled by 2 main protocols:
 - ***Client Embedded Protocol***: A customizable part of the protocol that runs in side of client instances. Allows clients ability to define how resources like topic partitions are assigned to group members (i.e. the consumer instances)
     - This is just a specific implementation / configuration of the Group Membership Protocol, one that is specific to client instances and applications
 
-Some of the vocabulary used above is similar to what was used in the [RAFT Consensus Algorithm](https://github.com/lsprangers/raft-course), and although they ultimately serve different purposes most of the edge cases and implementation oddities are the same
+Some of the vocabulary used above is similar to what was used in the [RAFT Consensus Algorithm](/docs/projects/raft/index.md), and although they ultimately serve different purposes most of the edge cases and implementation oddities are the same
 - Both involve heavy coordination among distributed nodes that all have a "dumb" thought process 
 - These "dumb" thought processes, when aggregated and combined over many nodes, produce intellectual and coordinated results
   - This doesn't require ${N * (N+1)} \over {2}$ communication paths among all nodes, they all typically work with a central coordinator of some sort

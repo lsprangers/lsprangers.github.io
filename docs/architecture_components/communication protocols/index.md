@@ -81,4 +81,4 @@ Webhook means you setup a URL on the client side that can be called by server wh
 
 ### WebSockets
 - **WebSockets**: A protocol that provides full-duplex communication channels over a single TCP connection - it's used for real-time applications where low latency is required
-    - The [RAFT Project](https://github.com/lsprangers/raft-course) from before showcases Websocket protocols
+    - The [RAFT Project](/docs/projects/raft/index.md) from before showcases Websocket protocols

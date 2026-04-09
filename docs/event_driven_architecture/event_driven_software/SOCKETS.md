@@ -23,7 +23,7 @@ There are blocking and non-blocking ways of working where you either wait for th
 
 In Python sockets allow for inter-process communication over networks, and it's the backing of most common networking frameworks like [AsyncIO](https://docs.python.org/3/library/asyncio.html), [FastAPI](https://fastapi.tiangolo.com/), and [Uvicorn](https://uvicorn.dev/) which all typically build on top of sockets to achieve concurrency using non-blocking asynchronous techniques. The reason this is so vital in Python is that Python is single threaded (due to GIL interpretation), and so building API's and utilizing all cores on a VM is increasingly important when programming in Python
 
-The [RAFT Implementation](https://github.com/lsprangers/raft-course) I had to do utilizes `sockets` a fair amount, and most of these actor based services need to extensively use sockets and streaming 
+The [RAFT Implementation](/docs/projects/raft/index.md) I had to do utilizes `sockets` a fair amount, and most of these actor based services need to extensively use sockets and streaming 
 
 ### IO Bound Vs CPU Bound
 A common misconception that should be addressed early is I/O bound and CPU bound workstreams 

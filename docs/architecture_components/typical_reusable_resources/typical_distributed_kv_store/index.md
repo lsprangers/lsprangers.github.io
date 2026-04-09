@@ -17,7 +17,7 @@ In this scenario you chose to create a distributed, sharded KV store with node r
 - The nodes are considered fault tolerant, replicated, and consistent
 - The cluster itself can autoscale by placing new nodes in the ring and shuffling to split, or by deleting nodes and shuffling to merge
 
-Code for this is easiest to just view my crappy [RAFT Repo](https://github.com/lsprangers/raft-course/blob/main/index.md) instead of me trying to recreate it heres
+Code for this is easiest to just view my crappy [RAFT Repo](/docs/projects/raft/index.md/blob/main/index.md) instead of me trying to recreate it heres
 
 #### In Memory Implementation
 Some specific implementations done for In-Memory KV Stores such as [KV Store With Transactions](/docs/leetcode_coderpad/coderpad_implementations/kv_store_with_transactions.md)
