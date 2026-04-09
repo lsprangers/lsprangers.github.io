@@ -1049,12 +1049,14 @@ The ***Edge Relaxation Property*** is the general property describing that altho
 #### Djikstra
 Djikstra's Algorithm can help solve the shortest path problem for graphs with ***non-negative weights***
 
-It solves the shortest path problem for a single vertex, to all other vertices:
-- Start with shortest path as `+inf` for every other node
-- Traverse outwards via DFS or BFS
-  - Mark a node as visited only after you've traversed all of it's neighbors
-  - Do not mark a node as visited if it's a neighbor
-- Update any node's shortest distance as `min(curr, new_edge + edge)`
+It solves the shortest path problem for a single vertex, to all other vertices by utilizing a min heap:
+- Sets distance to `+inf` for all nodes, except the source node which is set to `0`
+- Place source node with current distance of 0 into min heap
+- While the min heap has entries
+  - Find current node
+  - From that node, get the current node's weight plus the total weight to move to a destination node
+  - If this weight is less than what's been previously seen at the destination node, mark the destination node's weight as that
+  - Add to the min heap
 
 You also showcase this problem in [Pregel Graph Processing Docs](/docs/other_concepts/graph_processing/PREGEL.md#single-source-shortest-path-djikstra) - in most cases you can't hold an entire graph in memory, and we'll have it written to disk somewhere, and Pregel is a Graph Traversal SDK for distributed datasets using [Spark](/docs/other_concepts/SPARK.md)
 
@@ -1100,19 +1102,26 @@ def dijkstra(graph, source):
         # Skip if the current distance is not optimal
         #   if equal continue on to potentially find shorter
         #   paths for other nodes
+        # This should only occur if this current vertex's weight
+        #   here was added, say A ---10---B
+        #   and a shorter route was found later such as
+        #   A --3-- C --2-- B, which would have distances[B] = 5
+        #   and this would then skip. If we didn't skip then
+        #   it would use distances[B] = 10 below for neighbor
+        #   values, which would be incorrect
         if current_distance > distances[current_vertex]:
             continue
 
         # Explore neighbors
-        for neighbor, weight in graph[current_vertex]:
-            distance = current_distance + weight
+        for neighbor, neighbor_weight in graph[current_vertex]:
+            neighbor_distance = current_distance + neighbor_weight
 
             # If a shorter path is found
-            if distance < distances[neighbor]:
-                distances[neighbor] = distance
+            if neighbor_distance < distances[neighbor]:
+                distances[neighbor] = neighbor_distance
                 previous_nodes[neighbor] = current_vertex
                 # O(log V)
-                heapq.heappush(min_heap, (distance, neighbor))
+                heapq.heappush(min_heap, (neighbor_distance, neighbor))
 
     return distances, previous_nodes
 
@@ -1372,6 +1381,54 @@ order.append(u)
 ```
 
 You need to do postorder traversal for this to work, as for any node you need to go completely explore all of the nodes it depends on - so you'll need some sort of dictionary like `services_depends_on` where each key is a specific node, and each item in the value list is another node that it will depend on. Once you go through all of those, and eventually add them to your `order` response, it'll be a topologically sorted array
+
+#### Cycles In Directed Graph
+Similar to [cycles in an undirected graph](#cycles--connected-components-in-undirected-graph), we have a few options for calculating cycles:
+  - Can store visited / seen nodes along with some relationship as we traverse a graph in DFS. However, in a directed graph we also need to track if the node has been seen in this iteration, versus another iteration, and this is known as ***coloring***
+  - Can use [topological sorting](#topological-sorting--kahns-algorithm), and then if any nodes at the end have in-degree > 0, that means it's apart of a cycle
+    - In the below graph, the only `in-degree = 0` would be node 1, after that there's nothing with that, and so there's a cycle
+
+![Cyclic Directed Graph](/img/cyclic_directed_graph.png)
+
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Coloring Cycle DAG Python Script</summary>
+
+```python
+def isCyclicHelper(self, node, graph, visitedArr, currStackArr):
+  # this node is inside the current stack / loop
+  if currStackArr[node]:
+    return(True)
+
+  # we've visited this node, but not in this stack / loop
+  if visitedArr[node]:
+    return(False)
+  
+  visitedArr[node] = True
+  currStackArr[node] = True
+  
+  for neighbor in graph[node]:
+    if self.isCyclicHelper(neighbor, graph, visitedArr, currStackArr):
+      return(True)
+  
+  currStackArr[node] = False
+  return(False)
+
+def isCyclic(self, graph):
+  n = len(graph)
+
+  visited = [False] * n
+  currStack = [False] n
+
+  for node in range(n):
+    if not visited[node] and self.isCyclicHelper(node, graph, visited, currStack):
+      return(True)
+  
+  return(False)
+
+```
+</details>
 
 ## Advanced Graph Topics
 Below topics are more around Graph Theory, random stuff from lectures, etc 

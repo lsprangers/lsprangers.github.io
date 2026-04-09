@@ -8,14 +8,15 @@ This is a dump of all the DSA notes I had from school, coursework, and interview
 
 ## Cheat Sheet
 - Use prefix sum + hashmap for ***exact subarray sum*** questions: 
-    - count, existence, longest length, divisible/mod variants, especially when negatives may exist
+    - Count, existence, longest length, divisible/mod variants, especially when negatives may exist
+    - Works for negative numbers, sliding window does not work for negative numbers
 - Use sliding window for ***monotonic*** window problems based on ***at-most, or exact subarray*** questions:
-    - at-most constraints, character frequency windows, and sum constraints on nonnegative arrays
-    - count valid subarrays with `right - left + 1`
+    - At-most constraints, character frequency windows, and sum constraints on nonnegative arrays
+    - Count valid subarrays with `right - left + 1`
 - Prefix-sum init: 
     - `freq = {0: 1}` for counting 
     - `first = {0: -1}` for longest length
-    - usually keep only a running sum, not a full prefix array
+    - Usually keep only a running sum, not a full prefix array
 - If negatives exist, standard sum-based sliding window is usually wrong; prefix sums still work
 
 The number of subarrays between `left, right` is `right - left + 1`

@@ -17,19 +17,27 @@ In this dynamic programming problem, you'd start filling up the list from the ba
 - 5 is same logic as 3
     - `dp = [1, 1, 1, 3, 3, 2, 1, 1]`
 - So on and so forth until you get back to the front, and then you just find the `max(dp)` which will give us our longst subsequence
+
 ```python
 class Solution:
     def lengthOfLIS(self, nums: List[int]) -> int:
-        dp = [1] * len(nums)
-        for curr_idx in range(len(nums) - 2, -1, -1):
-            maxx = 0
-            for other_idx in range(curr_idx, len(nums)):
-                if nums[curr_idx] < nums[other_idx]:
-                    maxx = max(maxx, dp[other_idx])
-            
-            dp[curr_idx] = 1 + maxx
+        n = len(nums)
 
-        return(max(dp))
+        dp = [1] * n
+        resp = 1
+
+        # [10,9,2,5,3,7,101,18]
+        # [1, 1,1,2,2,3,  4, 4]
+        for idx in range(1, n):
+            curr_largest_backwards = 0
+            for backwards_idx in range(idx - 1, -1, -1):
+                if nums[backwards_idx] < nums[idx]:
+                    curr_largest_backwards = max(curr_largest_backwards, dp[backwards_idx])
+            
+            dp[idx] = 1 + curr_largest_backwards
+            resp = max(resp, dp[idx])
+        
+        return(resp)
 ```
 
 ## Binary Search
