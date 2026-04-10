@@ -16,6 +16,20 @@ Serving and making this data available to API's usually means efficiently storin
 It's the common OLAP vs OLTP discussion, but it's just on data comprised of nodes and edges!
 
 ## Graph Data Processing and Analytics
+Pregel and specifically GraphX on Spark make this pretty easy - you load in datasets and define Vertexes and Edges, which is most likely the hardest part for most analytics use cases, and then you can utilize most first order functions for graph, vertex, and edge statistics
+
+`graph.degrees.orderBy(desc("degree")).show(3)` would give the top 3 vertexes by count of incoming and outgoing degrees
+
+`graph.edge.filter("edgeAttribute in ("one",  "two", "three"))` would return any edge Triplet with those attributes!
+
+You can use motif's to find patterns without explicitly typing them out `.find("(a)-[]->(b); (b)-[]->(c); !(a)-[]->(c)")` which finds all edges that are missing that can create a triangle
+
+Lastly, the number of out of the box algorithms is extremely helpful as they essentially do distributed graph processing without human intervention:
+- Single Source Shortest Path
+- BFS / DFS
+- Page Rank
+- Connected Components
+- etc
 
 ### Pregel
 [Pregel](/arxiv_papers/Pregel%20MarkedUp.pdf) is an initial graph processing system built by Google that proposes a way to do Graph Traversals based on message-passing protocols
@@ -65,8 +79,7 @@ graph.pregel(initialMsg)(
 )
 ```
 
-### Flink Gelly
-TODO?
+
 
 ### Transitive Closure Example
 Transitive Closure helps us to identify all transitive paths between records that are connected from other nodes

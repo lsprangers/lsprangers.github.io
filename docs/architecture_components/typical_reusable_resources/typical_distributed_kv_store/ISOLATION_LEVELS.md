@@ -36,7 +36,7 @@ Phantom reads can still occur because the set of rows in a query can't all be lo
 
 ### Isolation Level Spectrum
 There's a spectrum below, from strictest to least strict, in performant availability (fast response) vs consistency (write and updates are shown in reads):
-- **Linearizable** means the transactions that occur appear ***linear***, meaning sequential, meaning things acts like the "old days". This means you need consensus and consistency, maybe using something like [RAFT](/docs/projects/raft/index.md/blob/main/index.md) which slows things down (less availability) but guarantees consistency
+- **Linearizable** means the transactions that occur appear ***linear***, meaning sequential, meaning things acts like the "old days". This means you need consensus and consistency, maybe using something like [RAFT](/docs/projects/raft/index.md) which slows things down (less availability) but guarantees consistency
     - *Causal Consistency* is around consensus and consistency where the nodes affected by writes will see all nodes that need to see them (typically happens with quorum based systems)
 - **Serializable** is in the same vein as linearizable, where the transactions on a database appear to occur as sequential updates. Allows for execution to happen concurrently, but the outcome appears to be sequential. ***However, it does not guarantee the order of the transactions***
     - *Snapshot Isolation* is a form/implementation of serializability, and updates things serially on snapshots of data. It allows for more concurrency but also leads to some weird anomalies

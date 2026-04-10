@@ -29,7 +29,7 @@ Looking at the below DAG Example, if you start at Node 1, you can reach Node 5 i
 - 3 hops: $1 \rarr 3 \rarr 2 \rarr 5$
 - 4 hops: $4 \rarr 1 \rarr 3 \rarr 2 \rarr 5$
 
-![Dag Example](./images/dag_example.png)
+![Dag Example](/img/dag_example.png)
 
 
 This works fine if you have a hierarchy:
@@ -45,12 +45,12 @@ This works fine if you have a hierarchy:
 
 Because at that point you can just find the max number of hops (in this case 2) and traverse that many times - it's not efficient, but it'll cover the entire graph
 
-![Hierarchy](./images/hierachy_dag.png)
+![Hierarchy](/img/hierachy_dag.png)
 
 
 It will fail if there are loops! Similar to social networks, corporate ownership structures, and many other phenomena
 
-![Loops](./images/loop_dag.png)
+![Loops](/img/loop_dag.png)
 
 Even if you set n to something large, it'll continue to loop around and around
 
@@ -76,17 +76,19 @@ while q:
     do_some_step_logic
 ```
 
-Let's start with Alice in below example:
+It's similar to Alice in below example:
 
 Below shows all of the `neighbor` we'd see in the first step, and this would equate to one "pulse" out from Alice
-![Alice Step1](./images/alice_step1.png)
+![Alice Step1](/img/alice_step1.png)
 
 In the next step out we'd encompass all remaining nodes
-![Alice Step2](./images/alice_step2.png)
+![Alice Step2](/img/alice_step2.png)
 
 However, you wouldn't have encompassed all remaining edges - the edge from `Grace --> Alice` was 3 hops away
 
 Oh well, this shows how each "step" or "hop" moves outwards from the central node you're looking at
+
+
 
 ## Pregel Implementation
 Pregel Vocabulary:
