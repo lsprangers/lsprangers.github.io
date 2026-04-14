@@ -11,18 +11,15 @@ show_back_link: true
 ```python
 class Solution:
     def reverseWords(self, s: str) -> str:
-        words = s.strip().split(" ")
-        words = [word for word in words if word != '']
+        s = s.strip()
+        sList = s.split()
+        left = 0
+        right = len(sList) - 1
+        while left <= right:
+            sList[left], sList[right] = sList[right], sList[left]
 
-        # 4/2 = 2, 5/2 = 2 - if it's even we'll be 1 over
-        mid = len(words) // 2
-
-        # 0, 1 for even - good to switch
-        # 0, 1 for odd - also good to switch
-        for idx in range(mid):
-            tmp = words[idx]
-            words[idx] = words[len(words) - idx - 1]
-            words[len(words) - idx - 1] = tmp
+            left += 1
+            right -= 1
         
-        return(" ".join(words))
+        return(" ".join(sList))
 ```
