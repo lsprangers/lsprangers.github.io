@@ -10,36 +10,36 @@ show_back_link: true
 ```python
 class Solution:
     def search(self, nums: List[int], target: int) -> int:
-        if len(nums) < 2:
-            return(0 if nums[0] == target else -1)
+        if len(nums) < 1:
+            return(-1)
 
-        # find inflection point
-        low = 0
-        high = len(nums) - 1
+        # closed interval, we need access to right
+        left = 0
+        right = len(nums) - 1
 
-        while low <= high:
-            mid = low + (high - low) // 2
-            if nums[mid] > nums[-1]:
-                low = mid + 1
-            else:
-                high = mid - 1
-
-
-        if target <= nums[-1]:
-            low = mid
-            high = len(nums) - 1
-        else:
-            low = 0
-            high = mid
-
-        while low <= high:
-            mid = low + (high - low) // 2
+        # 4,5,6,7,0,1,2
+        # target 0, 3
+        while left <= right:
+            mid = left + (right - left) // 2
             if nums[mid] == target:
                 return(mid)
-            elif nums[mid] > target:
-                high = mid - 1
+
+            # left sorted - check based on left
+            if nums[left] <= nums[mid]:
+                # left sorted, target in left side
+                if nums[left] <= target < nums[mid]:
+                    right = mid - 1
+                else:
+                    left = mid + 1
+                    
+            
+            # right sorted - check based on right
             else:
-                low = mid + 1
-        
+                # right sorted, but target in left side
+                if nums[right] >= target > nums[mid]:
+                    left = mid + 1
+                else:
+                    right = mid - 1
+
         return(-1)
 ```

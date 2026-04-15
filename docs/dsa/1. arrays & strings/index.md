@@ -325,16 +325,22 @@ def subarraySum(nums, k):
         prefix += num
         n_subarrays += freq.get(prefix - k, 0)
         freq[prefix] = freq.get(prefix, 0) + 1
+    
+    return(n_subarrays)
 """
-[1, 3, 0,  6,  2]
-[1, 4, 4, 10, 12]
+[1, 3, 0,  6, -2,  2]
+[1, 4, 4, 10,  8, 12]
 k = 4
 freq = {
   0: 1,
   1: 1,
   4: 2,
+  8: 1,
   10: 1
   12: 1
+}
+
+resp is 3
 """
 ```
 
@@ -407,15 +413,19 @@ Same thing as above - transform even to -1, and odd to 1, and then count subarra
 #### Kadane
 Kadane's algorithm is used to find the maximum sum of a contiguous subarray
 
-If it's all positive then we'd just take the entire array, if there are negatives we'd maybe include them
+If it's all positive then we'd just take the entire array, if there are negatives we'd maybe include them. Any subarray whose sum is positive is worth keeping, and in particular any subarray whose sum is larger than just taking the current value is worth keeping
+
+If we're at `[-1, 20, -18, 1]`, the first 3 numbers are worth keeping because they contribute +1, but `[-1, 20, -18, 1, -2]` is useless - it's sum is 0. This logic can be completely encapsulated in `currentMax = max(num, currentMax + num)`
+
+The only time `currentMax + num < num` is if `currentMax < 0`
 
 ```python
-nums = [1, 3, 4, 1, 2, 5]
-max_so_far = -float("inf")
-current_max = nums[0]
+nums = [1, 3, 4, -8, 1, -2, 2, 5]
+maxSoFar = nums[0]
+currentMax = nums[0]
 for num in nums[1:]:
-    current_max = max(num, current_max + num)
-    max_so_far = max(max_so_far, current_max)
+    currentMax = max(num, currentMax + num)
+    maxSoFar = max(maxSoFar, currentMax)
 
 return(max_so_far)
 ```
