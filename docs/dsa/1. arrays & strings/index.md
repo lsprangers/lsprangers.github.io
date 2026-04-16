@@ -156,6 +156,11 @@ def isSubsequence(self, s: str, t: str) -> bool:
     - The below function uses `curr += nums[right]` and `curr -= nums[left]` which is random access so it's $O(1)$
     - That being said, there are some sliding window problems that need more advanced data structures in the middle for checks
         - [Sliding Window Maximum](/docs/leetcode_coderpad/leetcode/python/maxSlidingWindow.md) problem is a good example, where you need an entire monotonic deque in the middle with while loops and `checks()` to update during the window, but ultimately the sliding window is the same
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
 ```python
 function fn(nums, k):
     left = 0
@@ -183,8 +188,6 @@ function fn(arr):
 
         Do some logic to update the answer
 ```
-- This can be useful in examples where we're allowed to do an action once, like flip a bit from 0 to 1, but you still want to find the largest subarray
-
 ```python
 def find_length(s):
     # curr is the current number of zeros in the window
@@ -200,6 +203,8 @@ def find_length(s):
     
     return ans
 ```
+</details>
+
 
 #### Number of Subarrays
 Off the bat, the number of subarrays in an array of length $N$ is $\sum_{i=1}^{i=n}{i} = (N * (N+1)) / 2$ 
@@ -310,6 +315,9 @@ Counting the number of subarrays with `sum = k`, determining the longest subarra
 
 Utilizing `{0: 1}` is critical to represent the empty prefix - before any processing is done, there is at least one single prefix sum that is 0 which is `[]`. After that, is there's a `prefix = k` exactly equal to `k` somewhere out there, it means the length is equal to starting at the initial empty prefix list
 
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 def subarraySum(nums, k):
@@ -343,6 +351,7 @@ freq = {
 resp is 3
 """
 ```
+</details>
 
 
 #### Longest Subarray Sum = k
@@ -359,6 +368,9 @@ For anything not equal to the entire subarray, like from index `2 -> 4` or `3 ->
 
 The length is similar - we still need to utilize `r + 1` and `l`, so we can achieve length = `r + 1 - l`, which is much cleaner to think about versus other indexing options.
 
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 def longestSubarray(nums, k):
@@ -380,10 +392,15 @@ def longestSubarray(nums, k):
 
     return(longest)
 ```
+</details>
 
 #### Modulo / Remainder Variants
 These are around counting subarrays whose sum is divisible by `k`, or whose sum has a remainder `r`, or something else similar. The main identity here is that:
 If `(prefix[r + 1] - prefix[l]) % k == 0`, $/rarr$ `prefix[r + 1] % k == prefix[l] % k`, and so if we simply store the remainders throughout the `freq` hash map, it's fine for us to come up with the same result. We're not looking for `freq[prefix - k]`, we're looking for `freq[remainder]`
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 def subarraysDivByK(nums, k):
@@ -399,18 +416,82 @@ def subarraysDivByK(nums, k):
 
     return count
 ```
+</details>
 
 #### Weird Variants
 There are some other weird patterns / variants that are just prefix sum in disguise:
+- Count Subarrays With Equal Number Of 0 And 1
+    - You can just transform all 0 to -1, and keep 1 as 1, and then the problem becomes "count subarrays with sum 0"
+- Count Subarrays With Exactly K Odd Numbers 
+    - Same thing as above - transform even to -1, and odd to 1, and then count subarrays with sum of 0
+- [Line Sweep](#line-sweep) is a greedy form of arrays that utilizes prefix sums to count how many overlapping intervals there are in things like meeting rooms and scheduling
 
-##### Count Subarrays With Equal Number Of 0 And 1
-You can just transform all 0 to -1, and keep 1 as 1, and then the problem becomes "count subarrays with sum 0"
 
-##### Count Subarrays With Exactly K Odd Numbers 
-Same thing as above - transform even to -1, and odd to 1, and then count subarrays with sum of 0
+## Greedy Arrays
+Greedy algorithms as a whole are any algorithms that makes the locally optimal decision at every step, and the locally optimal decisions ensure we reach the global optimal solution by the end. **Local** in this sense just refers to utilizing only the information at hand, it's not like [Dynamic Programming](/docs/dsa/10.%20dynamic%20programming/index.md) where you are bringing some state along through adjacent variables, but a lot of greedy problems are mistaken for dynamic programming and vice versa
 
+Array's aren't the only thing that can be greedy - most [heap](/docs/dsa/5.%20heap%20&%20priority%20queue/index.md) alogrithms over [graphs](/docs/dsa/8.%20trees%20&%20graphs/index.md) can be considered greedy because you're taking the next best edge or node in some scenario. So locality is hard to pin down in terms of "next to current" / adjacent, it really just means "with current information"
 
-#### Kadane
+The hardest part of these algorithms is proving they are the optimal solution. In a lot of scenario's a greedy algorithm gets us 90% of the way there (90% test cases passed), but it's not the truly optimal end-all-be-all solution. That being said, in greedy algorithms utilizing `arr.sort()` at the beginning and sorting by some thing is usually the best path forward!
+
+A scary problem that looks like some combination of dynamic programming and hell is [Partition An Array Such That the Maximum Difference Of Subsequences is K](/docs/leetcode_coderpad/leetcode/python/partitionArraySuchThatMaxDifferenceIsK.md)
+
+Given `nums = [3,6,1,2,5], k=2` we would want to split it into `[3, 1, 2], [6, 5]` and output 2. At first seeing subsequences, partitioning, etc brings about a ton of different choices, and so going through and finding the optimal solution is pretty difficult to prove. If there was a 0 involved in the array, our strategy here kinda breaks and we end up with `[0, 1, 2], [3, 5], [6]`. As we create more test cases the greedy solution starts to look useful, and then we can try and write out an invariant:
+- Invariant: Adding all numbers to a group started by `start` ensures it's as large as possible, and for any other `start*` where `start* < start - k` (i.e. within the old group), adding it to the `start` group can only help because it increases the bottom floor of the group `start*` was previously apart of - this will either maintain the same number of groups, or allow further groups to be consolidated and reduce the total number. Furthermore, our smallest item needs to be included in some group, and so our smallest item must be the initial start
+
+In frontier expansion / interval merging problems, there's a general immediate thought for at every interval you have to go back and check if it overlaps with others. In Jump Game, at each index you want to see if you can reach that index from some other index, and in interval merging you want to check if the `leftCoverage` overlaps with `otherRightCoverage` or something similar. This is how humans look at these problems, but they can usually be solved in a "faster" way via greedy algorithms that aren't necessarily intuitive to humans - these algorithms come to the same solution, but over millions of arrays humans just wouldn't find this setup
+- [Jump Game](/docs/leetcode_coderpad/leetcode/python/jumpGame.md) Invariant: After processing index `i`, every `index <= furthestReachedSoFar` is reachable. Therefore, if we just track `furthestReachedSoFar` based on each index, we will be able to track if we're able to reach the end in some fashion
+- [Jump Game 2](/docs/leetcode_coderpad/leetcode/python/jumpGameII.md) is similar, but since we need to track the minimum number of steps it takes, the invariant changes a little bit. At each step / layer we can commit to a certain length of a jump, and inside of that layer there's a set of certain lengths we can eventually reach. As long as we track `furthestInThisLayer` and `endOfThisLayer`, we just need to track until `furthestInThisLayer >= end`. Once we reach `currIdx = endOfThisLayer` we know we've checked all possible future coverages from this spot
+    - Invariant: Before committing the next jump, scan all positions reachable in the current number of jumps
+    - This is the same idea as [breadth first search](/docs/dsa/8.%20trees%20&%20graphs/index.md#breadth-first-search), except compressed into greedy array scanning
+    - ![Jump Game 2 BFS](/img/jump_game_2_bfs.png)
+    - What's convoluted here is that in BFS if you were to run shortest path you will run it in $O(V+E)$ via an adjacency list, and this could turn out to be $O(N^2)$ if each of the vertexes can reach all other neighbors
+    - In Jump Game we can bypass that and realize that all nodes in a current BFS layer are just indexes in an interval, and we can greedily pluck the furthest reaching one in each layer
+
+Typically problem says something like:
+- minimum number of jumps
+- minimum intervals / machines / clips / taps
+- cover a road / garden / timeline / segment
+- each object covers a range
+- from here you can go up to X
+
+### Line Sweep
+Line sweep is a variation of [prefix sum](#prefix-sum) that helps with overlapping interval problems. The general thought is that if we do +1 for the start, and -1 for the end along times, then the prefix sum array shows us the total number of overlaps at that point so far. It requires a `SortedDict()` in python so that we loop over the sorted keys, and so insertion is $O(log n)$ instead of $O(1)$, but everything else is the same
+
+![Line Sweep](line_sweep.png)
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+self.helper = SortedDict()
+self.maxOverlaps = 5 # just what to check for later
+
+# does not need to be sorted
+for intervalStart, intervalEnd in interval:
+    self.helper[intervalStart] = self.helper.get(intervalStart, 0) + 1
+    self.helper[intervalEnd] = self.helper.get(intervalEnd, 0) - 1
+
+    currCumulSum = 0
+    for intervalTime, intervalTimeCount in self.helper.items():
+        currCumulSum += intervalTimeCount
+        if currCumulSum > self.maxOverlaps:
+            self.helper[intervalStart] = self.helper.get(intervalStart, 0) - 1
+            self.helper[intervalEnd] = self.helper.get(intervalEnd, 0) + 1
+
+            if self.helper[intervalStart] = self.helper.get(intervalStart, 0) == 0:
+                del self.helper[intervalStart]
+            if self.helper[intervalEnd] = self.helper.get(intervalEnd, 0) == 0:
+                del self.helper[intervalEnd]
+            
+            return(False)
+    
+    return(True)
+```
+</details>
+
+### Kadane
 Kadane's algorithm is used to find the maximum sum of a contiguous subarray
 
 If it's all positive then we'd just take the entire array, if there are negatives we'd maybe include them. Any subarray whose sum is positive is worth keeping, and in particular any subarray whose sum is larger than just taking the current value is worth keeping
@@ -418,6 +499,10 @@ If it's all positive then we'd just take the entire array, if there are negative
 If we're at `[-1, 20, -18, 1]`, the first 3 numbers are worth keeping because they contribute +1, but `[-1, 20, -18, 1, -2]` is useless - it's sum is 0. This logic can be completely encapsulated in `currentMax = max(num, currentMax + num)`
 
 The only time `currentMax + num < num` is if `currentMax < 0`
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
 
 ```python
 nums = [1, 3, 4, -8, 1, -2, 2, 5]
@@ -429,3 +514,5 @@ for num in nums[1:]:
 
 return(max_so_far)
 ```
+</details>
+

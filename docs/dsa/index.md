@@ -6,6 +6,21 @@ layout: default
 ## DSA
 This is a dump of all the DSA notes I had from school, coursework, and interviews
 
+
+## Problem Families
+- Prefix sum
+- Sweep line / event counting
+    - Meeting Rooms 2, My Calendar, Airplanes In The Sky
+    - Intervals overlap, and we want to figure out the maximal merging policies
+    - "What changes at each start/end event, and what active state do I maintain?"
+- Frontier / interval coverage
+    - Jump Game, Snow Machines, Video Stitching
+    - Minimum jumps via `furthestPossible` at each layer, track a jump / machine / count as when `currIdx = endThisLayer`
+        - Choices extend a reachable frontier
+    - "Among all options currently available, which extends coverage furthest right?"
+- 
+
+
 ## Cheat Sheet
 - Use prefix sum + hashmap for ***exact subarray sum*** questions: 
     - Count, existence, longest length, divisible/mod variants, especially when negatives may exist
