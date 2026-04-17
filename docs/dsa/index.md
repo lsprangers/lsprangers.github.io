@@ -17,8 +17,87 @@ This is a dump of all the DSA notes I had from school, coursework, and interview
     - Jump Game, Snow Machines, Video Stitching
     - Minimum jumps via `furthestPossible` at each layer, track a jump / machine / count as when `currIdx = endThisLayer`
         - Choices extend a reachable frontier
+        - Kadane / Line Sweep are good options, and then general frontier expansion with multiple variables for counting layers
     - "Among all options currently available, which extends coverage furthest right?"
-- 
+- Monotonic stack
+    - Each element wants the next / previous greater / smaller thing, or we need to find maximal span where current value is min / max
+    - Daily Temperatures, Next Greater Element, Largest Rectangle in Histogram, Trapping Rain Water Variants
+    - Keep a stack where you continuously pop off `stack[-1]` if some condition is met 
+    - Which unresolved prior elements can this new element resolve?”
+- Monotonic deque / sliding optimum
+    - Max / min over sliding window with direct access to both sides of window. Two pointers is a variation of this where you don't store elements
+    - "How do I keep useful candidates for the current window?"
+- Prefix sum + hashmap
+    - Subarray condition can be written as difference between 2 cumulative states
+    - Subarray Sum Is K, Contiguous Array, Binary Subarrays With Sum
+    - "What earlier cumulative state would make the current one produce the target?”
+- In place cyclic placement / index as hash
+    - Array of numbers itself can be utilized as the proper hashmap - array positions can encode where each value belongs
+        - Value `x` belongs at `idx = x-1`, swap values into correct positions, and first number where `nums[idx] != idx + 1` is the "bad number"
+    - Return Sorted Array In Place, Missing Number, Missing ID
+- Binary search
+    - Answer is min / max threshold - `False, False, False, True, True`. That threshold ensures everything to left and right is equal
+    - Koko Eating Bananas, Capacity To Ship Packages, Split Array Largest Sum
+        - It doens't have to be an array, it can be on a search space of rates, packages, etc
+    - "Can I write a monotone feasibility check?"
+- Topological sort / DAG building
+    - Directed graph where we want to build out route based on pre-requisites
+        - Also able to find loops in directed DAG
+    - Course Schedule, Alien Dictionary, Parallel Courses
+    - "Is this a DAG problem, and do I need existence, order, or both?"
+- DFS with return-vs-global split
+    - Tree answer has local-through-node candiadte and a one-branch return value
+        - i.e. we want to find paths, sub-tree's, etc and we can use recursion
+    - Binary Tree Maximum Path Sum, Diameter Of A Binary Tree, Longest Univalue Path
+    - "What information can this subtree return upwards, and what must be tracked globally?"
+- Connected components
+    - Grid or graph asks for groups, reachability, islands, regions, etc
+        - Also useful for some graph traversals of "number or max/min of things"
+        - Hardest part is setting up edges between nodes - sometimes it's impromptu definition
+    - Number of Islands, Max Area Of Island, Surrounded Regions, Accounts Merge
+- Backtracking with pruning
+    - Need all combinations, permutations, placements, etc but constraints like size, sum, etc allow early pruning 
+    - N Queens, Combination Sum, Palindrome Partitioning
+    - "What partial states can never lead to a full valid answer, and what states are final answers?"
+- Dynamic programming on sequences
+    - Subproblems overlap, and local greedy optimum fails. States being indexes by index, prefix, position, etc allow for state tracking and memoization / tabulation
+        - Bidirectional problems can also occur where combining solutions in both directions (subspaces of subspaces), can give us the answer
+            - Buy and Sell Stock II, Trap Rain Water
+            - These look at maximizing differences among some total number of transactions
+    - Coin Change, House Robber, Decode Ways, Edit Distance
+        - Word Break overlaps similar to `dp[i]` means the prefix ending at index i can be segmented validly
+            - for each end position, check whether there exists a prior split `j` such that `dp[j]` is true and `s[j:i]` is a valid code
+    - "What is the minimal state needed, and the recurrence relation, so future decisions only depend on this state?"
+- Dynamic programming on intervals
+    - Answer depends on where to split a range, usually when recursive left / right partition structure matters
+    - Burst Balloons, Matrix Chain Multiplication, Palindrome Partition Variants
+- Greedy with heap / online best candidate
+    - Process items in order, but needs best-so-far among active candidates
+    - Meeting Rooms II, Task Schedulers, IPO, Merge K Sorted Lists
+    - "What candidate set do I need to pick from efficiently, and is greedy with only local knowledge sufficient?"
+- Union-find
+    - When components merge over time, and repeated connectivity querying matters
+    - Accounts Merge, Most Stones Removed
+    - "Is this really about repeated merges, or just connected components from scratch?"
+- Trie
+    - Many queries share prefixes, and potential prefixes are a finite set of options
+    - "Can shared prefixes collapse repeated work?"
+- Two heaps
+    - Maintain a lower and upper half dynamically to ensure you can stay in the middle
+    - Find Median From Data Stream, Sliding Window Median, IPO-ish Budget Split Variants
+    - "Can I maintain a balance between two heaps with a fast rebalance?"
+    
+Overall:
+- Need groups / reachability? DFS/BFS/Union-Find
+- Need dependencies / ordering? Topo sort
+- Need min/max threshold with feasibility? Binary search on answer
+- Need contiguous range with monotone validity? Sliding window
+- Need subarray exact count/sum relation? Prefix sum + hashmap
+- Need next greater / span boundaries? Monotonic stack
+- Need moving max/min? Monotonic deque
+- Need minimum moves / cover target / furthest frontier? Frontier greedy
+- Need local subtree answer plus global best? Tree DFS return-vs-global
+- Need choose/skip with overlapping subproblems? DP
 
 
 ## Cheat Sheet

@@ -458,7 +458,7 @@ Typically problem says something like:
 ### Line Sweep
 Line sweep is a variation of [prefix sum](#prefix-sum) that helps with overlapping interval problems. The general thought is that if we do +1 for the start, and -1 for the end along times, then the prefix sum array shows us the total number of overlaps at that point so far. It requires a `SortedDict()` in python so that we loop over the sorted keys, and so insertion is $O(log n)$ instead of $O(1)$, but everything else is the same
 
-![Line Sweep](line_sweep.png)
+![Line Sweep](/img/line_sweep.png)
 
 <!-- Collapsible Python snippet -->
 <details>
