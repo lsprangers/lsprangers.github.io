@@ -39,6 +39,7 @@ class Solution:
                         # we've ended at a word
                         dp[idx + 1] = True
 
-        
+        # if this is true, it must mean we have some word that started from either 0 or another
+        #   valid word, and that word either started from 0 or another valid word, or....
         return(dp[-1])
 ```
