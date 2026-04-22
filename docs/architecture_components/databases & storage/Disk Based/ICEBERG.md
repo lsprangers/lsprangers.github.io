@@ -126,7 +126,10 @@ So if the base snapshot / pointer is no longer current (another write has update
 Can alter the isolation level by altering the writer's write requirements - serializable isolation isn't strictly enforced. This showcases how a ***writers requirements***, which isn't bottlenecked in by central metadata handler, ***can determine isolation level of the entire system***
 
 #### Sequence Numbers
-Every successful commit receives a sequence number
+Every successful commit receives a sequence number, and each commit creates a new snapshot. Each new snapshot has:
+- A `sequence-number`
+- A `summary` including operation types like `append, replace, overwrite, delete`
+- A pointer to a manifest list
 
 Therefore, we're able to tell the *relative* age of data and delete files. As a snapshot is created for a commit, it's optimistically assigned the next sequence number and is written to the snapshot's metadata. Basically, you can follow the sequence (serialized) chain of events that optimistically commit via their sequence numbers.
 
@@ -141,11 +144,12 @@ When new data is written to a new manifest the inherited sequence number is writ
 #### Row Level Deletes
 These are stored in delete files, which are also immutable files
 
-- ***Position Deletes*** will mark a row deleted by data file path and row position 
+- *Position Deletes* will mark a row deleted by data file path and row position 
     - i.e. filepath `/path/to/dat1.dat` with location `256`
     - Position deletes are encoded in position delete file in V2, or deletion vectors in v3
-- ***Equality Deletes*** mark a row deleted by one or more columns (some sort of identifier)
+- *Equality Deletes* mark a row deleted by one or more columns (some sort of identifier)
     - `id = 5` means and row with that ID is deleted in subsequent reads
+- *Deletion Vectors* are optimized compressed bitmaps that help to efficiently identify which rows are deleted, but they're an entirely separate data structure that covers a compresesd version of the above 2 ideas
 
 Deletion files are also tracked by partitions as well, and a ***deletion file must be applied to older data files within the same partition*** and this is determined and planned in [Scan Planning](#scan-planning)
 
@@ -160,24 +164,141 @@ And these are compatible with most BLOB storage systems like S3 and GCS
 Tables don't require random write access, once a table is written, all of it's files are immutable until deleted - therefore there's no need for any sort of random write over the files!
 
 ### Scan Planning
+Scan planning is apart of query planning where Iceberg tries to decide which files need to be read for a query. If Iceberg were to simply read from every snapshot until if finds the right data, or read through a number of transaction logs until it has latest state, it would be horribly inefficient. Icerberg revolves around not having to read all $n$ rows of data to return up-to-date information including updates and deletes
 
-## Specifications and Vocabulary
-- **Schema**: Names and types of fields in a table
-- **Partition Spec**: A definition of how partition values are derived from data fields
-    - Forcing partition by `id, address, phone`
-- **Snapshot**: The state of a table at some point in time, including the set of all data files
-- **Manifest List**: A file that lists manifest files; One per snapshot
-    - This describes the metadata of manifest files, who in turn describe the mettadata of a table, which are all used in [Scan Planning](#scan-planning)
-- **Manifest**: A file that lists data or delete files, and it's a subset of a snapshot
-    - Helps to describe a table at a specific snapshot
-- **Data File**: A file that contains actual rows of a table
-- **Delete File**: A file that encodes rows of a table that are deleted by position or data values
-    - Positional (position) vs Equality (value) deletes
+Snapshots point to a single manifest list, and that manifest list points to a set of manifest files that describe the data and delete files apart of that snapshot
+
+catalog pointer $\rarr$ current metadata.json $\rarr$ chosen snapshot $\rarr$ manifest list $\rarr$ manifests $\rarr$ data/delete files
+
+We essentially need to find a version, find all of the manifest files (via manifest lists) apart of that snapshot, and find any deletes / updates corresponding to any rows or ID's apart of that current snapshot. Finally a snapshot is the table state at any point in time, and the data apart of the snapshot is the union of all these manifest and delete files!
+
+At a high level, scan planning looks like this:
+
+1. Resolve the table snapshot to read
+- For a normal read, this is the current snapshot
+- For time travel, this is the snapshot associated with `AS OF TIMESTAMP`, `VERSION AS OF`, a tag, or an explicit snapshot ID
+
+2. Read the snapshot's manifest list
+- The manifest list stores metadata about the manifests in that snapshot, including partition value ranges and file counts
+- Iceberg uses this metadata to avoid opening manifests that cannot possibly match the query predicate
+
+3. Read only the relevant manifest files
+- Each manifest contains a subset of the table's data files or delete files
+- For each file entry, Iceberg stores partition values and column-level statistics such as null counts, lower bounds, and upper bounds
+- Those stats are used to prune files that cannot match the filter
+
+4. Apply delete files when needed
+- In V2+, Iceberg can track row-level changes using immutable delete files
+- Scan planning determines which delete files apply to which data files before the final scan is executed
+
+5. Produce the final scan tasks
+- The engine now has the exact set of data files, and any applicable delete files, that must be read for this query
+
+The key idea is that Iceberg plans from metadata rooted at a snapshot, not from the full history of the table and not from raw directory listing. That is why old snapshots can still be queried efficiently: each snapshot already describes the table state at that point in time. Furthermore, for each snapshot we don't store full copies of data, we simply store which underlying data files are apart of it, and those data files can be reused by other snapshots
+
+#### Hidden partitioning and query predicates
+A subtle but important point in Iceberg is that reads are planned using predicates on data values, not directly on partition paths or partition columns. In practice, the query is written against the actual table columns, and Iceberg converts those predicates into partition predicates internally using the table's partition spec. This is one of the reasons Iceberg can support partition evolution without forcing users to think in terms of physical partition directories
+
+For example, if a table is partitioned by `day(event_ts)`, a query would still look like:
+
+```sql
+SELECT *
+FROM events
+WHERE event_ts >= TIMESTAMP '2026-04-20 00:00:00'
+  AND event_ts <  TIMESTAMP '2026-04-21 00:00:00'
+```
+
+The engine can derive the relevant partition value `(2026-04-20)` from the predicate on `event_ts`, and use that to prune manifests and files during planning. The query is written against the logical column, while the partition transform remains a storage detail
+
+#### Versioning, Partitioning, and Time Travel
+At first glance, it's tough to figure out how partitions are stored efficiently so that we can utilize metadata inside of them for query planning, while also covering incremental updates, inserts, and deletes on that immutable data. If we have data from Jan 01 sitting in a deeply established partition and we update a row that was sent there on June 01, we'll have some `_metadata/0001.json` that stores that change, but then our query planning loses the ability to plan properly!
+
+Somehow is still answers “give me the table as of version X” without drowning in metadata
+
+Suppose we have an Iceberg table which has gone through 3 total commits
+
+```sql
+CREATE TABLE orders (
+  order_id BIGINT,
+  customer_id BIGINT,
+  order_ts TIMESTAMP,
+  region STRING,
+  amount DECIMAL(10,2)
+)
+PARTITIONED BY (day(order_ts), region);
+```
+
+Commits:
+- S1 is an initial load of data that creates 2 data files
+    - `data/us_2026-04-20_f1.parquet`
+        - The below is metadata about the data file itself
+        - Partition `day(order_ts)=2026-04-20, region='us'`
+        - Rows are OrderID's `1-1000`
+        - `amount` has `min=15, max=900`
+    - `data/eu_2026-04-20_f2.parquet`
+        - Partition `day(order_ts)=2026-04-20, region='eu'`
+        - Rows are OrderID's `1001 - 1800`
+        - `amount` has `min=15, max=900`
+    - Snapshot S1 can point to manifest list `mlist_s1.avro` which points to manifests `m1.avro` where `m1.avro` contains entries for both data files - it essentially means "these 2 files are apart of S1", and this is exactly how Iceberg skips reading both data files, all $n$ rows, to ***plan*** reads (it still needs to full read them during query time)
+- S2 is a new batch of data for the next day 
+    - `data/us_2026-04-21_f3.parquet`
+        - `partition: day(order_ts)=2026-04-21, region='us'`
+    - `data/eu_2026-04-21_f4.parquet`
+        - `partition: day(order_ts)=2026-04-21, region='eu'`
+    - So Iceberg creates some new manifest files `mlist_s2.avro` and one of more manifests that now describe the table for S2
+        - What's important is that Iceberg does not mutate S1, or the underlying data /manifest files associated with S1, it creates an entirely new snapshot via ***updated manifest files only!***
+    - Older snapshots remain available for time travel via `AS OF SNAPSHOT S1` 
+- S3 is looking to delete a single row in `data/us_2026-04-20_f1.parquet` (the first file ever written in S1). In Iceberg V2 this can be represented with a delete file rather than rewriting the original data file in place - it's a ***tombstone record***!
+    - `deletes/us_2026-04-20_d1.parquet`
+        - Applies to `data/us_2026-04-20_f1.parquet`
+        - Marks order 55 as deleted, either by position (index) or equality rule (ID=55) depending on delete type
+    - Snapshot S3 points to a new manifest list overall, and this manifest list includes the existing data files apart of the table (through S2) and the new delete file that must be applied during all subsequent reads
+    - The original data file is still immutable, but the actual change is represented by new metadata and a new delete file
 
 
-## Final Thoughts
-The rest of the [Apache Iceberg Spec](https://iceberg.apache.org/spec/#overview) goes into Paritioning, Schema Evolution, Snapshots, Metadata, Retries, Commits, Conflict Resolution, and Deletes
+So how does a read get planned out on this table?
+```sql
+SELECT *
+FROM orders
+WHERE order_ts >= TIMESTAMP '2026-04-20 00:00:00'
+  AND order_ts <  TIMESTAMP '2026-04-21 00:00:00'
+  AND region = 'us'
+  AND amount > 300;
+```
 
-It's a very well thought out and well written spec, that helps to define all the typical issues and how to solve them in distributed big data systems
+Since we didn't specify a snapshot, the current snapshot of this query is S3, and so Iceberg would plan out which data files to read based on `mlist_s3.avro`
+- Load snapshot S3 (based on data files listed from manifest files in `mlist_s3.avro` manifest list)
+- Use manifest list partition ranged to ignore manifests that don't contain `region=us` or `day(order_ts)` outside of the specified range
+- Open only the matching manifest files that are still included
+- Inside these manifests, inspect file level partition data and column statistics
+    - `data/us_2026-04-20_f1.parquet` is a candidate because it is in the right partition and its amount `max=500`
+    - `data/eu_2026-04-20_f2.parquet` is skipped because `region='eu'`
+    - `data/us_2026-04-21_f3.parquet` is skipped because the `day=2026-04-21`
+- At this point we have our data files that need to be included
+- Also need to attach the applicable delete file `deletes/us_2026-04-20_d1.parquet` apart of this snapshot
+- Finally read `data/us_2026-04-20_f1.parquet` and apply the delete during execution
 
-Combining this with tools like Delta Sharing can allow you to have a perfected OLAP system that you use in Data Mesh, Client Sharing, and Analytics
+If we did 
+```sql
+SELECT *
+FROM orders /* AS OF SNAPSHOT S1, conceptually */
+WHERE region = 'us';
+```
+We would just start the traversal from the S1 snapshot instead 
+
+*The initial execution is done by the catalog pointing to `metadata.json` which points to any number of snapshots, and these snapshots are what include metadata of manifests for us to read only specific data files! In this way it can plan a query without reading all $n$ data rows!*
+
+#### Incremental Read Between Snapshots
+So what if we wanted to read data that incrementally occurred between two snapshots? i.e. if data that was placed in S2 had a number of updates / inserts into it - does it actually update it's actual `.parquet` data file? No, and so where does that overall metadata sit? We know there are [transaction logs for Apache Delta (Parquet) Files](/docs/architecture_components/databases%20&%20storage/Disk%20Based/PARQUET.md), but does Iceberg interact with them, especially during query planning and execution, or does it do something entirely different?
+
+Iceberg doesn't use transaction logs from Apache Delta, so we can ignore that. All Parquet, ORC, etc files are immutable, and so they can't be modified in place. Iceberg handles direct updates to rows via *creating new versions of files* and storing new metadata:
+- **Copy-on-Write (COW):** When a row is updated, iceberg identifies the data file containing that row, reads it, applies the change, and writes a completely new data file under a new snapshot (S4). This is a bit more write intensive, but ensures optimal read performance because no merging is required during read time, readers have direct access to the fully complete row if they read S4
+- **Merge-on-Read (MOR):** Instead of rewriting the entire data file, Iceberg appends small delete files to mark existing rows as obsolete and writes new data files for the updated values
+    - Position deletes mark rows by their specific file path and row position
+    - Equality deletes mark rows based on specific column values, i.e. `ID=5`
+    - Deletion vectors use highly compressed bitmaps to track deleted rows more efficiently than individual parquet delete files
+- COW will re-write the entire data file in a new snapshot with the updates, MOR will essentially create deletes + new rows in a delete file, and so if there are 100 rows total in the original and 10 updates, COW has 100 rows and MOR has 10 tombstone deletes in one file, and 10 new rows in it's data file, but they need to be merged with S1 data file on read
+
+Each commit creates a new snapshot, and each snapshot has a [sequence number](#sequence-numbers), a summary (append, delete, overwrite), and a pointer to a manifest list. That manifest list points to one or more manifest files, and this manifest list also stores summary metadata around the number of added / existing / deleted files, partition summaries, and manifest's sequence number. In total, there is no "data between S2 and S3" - S3 is an entirely new snapshot that will have COW or MOR based data / delete files associated to it, and those would be utilized via manifest metadata on data that may or may not have been involved in S2 and backwards
+
+Each Iceberg snapshot defines a complete table state, and the metadata written for that snapshot records file-level changes - added, existing, and deleted data/delete files - relative to prior state. Simple incremental reads only support append snapshots; updates and deletes are represented through rewritten data files and/or delete files, not by mutating Parquet in place
