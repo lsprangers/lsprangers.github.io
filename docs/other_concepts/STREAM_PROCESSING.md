@@ -21,7 +21,7 @@ Typical Streaming architectures will have:
 - ***Checkpointing and State Management***: Mechanisms to save the state of the stream processing job to recover from failures. Examples include Apache Flink's state backend, Spark Streaming's checkpointing, and Kafka Streams' state stores
 
 ### Generic Architecture
-![Generic Streaming Architecture](./images/generic_streaming.png)
+![Generic Streaming Architecture](/img/generic_streaming.png)
 - In the past generic streaming architectures were based on micro-batches and continuous operators
     - you would collect data for a few seconds, then process it, and repeat
 
