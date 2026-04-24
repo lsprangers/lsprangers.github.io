@@ -550,7 +550,7 @@ class Solution:
                 # This equates to a cycle. We want to ensure
                 #   the cycle in an undirected graph of neighbors
                 #   isn't tripping this up, but if we find this 
-                #   node that isn't our direct neighbor / parennt
+                #   node that isn't our direct neighbor / parent
                 #   then it's a cycle
                 if neighbor in parent:
                     return(False)
@@ -932,7 +932,7 @@ The [proof above would rely on contradiction](https://stackoverflow.com/question
 MST algorithms are useful to find solutions to things like "min number of vertices to connect all points" similar to traveling salesman and finding paths between towns
 
 #### Kruskal
-Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses sorting and [UnionFind](#unionfind--disjoint-set-union) to solve for MST 
+Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses sorting and [UnionFind](#unionfind--disjoint-set-union) to solve for MST
 Kruskal's Algorithm will:
 - Sort all edges, taking $O(E \times log(E))$ time using a typical sorting algorithm
 - Create all connected components via [UnionFind](#unionfind--disjoint-set-union) 
@@ -1062,7 +1062,7 @@ You also showcase this problem in [Pregel Graph Processing Docs](/docs/other_con
 
 Djikstra's algorithm is greedy, and essentially starts from a central point `u` and expands outwards, continually getting the min from the seen vertices to find shortest path to other vertices, it uses a min-heap to continuously select the vertex with the smallest known distance
 
-Yold the state of our source vertex to each other vertex in the graph, and you hold "previous vertex" and length information in this table which will help us traverse recursively if you needed to rebuild the path. you can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex you need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since you need to store visited node info)
+Hold the state of our source vertex to each other vertex in the graph, and you hold "previous vertex" and length information in this table which will help us traverse recursively if you needed to rebuild the path. you can lookup distance from source to any other vertex in $O(1)$ once it's complete, and then rebuilding path is at worst $O(E)$ because it might be a linked list, and building this data structure and traversing the graph resutls in us visiting each vertex and each node so it would be around $O(V + E)$ time complexity, but for each edge in a vertex you need to find the min vertex which is $O(log V)$, therefore total time complexity is $O(V + E \times log(V))$ and $O(V)$ space (since you need to store visited node info)
 
 | Time Complexity    | Space Complexity   |
 |--------------------|--------------------|
@@ -1195,7 +1195,7 @@ def bellman_ford(self, n: int, v: int, edges: List[List[int]]) -> List[int]:
     tmp = distances[:]
 
     for edge in edges:
-      if distances[0] < float("inf"):
+      if distances[edge[0]] < float("inf"):
         tmp[edge[1]] = min(
           tmp[edge[1]],
 

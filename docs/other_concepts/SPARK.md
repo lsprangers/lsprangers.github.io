@@ -18,7 +18,7 @@ A Cluster is a set of Compute Nodes
 
 It all starts with Driver and Executors in a Cluster - a Driver is the cluster manager that helps to schedule and distribute work, and Executors perform the work
 
-![Spark Cluster](./images/spark_cluster.png)
+![Spark Cluster](/img/spark_cluster.png)
 
 This is nice, because it basically allows us to horizontally scale as much as you need for our distributed datasets...and a majority of working with Spark comes down to setting up your data to be as parallel as possible, and for writing proper logic that utilizes programs running on different nodes
 
@@ -80,14 +80,16 @@ The two main types are Transformations and Actions, and at a high level Transfor
 
 - **Transformation**: Intermediate steps (e.g., type conversion) that are lazily evaluated and do not trigger computation immediately.
     - **Narrow Transformations**:
-    - Operate on a single partition (e.g., `map`, `filter`)
-    - Do not require shuffles
-    - you can chain together multiple narrow transformations on the same Node across the same Executors
+      - Operate on a single partition (e.g., `map`, `filter`)
+      - Do not require shuffles
+      - Can chain together multiple narrow transformations on the same Node across the same Executors
     - **Wide Transformations**:
-    - Require data from multiple partitions (e.g., `groupBy`, `join`)
-    - Trigger shuffles and create new Stages
-- **Action**: Concrete operations (e.g., `count`, `join`) that triggers computation across Executors and Shuffles across Nodes
-    - you can't possibly know the results, so you need to run this in a Stage (set of Tasks) and get results before going any further
+      - Require data from multiple partitions (e.g., `groupBy`, `join`)
+      - Trigger shuffles and create new Stages
+- **Action**: Concrete operations (e.g., `count`, `collect`, `save`) that triggers computation across Executors to bring data back to Driver
+    - You can't possibly know the results, so you need to run this in a Stage (set of Tasks) and get results before going any further
+    - An Action defines a Job, and each Job ultimately combines output from multiple Stages, where each Stage is defined by Shuffle events across Nodes
+    - Jobs can be thought of as the total work a Spark Application needs to perform, broken down into a series of Stages
 
 
 #### Work Steps
@@ -108,8 +110,9 @@ Work Steps here refers to the different ways you group together [Logical Operati
     - Stages are separated by Shuffles, which involve data movement across partitions or executors
         - $Shuffles = Stages – 1$
     - Stages are directly related to the number of Shuffles in a Job
+    - Stages are set off by shuffling, which are 1:1 with ***wide transformations*** like `join()`, `recudeByKey()`, etc where we need to look at data across Partitions
 - **Job**:
-    - A sequence of stages triggered by an action
+    - A sequence of stages triggered by an Action
     - Jobs are separated when data needs to move out of Spark executors (e.g., to the driver, disk, or external storage)
 
 #### Networking and Nodes
@@ -152,7 +155,7 @@ Work Steps here refers to the different ways you group together [Logical Operati
 ### Memory Management
 
 #### Spark Memory Overview
-![Spark Memory](./images/spark_memory.png)
+![Spark Memory](/img/spark_memory.png)
 
 TODO: More on heap and on machine in RAM, disk + spill, and efficient caching 
 
@@ -394,7 +397,7 @@ Spark Streaming allows us to re-use all of the goodness baked into Spark for thi
 
 
 ### Differences from Batch
-![Spark Streaming Architecture](./images/spark_streaming.png)
+![Spark Streaming Architecture](/img/spark_streaming.png)
 The main difference between Spark Streaming and Spark Batch is how you continuously get RDD data in our source
 
 Micro-batches sometimes get brought up when considering performance, but given that most Streaming services have some sort of computation window micro-batches are fairly aligned to this. There's a chance that micro-batches cause some slight delay versus sending each record independently, but the benefits of re-using Dataset and RDD API's and syncing with the Batch Engine outweigh the costs.
@@ -419,7 +422,7 @@ The Kubernetes architecture is similar to [Batch on Kubernetes](#kubernetes-arch
     - Better than forEachRDD, and better than forEachRecord (Map)
   - ...
 - For ***testing*** people tend to create queue's of RDD's, and release them over time to simulate streams
-![DStream Example](./images/dstream.png)
+![DStream Example](/img/dstream.png)
 
 ##### File Streams
 [File Stream DStreams](https://spark.apache.org/docs/latest/streaming-programming-guide.html#file-streams) are useful when you want to monitor a stream of file changes under a directory, and this can also be linked to directory like structures compatible with HDFS such as S3
@@ -430,7 +433,7 @@ Any new file ***updated or created*** under the specified directory will get pic
 Window Operations allow for transformations that run over a sliding window of data
 
 In the example below, there are 3 units in the window (***window length***), and it slides by 2 units (***sliding interval***)
-![Windowed DStream](./images/windowed_dstream.png)
+![Windowed DStream](/img/windowed_dstream.png)
 
 - **Window Length**: The total size of the window (e.g., 3 units)
 - **Sliding Interval**: The interval at which the window slides (e.g., every 2 units)
@@ -488,4 +491,19 @@ Spark Streaming has many workers, each running on different computes potentially
 
 ## Kubernetes Architecture
 TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, will use cloud provider block storage devices for disk. Spark-submit done via API Controller
-![Spark on Kubernetes](./images/spark_kubernetes_generic.png)
+![Spark on Kubernetes](/img/spark_kubernetes_generic.png)
+
+## Catalyst Optimizer
+How is any of this code / syntax actually created into physical commands for executors to run? [Delta / Parquet files have a ton of metadata](/docs/architecture_components/databases%20&%20storage/Disk%20Based/PARQUET.md), filters can potentially be pushed to sources, there are ways to broadcast datasets onto executors for efficient in memory joins, and the list goes on. Given all of that information, how can an entire [Job, Stage, or even Task](#work-steps) be planned to run on VM's pointing at file partitions
+
+![Catalyst Plan DAG](/img/catalyst_plan_dag.png)
+
+These plans show a major separation in 2 types:
+- **Logical Plan:** What to do - join, reduce, etc
+- **Physical Plan:** How to do - specific join type, a physical filter to apply, a disk seek
+
+Viewing that plan above, it's broken down into a few major components:
+- Initial method is passed into Spark Session
+- SQL Parser 
+  - Parses the SQL statement into an *ANTLR ParseTree*
+  - Converts the ANTLR ParseTree into an unresolved logical plan
