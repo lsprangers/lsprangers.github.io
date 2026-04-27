@@ -91,7 +91,7 @@ description: Discussion around Disk Based Databases
     - Each operation stored in a block of 32KB
     - Records larger than 32KB stored in multiple blocks
     - Start of block is a checksum to verify integrity
-    - ![RocksDB Block](./images/rocks_db_block.png)
+    - ![RocksDB Block](/img/rocks_db_block.png)
 
 ### Optimizations
 - Bloom Filters

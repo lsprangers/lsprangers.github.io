@@ -106,7 +106,7 @@ Rest of below is from courses + books
 - ***Hash Index*** means you will double the storage needed, but you essentially hash the value of each entry in the column and store this, so that our lookup is O(1) since you just hash the lookup value and find it’s corresponding row number which is just a fixed size memory offset you can jump to
     - Cannot do range based queries
 - ***B-Tree Index*** creates a Binary Search Tree based index on the data, so that a point search is O(log n), and range based searches are also O(log n) since you find the start, and iterate over our data points until you find the end
-    - There's more info in the [Disk Based Databases and Storage Document - Specifically the BTree one](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md)
+    - There's more info in the [Disk Based Databases and Storage Document - Specifically the BTree one](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE/index.md)
     - Challenges in KV Stores
         - *Primary Key Lookups:*
             - KV stores are optimized for primary key lookups, which are typically $O(1)$ when using hash-based partitioning.

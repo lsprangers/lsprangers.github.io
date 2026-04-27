@@ -8,7 +8,7 @@ show_back_link: true
 ---
 
 ## Self Balancing
-Ultimately Self Balancing Tree's are a way to restructure a Linked List so that search is in $O(\log n)$ time - one example is [B-Tree's](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md)
+Ultimately Self Balancing Tree's are a way to restructure a Linked List so that search is in $O(\log n)$ time - one example is [B-Tree's](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE/index.md)
 
 Self balancing tree's have less efficient writes (since they need to find where to place nodes and do some restructuring), but the idea is that reads are much more efficient
 

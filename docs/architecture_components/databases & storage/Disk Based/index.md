@@ -51,7 +51,7 @@ Some open source databases use a B-Tree or LSM-Tree as their primary storage eng
             - It would force us to do a full scan of the data until you find the key with a specific attribute, and any range queries are guaranteed $O(n)$
 
 ### B-Tree
-- There's an entire [BTree Sub Document](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md) showcasing the [Implementation and Runtimes](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE.md#implementation)
+- There's an entire [BTree Sub Document](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE/index.md) showcasing the [Implementation and Runtimes](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE/index.md#implementation)
 - B-Trees are self-balancing data structures, meaning writes take a bit more time to ensure that reads are always $O (\log n)$
 - Leaf nodes hold references to sorted records
 - Internal / parent nodes hold references to other nodes
