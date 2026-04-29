@@ -29,7 +29,7 @@ func NewLRUCache(capacity int) *LRUCache {
 func (c *LRUCache) Get(key string) (interface{}, bool) {
 	if e, ok := c.cache[key]; ok {
 		// e is a pointer to an entry, entry is a linked list node type
-		c.moveToFront(e)
+		c.MoveToFront(e)
 		return e.value, true
 	}
 	return nil, false
@@ -40,31 +40,31 @@ func (c *LRUCache) Put(key string, value interface{}) {
 	// Update value in cache, move to front
 	if e, ok := c.cache[key]; ok {
 		e.value = value
-		c.moveToFront(e)
+		c.MoveToFront(e)
 		return
 	}
 
 	// else create the new entry and move it to front
 	e := &entry{key: key, value: value}
 	c.cache[key] = e
-	c.addToFront(e)
+	c.AddToFront(e)
 	if len(c.cache) > c.capacity {
 		c.evict()
 	}
 }
 
-func (c *LRUCache) moveToFront(e *entry) {
+func (c *LRUCache) MoveToFront(e *entry) {
 	// If it's the head, return
 	if c.head == e {
 		return
 	}
 
 	// Remove pointers
-	c.remove(e)
-	c.addToFront(e)
+	c.Remove(e)
+	c.AddToFront(e)
 }
 
-func (c *LRUCache) addToFront(e *entry) {
+func (c *LRUCache) AddToFront(e *entry) {
 	e.prev = nil
 	e.next = c.head
 	if c.head != nil {
@@ -76,7 +76,7 @@ func (c *LRUCache) addToFront(e *entry) {
 	}
 }
 
-func (c *LRUCache) remove(e *entry) {
+func (c *LRUCache) Remove(e *entry) {
 	if e.prev != nil {
 		e.prev.next = e.next
 	} else {
@@ -94,5 +94,5 @@ func (c *LRUCache) evict() {
 		return
 	}
 	delete(c.cache, c.tail.key)
-	c.remove(c.tail)
+	c.Remove(c.tail)
 }

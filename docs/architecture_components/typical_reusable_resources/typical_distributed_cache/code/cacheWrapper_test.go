@@ -5,8 +5,8 @@ import (
 	"testing"
 )
 
-func TestCacheServiceBasic(t *testing.T) {
-	cache := NewCacheService(2)
+func TestCacheWrapperBasic(t *testing.T) {
+	cache := NewCacheWrapper(2)
 	cache.Put("a", 1)
 	cache.Put("b", 2)
 	if v, ok := cache.Get("a"); !ok || v != 1 {
@@ -18,8 +18,8 @@ func TestCacheServiceBasic(t *testing.T) {
 	}
 }
 
-func TestCacheServiceConcurrency(t *testing.T) {
-	cache := NewCacheService(10)
+func TestCacheWrapperConcurrency(t *testing.T) {
+	cache := NewCacheWrapper(10)
 	wg := sync.WaitGroup{}
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
