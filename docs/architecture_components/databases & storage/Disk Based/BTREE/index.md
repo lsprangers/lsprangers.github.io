@@ -143,7 +143,7 @@ Deletion can be done at both leaf or internal node levels, and the algorithm is 
 # Implementation
 The hardest part of implementation is self-balancing. DOing binary search over a sorted tree is easy enough, but self balancing items sitting on disk takes real effort
 - **Why** do nodes split? Because the tree needs to be balanced
-- **How** do nodes split? Splitting, promotion, and a few other tricks, and understanding how a [min heap gets heapified](/docs/dsa/5.%20heap%20&%20priority%20queue/code_examples/minHeap.py) is useful!
+- **How** do nodes split? Splitting, promotion, and a few other tricks, and understanding how a [min heap gets heapified](/docs/dsa/5.%20heap%20&%20priority%20queue/code_examples/minHeap.md) is useful!
 
 The difference between B-Tree splits and Min Heap is a lot more though, B-Tree manages pointers to many children, children to parents, parent levels to each other (B+Tree), disk locations, encodings, etc
 

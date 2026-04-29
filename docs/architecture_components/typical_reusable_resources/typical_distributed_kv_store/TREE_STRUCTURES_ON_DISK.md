@@ -1,3 +1,11 @@
+---
+layout: technical
+title: Tree Structures On Disk
+category: Architecture Components
+difficulty: Advanced
+description: Architecting a Distributed KV Store Solution
+---
+
 ## Data Structure and Implementation
 Why do you need any of this?
 - Durability is important
@@ -27,7 +35,7 @@ So long story short, ***disk writes of sorted data are useful in multiple scenar
 The two most common are B+ Trees, and LSMTree's
 
 ## Structures
-The [Disk Based Folder](/docs/architecture_components/databases%20&%20storage/Disk%20Based/) has more thorough discussions of all of these 
+The [Disk Based Folder](/docs/architecture_components/databases%20&%20storage/Disk%20Based/index.md) has more thorough discussions of all of these 
 
 ### B Tree
 
