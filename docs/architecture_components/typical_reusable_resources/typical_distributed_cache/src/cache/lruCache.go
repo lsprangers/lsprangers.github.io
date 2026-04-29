@@ -1,4 +1,4 @@
-package lruCache
+package cache
 
 // LRUCache is a simple LRU cache implementation
 type LRUCache struct {

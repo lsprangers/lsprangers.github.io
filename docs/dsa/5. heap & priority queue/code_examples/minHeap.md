@@ -115,3 +115,4 @@ if __name__ == "__main__":
     heap.deleteNode(50)
     print(heap.heapList)
 ```    
+</details>

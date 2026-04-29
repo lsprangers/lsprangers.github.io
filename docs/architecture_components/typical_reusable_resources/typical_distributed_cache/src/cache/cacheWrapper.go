@@ -1,8 +1,10 @@
-package lruCache
+package cache
 
 import (
 	"sync"
 )
+
+// In future this can be area where a cache miss is handled going directly to source
 
 type CacheWrapper struct {
 	lru  *LRUCache

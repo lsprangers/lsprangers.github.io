@@ -1,11 +1,13 @@
-package lruCache
+package main
 
 import (
 	"encoding/json"
 	"net/http"
+
+	"lsprangers.com/cache/cache"
 )
 
-var svc = NewCacheWrapper(100)
+var svc = cache.NewCacheWrapper(100)
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
@@ -26,6 +28,12 @@ func PutHandler(w http.ResponseWriter, r *http.Request) {
 	svc.Put(req.Key, req.Value)
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// curl -X POST -d '{"key":"foo","value":"bar"}' -H "Content-Type: application/json" http://localhost:8080/put
+// curl "http://localhost:8080/get?key=foo"
+// curl -X POST -d '{"key":"one","value":"1"}' -H "Content-Type: application/json" http://localhost:8080/put
+// curl -X POST -d '{"key":"two","value":"2"}' -H "Content-Type: application/json" http://localhost:8080/put
+// curl -X POST -d '{"key":"three","value":"3"}' -H "Content-Type: application/json" http://localhost:8080/put
 
 func main() {
 	http.HandleFunc("/get", GetHandler)

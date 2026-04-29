@@ -1,4 +1,4 @@
-package lruCache
+package cache
 
 import (
 	"testing"

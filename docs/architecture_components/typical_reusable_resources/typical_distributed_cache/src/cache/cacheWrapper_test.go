@@ -1,4 +1,4 @@
-package lruCache
+package cache
 
 import (
 	"sync"
@@ -20,15 +20,16 @@ func TestCacheWrapperBasic(t *testing.T) {
 
 func TestCacheWrapperConcurrency(t *testing.T) {
 	cache := NewCacheWrapper(10)
-	wg := sync.WaitGroup{}
+	wg := sync.WaitGroup{} // waits for a collection of goRoutines to finish
 	for i := 0; i < 100; i++ {
 		wg.Add(1)
+		// new goRoutine
 		go func(i int) {
-			defer wg.Done()
+			defer wg.Done() // Call wg.Done when the current goRoutine finishes, even if it panics and exits
 			key := string(rune('a' + (i % 10)))
 			cache.Put(key, i)
 			cache.Get(key)
-		}(i)
+		}(i) //input to goRoutine
 	}
 	wg.Wait()
 }
