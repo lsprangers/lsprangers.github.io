@@ -31,6 +31,16 @@ The book *Introduction To Algorithms* proves that a BTree with a height of 2 and
 - Level 2 leaves are $1001^2$ total nodes, and so we can store in total $1,001 \times 1,000 \times 1,000 \approx 1,000,000,000$ keys
 - This is roughly shown as $\log_{1,001}(1,000,000) = 3$, where the root node is counted as one of the 3
 
+## BTrees In The Wild
+There's several "production grade" implementations of BTree's so that no one has to continue writing their own:
+- [InnoDB](https://dev.mysql.com/doc/refman/8.4/en/innodb-introduction.html) is the general purpose storage engine for MySQL, and has a built in B-Tree index implementation along with many more optimizations
+    - Also fully supports composite keys where the primary key is the main driver of BTree keys, and further composite keys sort rows lexicographically to create sorted runs that maximize I/O for range scans / point equality lookups
+    - With `col1, col2, col3` composite key, `col1` is used to sort and traverse the BTree (because of lexicographic sort), and `col2, col3` are "tie breakers". If there are 100 pairs of `col2, col3` for a single `col1` value, the BTree itself will have 100 unique keys in it, there isn't a further sub-structure under a node for `col1` or anything special
+- [Lightning Memory-Mapped Database (LMBD)](https://www.symas.com/mdb) is somewhere between BTree and [LSMTree](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md), but overall it stores data in sorted order on disk and holds indexes to them in memory
+- [SQLite BTree Code](https://github.com/sqlite/sqlite/blob/master/src/btree.h) can be extracted and reused as a battle-tested BTree implementation you can just copy
+
+Sorting data on disk and using indexes of indexes are useful and common patterns, there's a community of developers out there making each thing faster compared to me trying to write something
+
 ## Usage + Structure
 BTree's are mostly just used for, the millionth time, sorted structure and reduced disk access - traversal, searching, inserting, etc
 
@@ -101,6 +111,13 @@ type BTreeNode struct {
 ## Searching 
 Searching for a key is a generalized form of a [Binary Search Tree](/docs/dsa/8.%20trees%20&%20graphs/index.md#binary-search-tree), where the only main difference is that the BST performs a binary decision, the BTree reduces a number of decisions at each node. The total number of decisions is equal to the number of node's children
 
+```
+    | 2 | 8 | 10 |
+   /    |   |     \
+ |1| |6,7|  |9|   |11, 12|
+```
+In a node with keys `[2, 8, 10]` if we are searching for value 9 we first iterate entirely through that node - we're looking for the first point such that all items are $\leq$ value, and since there are no duplicates it's similar to a `bisect_left` in Python. The point that's returned, in this case `idx=2`, is either the key itself in the node or the pointer that would be the correct position to move down
+
 Pseudocode:
 - Start from root node
 - Compare `lookup` with each of the keys in the current node until there's an entry with key $\gt$ `lookup`
@@ -141,7 +158,7 @@ Deletion can be done at both leaf or internal node levels, and the algorithm is 
     - Replace it with its in order *successor or predecessor*, since the successor or predecessor will always be on the leaf node, the process will be similar as the node is being deleted from the leaf node
 
 # Implementation
-The hardest part of implementation is self-balancing. DOing binary search over a sorted tree is easy enough, but self balancing items sitting on disk takes real effort
+The hardest part of implementation is self-balancing. Doing binary search over a sorted tree is easy enough, but self balancing items sitting on disk takes real effort
 - **Why** do nodes split? Because the tree needs to be balanced
 - **How** do nodes split? Splitting, promotion, and a few other tricks, and understanding how a [min heap gets heapified](/docs/dsa/5.%20heap%20&%20priority%20queue/code_examples/minHeap.md) is useful!
 

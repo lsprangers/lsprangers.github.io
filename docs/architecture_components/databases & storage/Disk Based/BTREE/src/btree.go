@@ -162,6 +162,7 @@ func (bt *BTree[K, V]) insert(n *Node[K, V], key K, value V) error {
 }
 
 func (bt *BTree[K, V]) insertInNode(n *Node[K, V], key K, value V, idx int) (*Node[K, V], error) {
+	// If it's not a leaf, insert it at whatever index it should be in
 	if !n.isLeaf {
 		targetNode := n.children[idx]
 		err := bt.insert(targetNode, key, value)
@@ -170,6 +171,9 @@ func (bt *BTree[K, V]) insertInNode(n *Node[K, V], key K, value V, idx int) (*No
 		}
 		return targetNode, nil
 	}
+
+	// If it's a leaf
+	// If it's at the end, append the node, otherwise insert into the node itself
 	if idx == len(n.keys) {
 		appendToNode(n, key, value)
 	} else {
@@ -278,7 +282,7 @@ func (bt *BTree[K, V]) searchNode(n *Node[K, V], key K) (V, bool) {
 		return n.keys[i] >= key
 	})
 
-	// if a value is actually found
+	// if a value is actually found in this node, return it
 	if idx < len(n.keys) && n.keys[idx] == key {
 		return n.values[idx], true
 	}
