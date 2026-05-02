@@ -63,6 +63,8 @@ Some open source databases use a B-Tree or LSM-Tree as their primary storage eng
 - B-Tree is a good choice for indexing in relational databases, especially when range queries are required
     - B-Trees are commonly used in relational databases for indexing columns, especially when range queries are required
 
+BTree's are everywhere, most commonly used in database indexes like [MySQL InnoDB](https://dev.mysql.com/doc/refman/8.4/en/innodb-introduction.html), a number of [Postgres Indexes](https://www.postgresql.org/docs/current/btree.html), and generic data structures that need to be persisted on disk
+
 ### LSM-Tree
 - There's an entire [LSMTree Sub Document](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) showcasing the [Implementation and Runtimes](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md#implementation)
 - Structured as Levels of Sorted Runs
