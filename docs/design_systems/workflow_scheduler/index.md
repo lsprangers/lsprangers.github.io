@@ -249,3 +249,41 @@ A message relay service needs to poll the `JobFuture` table / utbox / both, etc 
         - Send the message to the external service
         - After delivery, mark the messages as processed in a new transaction
         - ***This is where a Send Transaction can fail, and we need a background job that would clean up outbox and potentially resend the message*** - this is exactly where this architecture turns into "at least once" semantics for job deployment
+
+## Further Optimizations
+There are even more things we can do to pump up Postgres throughput and latency
+
+### Indexing On Ready and Batching
+Creating a further index on only the `status = ready` rows, and potentially in the future partitioning by time would allow a better set of these rows to be read on each call, and batching allows us to in bulk process and remove rows from `JobFuture`
+
+```sql
+CREATE INDEX job_future_ready_idx
+ON job_future (run_at, priority, id)
+WHERE state = 'ready';
+
+WITH claimed AS (
+  SELECT id
+  FROM job_future
+  WHERE state = 'ready'
+    AND run_at <= now()
+  ORDER BY run_at, priority, id
+  LIMIT 100
+  FOR UPDATE SKIP LOCKED
+),
+updated AS (
+  UPDATE job_future jf
+  SET state = 'dispatched',
+      lease_expires_at = now() + interval '30 seconds'
+  FROM claimed
+  WHERE jf.id = claimed.id
+  RETURNING jf.id, jf.job_id, jf.run_at
+)
+INSERT INTO outbox (job_future_id, payload)
+SELECT id, jsonb_build_object('job_id', job_id, 'run_at', run_at)
+FROM updated;
+```
+
+The above design removes a number of jobs from `JobFuture` and batches together workloads into `Outbox` in a single transaction
+
+### Redis Priority Queue
+In the above requirements we have strong durability and eventual consistency, so Postgres is still the right answer IMO, but if we needed to get into a "higher performance" priority queue then [Redis ZSets](/docs/architecture_components/databases%20&%20storage/Redis/ZSETS.md#min-heap) can be used to create a Min Heap style data structure, and utilizing Lua Claims helps on the outbox pattern semantics 
