@@ -41,6 +41,32 @@ There's several "production grade" implementations of BTree's so that no one has
 
 Sorting data on disk and using indexes of indexes are useful and common patterns, there's a community of developers out there making each thing faster compared to me trying to write something
 
+Most of these databases can support a BTree on top of some table, like an Orders / Jobs table, where we want to constantly pop off the smallest / next to occur item, while continuously adding in new ones. They maintain theoretical $O(\log n)$ time complexity, and handle all of the disk based I/O
+
+```sql
+CREATE TABLE priority_queue (
+    id SERIAL PRIMARY KEY,
+    payload TEXT, -- Task data
+    priority INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'queued' -- 'queued', 'processing', 'done'
+);
+
+CREATE INDEX idx_queue_priority ON priority_queue (priority ASC, created_at ASC);
+
+INSERT INTO priority_queue (payload, priority) VALUES ('task_data', 10);
+
+DELETE FROM priority_queue
+WHERE id = (
+    SELECT id FROM priority_queue
+    ORDER BY priority ASC, created_at ASC
+    LIMIT 1
+    FOR UPDATE SKIP LOCKED
+);
+```
+
+The above SQL would do a relatively good job at handling these use cases - it's the best case for low to moderate data volumes when strong durability is required over extreme performance. For a high performance priority queue, a [Redis based solution](/docs/architecture_components/databases%20&%20storage/Redis/PUBSUB.md) is usually preferrable 
+
 ## Usage + Structure
 BTree's are mostly just used for, the millionth time, sorted structure and reduced disk access - traversal, searching, inserting, etc
 
