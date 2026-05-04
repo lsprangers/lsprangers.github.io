@@ -1393,7 +1393,7 @@ Similar to [cycles in an undirected graph](#cycles--connected-components-in-undi
 
 <!-- Collapsible Python snippet -->
 <details>
-  <summary>Show Coloring Cycle DAG Python Script</summary>
+  <summary>Show Stack Coloring Cycle DAG Python Script</summary>
 
 ```python
 def isCyclicHelper(self, node, graph, visitedArr, currStackArr):
@@ -1419,7 +1419,7 @@ def isCyclic(self, graph):
   n = len(graph)
 
   visited = [False] * n
-  currStack = [False] n
+  currStack = [False] * n
 
   for node in range(n):
     if not visited[node] and self.isCyclicHelper(node, graph, visited, currStack):
@@ -1427,6 +1427,43 @@ def isCyclic(self, graph):
   
   return(False)
 
+```
+</details>
+
+
+An easier to remember option, that also allows to slice out the cycle, and find many cycles, is doing white, grey, black coloring on a node
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show WGB Coloring Cycle DAG Python Script</summary>
+
+```python
+def getCycles(self, graph):
+  # graph is full adjacency list of fromNode: [toNodes]
+  self.n = len(graph)
+  self.color = {node: 0 for node in range(self.n)}
+  self.path = []
+  self.cycles = []
+
+  for node in range(self.n):
+    if self.color[node] == 0:
+      self.dfs(graph, node)
+
+  return(self.cycles)
+
+def dfs(self, graph, node):
+  self.color[node] = 1
+  self.path.append(node)
+  for neighbor in graph[node]:
+    if self.color[neighbor] == 0:
+      self.dfs(graph, neighbor)
+    elif self.color[neighbor] == 1:
+      idx = self.path.index(neighbor)
+      self.cycles.append(self.path[idx : ] + [neighbor])
+  
+  # need to pop off for future cycles to not include
+  self.path.pop()
+  self.color[node] = 2
 ```
 </details>
 
