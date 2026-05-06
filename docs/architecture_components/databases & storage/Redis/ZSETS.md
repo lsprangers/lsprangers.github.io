@@ -14,7 +14,7 @@ The typical use cases for them are:
 - **Min Heap**: You can do $O(\log n)$ insertion and deletion while evicting stale entries (similar to rate limiter)
 - **Leaderboards**: Maintaining an ordered list of highest scores in massive online games
 
-Sorted Sets are a mix between a set and a hash, where it's composed of unique, non-repeating string elements, but alongside it each element is associated with a floating point value, ***the score***, which allows them to be ordered. Elements from the set are taken in order:
+Sorted Sets are a mix between a sorted set and a hash, where it's composed of unique, non-repeating string elements, but alongside it each element is associated with a floating point value, ***the score***, which allows them to be ordered. Elements from the set are taken in order:
 - Items are not natively stored in order in the underlying set
 - Upon request, the items are taken based on ordering of score
 
@@ -28,8 +28,24 @@ The implementation is done via skip list and hash tables:
 - Retrieving ranges themselves are $O(\log n + k)$ via `ZRANGEBYSCORE` and `ZRANGE`
     - Traversing a skip list $O(\log n)$
     - Returning $k$ results $O(k)$
-- Deletion is $O(\log n)$ via `ZREM`
-- `ZRANK` gives the relative ranking of an item in the scorebaord
+    - `ZREVRANGE` gives the highest scores first, `ZRANGE` default to ascending, not descending
+- Popping / deletion is $O(\log n)$ via `ZREM`
+- `ZRANK` gives the relative ranking of an item in the scorebaord, these operations are also $O(\log n)$
+- Updates are $O(\log n)$ as it adjusts current value and repositions the member
+    - Delete + add ( `ZREM` + `ZADD`)
+
+### Postgres Vs Redis
+Typically in interviews I'd utilize Postgres + indexes for as much as possible, but Redis is actually more performant for these specific range / rank based solutions like leaderboards
+
+Keeping an ordered list of players by their score, updating them, and retrieving them, even with ranges, is comparative or better performance than Redis - mostly due to [BTree Indexes](/docs/architecture_components/databases%20&%20storage/Disk%20Based/BTREE/index.md) on postgres which fulfill the $O(\log n)$ time complexities, however the ranking operation of `ROW_NUMBER() OVER(ORDER BY score DESC) AS rank` operation is a full $O(N)$ window scan in postgres, which is much less performant than the Redis counterpart
+
+Operation            | Redis Sorted Set | PostgreSQL (indexed)
+---------------------|------------------|---------------------
+ZADD / UPDATE        | O(log N)         | O(log N) index update
+ZREVRANK             | O(log N)         | O(N) window scan*
+Top-K query          | O(log N + K)     | O(K) with index
+Score range query    | O(log N + M)     | O(log N + M)
+Player count         | O(1) ZCARD       | O(1) with count cache
 
 ### Rate Limiter
 Implementing a [rate limiter](/docs/leetcode_coderpad/coderpad_implementations/rate_limiter.md) can be done easily in memory with a sliding window, but becomes increasingly complex when ***we hit the scale of millions of requests per minute*** (millions of entries in a list will explode local memory) and have ***to start distributing requests and keeping some sort of (eventually) consistent counter***
@@ -167,3 +183,5 @@ None of this covers sharding, which would still be bounded to a similar setup as
 
 It's suboptimal to store all local results also in the global result, as that simply introduces unnecessary local aggregators at that point. If the global one is evicting stale information, and the local ones are strictly to handle sharded writes, and they're also evicting old information, then there's a useful setup there. That being said if the global aggregator is overwhelmed for a period of time, there's a chance it doesn't see a high score in a certain time frame, and so the global and local aggregators need to be based on the same window
 
+Furthermore, consistent hashing of `userID` comes into play, where if our clusters scale up or down a portion of `userID` would need to get remapped, which means removing them from a priority queue and adding them to another
+op
