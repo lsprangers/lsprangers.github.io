@@ -50,54 +50,7 @@ description: Architecting a Distributed KV Store Solution
 - Hash based if there’s more data for the data points mapped to a partition
 
 #### Consistent Hashing
-[Relatively okay in-memory walkthrough of this](/docs/leetcode_coderpad/coderpad_implementations/consistent_hashing_service.md) from coderpad interviews. Helped to realize the tradeoffs of less data shuffle for non-uniformity, and how virtual nodes are randomly assigned throughout rings to help actual underlying servers be less skewed. Nodes get many virtual positions on the ring—e.g., 100–300 per node which smooths out randomness statistically
-- Instead of one big chunk per node, you break workload into many micro-shards
-- When a node joins, it takes 100 small micro-shards, not one huge region
-- Randomness averages out → distribution becomes roughly uniform
-
-Rest of below is from courses + books
-- ***Consistent Hashing*** assigns each server or item in a distributed hash table a place on an abstract circle, called a ring, irrespective of the number of servers on the circle
-    - Allows servers and objects to scale without compromising overall performance
-    - When an area of the ring becomes overused / Hot Spot you have to rebalance the partitions on the ring
-- Rebalancing Partitions
-    - you cannot use hash function here
-- The value of n, i.e. the number of partitions, needs to be able to scale horizontally quickly
-- If you have a hash value of 12345 at the start, and 5 servers, then you scale up to 6, all of this data needs to be reassigned to a new partition then
-    - High network I/O, and more downtime
-        - ***Fixed Partitions*** - you can just define a set number of partitions instead
-- Call this n, instead of the number of servers
-- Make n larger than number of servers
-- Whenever a new partition joins the cluster, it can take a few partitions from other servers which is better than all of the data being moved
-- The largest disadvantage here is some partitions can be much larger or smaller than others
-        - ***Dynamic Partitions*** – When the size of a partition reaches some threshold, it’s split equally into 2 partitions, which are then sent to different nodes on the cluster
-- There’s a lot of overhead and network I/O involved in this
-- Keeping track of everything as data is constantly moves will strain our ability to handle reads / writes
-        - ***Proportional Partitions*** – Is when you set the number of partitions to be proportional to the number of nodes, and each node has a fixed number of partitions
-- In this case the number of nodes remains fairly constant, and the partitions re-size themselves
-
-##### Consistent Hashing Example
-- Consistent Hashing, again
-    - you have a circular buffer / ring from 0 to n-1 where n is the number of available hash values
-    - For each of the nodes in our cluster, from 0 to m, where m is the number of available nodes in our cluster
-    - you calculate a hash for each nodeID and map it onto our ring
-- In this way, multiple nodes can be assigned to a slot in a ring
-        - Whenever a new node is added into the ring, the immediate next node is affected, and it has to share it’s data with the new node since it was split
-        - Then, whenever a request comes in, you move in a clockwise direction to find the node that should handle the request
-- If node1 handles request1, and then splits to node1 and node2, and request1 then maps to node2, then node2 will handle it in the future
-- This is why only node1 and node2 need to share data with each other, and over time node1’s load will be reduced
-        - As nodes join or leave, only a minimal amount of data needs to be shuffled, and a minimum amount of nodes are affected
-        - There can still be hotspots in this setup, and there are multiple methods, described above, for handling repartitioning of data when hotspots arise
-![Consistent Hashing](./images/consistent_hashing.png)
-
-![Consistent Hashing Hotspots Example](./images/consistent_hashing_hotspots.png)
-
-- In the figure, all 5 requests are handles by N1
-        - Hotspot help
-- Something you didn’t mention before is using virtual servers
-- you can use multiple hash functions on each node, and then distribute out the nodes to different parts of the ring
-    - Essentially allows us to reuse nodes around the ring so that requests will be handled in a more uniform manner
-    - Gives us “more slots filled up” by different virtual servers
-    - Nodes with larger hardware capacity can take on more virtual slots
+Moved discussion to an entirely [separate consistent hashing document](/docs/architecture_components/typical_reusable_resources/typical_distributed_kv_store/CONSISTENT_HASHING.md)
 
 
 ## Partitioning and Secondary Indexes

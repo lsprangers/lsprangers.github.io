@@ -18,7 +18,7 @@ Sorted Sets are a mix between a sorted set and a hash, where it's composed of un
 - Items are not natively stored in order in the underlying set
 - Upon request, the items are taken based on ordering of score
 
-The implementation is done via skip list and hash tables:
+The implementation is done via [skip list](/docs/dsa/4.%20linked%20lists/index.md#skip-lists) and hash tables:
 - Skip lists aid in ordered access
 - Hash tables for $O(1)$ lookup
 - Adding is $O(\log n)$ via `ZADD`

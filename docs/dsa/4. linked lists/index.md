@@ -64,3 +64,22 @@ return(prev)
 # This would return tail 
 return(resp.next)
 ```
+
+## Skip Lists
+Skip lists are a probabilistic data structure that utilize Linked Lists - at each further level down more nodes are "revealed", and it more and more looks like a tree the more you stare at it
+
+```
+Level 4: HEAD --------------------------------> [100] -> NULL
+Level 3: HEAD --------> [20] ---------------> [100] -> NULL
+Level 2: HEAD -> [10] -> [20] -> [50] -------> [100] -> NULL
+Level 1: HEAD -> [10] -> [20] -> [30] -> [50] -> [100] -> NULL
+```
+
+Each node in a skip list contains:
+- A score (float64)
+- A member string
+- Forward pointers for each level
+- A backward pointer (for reverse iteration)
+- A span (number of nodes skipped at each level)
+
+Each level's forward pointer tracks the span (nodes skipped). This allows ranking operations like `ZRANK` in [Redis ZSets](/docs/architecture_components/databases%20&%20storage/Redis/ZSETS.md) to compute rank in O(log N) by summing spans

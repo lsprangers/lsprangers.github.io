@@ -5,6 +5,12 @@ difficulty: Advanced
 show_back_link: true
 ---
 
+## Thoughts
+Helped to realize the tradeoffs of less data shuffle for non-uniformity, and how virtual nodes are randomly assigned throughout rings to help actual underlying servers be less skewed. Nodes get many virtual positions on the ring—e.g., 100–300 per node which smooths out randomness statistically
+- Instead of one big chunk per node, you break workload into many micro-shards
+- When a node joins, it takes 100 small micro-shards, not one huge region
+- Randomness averages out → distribution becomes roughly uniform
+
 ## Initial Problem Statement
 Implement a class that assigns keys to nodes using a consistent-hashing scheme
 
@@ -47,8 +53,10 @@ None atm
         - 80:99
         - 100 == 0
     - Getting the closest node can be placing it onto ring can be done via:
-        - `hash // (number_line // n_nodes) = index`
-        - `index * (number_line // n_nodes) = ring start`
+        - `hash // (number_line // n_nodes) = bucket`
+            - `hash = 45`, `45 / 5 = 9`
+        - `bucket * (number_line // n_nodes) = ring start`
+            - `9 * 5 = 40`
         - `(65 // (20)) * (20) = ring_start`
 - Adding a new node in means splitting up one of the sections
     - Should this enforce all sections to become uniform again? Or just split up one of the sections?

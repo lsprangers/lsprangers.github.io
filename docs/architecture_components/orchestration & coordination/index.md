@@ -43,3 +43,4 @@ To ensure fault tolerance and recoverability, data needs to be written to disk -
 To ensure consistency, Zookeeper uses a [RAFT](/docs/projects/raft/index.md) / Consensus style protocol for writes, so any replica / follower can receive a write, but only the leader / primary node can propose changes. There's a **messaging layer** that takes care of replacing leaders on failure, and syncing followers with leaders. The reliability 
 
 ## Kubernetes
+
