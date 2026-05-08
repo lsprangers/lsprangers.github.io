@@ -140,3 +140,5 @@ The idea is to create a stand-in snapshot of A at time t, and then keep an appen
     - Gives us “more slots filled up” by different virtual servers
     - Nodes with larger hardware capacity can take on more virtual slots
 
+## Limitations
+Consistent hashing itself has limitations around governance, routing, coordination, and complexity. A common example is for data locality like GDPR (EU data needs to stay in EU), consistent hashing reaches a quick limitation where now all of a sudden scaling events and rows need to have further coordination

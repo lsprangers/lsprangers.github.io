@@ -55,7 +55,7 @@ Moved discussion to an entirely [separate consistent hashing document](/docs/arc
 
 ## Partitioning and Secondary Indexes
 - If all of this data is partitioned and sharded, how do you create secondary indexes to speed up our reads?
-- Secondary Indexes are used in relational databases to decrease lookup time to O(1) or O(log n), by sorting and organizing a lookup table for the indexed column
+- Secondary Indexes are used in relational databases to decrease lookup time to $O(1)$ or $O(log n)$, by sorting and organizing a lookup table for the indexed column
 - ***Hash Index*** means you will double the storage needed, but you essentially hash the value of each entry in the column and store this, so that our lookup is O(1) since you just hash the lookup value and find it’s corresponding row number which is just a fixed size memory offset you can jump to
     - Cannot do range based queries
 - ***B-Tree Index*** creates a Binary Search Tree based index on the data, so that a point search is O(log n), and range based searches are also O(log n) since you find the start, and iterate over our data points until you find the end
