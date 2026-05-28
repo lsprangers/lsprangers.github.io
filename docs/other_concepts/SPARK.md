@@ -475,19 +475,18 @@ Spark Streaming has many workers, each running on different computes potentially
   - Checkpointing is costly, writing all of these RDD's to disk takes time and is prone to throughput issues especially if you are writing to cloud storage like S3 every second (interval)
   - Can mark certain variables as `volatile` which means they won't be kept track of on disk statefully
 
-### Streaming Application Deployment
-- Required:
-  - **Cluster + Cluster Manager**, which is apart of any Spark Cluster, and typically is a the Kubernetes Cluster Manager itself
-  - **Application JAR**: The compiled JAR file containing the Spark Streaming application code
-    - The Application JAR should have an entry point for the Spark Streaming application
-  - **Configuration**: The configuration settings for the Spark Streaming application, including memory settings, executor settings, and other parameters
-  - **Input Source**: The source of the streaming data, such as Kafka, TCP sockets, or file streams
-  - **Output Sink**: The destination for the processed data, such as a database, file system, or message broker
-- Optional:
-  - **Checkpoint Directory**: A directory for storing metadata and data checkpoints
-  - **Monitoring Tools**: Tools for monitoring the performance and health of the Spark Streaming application
-  - **Logging Configuration**: Configuration for logging application events and errors
+### Checkpointing
 
+#### [RocksDB](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) State Store
+The connector uses an internal instance of [RocksDB](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) on the Spark Driver node strictly to track processed S3 file metadata and avoid duplicate processing (ensuring exactly-once ingestion). This internal [RocksDB](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) lifecycle is self-contained and automatically backs up its metadata state to the Spark checkpoint directory on S3
+
+The connector maintains its own internal [RocksDB](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) instance on the Spark Driver node strictly to remember which S3 files it has already processed, preventing duplicate processing
+
+How it saves: You do not write code to push this [RocksDB](/docs/architecture_components/databases%20&%20storage/Disk%20Based/LSMTREE.md) data to S3. The connector automatically intercepts Spark's standard checkpointLocation and saves its metadata straight to that S3 directory alongside Spark's native offset logs.
+
+It handles its own compaction and state tracking seamlessly under the hood
+
+The connector pulls messages from SQS but does not delete them immediately.It holds onto the SQS message "Receipt Handles".Only when Spark's Structured Streaming engine successfully writes the checkpoint to S3 (signaling the batch is safe), the connector fires a background call to SQS to batch-delete those processed messages
 
 ## Kubernetes Architecture
 TODO: Driver is a Pod, and is calls API Server to scale up Executors in Pod, will use cloud provider block storage devices for disk. Spark-submit done via API Controller
