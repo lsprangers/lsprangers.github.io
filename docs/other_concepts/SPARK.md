@@ -97,6 +97,8 @@ Work Steps here refers to the different ways you group together [Logical Operati
 
 - **Task**:
     - A single operation performed on a single partition of an RDD
+      - A task is calculated over a **Row Group** which is a portion of a parquet file, row groups are determined by whoever wrote the file
+      - There are 1:Many row groups in a single parquet file, and each Task runs an operation over a row group
     - Executed as a single thread on an executor
     - The number of tasks in a stage equals the number of partitions in the RDD
         - If a dataset has 2 partitions, and you run a `.filter()` Transformation on it, that will trigger 2 Tasks in a single Stage
@@ -104,6 +106,7 @@ Work Steps here refers to the different ways you group together [Logical Operati
         - If there are 200 partitions and 100 Executors, each Executor gets 2 Partitions
         - If each Executor has 2 `executor-cores`, then all 200 Tasks are ran in parallel
         - If each Executor only has 1 core, then 100 are ran in parallel, then another 100
+    - When Spark reads a parquet file it tries to map row groups to partitions 1:1, but it's not always 100%. You can have more of one or the other, but overall the number of tasks is determined by the number of partitions
 - **Stage**:
     - A sequence of tasks that can run in parallel without requiring shuffles
     - A new Stage begins whenever network communication is needed between the Executors
