@@ -43,7 +43,8 @@ Datasets first need to be [tokenized](/docs/transformer_and_llm/TRANSFORMERS.md#
 
 ![Tokenizer](/img/gpt_tokenizer.png)
 
-Character / token level ascii characters can't be used very well in neural networks, and so most actual computations are done on [embeddings](/docs/transformer_and_llm/EMBEDDINGS.md). The most well documented and "Hello World" version of this is [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec), which creates static embeddings for each token in the input vocabulary by utilizing a bag-of-words or skip-gram architecture for predicting context words / missing single words in the training dataset to come up with a compressed representation of size $E_d$ for each of the input tokens. Typically this is size 128, 256, 512, or 1024. These embeddings are static, and so `the river bank` and `the bank teller`, both `bank` instances here have the same underlying embedding representation. Most LLM systems come up with their own embeddings during training, and don't reuse foundational vocabularies like those in Word2Vec. A key point on the examples below is most of them are pulling integer values for the tokens, which are actually just used as lookups to actual embedding vectors, so the input to the model is actually a sequence of embedding vectors of size $E_d$ for each token in the input sequence, and these are then sent through the rest of the model architecture. The embedding layer is essentially a lookup table that takes in the integer token IDs and outputs their corresponding embedding vectors, which are then fed into the subsequent layers of the model
+Character / token level ascii characters can't be used very well in neural networks, and so most actual computations are done on [embeddings](/docs/transformer_and_llm/EMBEDDINGS.md). The most well documented and "Hello oihgb 
+World" version of this is [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec), which creates static embeddings for each token in the input vocabulary by utilizing a bag-of-words or skip-gram architecture for predicting context words / missing single words in the training dataset to come up with a compressed representation of size $E_d$ for each of the input tokens. Typically this is size 128, 256, 512, or 1024. These embeddings are static, and so `the river bank` and `the bank teller`, both `bank` instances here have the same underlying embedding representation. Most LLM systems come up with their own embeddings during training, and don't reuse foundational vocabularies like those in Word2Vec. A key point on the examples below is most of them are pulling integer values for the tokens, which are actually just used as lookups to actual embedding vectors, so the input to the model is actually a sequence of embedding vectors of size $E_d$ for each token in the input sequence, and these are then sent through the rest of the model architecture. The embedding layer is essentially a lookup table that takes in the integer token IDs and outputs their corresponding embedding vectors, which are then fed into the subsequent layers of the model
 
 ![Embedding Lookup](/img/embedding_lookup.png)
 
@@ -684,7 +685,7 @@ Decoder only models like [GPT-3](/docs/transformer_and_llm/GPT.md) only use the 
 
 They still focus on auto-regressive decoder-only architecture, and ultimately utilizing the next word / sentence prediction means the 400 billion token input dataset can be re-used almost infinitely
 
-These LLM's take a large amount of the above architecture and combine it furth [further transformer layers](/docs/transformer_and_llm/TRANSFORMERS.md#other-layers) like normalization, shortcuts, residuals, and non-linear layers to ultimately create a GPT style model that avoids vanishing / exploding gradients, create non-linear features, and ultimately move forward with creating human text
+These LLM's take a large amount of the above architecture and combine it with [further transformer layers](/docs/transformer_and_llm/TRANSFORMERS.md#other-layers) like normalization, shortcuts, residuals, and non-linear layers to ultimately create a GPT style model that avoids vanishing / exploding gradients, create non-linear features, and ultimately move forward with creating human text
 
 GPT models are built on top of [multi-headed attention](#multi-head-attention) built into transformer blocks
 
@@ -694,7 +695,6 @@ New layers to create transformer blocks:
 - **Normalization Layer**: This will take a vector input and normalize the weights. It'll find mean and variance for each input sequence of tokens, and normalize the activations based on those, which ensures each the input to each layer afterwards has a stable distribution
 - **GELU Activation**: A non-linear activation function that acts as a smooth alternative to ReLU. It'll combine aspects of dropout, zoneout, and ReLU
     - Segments out inputs based on magnitude, not strictly based on sign like ReLU does
-    - 
 - **Feed Forward Network**: Simple feed-forward layer(s) to give model more expressive power
 - **Shortcut Connections**: Will bring results from residual layers through to further downstream layers
     - AKA *Residual connections*
