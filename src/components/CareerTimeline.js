@@ -4,12 +4,36 @@ import styles from '../css/CareerTimeline.module.css';
 const jobs = [
   {
     title: "ML + Data Tech Lead",
-    company: "Moody's Analytics",
+    company: "Moody's Analytics - Data Estate OU",
     logo: "/img/ma_logo_no_left.png",
-    period: "November 2022 - Present",
+    period: "July 2026 - Present",
+    excerpt: "I lead a group under the Data and AI Functional Group in the Data Estate OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.",
+    bullets: [
+      "Director - Engineering",
+      "Focus on Data and ML Platforms for graph analytics, agents, search, and large scale ML features",
+      "Help communicate and set strategy for SWE, MLE, DE, and Analytics across the org"
+    ]
+  },
+  {
+    title: "ML + Data Tech Lead",
+    company: "Moody's Analytics - Data Estate OU",
+    logo: "/img/ma_logo_no_left.png",
+    period: "November 2025 - July 2026",
+    excerpt: "I lead a group under the Data and AI Functional Group in the Data Estate OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.",
+    bullets: [
+      "Associate Director - Engineering",
+      "Focus on Data and ML Platforms for graph analytics, agents, search, and large scale ML features",
+      "Help communicate and set strategy for SWE, MLE, DE, and Analytics across the org"
+    ]
+  },
+  {
+    title: "ML + Data Tech Lead",
+    company: "Moody's Analytics - KYC OU",
+    logo: "/img/ma_logo_no_left.png",
+    period: "November 2022 - November 2025",
     excerpt: "I lead a group under the Data and AI Functional Group in the KYC OU in Moodys Analytics. The main projects I oversee are Data and ML Platforms along with real time feeds and ML inference.",
     bullets: [
-      "Associate Director (Engineering Manager) - responsible for 4 direct reports and 3 squads",
+      "Associate Director - Engineering, responsible for 4 direct reports and 3 squads",
       "Focus on Data and ML Platforms for graph analytics, agents, search, and large scale ML features",
       "Help communicate and set strategy for SWE, MLE, DE, and Analytics across the org"
     ]
