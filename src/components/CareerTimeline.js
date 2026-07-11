@@ -39,11 +39,11 @@ const jobs = [
     ]
   },
   {
-    title: "Senior ML Engineer",
+    title: "Senior Data Scientist",
     company: "Corrigo (JLL-T)",
     logo: "/img/corrigo_logo_no_left.png",
     period: "January 2022 - November 2022",
-    excerpt: "As an ML Engineer at Corrigo, I worked on developing machine learning models to improve operational efficiency and predictive maintenance.",
+    excerpt: "As a senior ML contributor at Corrigo, I worked on developing machine learning models to improve operational efficiency and predictive maintenance.",
     bullets: [
       "Developed predictive maintenance models",
       "Improved operational efficiency through ML solutions",
@@ -51,11 +51,11 @@ const jobs = [
     ]
   },
   {
-    title: "Senior Data Scientist",
+    title: "Data Scientist",
     company: "Corrigo (JLL-T)",
     logo: "/img/corrigo_logo.png",
     period: "March 2020 - January 2022",
-    excerpt: "As a Senior Data Scientist, I led data science projects to extract insights from large datasets and drive business decisions.",
+    excerpt: "As a Data Scientist, I led data science projects to extract insights from large datasets and drive business decisions.",
     bullets: [
       "Led data science projects",
       "Extracted insights from large datasets",
