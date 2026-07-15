@@ -33,5 +33,47 @@ class Solution:
         
         if curr_node != 0 and (curr_node, parent_node) not in self.roads:
             self.resp += 1
+```
 
+```python
+class Solution:
+    def minReorder(self, n: int, connections: List[List[int]]) -> int:
+        self.canReachZero = set([0])
+        self.twoWayGraph = defaultdict(set)
+        self.oneWayGraph = defaultdict(set)
+        
+        # O(E)
+        for _from, _to in connections:
+            if _to == 0 or _to in self.canReachZero:
+                self.canReachZero.add(_from)
+                
+            self.oneWayGraph[_from].add(_to)            
+            self.twoWayGraph[_from].add(_to)            
+            self.twoWayGraph[_to].add(_from)
+        
+        stack = [0]
+        seen = set()
+        resp = 0
+        while stack:
+            currNode = stack.pop()
+            if currNode in self.canReachZero:
+                canReach = True
+            else:
+                canReach = False
+            
+            for neighbor in self.oneWayGraph[currNode]:
+                if neighbor in self.canReachZero:
+                    canReach = True
+
+            for neighbor in self.twoWayGraph[currNode]:
+                if neighbor not in seen:
+                    stack.append(neighbor)
+                    seen.add(neighbor)
+            
+            self.canReachZero.add(currNode)
+            if not canReach:
+                resp += 1
+                
+        
+        return(resp)
 ```
