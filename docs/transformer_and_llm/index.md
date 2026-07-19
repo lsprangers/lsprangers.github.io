@@ -92,7 +92,19 @@ One of the most useful topics is getting more data without human supervision, an
 ## Merge
 Over time, merging of modalities happened and now there are multiple models that can handle multiple modalities! Meaning one single model can handle multiple objectives, embedding output, and downstream tasks for both text and images. The "Hello World" of this is generating captions from images, or generating images from captions, which is what DALL-E 2 showcased in it's release. At the end of the day this is taking information from one modality, and making it available in a separate modality.
 
-Finding datasets for multi-modality are increasingly difficult, BERT itself is pre-trained on open source datasets of almost 74 million sentences, and GPT-3 pre-training is comprised of five gigantic input datasets - no such datasets exist for high quality images to descriptions (multi-modal).
+**CLIP** was the first vision-language model (LVM), which was introduced by OpenAI in 2021, that was trained on 400 million image-text pairs. The large breakthrough here was that photos, text, and a combination of the two could be placed into the same latent space. CLIP helped break through the image-text alignment barrier, which allowed a basis to generate text from images, or images from text (diffusion). Some modern LLM's like **LLaVa** will use CLIP as a sub-component perception module, and feed in images to create embeddings which are then fed into LLM decoders allowing for image summarization, descriptions, etc.
+
+Multiple branches split off from this including video LLMs like **ReVisionLLM** which can process hours of video while ensuring some sort of temporal grounding, which is just a way of stating it can internalize when an event started and ended in a video. ReVisionLLM is specifically a recursive model designed to find and track these events.
+
+Furthermore, some of these models have shrinked into **smolVLM** type architectures to run on phones and in manufacturing devices
+
+Altogether, VLM's can't perform every task, especially complicated ones like financial table extraction, object detection, etc all in a zero-shot format. They excel at underlying latent space image-to-text tasks that work off of embeddings, and typically need to utilize other architectures / components to build off these
+- Segment Anything / Grounding DINO for object detection + segmentation
+- Custom table extraction with typical image thresholding, bounding boxes, and OCR. Especially for legal, finance, and compliance initiatives
+- etc
+
+These sub-component / "other models" can be routed to from general high level models. A proposed architecture was using DINO to segment out multiple areas of a PDF / photo, route each of those based on binary "is table", "is paragraph", etc classifiers for something like financial statements, and then have OCR, table extraction, and other models run off there. There are more deterministic routes like **LangGraph** for routing proper DAGs 
+
 
 ### Evaluation
 Finally, there's evaluation - which is the hardest part of any ML framework
