@@ -11,15 +11,20 @@ Ray is another open source framework for scaling AI and Python applications, typ
 
 Most Python multiprocessing is done utilizing `multiprocessing` in tutorials and other demonstrations, but actually creating a distributed Python application with communication overhead, data shuffling, network I/O, high availability, etc requires something a bit more robust - this is the use case of Ray 
 
-Ray focuses on taking functions and classes from typical Python programs, and translating them into ***tasks and actors***
-- Tasks are the unit of work scheduled by Ray and correspond to one function invocation or method invocation
-- Actors are then the nodes themselves, or potentially singular CPU / GPU on nodes, that perform tasks
+Ray focuses on taking functions and classes from typical Python programs, and translating them into ***workers, tasks, and actors***
+- A worker is the underlying compute process, 
+- Tasks are the unit of work scheduled by Ray and correspond to a stateless function invocation or method invocation
+- Actors are the long running services tied to a dedicated worker. Actors are the specific classes themselves that perform tasks which are invoked functions that need to run
 - To perform tasks, actors need a few things:
   - Shared memory stores help to share objects between workers without creating copies
   - In memory databases for storing metadata about other workers
   - Local network `eth0` access or some sort of networking device
 
-TODO: Need to extend this with unstructured processing and inference pipelines which is what it's mostly used for
+Actors are classes we define in Python, many actors can be spawned in a cluster across nodes. Nodes have multiple CPU's, GPU's, etc and when you instantiate a new actor, Ray creates a new worker and schedules methods of the actor on that specific worker. A worker is a physical OS process spawned on a cluster node to execute code, an actor is always tied to 1 single worker, and each worker is tied to a process on a node
+
+![Ray Cluster](/img/ray_cluster_overview.png)
+### Workers
+Workers are python processes that run on an [Actor](#actors)
 
 ### Tasks
 To actually run a function `func()` as a parallel, remote, and / or asynchronous call it needs to be decorated with `@ray.remote` - these will return futures, and then the actual function call will take place in the background as a Task

@@ -96,6 +96,7 @@ These are some of the resources I frequently use and reference throughout this r
 - [3Blue1Brown](https://www.3blue1brown.com/): Amazing visual explanations for Linear Algebra, Probability, and Deep Neural Networks.
   - Highly recommend the [Attention](https://www.youtube.com/watch?v=eMlx5fFNoYc&vl=en) video for understanding Transformers.
   - Also I use their [Manim](https://docs.manim.community/en/stable/tutorials/quickstart.html) package for my own animations now
+- [D2L AI](https://d2l.ai) is used everywhere, sometimes copy and pasting
 - [Jay Alammar's Visual Transformer Paper](https://jalammar.github.io/illustrated-transformer/): A fantastic resource for understanding Attention and Transformers.
 - [Yuan Meng Embeddings Post](https://www.yuan-meng.com/posts/ebr/)
   - Useful for seeing the actual topological interpretations of embeddings, and why geomtric / metric space operations are allowed

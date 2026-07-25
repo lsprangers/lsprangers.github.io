@@ -98,7 +98,7 @@ In Contrastive Learning, the negatives are explicitly sampled, and are typically
 The interpretation difference is language modeling treats “everything except the ground truth token” as negatives, whereas contrastive setups construct positives/negatives from augmentations or paired data
 
 ## Images
-This section was copied from the [Resnets - Contrastive Learning in Image Modality](/docs/transformer_and_llm/RESNETS.md#contrastive-learning) that discusses how Contrastive Learning is used in ResNets
+This section was copied from the [Resnets - Contrastive Learning in Image Modality](/docs/transformer_and_llm/CNN.md#contrastive-learning) that discusses how Contrastive Learning is used in ResNets
 
 **SlimCLR** was one of the first, and most known, contrastive learning frameworks - it's simple, highly accurate, well researched, and heavily utilized. The main idea is to have two copies of a single image, and use these to train two networks that are compared. A major con is that it doubls the overall storage size of the underlying dataset, but BLOB storage is cheap (in my opinion). **Boostrap Your Own Latent** was introduced to avoid making the double sized dataset. 
 

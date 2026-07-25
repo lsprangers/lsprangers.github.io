@@ -838,7 +838,7 @@ GeLU layers are often combined with `LinearLayer` that can double or triple the 
 ![Feed Forward Mini Example](/img/ff_mini_example.png)
 
 #### Shortcut Connections
-Shortcut connections, AKA residual or skip connections, were first introduced in [Residual CNN Networks, AKA Resnets](/docs/transformer_and_llm/RESNETS.md). They allow information from earlier layers to be reused in downstream layers, and ultimately are used as a way to help solve for vanishing gradient problems. They allow the larger gradients to pass through where they may have been lost with all of the small floating point operations
+Shortcut connections, AKA residual or skip connections, were first introduced in [Residual CNN Networks, AKA Resnets](/docs/transformer_and_llm/CNN.md). They allow information from earlier layers to be reused in downstream layers, and ultimately are used as a way to help solve for vanishing gradient problems. They allow the larger gradients to pass through where they may have been lost with all of the small floating point operations
 
 ![Deep NN Shortcut Connections](/img/deep_nn_shortcut_connections_additions.png)
 
