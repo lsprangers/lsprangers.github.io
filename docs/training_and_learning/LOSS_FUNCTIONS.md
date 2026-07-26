@@ -1,9 +1,9 @@
 ---
 layout: technical
-title: Loss Functions
+title: Activation and Loss Functions
 category: Training and Learning (ML)
 difficulty: Advanced
-description: Discussions around Loss Functions in NN's
+description: Discussions around Activation and Loss Functions in NN's
 show_back_link: true
 ---
 
@@ -32,6 +32,9 @@ Why do you use these output formulas? you want them to be "nice" for derivates a
 - **Usage**: Binary classification
 - **Description**: The sigmoid function outputs a probability value between 0 and 1 for each class. It is typically used for binary classification tasks
 - **Formula**: $\sigma(x) = \frac{1}{1 + e^{-x}}$
+
+#### ReLU
+TODO
 
 #### Softmax
 - **Usage**: Multi-class classification

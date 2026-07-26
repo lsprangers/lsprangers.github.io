@@ -286,6 +286,192 @@ Most pooling layers are maximums, sums, or averages. Pooling is effectively down
 
 Multiple input channels are also handled in aggregate where pooling is just done over each input channel to produce an effective output channel. It doesn't make much sense to alter input different than output unless you use different pooling types. If you want to use both max and average pooling, you'd just be making $c_o = 2 \cdot c_i$
 
+## LeNet
+The first digital ImageNet number detection CNN was created by Yann Lecun - it consists of:
+- A convolutional encoder consisting of two convolutional layers
+- A dense block consisting of three fully connected layers
+- There are 10 outputs in the final fully connected layer, which could be swapped with a [softmax activation function](/docs/training_and_learning/LOSS_FUNCTIONS.md#softmax) to describe the probability of being any digit 0-9 
+
+There's a great [website / article by sbondaryev](https://sbondaryev.dev/articles/lenet) on this with much better images / playground
+
+The input image would be $28 \times 28$, it would get sent through 4 layers of convolutions and average pooling, followed by 3 layers of fully connected
+
+LeNet also utilizes sigmoid activation funcations at the end of each 2D Convolution - this sigmoid is applied to every pixel coming out of the 2D convolutio itself. These are called **squashing activations** inside of the network. Digits are recognized by how its features relate to eachother, not by their pixel positions in the image itself - the number could be in part of the image itself; It's [local](#locality) and [translationally invariant](#translational-invariance)!
+
+The output layer itself is not a softmax classification of the 10 possible digits, it's something very different. Each of the 10 potential outputs holds a fixed $7 \times 12$ pattern, there's one pattern per class. The layer before the last is of size $(1, 84)$, which is $7 \times 12 = 84$. That second to final dense layer were chosen to match these patterns, and essentially allow mapping the output of any image onto the same $7 \times 12$ grid. The final **radial basis function (RBF)* computes the difference between each potential digit and the one passed through the network - whatever one has the smallest distance is the chosen class. 
+
+![LeNet](/img/lenet.png)
+
+The below python produces the following output:
+```
+Conv2D               (1, 28, 28, 6)
+AveragePooling2D     (1, 14, 14, 6)
+Conv2D               (1, 10, 10, 16)
+AveragePooling2D     (1, 5, 5, 16)
+Flatten              (1, 400)
+Dense                (1, 120)
+Dense                (1, 84)
+Dense                (1, 10)
+
+Epoch 1/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 10s 21ms/step - accuracy: 0.1018 - loss: 2.3085 - val_accuracy: 0.1000 - val_loss: 2.3085
+Epoch 2/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 11s 24ms/step - accuracy: 0.1059 - loss: 2.3041 - val_accuracy: 0.1000 - val_loss: 2.2969
+Epoch 3/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 11s 22ms/step - accuracy: 0.2186 - loss: 2.1957 - val_accuracy: 0.4717 - val_loss: 1.7799
+Epoch 4/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 10s 21ms/step - accuracy: 0.5319 - loss: 1.3382 - val_accuracy: 0.5858 - val_loss: 1.1263
+Epoch 5/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 12s 26ms/step - accuracy: 0.6057 - loss: 1.0367 - val_accuracy: 0.6458 - val_loss: 0.9725
+Epoch 6/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 11s 23ms/step - accuracy: 0.6565 - loss: 0.9127 - val_accuracy: 0.6679 - val_loss: 0.8768
+Epoch 7/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 9s 19ms/step - accuracy: 0.6882 - loss: 0.8395 - val_accuracy: 0.6914 - val_loss: 0.8234
+Epoch 8/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 10s 21ms/step - accuracy: 0.7064 - loss: 0.7883 - val_accuracy: 0.7072 - val_loss: 0.7793
+Epoch 9/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 9s 19ms/step - accuracy: 0.7207 - loss: 0.7418 - val_accuracy: 0.7210 - val_loss: 0.7390
+Epoch 10/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 9s 20ms/step - accuracy: 0.7342 - loss: 0.7011 - val_accuracy: 0.7391 - val_loss: 0.6995
+```
+
+<!-- Collapsible Python snippet -->
+<details>
+  <summary>Show Python Script</summary>
+
+```python
+import tensorflow as tf
+
+class LeNet(tf.keras.Model):
+    def __init__(self, num_classes=10):
+        super().__init__()
+        self.net = tf.keras.Sequential([
+            tf.keras.layers.Conv2D(
+                filters=6,
+                kernel_size=5,
+                padding="same",
+                activation="sigmoid"
+            ),
+            tf.keras.layers.AveragePooling2D(
+                pool_size=2,
+                strides=2
+            ),
+            tf.keras.layers.Conv2D(
+                filters=16,
+                kernel_size=5,
+                activation="sigmoid"
+            ),
+            tf.keras.layers.AveragePooling2D(
+                pool_size=2,
+                strides=2
+            ),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dense(120, activation="sigmoid"),
+            tf.keras.layers.Dense(84, activation="sigmoid"),
+            tf.keras.layers.Dense(num_classes)
+        ])
+    def call(self, x):
+        return self.net(x)
+
+model = LeNet()
+
+x = tf.random.normal((1, 28, 28, 1))
+
+for layer in model.net.layers:
+    x = layer(x)
+    print(f"{layer.__class__.__name__:20} {x.shape}")
+
+(x_train, y_train), (x_test, y_test) = \
+    tf.keras.datasets.fashion_mnist.load_data()
+
+x_train = x_train.astype("float32") / 255
+x_test = x_test.astype("float32") / 255
+
+x_train = x_train[..., None]
+x_test = x_test[..., None]
+
+batch_size = 128
+
+train_ds = (
+    tf.data.Dataset
+        .from_tensor_slices((x_train, y_train))
+        .shuffle(10000)
+        .batch(batch_size)
+)
+
+test_ds = (
+    tf.data.Dataset
+        .from_tensor_slices((x_test, y_test))
+        .batch(batch_size)
+)
+
+model.compile(
+    optimizer=tf.keras.optimizers.SGD(learning_rate=0.1),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(
+        from_logits=True
+    ),
+    metrics=["accuracy"]
+)
+
+model.fit(
+    train_ds,
+    epochs=10,
+    validation_data=test_ds
+)
+```
+</details>
+
+## Continuing CNNs
+After LeNet was released, there was a general "winter" of CNN exploration, usage, and continuation. There were lots of reasons for this, most I don't know, but the most interesting pieces were the **feature engineering, data, and hardware** at the time. 
+
+Most pipelines at that time were doing feature engineering before feeding inputs into the CNN:
+- Image centering
+- Greyscale processing
+- Reconstruction, splitting, etc
+
+These features were being processed before anything went into a model, and running these feature pipelines was expensive. In 1999 NVIDIA GeForce 256 could process $480,000,000$ (480 MFLOPS) per second, whereas today can perform $\gt 1,000,000,000,000,000$ (1000 TFLOPS, or 1 PFLOP) per device
+
+So back then you had to find a number of expensive images stored digitally, process them with analytical tools, open source software, and image processing toolkits, feed that through a standard feature extractor for images, and finally place this into a classifier. This was extremely expensive for the hardware at the time!
+
+After that, AlexNet was able to show that lower layers of CNNs can *learn the features*, given enough compute power and data. These lower layer features are able to be extended to higher level layers for more prominent features like noses, circles, dogs, etc.
+
+Separately, the use of [GPU's over CPU's](/docs/llm_systems/GPU_USAGE.md) allowed for significant matrix computations to be done on the order of TFLOPS per second, which is extremely necessary for convolutional networks which are doing thousands of matrix computations. The significance of **quantization** cannot be overstated - for 16 bit floating point it's on the order of 300 million BFLOAT16 operations per second compared to 20 million FP32 for general 32-bit floating point numbers.  CPU's rarely get over 1 TFLOPs, but they handle a large range of other logic besides matrix-matrix calculations
+
+### AlexNet
+AlexNet won the ImageNet Large Scale Visual Recognition Challenge in 2012, and was the first model to show that learned features can outperform manually designed features. 
+
+AlexNet is not very different from [LeNet](#lenet), it's mostly just an extended model with more layers which allowed for more features. Adding more convolutional layers with more channels required **more compute and more data**. With that, it won the competition!
+
+There are many other small tweaks in the name of training optimizations like using [ReLU instead of Sigmoid](/docs/training_and_learning/LOSS_FUNCTIONS.md#relu)
+
+### Training - Batch Normalization
+Training these CNNs is damn near impossible. Convergence never seems to come, there's memory issues, a loss of seeing an increase in loss, and many other typical pitfalls from ML. They are even more apparent when working with pixels in a small range of $[0, 255]$ that go through thousands of even more filtering and reduction operations, sooner or later it's just minimal updates in any direction. 
+
+ReLU helps with this and avoiding vanishing gradients, other tweaks with activations can help too, but none help as much as batch normalization. Batch normalization consistently helps with convergence, and can help alleviate a lot of these small issues with some light batch processing techniques
+
+The intuition behind this comes from standardizing vectors as input to MLP's and other linear models. The entire reason we standardize to mean = 0 and variance = 1 is because it ensures model variables all sit on the same playing field, and ensures they don't become to unwieldy. It also helps on explaining what's going on inside the models, but ultimately it just helps on passing the data through the model. If your input can become arbitrarily large, a model can implement much more violent decision boundaries. If the inputs are constrained to a smaller range, the model is forced to learn smoother, simpler functions. The main idea is we want to reduce the volatility to weight updates as our network produces - even if it takes a bit of time for it to converge, the convergence is smoother versus large, bouncing, violent updates
+
+If $z = w^{T}x$, and $x = [1000, 500, -700]$, then a tiny change to $w$ can produce an enormous change in $z$ given the $x$ values are so large. Simply because $x$ is large doesn't mean we want to make large updates to our weights
+
+If we normalize it to $x = [0.4, -0.2, 1.1]$, the same change or loss would produce a much smaller update, and ultimately reduces steep response updates
+
+The idea of **batch norm** is to normalize the batch itself to have *mean of 0 and unit variance over a mini batch*. The inventors of batch normalization postulated that this drift in the distribution of variables, whether in the input or along the multiple layers of the network, could hamper the convergence of the network. If one layer has activations 100 times larger of any other layer, maybe due to some odd activation function, this might necessitate compensatory adjustments to the learning rate - *there's no reason the updates from that layer shoud contribute 100 times as other layers*
+
+Batch normalization is applied to individual layers at a time. In each training iteration we normalize the inputs by subtracting their mean and dividing by the standard deviation, calculating these off of the mini batch itself. Lastly a scale coefficient and offset is applied to recover some lost degrees of freedom
+
+If $\Beta$ is a minibatch, and some $x \in \Beta$is an input to Batch Normalization $BN(x)$, it would be defined as
+
+$$BN(x) = \gamma \cdot {{x - \hat{u}_{\Beta}} \over \hat{\sigma}_{\Beta}} + D$$
+
+As a result, this minibatch would have zero mean and unit variance. The $\gamma$ and $D$ variables are 2 new variables introduced that must be learned, which brings the degrees of freedom back up 2. 
+
+In fully connected layers, batch normalization is done before activation functions:
+$$h = \phi (BN(\bold{Wx + b}))$$
+
+In convolutional layers, batch normalization happens after the convolution but before the non-linear activation function. Batch normalization happens *on a per channel basis across all locations*
+
+Once this model is learned and trained, batch normalization is calculated over the entire input dataset.
+
 ## ResNets
 Learning better networks isn't as easy as just simply stacking more and more of those above layers on! Unlike NLP, where more attention layers allow for better embedding representations, CNN's showed diminishing returns and sometimes complete degredation when stacking more of these layers together
 
