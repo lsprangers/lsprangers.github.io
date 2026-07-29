@@ -473,9 +473,74 @@ In convolutional layers, batch normalization happens after the convolution but b
 Once this model is learned and trained, batch normalization is calculated over the entire input dataset.
 
 ## ResNets
-Learning better networks isn't as easy as just simply stacking more and more of those above layers on! Unlike NLP, where more attention layers allow for better embedding representations, CNN's showed diminishing returns and sometimes complete degredation when stacking more of these layers together
+Learning better networks isn't as easy as just simply stacking more and more of those above layers on! Unlike NLP, where more attention layers allow for better embedding representations, CNN's showed diminishing returns and sometimes complete **degredation** when stacking more of these layers together. They also had problems with **vanishing and exploding gradients** from the millions of numeric multiplications across small floating point numbers. Vanishing gradients are related to degredation, but they are technically distinct problems that could be solved with separate architectures like batch normalization. Furthermore, CNN's mostly create new features by utilizing convolutional layers + pooling, but the more pooling we do the more channel features we sum up and **fail to preserve upstream information**. The more hidden layers, the more the information from the original input gets lost. ResNets attempt to solve this by allowing those convolutional channel features to continuously be reused with skip / residual connections, batch normalization across hidden layers, and by doing some fancy tricks with residual connections.
 
-ResNets were presented as an answer to "can stacking more layers enable the network to learn better" - the obstacle up to that point was vanishing / ***exploding gradients***, and they were primarily solved for by ***normalized initialization and intermediate normalization layers*** which enabled networks with tens of layers to start converging for [stochastic gradient descent](/docs/training_and_learning/TRAINING_OPTIMIZATIONS.md#stochastic-gradient-descent-sgd) with backprop. Degredation also proved to be an issue, where as network depth increased there was a saturation, and then rapid decrease, in accuracy. Adding more layers to a suitably deep model led to higher training error, and overfitting was not caused by this degredation. A shallower architecture was suggested, and using auxiliary layers consisting of identity mappings and others shallow model layers, but in practice this didn't help. Later on Deep Residual Learning took the charge, and utilized normalization / residual layers to help fix the problems of degredation
+Vanishing gradients are commonly talked about with ResNets as well, and while they weren't the intended focus of the original paper, they did help further the solution. When using batch normalization on even deeper layers, researchers did see networks converge (no more vanishing gradients), however the accuracy results were still degrading. So ultimately *mixing batch normaliztaion and skip / residual connections together allowed for deeper networks that converged without degredation*!
+
+To be clear, the initial ResNet paper strictly sought out to solve *How to create deeper models so that they perform **definitely** better than shallower models* - this is discussed in the [resnet function class math](#resnet-function-class-math) section. That being said ResNets helped with the latter two problems of gradient issues and information preservation
+
+The architecture of ResNet comes down to utilizing skip / residual connections $I(x)$ instead of just using some activation $F(x)$ - $y = F(x, W_i) + I(x)$
+
+In doing so, we ensure upstream layers are able to be reused, and furthermore if the $F(x)$ function does nothing useful (degrades), we can just learn to set it to 0. The core of the paper is that **learning $F(x) = 0$ is much easier than learning $F(x) = I(x)$** - that's it! In doing so we help to solve the 3 major problems of degredation, vanishing gradients, and information loss; The extra trick of batch normalization also helps vanishing / exploding gradients together
+
+The use of residual connections to solve the deeper model = degredation problem helped to also solve some extra side problems. This was showcased by the ResNet-18's ability to outperform other models and win 2015 Large Scale Visual Recognition Challenge
+
+### ResNet Function Class Math
+The general thought behind ResNets, and ultimately the whole "bigger is better" model continuation, deals with function class families. If we have some function family $\bold{F}$, which represents the class of functions a *specific network architecture can reach*, then for all $f \in \bold{F}$ there exist some set of weights and biases that obtain $f$ through training on a suitable dataset. If there is some magical $f^{*}$ that describes our black box we need to find, we mostly just care if $f^{*} \in \bold{F}$. We may approximate $f^{*}* with the best function $f^{*}_{\bold{F}} \in \bold{F}$ as our best function inside of $\bold{F}$ that is close to the magic one
+
+Again, to be clear, the initial ResNet paper strictly sought out to solve *How to create deeper models so that they perform **definitely** better than shallower models*. If the shallower model was the better choice, then the last layer of the model isn't needed and we can set $F(x) = 0$ in this case, which is much easier than getting it trained to $F(x) = I(x)$. ***Without the skip / residual connections, this mapping is much harder to learn***
+
+[Regularization](/docs/training_and_learning/LAYER_NORM.md) can control the complexity of $\bold{F}$ and achieve consistency, which means a larger set of training data can lead to better and better $f^{*}_{\bold{F}}$
+
+If we propose a new bigger and better architecture $\bold{F}^{'}$, we should hypothetically have a larger set of functions to choose from, and we'll either get a better $f^{*} \in \bold{F}^{'}$ or the same one as before from $\bold{F}$. ***This is only true if*** $\bold{F} \subseteq \bold{F}^{'}$
+
+If the above is not true, then something like $\bold{F}^{6}$ below may be worse off, even though it's larger, than $\bold{F}^{3}$
+
+![Function Class Families](/img/function_class_families.png)
+
+#### ResNet Function Example
+If we have a 10 layer network $\bold{F}_{10}$ and we insert another $\bold{F}_{11}$ via a fucntion $g(x)$, we'd be effectively turning it into $f(x) = g(x) + x$. This isn't completely true, but it's close enough
+
+![Residual Block](/img/resnet_residual_block.png)
+
+If we didn't add $ + x$ at the end, then to recover the original function and ensure that $\bold{F}_{10} \subseteq \bold{F}_{11}$, we would need $g(x) \rarr x$. That being said, for any layer, getting $\sigma(Wx + b) \rarr x$ is quite difficult. ReLU isn't an identity function for negative inputs, sigmoid is almost never an identity, and linear layers require $W = I, b = 0$ which may never be the case during training. Although $\bold{F}_{11}$ contains $\bold{F}_{10}$ mathematically, it may never actually find it, however we can be sure that $\bold{F}_{10}$ is a proper subset. So how did the authors propose to solve this? Just add in $+ x$ at the end! Forcing $g(x) \rarr 0$ is much easier
+
+The **degredation problem** stated out is when $\bold{F}_{11}$ is actually worse than $\bold{F}_{10}$, which means the new $g(x)$ included layer is struggling to find the identity function, and the new layers we have are even worse than just having stayed with $\bold{F}_{10}$, because we never added $x$ at the end and it couldn't converge to $I(x)$
+
+ResNets help the degredation problem by bringing $x$ along additively instead of forcing $g(x)$ to learn the identity function. In doing so, if the extra layer is struggling to find any better function fit, it can tend towards $g(x) \rarr 0$, which is infinitely easier to learn. In the examples above, if $f(x) = g(x) + x$, the network can learn $g(x) = 0$ and we just continue on with $\bold{F}_{10}$. Pushing $g(x)$ to 0 is much easier than forcing $g(x) = I(x)$ as well
+
+### ResNet Theory / Background
+The general theory was then for deep neural networks, if we can take any architecture and stack on some new layers that learn $f(x) = g(x) + x$, then the new architecture would be a strict superset of the old one. It for sure contains the old one, and it may contain new areas of exploration
+
+Residual Learning is useful because it allows very deep networks to be trained by reformulating the layers as learning residual functions with reference to the layer inputs, rather than directly learning unreferenced functions. This helps address vanishing gradient problems, and also enables effective training of much deeper architectures
+
+There was a huge issue of exploding / vanishing gradients, along with overall degredation of accuracy in these models, that were solved by utilizing normalization layers and residuals - ResNets usage of residual skip conncetions specifically addresses the degredation problems.
+
+![Residual Block](/img/resnet_residual_block.png)
+
+Why? The general idea is if $f(x)$ is the desired underlying mapping we want to learn for the activation function at this layer, then in the "old" way we directly have to learn $f(x)$ entirely. With a residual block, $g(x)$ only has to learn $f(x) - x$
+
+#### Small Aside On Intent Of Paper
+Again - why is that useful? If there's no better expressive model we find with $g(x)$, and the best course of action is to continue with $x$, we can just set $g(x) = 0$. This is a specific implementation of a multi-branch block, where one of the two branches is the identity function
+
+Again, again, again - why does this help us learn $f(x)$ which was the original goal? ***This is not the intuition*** - the main intuition is that **If** the optimal function happens to be close to the identity in *some* layer, then learning the difference (i.e. $g(x) = 0$) is much easier than learning the identity function from scratch. Learning the identity function is extremely difficult! ***That's the entire intuition - learning the difference is easier than learning the identity function***
+
+Why is this helpful? It is helpful because in the future the **degredation problem**, where adding in another layer actually makes the model worse off, can be solved by these residual blocks easily setting $g(x) = 0$. This is much easier than solving the degradation problem with identity functions
+
+![ResNet ID Function](/img/resnet_id_function.png)
+
+"Many intermediate transformations inside a very deep network are close to the identity. If one isn't, several residual blocks can compose many small residual changes into a large overall transformation"
+
+So although the original intent was not to split up $f(x)$, we see we can split up $f(x) = \sum_{i} g_{i}(x) + x$ into many other blocks that each learn different parts. Before, these were just strictly learned as convolutional output channel features, but now there are much more expressive mappings that can be learned with non-linear $g(x)$ blocks
+
+![ResNeXt](/img/resnext_multiple_blocks.png)
+
+This does lead to a large quadratic runtime cost of $O(c_i \times c_o)$ because each input layer needs to be utilized for each output layer. 3 input channels and 6 outputs is 18 total calculations!
+
+### ResNet Vanishing Gradients
+Since ResNets were presented as an answer to "can stacking more layers enable the network to learn better" - the obstacle up to that point fifn'y necessarily include vanishing / ***exploding gradients*** in a formal way. Most of the time they were primarily solved for by normalized initialization and intermediate batch normalization layers which enabled networks with tens of layers to start converging for [stochastic gradient descent](/docs/training_and_learning/TRAINING_OPTIMIZATIONS.md#stochastic-gradient-descent-sgd) with backprop. Degredation was the main issue, where as network depth increased there was a saturation, and then rapid decrease, in accuracy. Adding more layers to a suitably deep model led to higher training error, and overfitting was not caused by this degredation. A shallower architecture was suggested, and using auxiliary layers consisting of identity mappings and others shallow model layers, but in practice this didn't help. Later on Deep Residual Learning took the charge, and utilized normalization / residual layers to help fix the problems of degredation. 
+
+The two were connected in some way, and solving for degredation did also help to solve the vanishing / exploding gradient problem via **gradient highways** that, when paired with batch normalization, allowed for non-degrading, converging gradients.
 
 Parameters early on in CNN architectures sometimes don't receive meaningful gradient updates (vanishing gradients), sometimes the gradients are huge and chaotic (exploding gradients), the layers may not capture meaningful representations (just bad NN), or extra layers may degrade useful features in hidden layers (degredation)
 
@@ -483,37 +548,15 @@ Parameters early on in CNN architectures sometimes don't receive meaningful grad
 
 ResNets are an architecture that show promise in fixing many of the above issues, ultimately preserving gradients and allowing features to pass through downstream layers
 
-### ResNet Theory / Background
 
-### ResNet Architecture
-
-## Deep Residual Learning
-Deep Residual Learning is useful in the ResNet sense because it allows very deep networks to be trained by reformulating the layers as learning residual functions with reference to the layer inputs, rather than directly learning unreferenced functions. This helps address the vanishing gradient problem and enables effective training of much deeper architectures
-
-There was a huge issue of exploding / vanishing gradients, along with overall degredation of accuracy in these models, that were solved by utilizing normalization layers and residuals - ResNets usage of residual skip conncetions specifically addresses the degredation problems
-
-The degredation problem ultimately motivated the usage of residual learning 
-- In theory, if you add more layers to a NN the network should be able to at least match the performance of a shallower network, simply by learning the identity function
-    - i.e. the extra layers don't actually do anything
-- In practice, deep networks often perform worse (measured by a higher training error) as more layers were added - this is the ***degredation problem***
-- The reason for this problem is that it's surprisingly hard for standard (non-residual) deep networks to learn the identity mapping using many non-linear layers. Ultimately the optimization process just can't find this solution
-- Residual learning re-formulates the problem
-    - Instead of learning $H(x)$, some full mapping 
-    - It aims to learn the residual $F(x) = H(x) - x$ 
-    - So $H(x) = F(x) + x$
-- Why?
-    - If the best thing for the extra layers to do is nothing (identity function of shallow network), the residual $F(x)$ can just go to zero, which is easier for an optimizer to find
-    - If the optimal function is not an identity function, it's often closer to identity thatn zero, so learning a small "perturbation" from identity is easier for the optimization to learn instead of doing it from scratch
-        - If the optimal function starts to converge to a non-zero solution, then the middle mapping layers can be considered worthwhile, as they add some sort of new information
-- Altogether, Residual connections make it easier for deep networks to learn functions that are closer to identity mappings, which help to avoid the degredation problem and make optimization easier
-
-This entire thought process created the problem statement for residual learning frameworks / layers inside deep NN's. 
-
-### Residual Learning
+### Residual Learning (Again)
 The idea of residual learning is to replace the approximation of an underlying latent mapping $H(x)$, which is approximated by a few stacked layers, with an approximation of residual functions $F(x) := H(x) - x$ where $x$ denotes the inputs to the first of these few stacked layers - therefore $ H(x) \approx F(x) + x$
 
 Below, the $F(x, {W_i})$ is the residual mapping that is to be learned, an example is $F = {W_2} \sigma ({W_1} x)$ in which $\sigma$ denotes the ReLU activation function - most experiments show that ID mapping is enough to solve the degradation problem
+
 ![Identity Mapping Residual Arch](/img/id_map_residual.png)
+
+## DenseNet
 
 ### EfficientNet
 Before EfficientNet it was popular to scale only one of three dimensions - depth, width, or image size. Research papers and empirical studies, which ultimately led to EfficientNet, showed it's critical to balance all dimensions which can be achieved by scaling all 3 with a consistent ratio. 
