@@ -486,7 +486,7 @@ In doing so, we ensure upstream layers are able to be reused, and furthermore if
 The use of residual connections to solve the deeper model = degredation problem helped to also solve some extra side problems. This was showcased by the ResNet-18's ability to outperform other models and win 2015 Large Scale Visual Recognition Challenge
 
 ### ResNet Function Class Math
-The general thought behind ResNets, and ultimately the whole "bigger is better" model continuation, deals with function class families. If we have some function family $\bold{F}$, which represents the class of functions a *specific network architecture can reach*, then for all $f \in \bold{F}$ there exist some set of weights and biases that obtain $f$ through training on a suitable dataset. If there is some magical $f^{*}$ that describes our black box we need to find, we mostly just care if $f^{*} \in \bold{F}$. We may approximate $f^{*}* with the best function $f^{*}_{\bold{F}} \in \bold{F}$ as our best function inside of $\bold{F}$ that is close to the magic one
+The general thought behind ResNets, and ultimately the whole "bigger is better" model continuation, deals with function class families. If we have some function family $\bold{F}$, which represents the class of functions a *specific network architecture can reach*, then for all $f \in \bold{F}$ there exist some set of weights and biases that obtain $f$ through training on a suitable dataset. If there is some magical $f^{*}$ that describes our black box we need to find, we mostly just care if $f^{*} \in \bold{F}$. We may approximate $f^{*}$ with the best function $f^{*}_{\bold{F}} \in \bold{F}$ as our best function inside of $\bold{F}$ that is close to the magic one
 
 Again, to be clear, the initial ResNet paper strictly sought out to solve *How to create deeper models so that they perform **definitely** better than shallower models*. If the shallower model was the better choice, then the last layer of the model isn't needed and we can set $F(x) = 0$ in this case, which is much easier than getting it trained to $F(x) = I(x)$. ***Without the skip / residual connections, this mapping is much harder to learn***
 
@@ -556,7 +556,32 @@ Below, the $F(x, {W_i})$ is the residual mapping that is to be learned, an examp
 
 ![Identity Mapping Residual Arch](/img/id_map_residual.png)
 
-## DenseNet
+### DenseNet
+DenseNet, to some extent, is a logical extension of the ResNet architecture. DenseNet is characterized by both the connectivity pattern where each layer connects to all preceding layers and the concatenation operation (versus summing up the residual connections) to preserve and reuse features from earlier layers
+
+ResNet decomposes functions into $f(x) = g(x) + x$, which can be viewed as a complex non linear term and a simple linear term. What if we wanted to capture information beyond two terms? And what if we wanted to capture non-additive information beyond two terms? The solution in 2017 was the DenseNet architecture
+
+#### DenseNet Math Theory
+The general intuition behind it is similar to Taylor Expansion at some point like $x = 0$
+
+$$f(x) = f(0) + x \cdo [f^{'}(0) + x \cdot [f^{''}(0) \over {2!} + x \cdot [f^{'''}(0) \over {3!} + ...]]$$
+
+The Taylor Expansion helps to approximate a complicated, messy function using simple polynomials. It matches the functions value, slope, and higher order curvature using derivatives. For a function $f(x)$ and a point $x = a$:
+- The 0th derviative $f(a)$ is the constant term, and essentially just the $y$ height at that point. $y = f(a)$, we start things off directly at the function
+- The 1st derivative $f^{'}(a)(x - a)$ allows us to find the slope at that point, and gives us a tangent line
+- The second derivative gives us change of change, velocity, etc
+- As more terms are added, the polynomial hugs the original function tighter and tighter over a larger internal
+- We divide by $a!$ at each step to act as a counter-weight to remove the multiplication effects of repeatedly taking power-rule derivatives
+- The further we open the interval $x$ around $a$, the more polynomials we need to help track where we'll go
+
+Using these Taylor Expansions is much easier for computers to calculate versus `sin(a)` or something similar, and it's valid for a certain range around $a$. Calculators swap `sin(a)` for a 5th order polynomial to get a quick answer
+
+#### DenseNet Concatenations
+DenseNet doesn't do Taylor Series, but it reuses every possible skip connection it can, which ends up looking like a Taylor Series
+
+![Dense Net](/img/dense_net.png)
+
+Not every block is always a **DenseBlock** - DenseNet also uses $1 \times 1$ convolution layers known as **TransitionLayers** so that they don't create an exponentially increasing runtime model
 
 ### EfficientNet
 Before EfficientNet it was popular to scale only one of three dimensions - depth, width, or image size. Research papers and empirical studies, which ultimately led to EfficientNet, showed it's critical to balance all dimensions which can be achieved by scaling all 3 with a consistent ratio. 
@@ -570,6 +595,11 @@ $N = F_k \odot ... \odot F_2 \odot F_1(X_1)$
 Effectively, these layers are often split / partitioned into multiple stages and all layers in each stage share the same architecture - an example is ResNet which has 5 stages ($k = 5$), with all layers in each stage being the same convolutional type except the first layer which performs down-sampling. 
 
 Scaling all 3 is important as they'r all fairly linked - you cannot increase the resolution of an image without increasing it's depth and saturation (idk what this means). Therefore, a *compound scaling method* which uniformly scales network width, depth, and resolution is required
+
+## Designing Convolutional Networks
+Most of the convolutional networks above were heavily informed by human creativity, and less informed by systematic exploration of the design space. When you look up the choices behind each of these architectures, why they chose certain parameters, layer structures, and designs, most of it was just tweaking until loss converged. This *network engineering* approach was tremendously successful!
+
+The other side of the coin would be *neural architecture search* (NAS) which is extremely expensive brute-force search with some forms of hyperparameter optimizations. [EfficientNets](#efficientnet) are an outcome of this search type
 
 ## Contrastive Learning
 We've looked into [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) in another sub-document, and will copy this section over there, but this is a section specifically on Image based Contrastive Learning
