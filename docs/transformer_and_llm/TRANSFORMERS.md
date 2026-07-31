@@ -97,7 +97,7 @@ This is exactly what will come through in most attention calculations!
 ### Parameters
 In discussions below, we'll use these parameters to talk through time and memory complexities, along with architectures and layers
 
-The input is usually a sequence of size $S$, which has a number of tokens $t_i$, and each of these tokens will go through a static embedding layer to create input embeddings of size $E$ (typically 128). After this, the $S$ embeddings of size $E$ will all go through multiple layers of normalization, dropout, and self-attention to produce output hidden states. These output hidden states are of size $H$ (typically 512), and there would still be $s$ final states, one for each input. These final hidden states are labeled $T_i$
+The input is usually a sequence of size $S$, which has a number of tokens $t_i$, and each of these tokens will go through a static embedding layer to create input embeddings of size $E$ (typically 128). After this, the $S$ embeddings of size $E$ will all go through multiple layers of normalization, dropout, and self-attention to produce output hidden states. These output hidden states are of size $H$ (typically 256), and there would still be $s$ final states, one for each input. These final hidden states are labeled $T_i$
 
 - Parameters:
     - $L$ layers / encoder blocks
