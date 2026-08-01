@@ -100,21 +100,23 @@ In discussions below, we'll use these parameters to talk through time and memory
 The input is usually a sequence of size $S$, which has a number of tokens $t_i$, and each of these tokens will go through a static embedding layer to create input embeddings of size $E$ (typically 128). After this, the $S$ embeddings of size $E$ will all go through multiple layers of normalization, dropout, and self-attention to produce output hidden states. These output hidden states are of size $H$ (typically 256), and there would still be $s$ final states, one for each input. These final hidden states are labeled $T_i$
 
 - Parameters:
-    - $L$ layers / encoder blocks
-    - $H$ is the size of the hidden states
-         - 256 is typical size of hidden state dimension
-         - $d_h$ is the encoder hidden size
-         - $d_s$ is the decoder hidden size
-         - $d_a$ is the alignment MLP hidden size
-    - $A$ attention heads per layer
-        - Typically 6 attention heads
-    - $E$ represents the input embedding dimension
-        - 128 is typical embedding dimension
-    - $C \in \real^H$ represents the final hidden vector (of size $H$) of our `[CLS]` token (i.e. our "final" hidden layer for our sentence)
-    - $T_i \in \real^H$ as the final hidden state for a specific input token $w_i$
-    - $P_i$ is our positional encoding which represents the learned positional embedding for our token in it's specific sentence of any size
-    - $X_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
-        - In our inference time examples for embeddings most people just fill it with `0's` or `1's` depending on which sentence it's apart of
+   - $V$ is the vocabulary size
+   - $L$ layers / encoder blocks
+   - $H$ is the size of the hidden states
+      - 256 is typical size of hidden state dimension
+      - $d_e$ is the embedding dimension of the input
+      - $d_h$ is the encoder hidden size
+      - $d_s$ is the decoder hidden size
+      - $d_a$ is the alignment MLP hidden size
+   - $A$ attention heads per layer
+      - Typically 6 attention heads
+   - $E$ represents the input embedding dimension
+      - 128 is typical embedding dimension
+   - $C \in \real^H$ represents the final hidden vector (of size $H$) of our `[CLS]` token (i.e. our "final" hidden layer for our sentence)
+   - $T_i \in \real^H$ as the final hidden state for a specific input token $w_i$
+   - $P_i$ is our positional encoding which represents the learned positional embedding for our token in it's specific sentence of any size
+   - $X_i$ is our segment encoding which represents the learned positional embedding for our token in either segment sentence A or B
+      - In our inference time examples for embeddings most people just fill it with `0's` or `1's` depending on which sentence it's apart of
 
 ### Bahdanau RNN Attention
 Things first started off with Bahdanau Style RNN Attention via [Neural Machine Translation by Jointly Learning to Align and Translate (2014)](https://arxiv.org/abs/1409.0473)
@@ -147,16 +149,21 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
 - The top part is a decoder, which outputs the translated sentence
 
 #### Encoder RNN Attention
-- ***Input***: A sequence of vectors $\bold{x} = (x_1, ..., x_n)$
-   - ***Encoder Hidden States***: $h_t = f(x_t, h_{t-1})$
-      - $f$ is some non-linear function
-      - This will take the current input embedding, and the output of the last recurrence
-      - These are bi-directional
-         - $\overrightarrow{h_2} = f(x_2, h_1)$
-         - $\overleftarrow{h_2} = f(x_2, h_3)$
-         - $h_2 = [\overrightarrow{h_2} \frown \overleftarrow{h_2}]$
-            - Concatenation!
-      - It is formalized that $h_t \in \mathbb{R^{d_h}}$ is the hidden state of the encoder at time $t$
+The input is a sequence of vectors $\bold{x} = (x_1, ..., x_{T_x})$
+
+The encoder produces hidden states $\bold{H} = [h_1, h_2, ... h_{T_x}] \in \real^{{T_x} \times {d_h}}$
+- i.e. the encoder produces multiple hidden state vectors of length / size $d_h$, and specifically it will produce $T_x$ of these
+
+Producing a specific hidden state  $h_t = f(x_t, h_{t-1})$ depends on both the last hidden state $h_{t-1}$ and the current input vector $x_t$. As with most RNN's, $f$ is a non-linear function that has learnable weights $W_{d_h}$ and $W_{d_E}$
+- $d_E$ is the size of the input embedding, i.e. the size of a single vector $x_t$, and $d_h$ is the size of the hidden state vector $h_t$
+- $h_t = W_{d_h} \cdot h_{t-1} + W_{d_E} \cdot x_t + \Beta$ shows how we can just multilpy the last hidden state and our current vector to get this current hidden state
+
+We do this in both directions
+- $\overrightarrow{h_2} = f(x_2, h_1)$
+- $\overleftarrow{h_2} = f(x_2, h_3)$
+- $h_2 = [\overrightarrow{h_2} \frown \overleftarrow{h_2}]$
+   - Concatenation!
+- It is formalized that $h_t \in \mathbb{R^{d_h}}$ is the hidden state of the encoder at time $t$
 - These $h_i = [\overrightarrow{h_i} \frown \overleftarrow{h_i}] \space \forall i \in \{1, ..., T_x\}$ 
    - They live entirely in the encoder block
    - They are fixed once the input is encoded
@@ -164,11 +171,14 @@ This paper discusses how most architectures of the time have a 2 pronged setup:
 ![RNN Encoder GIF](/img/RNNEncoderSetup.gif)
 
 #### Decoder RNN Attention
-Decoder is often trained to predict the next word $\hat{y_t}$ given the context vector $c_t$ and all the previously predicted words $\{\hat{y_1}, ..., \hat{y_{t-1}} \}$
+Bahdanau attention for decoders starts to utilize attention by comparing the decoder hidden states $s_t$ to every encoder hidden state $h_i$ - the number of decoder tokens does not need to be equal to the number of encoder tokens, **and this is the heart of Seq2Seq** variability text size
 
-Our translation can be defined as $\bold{y} = (y_1, ... y_{T_n})$ which is just the sequence of words output so far!
+$s_{t} \in \real^{d_h}$ is typically of the same dimension as the encoder hidden state $h_i$ 
 
-It does this by defining a probability distribution over the translation output word $\bold{y}$ by decomposing the joint probability. 
+##### Historic Decoder Theory
+In the past, decoders were often trained to predict the next word $\hat{y_t}$ ***given the context vector $c_t$*** and all the previously predicted words $\{\hat{y_1}, ..., \hat{y_{t-1}} \}$. A translation can be defined as $\bold{y} = (y_1, ... y_{T_n})$ which is just the sequence of words output by the decoder!
+
+It does this by defining a probability distribution over the translation output word $\bold{y}$ by decomposing the joint probability. It just looks to find the most probable word $y_t$ given the distribution of the last words and the context vector $c_t$
 
 $p(\bold{y}) = \prod_{t=1}^{T} p(y_t \mid \{y_1, \ldots, y_{t-1}\}, c_t)$
 
@@ -178,22 +188,52 @@ So we're just choosing the next most likely word so that the probability of seei
 
 The sequence "Hi, what's your", if you looked over all potential next words, would most likely have the highest predicted outcome of "Hi, what's your name"
 
-Each of these conditional probabilities is typically modeled with a non-linear function $g$ such that 
+##### Bahdanau Decoder
+In Bahdanau decoder setup, we still utilize a context vector, but this context vector is created for each new output word prediction, and isn't reused across them like historic RNN's. Furthremore, **Bahdanau decoder's don't attend over previously generated words, it only utilizes the last hidden state, and last predicted word**
 
-So, ***at each time step $t$*** the decoder combines:
-- ***Decoder hidden state formula***: $g_t = f(g_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$  based on
-   - $g_{t-1}$ the last hidden state
-      - Dimension $d_s$
-   - $y_{t-1}$ the last output word
-   - $c_t$ the context at that state
-      - $c_t = \sum_{i=1}^{T_x} \alpha_{ti}h_i$
-      - Where $\alpha_{ti}$ is the weight applied to $h_i$ based on the comparison similarity between the last decoder hidden state $g_{t-1}$ to each encoder hidden state (annotation) $h_i$ 
+The decoder will receive the previously predicted token $y_{t-1}$, and will embed it into the hidden state dimension $e(y_{t-1}) \in \real^{d_e}$. The embeddings are of size $d_e$ and there are $V$ of them, which $V$ relates to the vocabulary size. Therefore there are a total of $V$ rows, relating to each word in our vocabulary, and each of them is of size $d_e$ embedding size. For each word, we just use the embedding as a single lookup table to get each embedding
+
+$$E \in \real^{V \times d_e}$$
+
+$$
+E = \left[
+\begin{matrix}
+   \text{embedding("the")}, \\
+   \text{embedding("cat")}, \\
+   ... \\
+   \text{embedding("zip")} \\
+\end{matrix}
+\right]
+$$
+
+It will also utilize the previous decoder hidden state $s_{t-1}$ to score every encoder hidden state $\bold{H} = [h_1, h_2, ..., h_{T_x}] : h_i \in \real^{T_x \times d_h}$. **Bahdanau additive attention** doesn't directly score the decoder hidden state to each encoder hidden state. It first projects each into a learned attention space (doing this via $W_s$ and $W_h$ learned matrices), adds them together, and then applies a non-linear $z_{t,i} = tanh()$ to map them to a final scalar compatibility score $e_{t, i}$
+
+$$e_{t,i} = v_{a}^T \cdot tanh(W_s s_{t-1} + W_h h_i)$$
+
+- Both encoder and decoder weight matrices are of size $\real^{d_a \times d_h}$ - when multiplied by individual hidden states (encoder or decoder), we get a resulting $z_{t,i} \in \real^{d_a}$
+   - $W_s \in \real^{d_a \times d_h}$ is where we multiply decoder hidden state $s_t$ of size $d_h$ via $d_a$ to add them to the encoder hidden states
+   - $W_h \in \real^{d_a \times d_h}$ is where we multiply encoder hidden state $h_i$ of size $d_h$ via $d_a$ to add them to the encoder hidden states
+   - i.e. $W_s s_{t-1} \text{ and } W_h h_i \in \real^{1 \times d_a}$
+
+Afterwards, all of the $h_i$ need to be compared, and so they're softmaxed and summed. This is similar to self-attention, but not exact
+
+$$\alpha_{t,i} = {{exp(e_t, i)} \over {\sum_j exp(e_t, j)}}$$
+
+$$c_t = \sum_{i=1}^{T_x} \alpha_{t,i} h_i$$
+
+At this point we've computed the context vector $c_t$ for our current decoder step $t$, and we've utilized the last decoder hidden state $s_{t-1}$ and all of the encoder hidden states. To get the actual hidden state of this decoder, we still need to utilize some RNN GRU gates based on the last predicted word $y_{t-1}$. Also, our hidden state has $s_t \in \real^{d_h}$ - normally encoder and decoder share the same dimension
+
+$$s_t = GRU([e(y_{t-1}); c_t], s_{t-1})$$
+
+And finally, this is pushed through softmax to actually predict the next token
+
+$$p(y_t) = \text{softmax}(W_o[s_t;c_t] + b)$$
 
 
 #### Learning To Align And Translate
-The rest of the architecture proposes using a bi-directional RNN as an encoder, and then a decoder that emulates searching the source sentence during translation
+Overall the architecture proposes using a bi-directional RNN as an encoder, and then a decoder that emulates searching the source sentence during translation. For each word that comes in we compare the last predicted word, and the last hidden state which brings along some information from the entire sentence. These are all compared to the encoder to get a sense of what input words should be used to produce the next output word
 
-The "searching" is done by comparing the decoders last hidden state $g_{t-1}$ to each encoder hidden state $h_i \space \forall i \in [1,...,T_x]$ in our alignment model, and then creating a distribution of weights (softmax) to create a context vector. This context vector, the previous hidden state, and the previous hidden word help us to compute the next word!
+The "searching" is done by comparing the decoders last hidden state $s_{t-1}$ to each encoder hidden state $h_i \space \forall i \in [1,...,T_x]$ in our alignment model, and then creating a distribution of weights (softmax) to create a context vector. This context vector, the previous hidden state, and the previous hidden word help us to compute the next word!
 
 **P.S. the alignment model here is very similar to self-attention in the future
 
@@ -210,21 +250,21 @@ Since sentences aren't exactly isomoprhic (one-to-one and onto), there may be 2 
          - Concatenation!  
 - ***Decoder***
    - For each step $t$, you need to come up with a context vector $\bold{c}_t$
-   - $e_{ti} = a(g_{t-1}, h_i)$ is an alignment model which scores similarities between decoder hidden state at $t-1$ and ***all encoder states***, where each one is denoted at some time $i$
+   - $e_{ti} = a(s_{t-1}, h_i)$ is an alignment model which scores similarities between decoder hidden state at $t-1$ and ***all encoder states***, where each one is denoted at some time $i$
       - $a(\cdot)$ is a small feed-forward NN defined below
-      - $e_{ti} = {\bold{v}^T} \cdot \tanh({W_s} \bold{g_{t-1}} + {W_h}{\bold{h}_i})$
+      - $e_{ti} = {\bold{v}^T} \cdot \tanh({W_s} \bold{s_{t-1}} + {W_h}{\bold{h}_i})$
          - $e_{ti}$ is the alignment score
          - $W_s \in \mathbb{R^{d_a \times d_s}}$
          - $W_h \in \mathbb{R^{d_a \times d_h}}$
          - $\bold{v} \in \mathbb{R^{d_a}}$
             - $\bold{v}$ is a learned vector that helps compute the scalar alignment score
          - What does this mean?
-            - ${W_s} \bold{g_{t-1}}$ is a weighted version of our decoder hidden state at $t-1$
+            - ${W_s} \bold{s_{t-1}}$ is a weighted version of our decoder hidden state at $t-1$
             - ${W_h}{\bold{h}_i}$ is a weighted version of our encoder hidden state at time $i$
             - Therefore, $\tanh(\cdot) \in [-1, 1]$ acts as an activation function which helps us to score how close the decoder hidden state at $t-1$ and our current encoder hidden state at $i$ are
    - Normalize with softmax to get attention weights $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$
       - $e_{tk}$ will be the attention score of $t$ to all other states
-         - If there are 5 words in the input, and we're at $t = 3$, this will score how well $g_2$ is to $h_3$ compared to all other annotations $h_{[1, 2, 4, 5]}$
+         - If there are 5 words in the input, and we're at $t = 3$, this will score how well $s_2$ is to $h_3$ compared to all other annotations $h_{[1, 2, 4, 5]}$
          - Another blog mentioned how attention scores $e_t$ are computed by "scalarly combining the hidden states of the decoder with all of the hidden states of the encoder"
             - ***The below is Luong Style Attention, not Bahdanau***
             - $e_t = [(g^t)\cdot{h}^1, ... , (g^t)\cdot{h}^n]$
@@ -232,14 +272,14 @@ Since sentences aren't exactly isomoprhic (one-to-one and onto), there may be 2 
       - Since our attention model helps to compute scores across encoder hidden states to a decoder hidden state, taking the softmax here will then give us the ***relative weight of each encoder hidden state to a decoder hidden state***
    - Form the context vector, AKA attention output, $\bold{c}_t$ as the weighted sum of these annotations
       - $\bold{c}_t = \sum_{i=1}^{T_x} \alpha_{ti} \cdot h_i$
-         - Where $\alpha_{ti}$ is the weight of $g_{t-1}$ compared to each annotation $h_i$ and is a similarity metric between the two
-   - $g_t = f(g_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$ is the decoder hidden state
+         - Where $\alpha_{ti}$ is the weight of $s_{t-1}$ compared to each annotation $h_i$ and is a similarity metric between the two
+   - $s_t = f(s_{t-1}, y_{t-1}, c_t) \in \mathbb{R^{d_s}}$ is the decoder hidden state
       - $y_{t-1}$ is the last output word from decoder
    - To bring it all out:
-      - $g_t = f(g_{t-1}, y_{t-1}, \sum_{i=1}^{T_x} (\frac{\exp(a(g_{t-1}, h_i))}{\sum_{k=1}^{T_x} \exp(a(g_{t-1}, h_k))}) \cdot h_i$ )
-         - Our query is $g_{t-1}$, and our keys / values are $h_i$
+      - $s_t = f(s_{t-1}, y_{t-1}, \sum_{i=1}^{T_x} (\frac{\exp(a(s_{t-1}, h_i))}{\sum_{k=1}^{T_x} \exp(a(s_{t-1}, h_k))}) \cdot h_i$ )
+         - Our query is $s_{t-1}$, and our keys / values are $h_i$
          - Our attention score is based on $\alpha_{ti} = \frac{\exp(e_{ti})}{\sum_{k=1}^{T_x} \exp(e_{tk})}$ which is multiplied by $h_i$ to attend to it
-   - $g_t$ will typically combine the vectors of it's inputs via addition, concatenation, etc and pass them through a nonlinear function $f$
+   - $s_t$ will typically combine the vectors of it's inputs via addition, concatenation, etc and pass them through a nonlinear function $f$
       - GRU, LSTM, etc
    - All of this will be the basis of [Self-Attention](#self-attention) in the future, and for this you can just read this as the context vector $c_i$ is based on the similarity of an input annotation with the rest of the annotations
 
@@ -302,12 +342,12 @@ $$O(T_x \cdot d_h)$$
 
 ##### Bahdanau Alignment + Attention Complexity
 Alignment score is 
-$$e_{ti} = {v^T} \cdot \tanh({W_s} g_{t-1} + {W_h}{h_i})$$
+$$e_{ti} = {v^T} \cdot \tanh({W_s} s_{t-1} + {W_h}{h_i})$$
 
 For each encoder position $i$, with hidden state $h_i$:
-- ${W_s} g_{t-1}$ has time complexity $O(d_a \cdot d_s)$
+- ${W_s} s_{t-1}$ has time complexity $O(d_a \cdot d_s)$
    - $d_a$ is the MLP alignment embedding size
-   - $d_s$ is the decoder hidden state, $g_{t-1}$ size
+   - $d_s$ is the decoder hidden state, $s_{t-1}$ size
    - ***This is computed once***
 - ${W_h}{h_i}$ has time complexity $O(d_a \cdot d_h)$
    - This is computed per $i$
@@ -327,9 +367,9 @@ So:
 $$O(d_a d_s + T_x d_a d_h + T_x d_h)$$
 
 ##### Bahdanau Decoder Time Complexity
-$$g_t = f(g_{t-1}, y_{t-1}, c_t)$$
+$$s_t = f(s_{t-1}, y_{t-1}, c_t)$$
 
-The decoder here is just producing a new hidden state, but inside of a GRU / LSTM both $g_t$ and $h_i$ (which is apart of $c_t$) are multiplied by different weight matrices
+The decoder here is just producing a new hidden state, but inside of a GRU / LSTM both $s_t$ and $h_i$ (which is apart of $c_t$) are multiplied by different weight matrices
 
 Therefore the entire operation is $O(d^2_s + E d_s)$ for each decoder step, and there are $T_y$ decoder steps
 
