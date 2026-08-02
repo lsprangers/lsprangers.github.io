@@ -392,11 +392,16 @@ The rest of the discussion is around Attention blocks in Transformer Architectur
 
 ### Transformer Extra Parameters
 - Input $x_i \in \real^d$
-- $S$ = Sequence length
-- $d$ = Model dimension
+- $S$ is input sequence, same meaning as $\bold{X} = (x_1, x_2, ... x_{T_x}$
+- $d_{\text{model}} == d$ is essentially the dimension across the entire architecture, and covers all 3 of the dimensions from above. $d$ replaces the 3 below
+   - $d_e$ = token embedding size
+   - $d_h$ = hidden state dimension
+   - $d_a$ = attention MLP hidden dimension
 - $h$ = # of heads
-- $d_k$ = $d$ / $h$
-- Projection matrices $W_Q$, $W_K$, $W_V \in \real^{d \times d}$
+- $d_{\text{model}}$ = model embedding dimension
+- $d_k$ = $d_{\text{model}} \over h$
+- Projection matrices $W_Q$, $W_K$, $W_V \in \real^{d_{\text{model}} \times d_k}$
+   - Bring us from model into projected head space
 
 ![Transformers High Level](/img/transformers_high_level.png)
 
@@ -424,19 +429,10 @@ This setup allows us to create a paradigm of:
 
 These matrices are learned during training and updated via backpropagation
 
-#### K Q V Complexities
-In [Bahdanau Attention - each decoder is compared to all encoder states](#bahdanau-attention-time-complexities)
-
-In Transformer self-attention, we ***compare all tokens to all tokens simultaneously***
-
-$$QK^T \text{ with shape } (S \times d_k) \cdot (d_k \times S) = S \times S$$
-
-Which is now a quadratic term, which is where GPU behavior gets interesting
-
 ### Tokenization
-Tokenization is actually a fairly large part that gets looked over for Transformers - authors and creators of most models have utilized ***Sub-Word Tokenization*** to reduce overall vocabulary size and ensure out-of-vocabulary tokens are handled well. Instead of replcaing with `[UNK]` or something else, splitting up the entire vocabulary into different character chunks allows for reusability between `##ing` for `dining` and `banking`
+Tokenization is actually a fairly large part that gets looked over for Transformers - authors and creators of most models have utilized ***Sub-Word Tokenization*** to reduce overall vocabulary size and ensure out-of-vocabulary tokens are handled well. Instead of replacing with `[UNK]` or something else, splitting up the entire vocabulary into different character chunks allows for reusability between `##ing` for `dining` and `banking`
 
-***Byte Pair Encoding*** is also utilized as a compression technique which iteratively replaces the most frequent pair of bytes in a sequence with a single, unused byte. Instead of merging together frequent pairs of bbytes, the tokenization algorithms will merge together characters or sub-word character sequences that are frequent. That's how the model learns to pull out `##ing` as a sub-word, because it's quite frequent!
+***Byte Pair Encoding*** is also utilized as a compression technique which iteratively replaces the most frequent pair of bytes in a sequence with a single, unused byte. Instead of merging together frequent pairs of bytes, the tokenization algorithms will merge together characters or sub-word character sequences that are frequent. That's how the model learns to pull out `##ing` as a sub-word, because it's quite frequent!
 
 #### Training
 This model needs actual training to be done on it to learn these frequency word pairings. The algorithm needs to build merge tables and vocabulary of tokens that ultimately will be updated across epochs to create an optimized set of sub-words to tokenize in the future
@@ -463,7 +459,20 @@ After learning BPE rules, the merge table is the main artifact output that is re
 So inference is just constantly replacing merges over time, and hypothetically could replace an entire word with a compressed single token in some cases
 
 ### Encoding Blocks
-Once we have tokenized inputs relating to some sort of static embedding, we focus on encoding 
+Tokenized inputs bring us from characters into a compressed, numeric integer representation of our input. Our embedding matrix $E$ represents all of the embeddings for our tokenized input - if our input vector is $v_i = [127, 180, 4, 600]$, $v_i$ can be used to just look up the embeddings at positions 127, 180, 4, and 600. Just need to transform the input into one hot encoded vectors of size $d_e$
+
+$$E \in \real^{V \times d}$$
+
+$$
+E = \left[
+\begin{matrix}
+   \text{embedding("the")}, \\
+   \text{embedding("cat")}, \\
+   ... \\
+   \text{embedding("zip")} \\
+\end{matrix}
+\right]
+$$
 
 The main layer you focus on in our Encoding blocks is Self Attention, but alongside this there are other linear layers that help to stabilize our context creation
 
@@ -610,7 +619,7 @@ The ***path length*** is still $O(1)$ because all tokens attend to each other in
 The attention matrix itself is an $S \times S$ matrix, and so memory ultimately is 
 $$O(S^2)$$
 
-This is often the true bottleneck in most transformer architectures when $S$ becomes large (this is the ***large context length problem***). Attention is often memory bound at large $S$ due to O(S^2)$ attention matrix, even if compute utilization appears high
+This is often the true bottleneck in most transformer architectures when $S$ becomes large (this is the ***large context length problem***). Attention is often memory bound at large $S$ due to $O(S^2)$ attention matrix, even if compute utilization appears high
 
 The bottleneck is:
 - Storing $S \times S$ attention matrix
@@ -619,7 +628,7 @@ The bottleneck is:
 
 This becomes critical for optimizing later on with things like:
 - FlashAttention
-- KV Caching
+- KV Caching (this is a decoder problem)
 - etc
 
 For example, long-context models begin to show signs of degredation when their GPU utilization is $\gt$ 90% but their FLOPS are stagnant at an unoptimal place like $\approx$ 50%. At this point the GPU is busy working through memory buffers and bringing data into main memory, and it's not able to truly run things in parallel.
@@ -642,7 +651,7 @@ With $h$ heads, we now have $h \cdot O(S^2 d_k)$ for each head becuase $hd_k = d
 Therefore, multi-head attention has the same time complexities as single headed
 
 #### Pruning
-There's an entire section in some Transformer papers talking about pruning of heads. Ultiamtely this is because not every head is needed, and some generally won't have any useful features in some datasets
+There's an entire section in some Transformer papers talking about pruning of heads. Ultimately this is because not every head is needed, and some generally won't have any useful features in some datasets
 
 Pruning allows the model to run faster, perform less computations, and potentially do this without any loss of quality! Most of the time it's a pruning + speed / accuracy tradeoff where you can prune up to certain elbow thresholds where the return on pruning starts to decrease compared to decrease on accuracy
 
@@ -651,8 +660,9 @@ The model needs to be trained with all possible heads being updated, but afterwa
 ### Other Layers
 Other layers outside of attention based layers in transformers help to extend the problems to a wider set of real world scenario's:
 - Non-linearity (feed forward + residual layers)
-- Gradient issues (Normalization)
-- Distribution shift (normalization, skip layers)
+- Gradient issues (Batch Normalization)
+- Degredation, gradient issues, and network deepening (normalization, skip layers)
+   - Similar to [ResNets](/docs/transformer_and_llm/CNN.md#resnets) skip layers help with fixing degredation and vanishing gradients as network size increases
 - etc..
 
 Below blurb helps to showcase some of the reasons why all of these layers and architectures are added into the "attention only" architectures (i.e. attention isn't all you need, and below explains why)
@@ -686,16 +696,15 @@ Attention learns where to search for relevant information. Surely, attending to 
 ![Positional Encoding](/img/positional_encoding.png)
 
 #### Residual Connections and Normalization
+Similar to [ResNets](/docs/transformer_and_llm/CNN.md#resnets) skip layers help with fixing degredation and vanishing gradients as network size increases
 
-- Each encoder layer includes a **residual connection** and **normalization layers** to stabilize training and improve gradient flow
+- Each encoder layer includes a **residual connection** and **normalization layers** to stabilize training, improve gradient flow, and help with degredation
 - This happens after both Self Attention Layer and Feed Forward Layer in the "Add and Normalize" bubble
 - Add the residual (the original input for that sublayer) to the output of the sublayer
    - In the case of Self Attention layer, you add the output of Self Attention to the original input word (non-attended to word)
 - Apply LayerNorm to the result
    - This just means normalize all actual numeric values over the words embedding
 - **If the diagram shows a block over the whole sentence, it just means the operation is applied to all words, but always independently for each word
-- **Why is any of this useful**:
-   - Helps with gradient vanishing and exploding, and also ensures input stability
 
 ![Self Attention Encoding](/img/summary_self_attention_encoding.png)
 
@@ -735,6 +744,7 @@ This diagram below shows one single encoding block using Self Attention
 ![Self Attention Encoding](/img/summary_self_attention_encoding.png)
 
 #### Masked Self Attention
+Masked Self Attention **is only used in training** to ensure that models don't cheat. During inference, this essentially reduces to Self Attention
 - In Masked Self Attention, it's the same process as Self Attention except you mask a certain number of words so that the $ Q \cdot K $ results in 0 effectively removing it from attention scoring
     - In BERT training you mask a number of words inside of the sentence
     - In GPT2 training you mask all future words (right hand of sentence from any word)
@@ -796,25 +806,80 @@ It's based on the $S$ sequence length, and projection dimensions $d$
 #### Decoder
 ![Encoder to Decoder Summary](/img/encoder_to_decoder.png)
 
+At the end of the encoder, we have $T_x$ hidden states of size $d_{\text{model}}$
 Parameters:
-- $S$ = encoder length
-- $T$ = decoder length
-- $d$ = model dimension
+- $T_x$ = encoder input length, relates to $S$
+- $T_y$ = decoder sequence length
 - $h$ = # of heads
-- $d_k = d / h$
+- $d_{\text{model}}$ = model embedding dimension
+- $d_k$ = $d_{\text{model}} \over h$
 
-So inside of the masked self attention layer:
-- $Q_{\text{dec}} \in \real^{T \times d_k}$
-- $K_{\text{dec}} \in \real^{T \times d_k}$
-- $V_{\text{dec}} \in \real^{T \times d_k}$
+Both $T_x$ and $T_y$ can vary, and are usually not equal - specifically, $T_y$ will grow with each new predicted word
 
-Inside cross-attention layer:
-- $Q_{\text{cross}} \in \real^{T \times d_k}$
-- $K_{\text{enc}} \in \real^{S \times d_k}$
-- $V_{\text{enc}} \in \real^{S \times d_k}$
+$$H_{\text{enc}} \in \real^{T_x \times d_k}$$
+
+The decoder is going to take these encoder outputs and compute it's own $K, V$ for the decoding side
+
+$$K = H_{\text{enc}} W_K$$
+$$V = H_{\text{enc}} W_V$$$
+
+Therefore, both $H, V \in \real^{T_x \times d_k}$
+
+The queries come from the decoder
+$$Q = H_{\text{dec}} W_Q$$$
+
+Therefore, both $Q \in \real^{T_y \times d_k}$, not $T_x$
+
+So inside of the masked self attention layer, all 3 values come from the decoder and relate to a self-attention during inference, and masking during training
+- $Q_{\text{dec}} \in \real^{T_y \times d_k}$
+- $K_{\text{dec}} \in \real^{T_y \times d_k}$
+- $V_{\text{dec}} \in \real^{T_y \times d_k}$
+
+Inside cross-attention layer queries come from decoder, and keys, values from encoder hidden states
+- $Q_{\text{cross}} \in \real^{T_y \times d_k}$
+- $K_{\text{enc}} \in \real^{T_x \times d_k}$
+- $V_{\text{enc}} \in \real^{T_x \times d_k}$
+
+We need to multiply $Q_{\text{cross}} \cdot K_{\text{enc}}^{T}$ to get to our cross encoder-decoder attention 
+
+$$Q_{\text{cross}} \cdot K_{\text{enc}}^{T} == (T_y \times d_k)(d_k \times T_x) = T_y \times T_x$$
+
+For encoder "the cat sat on the mat" and decoder $T_y = 2$ "Le chat", we'd have
+
+$$Q = \left[
+\begin{matrix}
+   q_1 \\
+   q_2 \\
+\end{matrix}
+\right] \in \real^{2 \times d_k}
+$$
+
+$$K = \left[
+\begin{matrix}
+   k_1 \\
+   k_2 \\
+   k_3 \\
+   k_4 \\
+   k_5 \\
+   k_6 \\      
+\end{matrix}
+\right] \in \real^{6 \times d_k}
+$$
+
+$$QK^{T} = \left[
+\begin{matrix}
+   q_1 \cdot k_1, q_1 \cdot k_2, ...q_1 \cdot k_6 \\
+   q_2 \cdot k_1, q_2 \cdot k_2, ...q_2 \cdot k_6 \\     
+\end{matrix}
+\right] \in \real^{2 \times 6}
+$$
+
+$$A = \text{softmax}({{QK^{T}} \over \sqrt{d_k}}) \in \real^{T_y \times T_x}$$
+
+***$T_y$ and $T_x$ never have to match!***
 
 
-The decoder generates the output sequence one token at a time, using both the encoder's output and its own previous outputs. Each encoder, and specifically the last one, outputs a hidden state matrix $H \in \real^{S \times d}$ that's the size of the sequence $S$ and the projected attended to embeddings (i.e. for each input in $S$, we have a vector of size $d$). Afterwards, each decoder block will apply masked self-attention over the encoder input and the previous decoder outputs, which allows it to auto-regressively focus on it's past output words to predict the next word
+The decoder generates the output sequence one token at a time, using both the encoder's output and its own previous outputs. Each encoder, and specifically the last one, outputs a hidden state matrix $H \in \real^{T_x \times d_k}$ that's the size of the sequence $S$ and the projected attended to embeddings (i.e. for each input in $S$, we have a vector of size $d_k$). Afterwards, each decoder block will apply masked self-attention over the encoder input and the previous decoder outputs, which allows it to auto-regressively focus on it's past output words to predict the next word
 
 - Input:
    - The ***contextual embeddings*** output from the final Encoding Layer
