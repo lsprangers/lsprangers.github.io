@@ -813,20 +813,21 @@ Parameters:
 - $h$ = # of heads
 - $d_{\text{model}}$ = model embedding dimension
 - $d_k$ = $d_{\text{model}} \over h$
+- $W_K, W_V \in \real^{d_{\text{model}} \times d_k}$
 
 Both $T_x$ and $T_y$ can vary, and are usually not equal - specifically, $T_y$ will grow with each new predicted word
 
-$$H_{\text{enc}} \in \real^{T_x \times d_k}$$
+$$H_{\text{enc}} \in \real^{T_x \times d_{\text{model}}}$$
 
 The decoder is going to take these encoder outputs and compute it's own $K, V$ for the decoding side
 
 $$K = H_{\text{enc}} W_K$$
-$$V = H_{\text{enc}} W_V$$$
+$$V = H_{\text{enc}} W_V$$
 
 Therefore, both $H, V \in \real^{T_x \times d_k}$
 
 The queries come from the decoder
-$$Q = H_{\text{dec}} W_Q$$$
+$$Q = H_{\text{dec}} W_Q$$
 
 Therefore, both $Q \in \real^{T_y \times d_k}$, not $T_x$
 
@@ -840,6 +841,7 @@ Inside cross-attention layer queries come from decoder, and keys, values from en
 - $K_{\text{enc}} \in \real^{T_x \times d_k}$
 - $V_{\text{enc}} \in \real^{T_x \times d_k}$
 
+##### Training Encoder Decoder Attention
 We need to multiply $Q_{\text{cross}} \cdot K_{\text{enc}}^{T}$ to get to our cross encoder-decoder attention 
 
 $$Q_{\text{cross}} \cdot K_{\text{enc}}^{T} == (T_y \times d_k)(d_k \times T_x) = T_y \times T_x$$
@@ -878,58 +880,38 @@ $$A = \text{softmax}({{QK^{T}} \over \sqrt{d_k}}) \in \real^{T_y \times T_x}$$
 
 ***$T_y$ and $T_x$ never have to match!***
 
+##### Inference KV Cache
+During inference we can cache the already generated $Q K^T$ values, and for each step to generate a new word, we simply need to compute the representation for the newest position. The KV cache can be used for both self attention and encoder-decoder attention
 
-The decoder generates the output sequence one token at a time, using both the encoder's output and its own previous outputs. Each encoder, and specifically the last one, outputs a hidden state matrix $H \in \real^{T_x \times d_k}$ that's the size of the sequence $S$ and the projected attended to embeddings (i.e. for each input in $S$, we have a vector of size $d_k$). Afterwards, each decoder block will apply masked self-attention over the encoder input and the previous decoder outputs, which allows it to auto-regressively focus on it's past output words to predict the next word
+$$Q_{\text{new}} \in \real^{1 \times d_k}$$
 
-- Input:
-   - The ***contextual embeddings*** output from the final Encoding Layer
-      - These K, V contextual output embeddings are passed to each Decoder block
-      - For cross-attention, the decoder applies it's own learned $W_K, W_V$ to that encoder output
-      - ***Keys and Values are re-projected in each decoder layer***
-   - The previous Decoder block(s) output (previously generated word)
-- Each decoder block consists of:
-   - Masked Self Attention Layer:
-      - Allows each token in the output sequence to attend to previously generated tokens in the sequence (auto-regressive behavior)
-      - Future tokens are masked to prevent the model from "cheating" by looking ahead
-      - So self-attention only happens from words on the left, not all Keys
-      - Query: Current token's embedding
-         - For the first layer this is the embedding $E x_i$ from our actual input 
-         - For deeper decoder layers, this is from the decoders previous output
-      - Key and Values: All already generated words to the left
-      - Similar to self-attention except you ignore all to the right
-   - Encoder-Decoder Attention Layer:
-      - Attends to the encoder's output (contextual embeddings) to incorporate information from the input sequence
-      - Query: Comes from the decoder's self-attention output
-      - i.e. it's the decoder's current representation of a token after masked self-attention
-      - Key and Values: Encoder's output for each input token
-   - Feed Forward Layer:
-      - Applies a fully connected feed-forward network to each token independently
-- Architecture:
-    - Composed of multiple identical blocks (e.g., 6 blocks by default).
-    - Each block contains:
-        - Self Attention Layer: Captures relationships within the output sequence
-        - Encoder-Decoder Attention Layer: Incorporates information from the encoder's output
-        - Feed Forward Layer: Processes each token independently
-- Example:
-   - Input sentence has 5 words in total
-      - Remember, the encoder put out 5 total vectors, one for each input word
-   - Let's walk through the third word in the decoder output, meaning the first two have already been generated
-   - Decoder Self Attention
-      - Input: The embeddings for the first, second, and third generated tokens so far
-         - The query is the input embedding (same one fed to encoder) for the 3rd word
-         - K,V are the input embedding (same one fed to encoder) for the 1st and 2nd words so far
-      - Masking: The self-attention is masked so the third position can only "see" the first, second, and third tokens (not future tokens)
-      - What happens: The third token attends to itself and all previous tokens (but not future ones), using their embeddings as keys and values
-   - Encoder Decoder Cross Attention
-      - Input: The output of the decoder’s self-attention for the third token (now a context-aware vector), and the encoder’s output for all input tokens
-      - Q, K, V:
-         - The query is the third word's attended to vector (after self-attention and residual/LayerNorm in decoder)
-         - The keys and values are the encoder’s output vectors for each input token (these are fixed for the whole output sequence)
-      - What happens The third token’s representation attends to all positions in the input sequence, using the encoder’s outputs as keys and values  
-3. Final Decoder Output:
-   - The final decoder layer produces a vector of floats for each token, which is passed through:
-     - A linear layer to expand the vector to the vocabulary size
-     - A softmax layer to produce a probability distribution over the vocabulary for the next token
+Then for each new word, we just compare it to all of the encoders hidden states:
+$$(1 \times d_k)(d_k \times T_x) = 1 \times T_x$$
+
+The previous K, V from the decoder are stored in the ***KV Cache***, which is a topic of much optimizations and memory constraints. At any timestamp $t$ in the decoder:
+$$Q_t = h_t W_Q$$
+$$K = [K_1, K_2, ..., K_t]$$
+$$V = [V_1, V_2, ..., V_t]$$
+
+Then, we only need to compute the attention for the new token via
+$$Q_t K^T$$
+
+The decoder generates the output sequence one token at a time, using both the encoder's output and its own previous outputs. Each encoder, and specifically the last one, outputs a hidden state matrix $H \in \real^{T_x \times d_k}$ that's the size of the sequence $S$ and the projected attended to embeddings (i.e. for each input in $S$, we have a vector of size $d_k$). Afterwards, each decoder block will apply some form of attention, different for training and inference, over the encoder input and the previous decoder outputs, which allows it to auto-regressively focus on it's past output words to predict the next word
+
+##### Decoder Step By Step
+Inputs:
+- During **training**, this is the entire shifted target sequence, and we use masked self attention
+   - i.e. it's the full $T_y$ that we know exists, but the latter half is masked out for each predicted word 
+   - During training, we also utilize $Q, K, V \in \real^{T_y \times d_k}$ - none of these come from the encoder, they're all from the decoder
+      - Every decoder token has it's own query, the causal mask simply prevents rows $i$ from attending to columns $j > i$
+- During **inference** the sequence generated up to the current point $i$
+   - The KV Cache stores all historic decoder queries / output words and their corresponding similarity
+   - The new query is compared to all encoder hidden states
+- The **contextual embeddings** output from the final encoding Layer, $K, V \in \real^{T_x \times d_k}$
+   - These K, V contextual output embeddings are passed to each decoder block
+   - For cross-attention, the decoder applies it's own learned $W_K, W_V$ to that encoder output
+
+Regardless of training or inference, the input to self / masked self attention is the embedding from the target sequence. We still utilize $E \in \real^{V \times d}$ as our embedding lookup for the target sequence
 
 ##### Decoder Complexity
 The decoder is more complicated than the encoder!
