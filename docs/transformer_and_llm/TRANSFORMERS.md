@@ -10,7 +10,9 @@ show_back_link: true
 ## Attention
 [Seq2Seq Models](/docs/transformer_and_llm/SEQ2SEQ.md) with encoder-decoder architectures looked to encode the entire context into a singular vector $c_t$ that got passed to each decoder step, which led to bottlenecks, inefficiencies, etc
 
-Attention, as an embedding concept, is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
+**Attention**, as an embedding concept, is what separates static embeddings from dynamic embeddings - they allow word embeddings to be updated, aka attended to, by the contextual words surrounding them
+
+Along with attention, [resnets](/docs/transformer_and_llm/CNN.md#resnets) helped with degredation of larger networks, [layer norm](/docs/training_and_learning/LAYER_NORM.md) helped with vanishing gradients, and "web scale" unsupervised learning with tasks like language modeling and next token prediction, ultimately all came together to create **Transformers** - Transformers themselves are just the architecture utilizing residual layers, layer norms, and self, cross encoder-decoder, and multi-head attention blocks, but the unsupervised tasks, parallel matrix computation, and web scale data to choose from all led to the creation of a more robust NLP world
 
 Transformers as an architecture helped to make attention a parallelizable function, ultimately allowing for context to spread in a way that no longer bottlenecked infromation into a context vector, and allowed for large scale SIMD type of parallel processing
 
@@ -392,7 +394,7 @@ The rest of the discussion is around Attention blocks in Transformer Architectur
 
 ### Transformer Extra Parameters
 - Input $x_i \in \real^d$
-- $S$ is input sequence, same meaning as $\bold{X} = (x_1, x_2, ... x_{T_x}$
+- $S$ is input sequence, same meaning as $\bold{X} = (x_1, x_2, ... x_{T_x})$
 - $d_{\text{model}} == d$ is essentially the dimension across the entire architecture, and covers all 3 of the dimensions from above. $d$ replaces the 3 below
    - $d_e$ = token embedding size
    - $d_h$ = hidden state dimension
@@ -708,6 +710,8 @@ Similar to [ResNets](/docs/transformer_and_llm/CNN.md#resnets) skip layers help 
 
 ![Self Attention Encoding](/img/summary_self_attention_encoding.png)
 
+So in the above, if the self attention block isn't adding much value, it will mostly end up setting $W_{Q, K, V} == 0$ so that effectively only $X$ (the input in the example) comes through and is layer normalized. The same is true for each subsequent head
+
 #### Summary of Self Attention Encoding
 
 1. **Input Embedings**:
@@ -719,16 +723,18 @@ Similar to [ResNets](/docs/transformer_and_llm/CNN.md#resnets) skip layers help 
 
 3. **Self Attention**:
    3.1 **Input Transformation**:
-      - Positionally encoded embeddings are transformed into $ Q, K, V $ using learned weight matrices.
+      - Positionally encoded embeddings are transformed into $ Q, K, V $ using learned weight matrices
 
    3.2 **Self Attention Calculation**:
-      - Compute attention scores using dot products of $ Q $ and $ K $, scale them, and apply softmax.
+      - Compute attention scores using dot products of $ Q $ and $ K $, scale them, and apply softmax
 
    3.3 **Weighted Sum**:
-      - Use the attention weights to compute a weighted sum of $ V $, and add that onto the input word, producing the output.
+      - Use the attention weights to compute a weighted sum of $ V $, and add that onto the input word, producing the output
 
    3.4 **Residual + Normalization**:
-      - [LayerNorm](/docs/training_and_learning/LAYER_NORM.md#layer-normalization) add together input and self-attended to matrices
+      - [LayerNorm](/docs/training_and_learning/LAYER_NORM.md#layer-normalization) helps to ensure stable gradients
+      - [ResNets](/docs/transformer_and_llm/CNN.md#resnets) help to ensure no degredation with added heads (and help with stable gradients)
+      - These are then the input to the next layer
 
    3.5 **Feed Forward Layer**:
       - Each position’s output from the self-attention layer is passed through a fully connected feed-forward neural network (the same network is applied independently to each position)
@@ -763,9 +769,15 @@ Masked Self Attention **is only used in training** to ensure that models don't c
  
 ### Encoder-Decoder Attention
 
-Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., translation, summarization) to transform an input sequence into an output sequence. It combines **Self Attention** within the encoder and decoder blocks each, and then **cross-attention** between the encoder and decoder
+Encoder-Decoder Attention is a mechanism used in **Seq2Seq tasks** (e.g., translation, summarization) to transform an input sequence into an output sequence. It is downstream from the self attention layers in the decoder and is referred to as **cross-attention** between the encoder and decoder
 
 ![Encoder To Decoder Summary](/img/encoder_to_decoder.png)
+
+The encoder is just a set of hidden states $h_{1, ..., T_x} \in \real^d$ - these are not the exact embeddings of the input words, and ideally they hold useful information about the input sequence. In "El gato feliz" the cat portion is the second word, and in english version "the happy cat" it's the third word. Ideally in the encoder-decoder cross-attention, when comparing the output of the previously generated words to the hidden states of the decoder, the network comes to the conclusion that feliz needs to be attended to the most instead of cat
+
+![Adjective Positions](/img/adjective_positions.png)
+
+As we can see above, this does tend to actually happen!
 
 #### Encoder
 
@@ -822,6 +834,7 @@ $$H_{\text{enc}} \in \real^{T_x \times d_{\text{model}}}$$
 The decoder is going to take these encoder outputs and compute it's own $K, V$ for the decoding side
 
 $$K = H_{\text{enc}} W_K$$
+
 $$V = H_{\text{enc}} W_V$$
 
 Therefore, both $H, V \in \real^{T_x \times d_k}$
@@ -831,15 +844,15 @@ $$Q = H_{\text{dec}} W_Q$$
 
 Therefore, both $Q \in \real^{T_y \times d_k}$, not $T_x$
 
-So inside of the masked self attention layer, all 3 values come from the decoder and relate to a self-attention during inference, and masking during training
+So inside of the masked self attention layer, all 3 values come from the decoder and relate to a self-attention during inference, and masking **during training**
 - $Q_{\text{dec}} \in \real^{T_y \times d_k}$
 - $K_{\text{dec}} \in \real^{T_y \times d_k}$
 - $V_{\text{dec}} \in \real^{T_y \times d_k}$
 
-Inside cross-attention layer queries come from decoder, and keys, values from encoder hidden states
-- $Q_{\text{cross}} \in \real^{T_y \times d_k}$
-- $K_{\text{enc}} \in \real^{T_x \times d_k}$
-- $V_{\text{enc}} \in \real^{T_x \times d_k}$
+Inside cross-attention layer, **in training or inference** queries come from decoder, and keys, values from encoder hidden states
+- $Q_{\text{cross}} \in \real^{T_y \times d_k}$ - decoder side queries
+- $K_{\text{enc}} \in \real^{T_x \times d_k}$ - encoder side
+- $V_{\text{enc}} \in \real^{T_x \times d_k}$ - encoder side
 
 ##### Training Encoder Decoder Attention
 We need to multiply $Q_{\text{cross}} \cdot K_{\text{enc}}^{T}$ to get to our cross encoder-decoder attention 
@@ -856,7 +869,8 @@ $$Q = \left[
 \right] \in \real^{2 \times d_k}
 $$
 
-$$K = \left[
+$$
+K = \left[
 \begin{matrix}
    k_1 \\
    k_2 \\
@@ -868,7 +882,8 @@ $$K = \left[
 \right] \in \real^{6 \times d_k}
 $$
 
-$$QK^{T} = \left[
+$$
+QK^{T} = \left[
 \begin{matrix}
    q_1 \cdot k_1, q_1 \cdot k_2, ...q_1 \cdot k_6 \\
    q_2 \cdot k_1, q_2 \cdot k_2, ...q_2 \cdot k_6 \\     
@@ -1026,19 +1041,10 @@ TODO:
 ## Vision Transformers (ViT)
 In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training
 
-All changes are relatively minor:
-- ***Input***:
-   - *Text*: Input is a sequence of tokens
-   - *Vision*: Input is an image split into fixed size patches `16x16` 
-      - Each patch gets flattened and linearly projected to form a "patch embedding" similar to static word embeddings
-      - `[CLS]` token used for classification tasks
-- ***Positional Encoding***:
-   - *Text*: Added to token embeddings to encode word order
-   - *Vision*: Added to patch embeddings to encode spatial information of each patch in the image
-- ***Objective***:
-   - *Text*: Predict the next word (causal), fill in the blank, or generate a sequence (translation / summarization)
-   - *Vision*: Usually image classification, or can also be segmentation, detection, or masked patch prediction (fill in the blank) 
-- ***Architecture***: Basically the same without any major overhauls
-- ***Self Supervision***:
-   - *Text*: Fill in the blank, next sentence prediction
-   - *Vision*: Fill in the blank (patch), or pixel reconstruction which aims to recreate the original image from corrupted or downsampled versions
+[The arxiv paper an image is worth 16x16 words](/static/arxiv_papers/ViT.pdf) talks about how Vision Transformers are ultimately created. Compared to [CNN's](/docs/transformer_and_llm/CNN.md) which do pooling, convolutions, etc over images, vision transformers take a more holistic approach. Vision transformers still do strided / padded bounding boxes over the original input, but most of the time it's a $2 \times 2$ box called a segment, and each of these segments is distinct, meaning portions of them don't overlap. Each of these segments is sent through a linear projection to create a local embedding of that area of the image, and each of those in turn are fed in similar to a sequence of words
+
+![ViT](/img/vit_example.png)
+
+Each of the 9 segments above has a unique portion of the input, each is projected and given a positional encoding added to it, and then it's basically sent through the exact same [transformer encoder with self attention](#self-attention) that an NLP encoder does. The final hidden states are, as usual, useless, and so ViT paper used a simple MLP [cross entropy](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) classification head on top to get some sort of loss during training
+
+While most transformers benefit from "web scale" datasets with unsupervised learning, there wasn't anything at that time for images. Pixel augmentation and re-prediction (masked pixel modeling) and other forms of self supervised learning didn't show as much promise for images, so ViT needed to use labeled datasets
