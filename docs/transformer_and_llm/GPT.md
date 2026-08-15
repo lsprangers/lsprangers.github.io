@@ -9,15 +9,15 @@ show_back_link: true
 
 ## GPT
 The GPT models are a decoder only (no cross encoder-decoder attention, no encoder hidden states) [transformers](/docs/transformer_and_llm/TRANSFORMERS.md). Their use in language modeling was created from the same overall desires of [BERT](/docs/transformer_and_llm/BERT.md) and Transformers, where we want to use "web scale" data in an unsupervised fashion to gain an edge over supervised tasks that require curated datasets
-- [GPT 1 - Improving Language Understanding by Generative Pre-Training](/static/arxiv_papers/GPT1.pdf) introduced the idea of *generative pre-training* followed by *discriminative fine-tuning* on web scale data. Unsupervised pre-training is used for general language modeling, similar to the pre-training desires in BERT, however only a decoder is used. Afterwards, the model is then saved and utilized for supervised fine tuning tasks, and those tasks need to be altered to fit into the pre-training generative architecture
-- [GPT 2 - Language Models are Unsupervised Multitask Learners](/static/arxiv_papers/GPT2.pdf) is mostly a larger extension of GPT 1, and furthers the idea of unsupervised learning taking over. It does this by essentially throwing out the downstream supervised fine tuning, and hypothesizing "all downstream fine tuning tasks can be modeled as next token generative output". In doing so, **zero-shot** prompting emerges where we give the model some example in the prompt for it to output the correct sequence
+- [GPT 1 - Improving Language Understanding by Generative Pre-Training](/arxiv_papers/GPT1.pdf) introduced the idea of *generative pre-training* followed by *discriminative fine-tuning* on web scale data. Unsupervised pre-training is used for general language modeling, similar to the pre-training desires in BERT, however only a decoder is used. Afterwards, the model is then saved and utilized for supervised fine tuning tasks, and those tasks need to be altered to fit into the pre-training generative architecture
+- [GPT 2 - Language Models are Unsupervised Multitask Learners](/arxiv_papers/GPT2.pdf) is mostly a larger extension of GPT 1, and furthers the idea of unsupervised learning taking over. It does this by essentially throwing out the downstream supervised fine tuning, and hypothesizing "all downstream fine tuning tasks can be modeled as next token generative output". In doing so, **zero-shot** prompting emerges where we give the model some example in the prompt for it to output the correct sequence
     - "zero-shot task performance emerged from simply conditioning the language model with text, reducing the need for task-specific fine-tuning"
     - Classification is simply "generate a single word text description of the input"
     - Named Entity Recognition is simply "generate a CSV list of named entities in the input"
 - [GPT 3]
 
 These families introduced training and alignment objectives to further the zero-shot abilities. Web scale data is great, but the actual structure of generative output needed some structure
-- [Instruct GPT](/static/arxiv_papers/IntstructGPT.pdf) 
+- [Instruct GPT](/arxiv_papers/IntstructGPT.pdf) 
 
 
 GPT models are ***dDecoder only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input. They can be used as generators to fine-tune their probability of predicting the next word conditioned on the previous words. The models are suitable for tasks similar to the training, including any type of dialogue and document summarization
