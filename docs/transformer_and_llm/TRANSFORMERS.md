@@ -685,6 +685,9 @@ Attention learns where to search for relevant information. Surely, attending to 
   </em>
 </div>
 
+
+The below is just the training portion with masked self attention:
+
 ![Freehand Transformer Arch](/img/freehand_transformer_arch.png)
 
 
@@ -780,8 +783,8 @@ The encoder is just a set of hidden states $h_{1, ..., T_x} \in \real^d$ - these
 As we can see above, this does tend to actually happen!
 
 #### Encoder
+The encoder is a set of vectors for all inputs. Therefore, it's a matrix of size $T_x \times d$ - there are $T_x$ words, and the output hidden states are of size $d$
 
-**Encoder**:
 - The Encoder Portion is completely described in [Summary of Self Attention Encoding](#summary-of-self-attention-encoding)
 - TLDR;
    - The encoder processes the input sequence and generates a sequence of **hidden states** that represent the context of the input
@@ -844,6 +847,7 @@ $$Q = H_{\text{dec}} W_Q$$
 
 Therefore, both $Q \in \real^{T_y \times d_k}$, not $T_x$
 
+##### Decoder Queries in Training Vs Inference
 So inside of the masked self attention layer, all 3 values come from the decoder and relate to a self-attention during inference, and masking **during training**
 - $Q_{\text{dec}} \in \real^{T_y \times d_k}$
 - $K_{\text{dec}} \in \real^{T_y \times d_k}$
@@ -896,7 +900,7 @@ $$A = \text{softmax}({{QK^{T}} \over \sqrt{d_k}}) \in \real^{T_y \times T_x}$$
 ***$T_y$ and $T_x$ never have to match!***
 
 ##### Inference KV Cache
-During inference we can cache the already generated $Q K^T$ values, and for each step to generate a new word, we simply need to compute the representation for the newest position. The KV cache can be used for both self attention and encoder-decoder attention
+During inference we can cache the already generated $Q K^T$ values, and for each step to generate a new word, we simply need to compute the representation for the newest position. ***The KV cache can be used for both self attention and encoder-decoder attention***
 
 $$Q_{\text{new}} \in \real^{1 \times d_k}$$
 
@@ -1039,12 +1043,39 @@ TODO:
 TODO:
 
 ## Vision Transformers (ViT)
-In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training
+In using transformers for vision, the overall architecture is largely the same - flattening structure out and using augmention for new examples and then doing self-supervised "fill in the blank" for training. Vision Transformers extract patches fromimages and feed them into a [transformer encoder](#encoder) to obtain a global representation via the $T_x \times d$ hidden states
 
-[The arxiv paper an image is worth 16x16 words](/static/arxiv_papers/ViT.pdf) talks about how Vision Transformers are ultimately created. Compared to [CNN's](/docs/transformer_and_llm/CNN.md) which do pooling, convolutions, etc over images, vision transformers take a more holistic approach. Vision transformers still do strided / padded bounding boxes over the original input, but most of the time it's a $2 \times 2$ box called a segment, and each of these segments is distinct, meaning portions of them don't overlap. Each of these segments is sent through a linear projection to create a local embedding of that area of the image, and each of those in turn are fed in similar to a sequence of words
+**Transformers show better scalability, parallelism, and include the resnet / layernorm benefits for gradient stability and degredation as compared to CNN's alone**. When trained on increasingly larger datasets, Vision Transformers outperform ResNets by a significant margin 
+
+[The arxiv paper an image is worth 16x16 words](/arxiv_papers/ViT.pdf) talks about how Vision Transformers are ultimately created. Compared to [CNN's](/docs/transformer_and_llm/CNN.md) which do pooling, convolutions, etc over images, vision transformers take a more holistic approach. Vision transformers still do strided / padded bounding boxes over the original input, but most of the time it's a $2 \times 2$ box called a segment, and each of these segments is distinct, meaning portions of them don't overlap. Each of these segments is sent through a linear projection to create a local embedding of that area of the image, and each of those in turn are fed in similar to a sequence of words
 
 ![ViT](/img/vit_example.png)
 
 Each of the 9 segments above has a unique portion of the input, each is projected and given a positional encoding added to it, and then it's basically sent through the exact same [transformer encoder with self attention](#self-attention) that an NLP encoder does. The final hidden states are, as usual, useless, and so ViT paper used a simple MLP [cross entropy](/docs/training_and_learning/LOSS_FUNCTIONS.md#cross-entropy) classification head on top to get some sort of loss during training
 
 While most transformers benefit from "web scale" datasets with unsupervised learning, there wasn't anything at that time for images. Pixel augmentation and re-prediction (masked pixel modeling) and other forms of self supervised learning didn't show as much promise for images, so ViT needed to use labeled datasets
+
+There are a few differences in the encoder for the linear units, some dropout, and other items, but ultimately it's a 1:1 similarity that comes out representing an image as a set of hidden states that can be used for downstream tasks. These hidden states show humongous promise across the board as compared to CNNs alone
+
+### Patch Embeddings
+The main part of using a vision component is to project the $S$ unique segments into embeddings that include positional aspects. The patch embedding inputs can still be describes as $T_x \times d$, but the original image will have $S$ segments of channel size $C$. The patch height and width can both be defined by some parameter $p$ to ensure it's square, and then the image is split into a sequence $m = {hw} \over {p}^2$ patches, and each patch is flattened to a vector of length $c{p}^2$
+
+The below code shows how we can do a lazy 2D CNN over the channels, and then just append them onto each other to create a flattened representation. This representation is the embedding
+```python
+class PatchEmbedding(nn.Module):
+    def __init__(self, img_size=96, patch_size=16, num_hiddens=512):
+        super().__init__()
+        def _make_tuple(x):
+            if not isinstance(x, (list, tuple)):
+                return (x, x)
+            return x
+        img_size, patch_size = _make_tuple(img_size), _make_tuple(patch_size)
+        self.num_patches = (img_size[0] // patch_size[0]) * (
+            img_size[1] // patch_size[1])
+        self.conv = nn.LazyConv2d(num_hiddens, kernel_size=patch_size,
+                                  stride=patch_size)
+
+    def forward(self, X):
+        # Output shape: (batch size, no. of patches, no. of channels)
+        return self.conv(X).flatten(2).transpose(1, 2)
+```
