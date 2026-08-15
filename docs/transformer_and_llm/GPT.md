@@ -16,10 +16,11 @@ The GPT models are a decoder only (no cross encoder-decoder attention, no encode
     - etc
 - [GPT 2 - Language Models are Unsupervised Multitask Learners](/arxiv_papers/GPT2.pdf) is mostly a larger extension of GPT 1, and furthers the idea of unsupervised learning taking over. It does this by essentially throwing out the downstream supervised fine tuning, and hypothesizing "all downstream fine tuning tasks can be modeled as next token generative output with enough data". In doing so, **zero-shot** prompting emerges where we give the model some example in the prompt for it to output the correct sequence
     - "zero-shot task performance emerged from simply conditioning the language model with text, reducing the need for task-specific fine-tuning"
-- [GPT 3]
+- [GPT 3] takes it a step further from "GPT 2 can do tasks from prompts" to "GPT 3 can learn tasks from examples in the prompt". Meaning if you give the prompt some general set of translations, GPT 3 will understand it needs to do a translation task simply from the input output pairs
+    - **In-context learning / few-shot learning** is the idea that GPT 3 can see examples of the task in the prompt and reason what it needs to do next. There's still no weight updates or anything, the prompt can just become simpler and easier to create
 
 These families introduced training and alignment objectives to further the zero-shot abilities. Web scale data is great, but the actual structure of generative output needed some structure
-- [Instruct GPT](/arxiv_papers/IntstructGPT.pdf) 
+- [Instruct GPT](/arxiv_papers/IntstructGPT.pdf) extends GPT 3. GPT 3 can infer what task it should do from prompts, but that isn't the same objective as "do what the human asks". InstructGPT starts getting into human preference modeling, reinforcement learning with human feedback (RLHF), and other alignment architectures
 
 
 GPT models are ***decoder only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input. This input (prompt, sentence, etc) still goes through GPT during inference in the same format - it runs multi-headed self attention over the inputs (which it sees as auto-regressive even though it's not) to ultimately produce an output. ***The only major difference in the supervised fine tuning tasks is the auto-regressive output may be singular!***
