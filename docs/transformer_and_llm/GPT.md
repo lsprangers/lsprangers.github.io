@@ -14,16 +14,23 @@ The GPT models are a decoder only (no cross encoder-decoder attention, no encode
     - Named Entity Recognition is simply "generate a CSV list of named entities in the input"
     - Similarity is outputting two results and comparing their similarity (this is still weird)
     - etc
-- [GPT 2 - Language Models are Unsupervised Multitask Learners](/arxiv_papers/GPT2.pdf) is mostly a larger extension of GPT 1, and furthers the idea of unsupervised learning taking over. It does this by essentially throwing out the downstream supervised fine tuning, and hypothesizing "all downstream fine tuning tasks can be modeled as next token generative output with enough data". In doing so, **zero-shot** prompting emerges where we give the model some example in the prompt for it to output the correct sequence
+- [GPT 2 - Language Models are Unsupervised Multitask Learners](/arxiv_papers/GPT2.pdf) is mostly a larger extension of GPT 1, and furthers the idea of unsupervised learning taking over. It does this by essentially throwing out the downstream supervised fine tuning, and hypothesizing "all downstream fine tuning tasks can be modeled as next token generative output with enough data". In doing so, **zero-shot** prompting emerges where we give the model an explicit task definition in the prompt for it to output the correct sequence
     - "zero-shot task performance emerged from simply conditioning the language model with text, reducing the need for task-specific fine-tuning"
-- [GPT 3] takes it a step further from "GPT 2 can do tasks from prompts" to "GPT 3 can learn tasks from examples in the prompt". Meaning if you give the prompt some general set of translations, GPT 3 will understand it needs to do a translation task simply from the input output pairs
-    - **In-context learning / few-shot learning** is the idea that GPT 3 can see examples of the task in the prompt and reason what it needs to do next. There's still no weight updates or anything, the prompt can just become simpler and easier to create
+    - Zero shot is an important caveat because ***not updating weights means it can generalize to all of these tasks via contextual prompts alone, and not gradient updates***
+- [GPT 3] takes it a step further from "GPT 2 can do tasks from prompts" to "GPT 3 can learn tasks from examples in the prompt". Meaning if you give the prompt some general set of translations, GPT 3 will understand it needs to do a translation task simply from the input output pairs. There are a few new vocabulary terms:
+    - **Few-shot** prompting is just an extension of zero and one shot, meaning you provide more than one example in the prompt
+    - **In-context learning** means that GPT 3 can infer the task *from the context* (in context) and doesn't do any weight updates (it says learning, but it specifically does not update weights)
+        - This is an important caveat because ***not updating weights means it can generalize to all of these tasks via contextual prompts alone, and not gradient updates*** (I know this is a repeat, but it's of importance)
+    - **Meta learning** is a buzz phrase saying GPT 3 can learn to learn, i.e. it has learned how to infer the task from the contextual prompt
+
+Going from GPT 1 to GPT 2 showed we can remove any fine tuning heads, and that GPT 2 itself can handle all sorts of tasks without gradient updates. Simply framing any task as a generative output sequence, and showing GPT 2 had state of the art results, proved a major breakthrough. From GPT 2 to GPT 3 there wasn't a major breakthrough except a much larger model, larger context, etc, which meant we could simply push task examples into the prompt without writing it by hand. GPT 3 can infer what it needs to do from examples, which means it is much easier to automate as a system versus a human writing things out by hand
+
+It should be clear that GPT models generate text. They typically aren't a great replacement for encoder only models, like [BERT](/docs/transformer_and_llm/BERT.md), for other NLP tasks such as classification, document retrieval, similarity, etc. These NLP tasks utilizing an encoder only model + fine tuned head are much cheaper, more accurate, deterministic, etc compared to decoder models, but the GPT models did show that broad Seq2Seq tasks can be handled exceptionally well by generative language modeling alone. Altogether, the GPT models allow for a humongous range of NLP tasks to be done by a singular interface; They are a one size fits all solution, ***but they are not the most efficient solution for everything***
 
 These families introduced training and alignment objectives to further the zero-shot abilities. Web scale data is great, but the actual structure of generative output needed some structure
-- [Instruct GPT](/arxiv_papers/IntstructGPT.pdf) extends GPT 3. GPT 3 can infer what task it should do from prompts, but that isn't the same objective as "do what the human asks". InstructGPT starts getting into human preference modeling, reinforcement learning with human feedback (RLHF), and other alignment architectures
-
-
-GPT models are ***decoder only***, meaning they immediately start to output text in an auto-regressive fashion after receiving input. This input (prompt, sentence, etc) still goes through GPT during inference in the same format - it runs multi-headed self attention over the inputs (which it sees as auto-regressive even though it's not) to ultimately produce an output. ***The only major difference in the supervised fine tuning tasks is the auto-regressive output may be singular!***
+- [Instruct GPT](/arxiv_papers/IntstructGPT.pdf) extends GPT 3. GPT 3 can infer what task it should do from prompts, but that isn't the same objective as "do what the human asks". InstructGPT starts getting into human preference, reinforcement learning with human feedback (RLHF), and other alignment architectures
+    - GPT 3 can infer from the prompt what task needs to be done, but GPT 3 was more focused on plausible continuations (i.e. task pattern and continuation), which may be inherently different from structuring it to what a human needs
+    - InstructGPT helps to make it reliably do what humans ask it in the prompt
 
 ![GPT, BERT, and Others](/img/gpt_bert_others.png)
 
@@ -80,7 +87,9 @@ This is where "classification is only outputting a single word" and "named entit
 
 ***The only extra parameters we require during fine tuning are $W_y$***
 
-Some online documents mention supervised fine tuning only creates a singular classification style output, others mention is allows for generative sequence creation, and the loss $L_{2}$ is the same as $L_{1}$ over all of the predicted tokens in the sequence, but ultimately who cares. The major meat is that the unsupervised pre-training allows for many downstream tasks!
+Some online documents mention supervised fine tuning only creates a singular classification style output, others mention is allows for generative sequence creation, and the loss $L_{2}$ is the same as $L_{1}$ over all of the predicted tokens in the sequence. From the [GPT 1 Paper](/arxiv_papers/GPT1.pdf) the supervised fine tuning task was typically done for a classification / discrete size result. The $W_y$ can be shrunk to a set of $m$ classes instead of tokens, and then GPT 1 would be doing transfer learning from it's final hidden state into a classification head! Other tasks were also included in this by simply utilizing $W_y$ to ensure the final projections allowed it to utilize an appropriate loss function, and also to validate results against other models
+
+GPT 1 uses task specific input transformations to ensure any task input is turned into a sequence the transformer architecture can use, and then the output layer $W_y$ is used to take the output from the decoder only transformer and project it into an appropriate output
 
 #### Task Specific Transformations
 Modeling the tasks to just be sequence outputs required some tweaking, but it's very easy to see. Hell, even regression can be considered an output if it just produced a string representing "12.4"!
