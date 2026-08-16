@@ -10,9 +10,27 @@ show_back_link: true
 ## BERT
 BERT (Bidirectional Encoder Representations from Transformers) goes a step beyond [Word2Vec](/docs/transformer_and_llm/EMBEDDINGS.md#word2vec) as it is an all around ***language representation model*** that can provide contextual word and sentence embeddings for specific supervised tasks
 
-BERT is technically an ***Encoder Only Model*** even though it has a decoder stack, the Attention is All You Need Paper references Encoder-Decoder, which BART is, but BERT is Encoder only
+BERT is technically an ***encoder only model***. [The Attention is All You Need Paper references Encoder-Decoder](/arxiv_papers/BERT%20MarkedUp.pdf), which BART is, but BERT is encoder only
 
-***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for BERT! Encoder only helps us with transfer learning for a variety of contextual embedding use cases
+While [BERT is the second most downloaded model on HuggingFace](https://huggingface.co/blog/modernbert#introduction), there is a newer, more "modern" version with more comparable sizes to the [GPT](/docs/transformer_and_llm/GPT.md) models called [ModernBERT](https://huggingface.co/blog/modernbert), which reach a pareto style improvement to original BERT models, similarily to how GPT models keep exponentially improving. A great quote from the introduction showcases the differences between these two, specifically how BERT style models can be locally deployed, maintained, optimized, etc for extremely fast retrieval compared to ferrari style GPT's (that don't have strictly deterministic output):
+
+<div style={{
+  margin: "2em auto",
+  maxWidth: 600,
+  background: "#f5f7fa",
+  borderLeft: "4px solid #4f8cff",
+  padding: "1.5em 2em",
+  borderRadius: 8,
+  textAlign: "left"
+}}>
+  <em>
+Basically, a frontier model like OpenAI's O1 is like a Ferrari SF-23. It’s an obvious triumph of engineering, designed to win races, and that’s why we talk about it. But it takes a special pit crew just to change the tires and you can’t buy one for yourself. In contrast, a BERT model is like a Honda Civic. It’s also an engineering triumph, but more subtly, since it is engineered to be affordable, fuel-efficient, reliable, and extremely useful. And that’s why they’re absolutely everywhere.
+  </em>
+</div>
+
+![ModernBERT](/img/modern_bert_pareto.png)
+
+***Use Case***: Original Encoder-Decoder Transformers were great for *machine translation*, but that isn't the use case for BERT! Encoder only helps us with transfer learning for a variety of contextual embedding use cases like retrieval, document comparison / similarity, and classification
 
 BERT can be seen as stacked encoders, T5 aims to combine the good parts of encoders and decoders, while GPT are stacked decoders
 
@@ -20,19 +38,19 @@ BERT can be seen as stacked encoders, T5 aims to combine the good parts of encod
 
 ![BERT vs GPT](/img/bert_vs_gpt.png)
 
-Therefore, if you look into [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) markdown, BERT would only use the [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
+Therefore, if you look into [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention), BERT would only use the [Self Attention](/docs/transformer_and_llm/TRANSFORMERS.md#self-attention) encoding over multiple stacked encoders, ultimately resulting in an attended to set of hidden states outputs
 
 BERT doesn't generate text, but it produces token embeddings that are great for Classification, Sentence Similarity, Sentiment Analysis, and NER / Token Level Tasks
 
 ***Contextual Word and Sentence Embeddings*** is a loaded phrase, but it basically means it can help encode any structure of text, for any vocabulary, and it does this through word tokenization and [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) respectively
 
-***Transfer Learning*** is the idea that the semi-supervised training of of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers tacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
+***Transfer Learning*** is the idea that the self supervised training of a BERT model is just for creating weights and parameters, and that the ideal output of this phase is just the BERT model with said weights and parameters. Once this is done the model itself can have extra layers stacked onto it / updated and be used in a wide range of downstream tasks like sentence classification, word embeddings, report summary, etc...
 
 BERT training has a similar setup to Word2Vec where you use a certain context size to help us model a specific word, but the embeddings can't necessarily be saved because the output layer (embedding) depdends on the hidden layers...therefore you need to pass a word through with context to get an embedding
 
 ***Bidirectionality*** is the big buzz word throughout this paper, and the paper mentioned OpenAI's GPT models multiple times discussing how they only have unidirectional architecture in the [Attention](/docs/transformer_and_llm/TRANSFORMERS.md#attention) layers which ultimately restricts it's abilities in some downstream tasks like sentence classification and question answering
 
-BERT itself is...useless? Meaning the model out of the box doesn't have an exact perfect use case (outside of word / sentence embeddings) and for most successful NLP projects it needs to have a final layer trained (this is false too, a lot of good sentence embedding can be done OOTB)
+BERT itself is...useless? The model itself just produces a set of hidden states. For each of the input embeddings $x \in \real^d_{\text{in}}$, where there are $T_x$ total inputs, it produces $T_y$ hidden final states where $t_y \in \real^d_{\text{out}}$
 
 There are other BERT adjacent models as well, such as Robustly Optimized BERT (RoBERTa) which uses larger batch sizes, more training input, and removes the next sentence prediction task to reduce overall size of models
 

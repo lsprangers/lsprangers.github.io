@@ -17,7 +17,8 @@ This document describes everything around transactions, isolation levels, and ho
     - Basically just means concurrent write affects a read
     - Is typically around ***a set of rows***
     - Locking a set of rows around a `where` clause is extremely expensive, so preventing phantom reads around sets of rows is difficult (full scan of DBase)
-- *Non-Repeatable Read*: Occurs when a transaction A reads a single row, and another transaction B modifies / deletes that row, then the first transaction A when re-reading the data sees new updates
+    - Phantom reads can also occur when a separate transaction inserts a row that wasn't viewed on another transaction
+- *Non-Repeatable Read*: Occurs when a transaction A reads ***a single row***, and another transaction B modifies / deletes that row, then the first transaction A when re-reading the data sees new updates
 - *Dirty Read*: Simply allows reads on data in flight of transactions or uncommitted data
 
 ### Phantom Versus Non-Repeatable
@@ -27,12 +28,12 @@ Non-Repeatble reads can be avoided by once reading a row just locking it so that
 
 ![Non-Repeatable Read](images/non_repeatable_read.png)
 
-This can be solved by locking the single rows!
+This specific problem can be solved by locking the single rows!
 ![Repeatable Read](images/repeatable_read.png)
 
-Phantom reads can still occur because the set of rows in a query can't all be locked, since this would require a full scan of the database for all of these filters!
+Phantom reads can still occur because the set of rows in a query can't all be locked, since this would require a full scan of the database for all of these filters! Furthermore, if transaction B inserts a separate row instead of trying to update `set(a, 4)`, then transaction B will succeed but there's still a phantom read. ***The only way to truly solve phanom reads is fully serializable transactions*** which will utilize snapshots of data for each transaction so there can't be any overlap
 
-***Key difference is in single versus multiple rows and locks***
+Altogether, the main difference between phantom reads and non repeatable is around a set of rows vs a singular row
 
 ### Isolation Level Spectrum
 There's a spectrum below, from strictest to least strict, in performant availability (fast response) vs consistency (write and updates are shown in reads):
