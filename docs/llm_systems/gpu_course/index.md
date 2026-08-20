@@ -15,6 +15,8 @@ GPU's are busses, and CPU's are cars! If we need to handle many small tasks with
 The choice of single thread CPU, vs multi thread CPU, vs GPU usually comes to the data size $N$
 ![Single Thread CPU vs Multi Thread CPU vs GPU](/img/single_thread_cpu_vs_multi_thread_cpu_vs_gpu.png)
 
+As long as operations are **independent of each other** we can utilize GPU's for massive parallel processing - even seemingly [complex operations mapping indexes, pooling values, and doing map-reduce style programs](/docs/llm_systems/gpu_course/code/cuda_operators.md#complex-operations) can utilize [iterators](/docs/llm_systems/gpu_course/code/cuda_operators.md#iterators) to ensure all operations are done in parallel, even if they seem to be dependent on each other. With large enough input, the GPU processing starts to drastically outperform multi-threaded CPU operations, but getting the data setup to be ran, and writing the right CUDA code is the hardest part after identifying the problem
+
 ### Vocabulary
 - **Bandwidth**: The maximum theoretical capacity of a network link
 - **Throughput**: The actual data successfully delivered over time
@@ -32,10 +34,13 @@ CUDA itself is just another compiler to take C++ code and run it on a GPU, the s
 The CUDA Runtime itself covers many areas, and inside of the CUDA Runtime there are a ton of different libraries that can be used to actually execute instructions on GPU's for data:
 - Thrust builds pre-built components of common tasks for GPU for things like vectors, copying, sort, etc, except on a GPU
     - The [thrust example](/docs/llm_systems/gpu_course/code/thrust_execution_policy_cpu_vs_gpu.md#gpu-with-thrust) shows how `transform` lambda function can go from a for loop over a vector to a GPU based SIMD instruction
-- CuDNN helps on DNN's
+- CuDNN helps on DNN's, and matrix pooling operations:
+    - ![Heat Transfer / Pooling](/img/cuda_pooling_freehand.png)
 - CuBLAS helps on linear algebra
+- `cuda:std` recreates a majority of the `std` library for CUDA, including functions like flatten, span, etc
 - etc
 
 ![CUDA Runtime](/img/cuda_runtime_libs.png)
 
-That being said, if an algorithm doesn't fit into the standard CUDA Runtime / Libraries, 
+That being said, if an algorithm doesn't fit into the standard CUDA Runtime / Libraries, how can we actually create it ourselves?
+

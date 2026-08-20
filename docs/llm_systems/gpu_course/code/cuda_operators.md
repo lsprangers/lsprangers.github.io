@@ -29,7 +29,7 @@ T operator[] (int idx) {
 }
 ```
 
-## Iterators
+# Iterators
 Iterators utilize operators to help access elements / do certain logic without having to actually place the final results anywhere. Python `yield` functions act as iterators, and they allow you to access sequential elements without storing the actual data anywhere
 
 You can initialize the below operator with `zip_iterator it{a.data, b.data()};`, and then running `it[0]` would give you back the iterator for the 0th index **without storing it in memory anywhere**
@@ -77,8 +77,15 @@ int main()
 ```
 </details>
 
-
+## Thrust Iterators
 Why is this so important? We can then use `thrust::reduce` operations with an iterator type of structure, and it will run all of the zip based iterators at the same time, and then run the transform reduction over the final iterator sequentially. *The reason it works well on a GPU is we aren't forced to store it on GPU and have it re-read it!*
+
+Thrust provides many out of the box functions to create iterators or work with them:
+- `thrust::make_transform_iterator` is a map function that runs over an input and creates an output
+- `thrust::make_zip_iterator` takes multiple inputs and iterates over them all to create an output
+- `thrust::tabulate` creates an implicit counting iterator (essentially `range()` in python) and runs an operation over it. The call is `thrust::tabulate(first, last, op)`, so we define the range and operation and it runs it for us
+- `thrust::reduce` takes an iterator, an initial value, and an operation and runs that operation over each iterator and the initial value
+  - The default operation is summation, meaning it adds each value to the initial value
 
 You can also make a identity iterator that just returns the index passed to it, and that would allow you to just run a transformation over a range of integers without actually storing the range in memory! You only store the result
 <!-- Collapsible C++ snippet -->
@@ -150,3 +157,22 @@ int main()
 }
 ```
 </details>
+
+## Complex Operations
+More complex operations like [CNN Pooling](/docs/transformer_and_llm/CNN.md#pooling-layers) and heat transfer, require more complicated indexing. That just means the iterators and transformations need some better logic during indexing - the actual blue inputs and yellow output id's can all be mapped from each other as a domain and range function. The 2D blue grid itself can just be flattened into a 1D array if required with $row \times col$ total values. Based on these values and some fancy modulos, we can find the yellow cell it maps to
+
+![Heat Transfer / Pooling](/img/cuda_pooling_freehand.png)
+
+The benefit of iterators here is that all of this can be done **without a for loop** since every operation is independent of the other
+
+Furthermore, using operations like `cuda:std:mdspan` and flatten functions can do this out of the box for us and give us iterators over the original $N$ dimensional data without actually materializing it anywhere else. You just need to supply a pointer to start of vector, and then you can access with `(,)` indexing operators
+
+```cpp
+cuda::std::array<int, 6> sd{0, 1, 2, 3, 4, 5};
+
+// 2 rows by 3 columns
+cuda::std::mdspan md(sd.data(), 2, 3);
+
+md(0, 0); // 0
+md(1, 2); // returns row 1 col 2 == 5
+```
