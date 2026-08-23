@@ -218,3 +218,38 @@ GPU and CPU memory use a single unified virtual memory space, which means the vi
 There are CUDA API's to move data between each of these virtual memory spaces, which essentially allows for transferring data between CPU(s) and GPU(s) 
 
 Beyond shared memory, each GPU has it's own local on-chip memory, and each streaming multiprocessor has it's own register file and shared memory. The **register file on a streaming multiprocessor** stores thread local variables, typically allocated by the compiler, and the **shared memory is accessible by all threads** within a thread block or cluster (since a thread block is tied to a specific streaming multiprocessor)
+
+## Asynchrony and CUDA Streams
+Writing parallel algorithms isn't a sufficient condition to writing performant CUDA applications. Apart of a performant application involves data transfer, parallelization, memory usage, and **asynchrony**. Asynchrony was enough of a pain point that apparently an entire section was dedicated to it!
+
+![Asynchrony Overlap](/img/asynchrony_overlap.png)
+
+**Asynchrony** let's us overlap computation with I/O, and helps us to solve problems similar to below where the CPU / GPU would be idle while the other does work:
+![GPU Bad Async](/img/gpu_bad_async.png)
+
+While the GPU is busy, the CPU can do many things! Most of them deal with I/O, which can specifically be from the GPU as well. In the heat transfer example, while the GPU is running simulation $t + 1$, the CPU can copy data from `dprev` device vector which holds the computation results from time $t$
+
+There's a standard CUDA library called `cub` (CUDA unBound) which helps to handle asynchronous computations, and CUB commands can launch work on the GPU and immediately return control to the CPU for it to continue handling I/O and OS level work. CUB is CUDA specific, and doesn't allow for any host side implementations specifically, but it can still be used to synchronize threads on the host CPU as the device GPU runs computations
+
+`cudaDeviceSynchronize` can ensure the CPU waits for the GPU work to complete on a specific thread. CUB and Thrust have similar throughput and timing metrics, but the entire time the GPU is running on Thrust the CPU sits idle, whereas with CUB the CPU can be performing actual work
+
+![GPU Tabulate vs CUB](/img/thrust_vs_cub.png)
+
+```cpp
+// thrust
+auto begin = std::chrono::high_Resolution_click::now();
+thrust::tabulate(thrust::device, out.begin(), out.end(), compute);
+auto end = std::chrono::high_Resolution_click::now();
+
+//cub
+auto begin = std::chrono::high_Resolution_click::now();
+auto cell_ids = thrust::make_counting_iterator(0);
+cub::DeviceTransform:Transform(cell_ids, out.begin(), out.end(), compute);
+cudaDeviceSynchronize(); // ---> without this, CUB looks like it runs 100x faster, but realistically it's just control back to CPU
+auto end = std::chrono::high_Resolution_click::now();
+```
+
+### Profiling CUDA Applications
+To profile how the GPU, CPU, and overall application is doing with saturation, timings, etc NVIDIA provides a tool called **Nsight Systems** - this is the most useful tool for developing and debugging applications locally, and it also provides exports for OTEL tools for live applications
+
+It can help show when GPU computations are launched, when data is transferred between host and device, and when each write to different portions of memory. Interpreting these reports is incredibly hard, and **NVTX** allows you to create custom ranges inside of an application, similar to debugging stop points, that help to break down the actual NSight reports
