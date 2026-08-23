@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: GPU Notes + Courses
+title: CUDA Notes + Courses
 category: GPU Notes + Courses
 difficulty: Advanced
 description: Structured dump of GPU notes
@@ -33,6 +33,8 @@ The host code that runs on the CPU can use CUDA APIs to copy data between the ho
 
 For historic reasons the code an application executes on the GPU is called **device code**, and a function that's invoked for execution on the GPU is called a **kernel / kernel function**. The act of starting up a function to run is **launching a kernel**, which is basically just starting many threads that all execute the kernel code in parallel on the GPU
 
+CUDA Threads are the basic unit of parallelism, each thread maintains its own state and control flow
+
 The programming model of how kernel functions are actually distributed reaches into streaming processors, threads, thread blocks, grids, etc. These are all logical /physical units of separation that allow for data operations to run in parallel, with some shared state, and actual distribution of scheduling and execution of code on an unspecified size GPU
 
 ![GPU Programming Hierarchy](/img/gpu_programming_hierarchy.png)
@@ -47,6 +49,8 @@ The distribution of threads to cores should mostly be done declaratively, by let
 
 ### CUDA C++ & Python
 CUDA C++ has a huge ecosystem of libraries for utilizing GPU without writing kernel or GPU code directly. In fact, it's most likely better for developers to utilize abstracted APIs that sit on to of typical CUDA libraries like BLAS, CUDADNN, etc; Ensuring the input data, connections between these libraries, and configurations are setup appropriately will reap a higher GPU utilization as compared to writing new kernel code
+
+![CUDA Libraries](/img/cuda_common_libraries.png)
 
 In the modern era of CUDA, it is almost always advisable to use GPU-accelerated libraries if they provide the necessary expressiveness for your needs. Many of these libraries provide implementations tuned by GPU computing experts. When libraries are not available or sufficient, writing GPU kernels and device functions directly is available in Python as in C++
 
@@ -112,6 +116,74 @@ If an array of size $(M, N)$ is created, and there's a desire to move this to a 
 ![Tile and Array](/img/gpu_tile_and_array.png)
 
 Many out of the box linear algebra, transforms, etc exist for tile based programming, especially in BLAS and CUDADNN modules
+
+### Writing SIMT Kernels
+CUDA Threads are the basic unit of parallelism, each thread maintains its own state and control flow
+
+Threads are organized into thread blocks which are organized into grids. Grids and thread blocks can be 1, 2, or 3 dimensional
+
+Threads inside of a thread block can cooperate and access the same memory addressees, especially in shared memory. During this time, synchronization is required to avoid race conditions and memory hazards, and the most basic form of synchronization within a block is called **syncthreads**
+
+![GPU Memory Type and Scope](/img/gpu_memory_type_and_scope.png)
+
+#### Thread Memory Management
+- **Global memory (device memory)** is primary memory space that's **accessible by all threads in a kernel**
+    - Global memory persists util it's released, or the application is terminated
+    - The CPU can access this via `cudaMemcpy`, and GPU global memory can be written back to the CPU after GPU kernel functions are completed
+    - During kernel execution, data from global memory can be read by CUDA threads, and the result from operations carried out by CUDA threads can be written back to global memory
+- **Shared memory** is a memory space that is **accessible by all threads in a thread block**. It's physically located on each streaming multiprocessor and it uses the same phyiscal resource as L1 cache
+    - Each thread block is tied to a specific streaming multiprocessor, but each streaming multiprocessor may have multiple thread blocks allocated to it
+    - Data in shared memory persists thoughout the kernel execution, and is condsidered a user-managed scratchpad for use during kernel execution
+    - Since shared memory is placed on the streaming multiprocessor itself, the bandwidth is higher and latency is lower compared to global memory, but the total storage size is significantly lower
+    - Data is accessible by all threads in the thread block, so `__syncthreads()` function is needed to avoid race conditions. The `__syncthreads()` will block all threads in the thread block until all threads have reached the call to `__syncthreads()`
+        - In total, it ensures all threads meet at the same end point, and afterwards data can be moved between threads and continued
+        - It can be created statically or dynamically
+    - Shared memory can be created via `__shared__` decorator
+    - ```cpp
+        // assuming blockDim.x is 128
+        __global__ void example_syncthreads(int* input_data, int* output_data) 
+        {
+            __shared__ int shared_data[128];
+            shared_data[threadIdx.x] = input_data[blockDim.x*blockIdx.x + threadIdx.x];
+
+            // All threads synchronize, guaranteeing all writes to 'shared_data' are ordered 
+            // before any thread is unblocked from '__syncthreads()':
+            __syncthreads();
+
+            // A single thread safely reads 'shared_data':
+            if (threadIdx.x == 0) {
+                float sum = 0;
+                for (int i = 0; i < blockDim.x; ++i) {
+                    sum += shared_data[i];
+                }
+                output_data[blockIdx.x] = sum;
+            }
+        }
+        ```
+- **Registers** are located on the streaming multiprocessor, and **have local thread scope**
+    - They are used for thread local storage during the execution of a kernel
+    - Developers can configure the maximum number of registers to be used by a kernel, which can help alleviate memory pressure or lead to spill
+        - *Register spill* occurs when values currently stored on-chip must be written out to global memory and read back later to make space
+- **Local memory** is also **thread local storage**, but the physical location of local memory is in the global memory space
+    - It is logical in scope, not physical
+    - It's also used during threads during kernel execution
+    - Compiler will automatically place in local memory are:
+        - Large arrays
+        - Large data structures in general that would overconsume register space
+        - Any variable if the kernel uses the more registers than available (register spill)
+- **Constant space** is **scoped to the grid**, and it resides on the device and is read only to the kernel. Being constant means:
+    - Resides in constant memory
+    - Has a distinct object per device
+    - Is accessible from all threads within the grid, and from within the host in C++
+    - Constant memory is useful for small amounts of data that each thread will use in a read-only fashion
+- **Caches** have multiple uses
+    - **L2 cache** is located on device, and shared among all streaming multiprocessors
+    - **L1 cache** is phyiscally located on each streaming multiprocessor, and is the same physical space as shared memory
+- **Distributed shared memory** provide the ability for threads in a thread block to access shared memory of all the participating thread blocks in that cluster
+    - Threads in the thread block cluster can read, write, or perform atomics in the distributed address space, regardless of whether the address belongs to the local thread block or the remote thread block
+    - Using this requires a number of synchronization tasks to be completed, and can significantly slow down a parallel program, but sometimes this communication is needed
+
+
 
 ### CUDA Compiler
 CUDA itself is just another compiler to take C++ code and run it on a GPU, the same way `g++` and `aarch` are used to compile C++ onto x86 and ARM processors, `nvcc` is the CUDA compiler to transform C++ code into GPU instruction sets

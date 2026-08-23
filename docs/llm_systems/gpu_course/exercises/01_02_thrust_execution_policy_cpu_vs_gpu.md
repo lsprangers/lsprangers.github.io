@@ -1,11 +1,12 @@
 ---
 layout: technical
-title: CUDA GPU Execution Policies
-category: GPU Notes + Courses
+title: 1.01 - Execution Policies
+category: CUDA Course Exercises
 difficulty: Advanced
 description: Structured dump of GPU notes
 show_back_link: true
 ---
+
 
 # Execution Policies
 Execution policies are `std::` variables that help to define whether CUDA runtime libraries run on CPU or GPU!

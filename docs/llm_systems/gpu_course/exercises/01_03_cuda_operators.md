@@ -1,7 +1,7 @@
 ---
 layout: technical
-title: CUDA GPU Iterators and Operators
-category: GPU Notes + Courses
+title: 1.02 - Iterators and Operators
+category: CUDA Course Exercises
 difficulty: Advanced
 description: Structured dump of GPU notes
 show_back_link: true

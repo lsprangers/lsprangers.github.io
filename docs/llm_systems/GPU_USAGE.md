@@ -1,20 +1,18 @@
 ---
 layout: technical
-title: GPU Usage Metrics in LLM Systems
-category: LLM Systems, Hardware, and Code
+title: GPU Usage
+category: ML Systems, Hardware, and Code
 difficulty: Advanced
 description: Discussions around NN's, Transformers, LLMs, and other topics
 show_back_link: true
 ---
 
+# GPU Usage
+GPU usage for modern ML systems is mostly split between training and inference
 
-### GPU Metrics
-- ***Utilization*** = Output achieved $\div$ Capacity paid for
-- ***GPU Allocation Utilization*** = GPU-seconds running application code $\div$ GPU-seconds paid for
-- ***GPU Kernel Utilization*** = GPU-seconds running kernels $\div$ GPU-seconds paid for
+In training you run distributed pipelines to feed data into distributed gradient descent on GPU's, GPU's really just act like a gigantic bus shoveling tons of data through to update model weights. Inference is slightly different since you're most likely serving it behind an API, and you need to use some API metrics like P99 latency to ensure the request / response of the API is small enough. You still need to use clever batching techniques as copying data to and from GPU is expensive, but it's a different game compared to training where you just shovel as much data in as the GPU can handle
 
-When utilizing GPU's, there are a few metrics to use to figure out how much you get out of it. The time to actually reserve, setup, and place code onto a GPU is known as **Allocation**, and then once code is sitting on the GPU the actual utilization of SIMD processing, which is commonly known as **kernel compute**, showcases our actual ability to use the GPU for what it's best for
+## GPU Monitoring and Metrics
+Most GPU metrics will be sourced from [CUDA API](/docs/llm_systems/gpu_course/index.md) backends, specifically with NVIDIA GPU Manager or some other OTEL service like datadog
 
-Just because an allocated GPU is running application code doesn’t mean it is running code on the GPU. The term of art for “code that runs on the GPU” in the popular CUDA programming model for GPUs is “kernel”, and so we call the fraction of time we spend running code on the GPU the GPU Kernel Utilization
-
-This utilization metric is reported by, among others, the beloved `nvidia-smi` command line tool wrapping NVIDIA’s Management Library for their GPU hardware, and so it is commonly checked and cited
+Profiling these metrics to figure out what's going on is

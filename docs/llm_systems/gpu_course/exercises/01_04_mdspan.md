@@ -1,3 +1,12 @@
+---
+layout: technical
+title: 1.04 - MDSpan
+category: CUDA Course Exercises
+difficulty: Advanced
+description: Structured dump of GPU notes
+show_back_link: true
+---
+
 ## Exercise - MDSpan
 
 ### Input
@@ -35,6 +44,8 @@ void simulate(int height, int width,
 
 ### Output
 `mdspan` needs to utilize an input, which needs to be a raw pointer to some sort of iterable dataset. We're given `in_data()` `in_ptr` which we can use with height and width of the actual underlying grid to retrieve values. `mdspan` just needs height and width to do the correct modulo and division operations to efficiently index the right location
+
+`mdspan` is similar to `iloc` in pandas / numpy on python - helps to get retrieve $N$-dimensional coordinates even though the array in memory is just a flat structure
 
 
 ```cpp
