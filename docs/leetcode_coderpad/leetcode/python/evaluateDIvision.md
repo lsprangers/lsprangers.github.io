@@ -1,11 +1,11 @@
 ---
-title: evaluateDIvision
+title: evaluateDivision
 category: Leetcode Solutions
 difficulty: Advanced
 show_back_link: true
 ---
 
-# evaluateDIvision
+# evaluateDivision
 
 ```python
 class UnionFind:
