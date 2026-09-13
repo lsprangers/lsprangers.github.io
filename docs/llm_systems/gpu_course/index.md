@@ -31,11 +31,11 @@ CUDA applications *can run specific parts* of their programs on GPU, but applica
 
 The host code that runs on the CPU can use CUDA APIs to copy data between the host and device memory, start GPU code, and wait for data copies or GPU code to complete. Also, the CPU and GPU can run things at the same time in parallel. The best performance is usually found by maximizing utilization of both!
 
-For historic reasons the code an application executes on the GPU is called **device code**, and a function that's invoked for execution on the GPU is called a **kernel / kernel function**. The act of starting up a function to run is **launching a kernel**, which is basically just starting many threads that all execute the kernel code in parallel on the GPU
+For historic reasons the code an application executes on the GPU is called **device code**, and a function that's invoked for execution on the GPU is called a [**kernel / kernel function**](/docs/llm_systems/gpu_course/exercises/03_02_kernels.md). The act of starting up a function to run is **launching a kernel**, which is basically just starting many threads that all execute the kernel code in parallel on the GPU
 
 CUDA Threads are the basic unit of parallelism, each thread maintains its own state and control flow
 
-The programming model of how kernel functions are actually distributed reaches into streaming processors, threads, thread blocks, grids, etc. These are all logical /physical units of separation that allow for data operations to run in parallel, with some shared state, and actual distribution of scheduling and execution of code on an unspecified size GPU
+[The programming model of how kernel functions are actually distributed reaches into streaming processors, threads, thread blocks, grids, etc](/docs/llm_systems/gpu_course/exercises/03_02_kernels.md). These are all logical /physical units of separation that allow for data operations to run in parallel, with some shared state, and actual distribution of scheduling and execution of code on an unspecified size GPU
 
 ![GPU Programming Hierarchy](/img/gpu_programming_hierarchy.png)
 ![GPU Programming Hierarchy](/img/gpu_programming_hierarchy_2.png)
@@ -67,7 +67,7 @@ When analyzing a kernel, you need to know the specific GPU architecture you're t
 
 ![GPU Hardware Example](/img/gpu_hardware_example.png)
 
-#### GPU Thread Blocks
+#### [GPU Thread Blocks](/docs/llm_systems/gpu_course/exercises/03_02_kernels.md#thread-blocks)
 When a CUDA application launches a kernel, it does so with many threads, usually millions. The threads are organized into blocks called **thread blocks**, and thread blocks are organized into a **grid**. All thread blocks in a grid have the same size and dimensions
 
 ![GPU Thread Grid](/img/gpu_thread_grid.png)

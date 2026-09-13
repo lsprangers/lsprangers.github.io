@@ -107,6 +107,7 @@ int main()
     std::printf("achieved throughput: %g GB/s\n", throughput);
 }
 ```
+</details>
 
 ### Reduce By Key
 The general answer to this is to use `thrust::reduce_by_key` which is a generalization of `thrust::reduce`. Instead of reducing the sequence to s single value it allows you to reduce segments of values and store the results in an output array / iterator. Distinguishing the elements is done by providing keys, where consecutive keys form a segment, and then `reduce_by_key` returns one value per segment

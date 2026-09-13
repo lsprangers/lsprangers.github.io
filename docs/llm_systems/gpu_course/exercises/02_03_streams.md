@@ -1,6 +1,6 @@
 ---
 layout: technical
-title: 2.02 - Streams
+title: 2.03 - CUDA Streams
 category: CUDA Course Exercises
 difficulty: Advanced
 description: Structured dump of GPU notes
