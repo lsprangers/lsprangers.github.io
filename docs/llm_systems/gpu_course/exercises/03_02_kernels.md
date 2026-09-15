@@ -29,6 +29,8 @@ CUDA Kernels are inherently able to be parallelized using **threads + thread ind
 
 The first thread works on `threadIdx = 0`, and then would jump to `id = 0 + 2`
 
+![GPU Kernel Thread Idx](/img/gpu_kernel_thread_idx.png)
+
 ```cpp
 const int number_of_threads = 2
 

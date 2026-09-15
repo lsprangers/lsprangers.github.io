@@ -35,14 +35,14 @@ For historic reasons the code an application executes on the GPU is called **dev
 
 CUDA Threads are the basic unit of parallelism, each thread maintains its own state and control flow
 
-[The programming model of how kernel functions are actually distributed reaches into streaming processors, threads, thread blocks, grids, etc](/docs/llm_systems/gpu_course/exercises/03_02_kernels.md). These are all logical /physical units of separation that allow for data operations to run in parallel, with some shared state, and actual distribution of scheduling and execution of code on an unspecified size GPU
+[The programming model of how kernel functions are actually distributed reaches into [streaming processors](/docs/llm_systems/gpu_course/exercises/03_05_shared_memory.md), threads, thread blocks, grids, etc](/docs/llm_systems/gpu_course/exercises/03_02_kernels.md). These are all logical /physical units of separation that allow for data operations to run in parallel, with some shared state, and actual distribution of scheduling and execution of code on an unspecified size GPU
 
 ![GPU Programming Hierarchy](/img/gpu_programming_hierarchy.png)
 ![GPU Programming Hierarchy](/img/gpu_programming_hierarchy_2.png)
 
-Threads in a thread block are guaranteed to be co-scheduled on a streaming processor, and thread blocks in a cluster are guaranteed to be co-scheduled on a GPU processing cluster
+Threads in a thread block are guaranteed to be co-scheduled on a [streaming processor](/docs/llm_systems/gpu_course/exercises/03_05_shared_memory.md), and thread blocks in a cluster are guaranteed to be co-scheduled on a GPU processing cluster
 
-The distribution of threads to cores should mostly be done declaratively, by letting compiler and GPU schedulers handle the actual divvying up of thread code / parallelism to GPU cores to run. There are some tweaks that can be made via thread blocks, thread clusters, and streaming multiprocessor mappings. Memory is mostly defined to a streaming multiprocessor which helps to define memory and computation boundaries during parallel execution
+The distribution of threads to cores should mostly be done declaratively, by letting compiler and GPU schedulers handle the actual divvying up of thread code / parallelism to GPU cores to run. There are some tweaks that can be made via thread blocks, thread clusters, and [streaming multiprocessor](/docs/llm_systems/gpu_course/exercises/03_05_shared_memory.md) mappings. Memory is mostly defined to a [streaming multiprocessor](/docs/llm_systems/gpu_course/exercises/03_05_shared_memory.md) which helps to define memory and computation boundaries during parallel execution
 
 ![GPU thread mapping to cores](/img/gpu_thread_mapping_to_cores.png)
 ![GPU thread hierarchy to memory](/img/gpu_thread_hierarchy_to_memory.png)
@@ -57,7 +57,7 @@ In the modern era of CUDA, it is almost always advisable to use GPU-accelerated 
 `cupy` for GPU device memory, and `numpy` for CPU host memory, are highly 1:1 libraries which allow for passing data between memory hardware. After that, there are many `cupy` libraries for altering, transforming, and running data with CUDA applications
 
 ### [GPU Hardware Model](https://docs.nvidia.com/cuda/cuda-programming-guide/01-introduction/programming-model.html#gpu-hardware-model)
-For the purposes of CUDA, the GPU can be considered a collection of **streaming multiprocessors (SM)** which are organized into groups called **graphics processing clusters (GPC)**. Each SM contrains a local register file, a unified data cache, and some other functional units for computations
+For the purposes of CUDA, the GPU can be considered a collection of [**streaming multiprocessors (SM)**](/docs/llm_systems/gpu_course/exercises/03_05_shared_memory.md) which are organized into groups called **graphics processing clusters (GPC)**. Each SM contrains a local register file, a unified data cache, and some other functional units for computations
 
 *Unified data cache* provides physical resources for *shared memory and L1 cache*. Allocation of unified data cache to L1 and shared memory is controlled at runtime. This mostly just means that shared memory and L1 cache may use the physically same on-chop **static RAM (SRAM)** inside each streaming multiprocessor, and the GPU can dynamically change the allocation to each. Some programs run better with different configurations, shared memory is more imperative where developer allocates, L1 is declarative and handles by hardware:
 - Shared memory, developer controls what goes into shared memory via `__shared__` constructs
