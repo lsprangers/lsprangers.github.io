@@ -596,10 +596,17 @@ Effectively, these layers are often split / partitioned into multiple stages and
 
 Scaling all 3 is important as they'r all fairly linked - you cannot increase the resolution of an image without increasing it's depth and saturation (idk what this means). Therefore, a *compound scaling method* which uniformly scales network width, depth, and resolution is required
 
+## FastRCNN
+[FastRCNN](/arxiv_papers/FastRCNN.pdf) is an extension of [RCNN](/arxiv_papers/R-CNN.pdf). Both models specifically utilize [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) to create initial regions of interest, and FastRCNN does a few architecture changes to ultimately speed up the processing
+
+RCNN / FastRCNN
+
 ## Designing Convolutional Networks
 Most of the convolutional networks above were heavily informed by human creativity, and less informed by systematic exploration of the design space. When you look up the choices behind each of these architectures, why they chose certain parameters, layer structures, and designs, most of it was just tweaking until loss converged. This *network engineering* approach was tremendously successful!
 
 The other side of the coin would be *neural architecture search* (NAS) which is extremely expensive brute-force search with some forms of hyperparameter optimizations. [EfficientNets](#efficientnet) are an outcome of this search type
+
+
 
 ## Contrastive Learning
 We've looked into [Contrastive Learning](/docs/training_and_learning/CONTRASTIVE_LEARNING.md) in another sub-document, and will copy this section over there, but this is a section specifically on Image based Contrastive Learning
