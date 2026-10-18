@@ -932,10 +932,10 @@ The [proof above would rely on contradiction](https://stackoverflow.com/question
 MST algorithms are useful to find solutions to things like "min number of vertices to connect all points" similar to traveling salesman and finding paths between towns
 
 #### Kruskal
-Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses sorting and [UnionFind](#unionfind--disjoint-set-union) to solve for MST
+Kruskal's Algorithm is for creating a [Minimum Spanning Tree](#minimum-spanning-tree) from a Weighted Undirected Graph. It uses sorting and [UnionFind](#disjoint-set) to solve for MST
 Kruskal's Algorithm will:
 - Sort all edges, taking $O(E \times log(E))$ time using a typical sorting algorithm
-- Create all connected components via [UnionFind](#unionfind--disjoint-set-union) 
+- Create all connected components via [UnionFind](#disjoint-set) 
 - Starting smallest, for each edge:
   - Check if the vertices of the edge are in the same connected component, if not add the edge to the MST
     - Union find `.union(x, y)` function will return `False` if they're in same component, and `True` if they aren't. If they aren't in the same component it'll ensure that they are afterwards
