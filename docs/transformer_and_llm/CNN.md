@@ -596,10 +596,48 @@ Effectively, these layers are often split / partitioned into multiple stages and
 
 Scaling all 3 is important as they'r all fairly linked - you cannot increase the resolution of an image without increasing it's depth and saturation (idk what this means). Therefore, a *compound scaling method* which uniformly scales network width, depth, and resolution is required
 
-## FastRCNN
+## Real World Object Detection Algorithms
+General index of real world object detection algorithms that utilize CNN architectures as their major backend components
+
+### FastRCNN
 [FastRCNN](/arxiv_papers/FastRCNN.pdf) is an extension of [RCNN](/arxiv_papers/R-CNN.pdf). Both models specifically utilize [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) to create initial regions of interest, and FastRCNN does a few architecture changes to ultimately speed up the processing
 
-RCNN / FastRCNN
+**Object detection is inherently a multi-output problem**, meaning the output size for a single photo isn't known - there can be 1:M objects in any photo. To combat this, most CNN object detection algorithms generate initial regions of interest utilizing [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) and then just work off of each of those
+
+Both RCNN and FastRCNN utilize ImageNet models, mostly VGG-16 which have a number of convolutional and max pooling layers for feature extraction
+
+#### RCNN
+[RCNN](/arxiv_papers/R-CNN.pdf) specifically chooses 2,000 as the limit for the number of initial region proposals it can take in. After that each of the initial region proposals is fed through a CNN that produces a 4096-dimensional feature vector as output
+
+The CNN as a whole simply acts as a feature extractor and these 4096 dimensional vectors are fed into an SVM to classify the presence of an object inside that region of interest. It also produces 4 values which are offset values to alter the bounding box in certain directions
+
+#### FastRCNN Improvements
+There were some speed issues with RCNN, specifically around regional processing and having a full model for all 2,000 potential regions. FastRCNN looks to improve this with a few tricks - *specifically it looks to avoid running an entire CNN over each region proposal*
+
+- The entire image itself is passed through a CNN once to produce a shared convolutional feature map
+- [Selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) is still used to generate the initial regions of interest
+    - Each region:
+        - Is mapped onto the shared feature map. This mapping is essentially taking the ROI bounding box coordinates and using them to extract part of the global feature vector
+            - This is how FastRCNN avoids a CNN model per ROI, **it just uses the ROI bounding boxes to extract a part of the global feature vector**
+        - Goes through an RoI (region of interest) pooling layer to convert it into a fixed size feature vector
+            - The extraction from the global feature vector isn't guaranteed to be any specific size, so the ROI pooling layer ensures a fixed size
+        - Pass this fixed size vector through fully connected layers into two distinct heads:
+            - Classification head to predict if there's an object
+            - Bounding box regression head to predict offsets
+
+![FastRCNN Architecture](/img/fastrcnn_architecture.png)
+
+### YOLO
+YOLO is magnitudes faster than most other object detection algorithms, but it struggles with small objects inside of an image
+
+YOLO takes an image and split it into an $S \times S$ grid, within each of the grid we take $m$ bounding boxes. For each bounding box the network outputs a class probability and offset values for the bounding box, and any class probability above a specific threshold is selected and used to locate the object within the image
+
+### LayoutLM
+[LayoutLM](/arxiv_papers/LayoutLM.pdf) is a bit of an extension of [FastRCNN](#fastrcnn), but it's not an object detection model, it's actually a text / document understanding model that utilizes object layouts as extra context for text
+
+The overall goal was that certain textual information has context from where it sits - John Smith at the top left of a page in bold means it's most likely a name of a person, and LayoutLM sought to include the positioning and layout of a page into the text reasoning model itself
+
+LayoutLM requires an OCR engine / PDF parser to run separately and extract the actual text / bounding boxes from an image, and then it sends those bounding boxes as the initial regions of interest into [FastRCNN](#fastrcnn) to get output feature vectors for each RoI from it. Finally it will combine the word text embedding, 2D position embedding, and visual feature vector from FastRCNN together and input all of them into a typical [transformer](/docs/transformer_and_llm/TRANSFORMERS.md) architecture
 
 ## Designing Convolutional Networks
 Most of the convolutional networks above were heavily informed by human creativity, and less informed by systematic exploration of the design space. When you look up the choices behind each of these architectures, why they chose certain parameters, layer structures, and designs, most of it was just tweaking until loss converged. This *network engineering* approach was tremendously successful!
