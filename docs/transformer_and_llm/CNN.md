@@ -599,31 +599,34 @@ Scaling all 3 is important as they'r all fairly linked - you cannot increase the
 ## Real World Object Detection Algorithms
 General index of real world object detection algorithms that utilize CNN architectures as their major backend components
 
-### FastRCNN
-[FastRCNN](/arxiv_papers/FastRCNN.pdf) is an extension of [RCNN](/arxiv_papers/R-CNN.pdf). Both models specifically utilize [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) to create initial regions of interest, and FastRCNN does a few architecture changes to ultimately speed up the processing
-
-**Object detection is inherently a multi-output problem**, meaning the output size for a single photo isn't known - there can be 1:M objects in any photo. To combat this, most CNN object detection algorithms generate initial regions of interest utilizing [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) and then just work off of each of those
-
-Both RCNN and FastRCNN utilize ImageNet models, mostly VGG-16 which have a number of convolutional and max pooling layers for feature extraction
-
 #### RCNN
-[RCNN](/arxiv_papers/R-CNN.pdf) specifically chooses 2,000 as the limit for the number of initial region proposals it can take in. After that each of the initial region proposals is fed through a CNN that produces a 4096-dimensional feature vector as output
+[RCNN](/arxiv_papers/R-CNN.pdf) specifically utilize [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) to create 2,000 initial region proposals. After that each of the initial region proposals is fed through a CNN that produces a 4096-dimensional feature vector as output. **Object detection is inherently a multi-output problem**, meaning the output size for a single photo isn't known - there can be 1:M objects in any photo. To combat this, most CNN object detection algorithms generate initial regions of interest utilizing [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) and then just work off of each of those
+
+["The R-CNN first extracts many (e.g., 2000) region proposals from the input image (e.g., anchor boxes can also be considered as region proposals), labeling their classes and bounding boxes (e.g., offsets)."](https://d2l.ai/chapter_computer-vision/rcnn.html#r-cnns). Every selective search RoI is sent through a full fledge CNN model to extract both:
+- New bounding box offsets, which help to adjust where the bounding box should actually be
+- Class prediction 
+
+![RCNN Architecture](/img/rcnn_architecture.png)
 
 The CNN as a whole simply acts as a feature extractor and these 4096 dimensional vectors are fed into an SVM to classify the presence of an object inside that region of interest. It also produces 4 values which are offset values to alter the bounding box in certain directions
 
-#### FastRCNN Improvements
-There were some speed issues with RCNN, specifically around regional processing and having a full model for all 2,000 potential regions. FastRCNN looks to improve this with a few tricks - *specifically it looks to avoid running an entire CNN over each region proposal*
+### FastRCNN
+[FastRCNN](/arxiv_papers/FastRCNN.pdf) is an extension of [RCNN](/arxiv_papers/R-CNN.pdf). Both models specifically utilize [selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) to create initial regions of interest, and FastRCNN does a few architecture changes to ultimately speed up the processing
 
-- The entire image itself is passed through a CNN once to produce a shared convolutional feature map
-- [Selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) is still used to generate the initial regions of interest
-    - Each region:
-        - Is mapped onto the shared feature map. This mapping is essentially taking the ROI bounding box coordinates and using them to extract part of the global feature vector
-            - This is how FastRCNN avoids a CNN model per ROI, **it just uses the ROI bounding boxes to extract a part of the global feature vector**
-        - Goes through an RoI (region of interest) pooling layer to convert it into a fixed size feature vector
-            - The extraction from the global feature vector isn't guaranteed to be any specific size, so the ROI pooling layer ensures a fixed size
-        - Pass this fixed size vector through fully connected layers into two distinct heads:
-            - Classification head to predict if there's an object
-            - Bounding box regression head to predict offsets
+![FastRCNN Architecture](/img/fastrcnn_architecture2.png)
+
+#### FastRCNN Improvements
+There were some speed issues with RCNN, specifically around regional processing and having a full model for all 2,000 potential regions. FastRCNN looks to improve this with a few tricks - *specifically it looks to avoid running an entire CNN over each region proposal*. The entire image itself is sent through the CNN ImageNet backbone only once to produce a global feature vector, and then each RoI is essentially used to subset / extract part of that global feature vector and sent through class prediction
+
+- The entire image itself is passed through an ImageNet CNN once to produce a shared convolutional global feature map
+- [Selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) is still used to generate the initial regions of interest. Each region:
+    - Is mapped onto the shared global feature map. This mapping is essentially taking the ROI bounding box coordinates and using them to extract part of the global feature vector
+        - This is how FastRCNN avoids a CNN model per RoI, **it just uses the ROI bounding boxes to extract a part of the global feature vector**
+    - Goes through an RoI (region of interest) pooling layer to convert it into a fixed size feature vector
+        - The extraction from the global feature vector isn't guaranteed to be any specific size, so the ROI pooling layer ensures a fixed size
+    - Pass this fixed size vector through fully connected layers into two distinct heads:
+        - Classification head to predict if there's an object
+        - Bounding box regression head to predict offsets
 
 ![FastRCNN Architecture](/img/fastrcnn_architecture.png)
 
