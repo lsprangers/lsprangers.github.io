@@ -103,44 +103,97 @@ Since we are forced to traverse to the end and create a new leaf node, every ins
 
 A segment tree is a Binary Tree where each node represents an interval, and each node would store one or more properties of an interval that'd be queried later on
 
+A segment tree is a data structure that lets you **query an aggregate over a range while supporting updates to individual elements efficiently**
+
 Most of the time it's segements / indexes of an array, and the total sum, count, or some aggregation over them, which allows us to find a certain aggregation over a range of data in potentially $O(\log n)$ time
+
+#### Segment Tree Theory
+For some data structure like an array `arr = [3,1,4,2,7,5,6,8]`, to do something like "query the sum from index 2 to 5" you can
+
+Do an $O(n)$ scan and sum from 2 to 5, which just computes the statistic at some aggregate each time
+
+```python
+def query(arr, left, right):
+    total = 0
+    for i in range(left, right + 1):
+        total += arr[i]
+    return total
+```
+
+Precompute the result for every potential range, which means there's $O(n^2)$ total stored outcomes, but querying is $O(1)$
+
+Continuously split the input until we reach individual elements
+```
+          [0,7] = 36
+  [0,3] = 10    [4,7] = 26
+...     ...     ...     ...
+```
+
+For this to work, the following must hold, where we can cleanly divide something into two separate items, and the resulting aggregation is equal to the parent
+$$\sum_l ^r = \sum_l ^m + \sum _{m+1} ^r$$
+
+As long as the aggregation holds over sub-ranges, a segment tree can be used to reach a middle ground in terms of storage, computation, point updates, and querying:
+- Build: $O(n)$
+- Point update: $O(\log n)$
+- Range query: $O(\log n)$ for standard segment-tree range queries
+- Space: $O(n)$
+
+#### Segment Tree Implementation
 
 ![LeetCode Segment Tree](/img/lc_segment_tree.png)
 
-- Typically the root holds the entire interval of data we're interested in traversing
-- Each leaf of the tree represents a range of just one single element
-- The internal nodes would represent the merged or unioned result of their children nodes
-- Ideally, each child node would represent about 1/2 of it's parent
-- Implementation:
-  - Single callable function
-  - Recurses down until at leaf node, and stores singular value in leaf node
-  - After exiting later on in recursive call merge the child values via $O(1)$ array lookup
+Implementing this usually involves storing an array of $n * 4$, and then doing a recursive loop using `left = 2*i, right = 2*(i+1)`
 
+```python
+def build(node, left, right):
+    if left == right:
+        tree[node] = arr[left]
+        return
+
+    mid = (left + right) // 2
+    build(2 * node, left, mid)
+    build(2 * node + 1, mid + 1, right)
+
+    tree[node] = tree[2 * node] + tree[2 * node + 1]
+  
+def query(node, left, right, ql, qr):
+    # no overlap
+    if qr < left or right < ql:
+        return 0
+
+    # return the entirety of this node
+    if ql <= left and right <= qr:
+        return tree[node]
+
+    # missing something
+    mid = (left + right) // 2
+
+    # if we're missing something, return the 
+    #   aggregate of children
+    return (
+        query(2 * node, left, mid, ql, qr)
+        + query(2 * node + 1, mid + 1, right, ql, qr)
+    )
+
+def update(node, left, right, idx, value):
+    if left == right:
+        tree[node] = value
+        return
+
+    # get mid of this range
+    mid = (left + right) // 2
+
+    # rebuild
+    if idx <= mid:
+        update(2 * node, left, mid, idx, value)
+    else:
+        update(2 * node + 1, mid + 1, right, idx, value)
+
+    # update this value
+    tree[node] = tree[2 * node] + tree[2 * node + 1]
 ```
-void buildSegTree(vector<int>& arr, int treeIndex, int lo, int hi)
-{
-    if (lo == hi) {                 // leaf node. store value in node.
-        tree[treeIndex] = arr[lo];
-        return;
-    }
 
-    int mid = lo + (hi - lo) / 2;   // recurse deeper for children.
-    buildSegTree(arr, 2 * treeIndex + 1, lo, mid);
-    buildSegTree(arr, 2 * treeIndex + 2, mid + 1, hi);
-
-    // merge build results
-    tree[treeIndex] = merge(tree[2 * treeIndex + 1], tree[2 * treeIndex + 2]);
-}
-
-// call this method as buildSegTree(arr, 0, 0, n-1);
-// Here arr[] is input array and n is its size.
-```
-
-- The more important part is querying
-  - you can't read partial overlaps, it would be too confusing
-  - Need to traverse down until you get to a section that's smaller than your desired interval, and worst case add in from other sections as well
-    - Can hopefully use some internal / middle nodes, and complete the aggregation using other leaf nodes
-- Updating values means finding the leaf node of the actual index, and traversing back up and out to update that leaves parents
+So anything that calls `query()` has to start at node 0, supply a `left, right` and can get the result in $O(\log n)$. There's no way to pick the index where a node would be in the array
 
 ### Prefix Sum
 - The Prefix Sum is defined, for 1-D arrays, in [Arrays and Strings](/docs/dsa/1.%20arrays%20&%20strings/index.md#prefix-sum)
