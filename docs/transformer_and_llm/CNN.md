@@ -618,17 +618,14 @@ The CNN as a whole simply acts as a feature extractor and these 4096 dimensional
 #### FastRCNN Improvements
 There were some speed issues with RCNN, specifically around regional processing and having a full model for all 2,000 potential regions. FastRCNN looks to improve this with a few tricks - *specifically it looks to avoid running an entire CNN over each region proposal*. The entire image itself is sent through the CNN ImageNet backbone only once to produce a global feature vector, and then each RoI is essentially used to subset / extract part of that global feature vector and sent through class prediction
 
-- The entire image itself is passed through an ImageNet CNN once to produce a shared convolutional global feature map
-- [Selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) is still used to generate the initial regions of interest. Each region:
-    - Is mapped onto the shared global feature map. This mapping is essentially taking the ROI bounding box coordinates and using them to extract part of the global feature vector
-        - This is how FastRCNN avoids a CNN model per RoI, **it just uses the ROI bounding boxes to extract a part of the global feature vector**
-    - Goes through an RoI (region of interest) pooling layer to convert it into a fixed size feature vector
-        - The extraction from the global feature vector isn't guaranteed to be any specific size, so the ROI pooling layer ensures a fixed size
-    - Pass this fixed size vector through fully connected layers into two distinct heads:
-        - Classification head to predict if there's an object
-        - Bounding box regression head to predict offsets
+The entire image itself is passed through an ImageNet CNN once to produce a shared convolutional global feature map. Can say the CNN output is of size $1 \times c \times h_1 \times w_1$. [Selective search](/docs/transformer_and_llm/NONML_IMAGE_PROCESSING.md#selective-search) is then used to generate the $n$ initial regions of interest. Each region is then used as a way to slice the original output of the global CNN feature map. Each RoI can differ in size, and so somehow they all need to be brought back into a common dimensionality. The RoI Pooling Layer is meant to take the sliced global feature map for a specific RoI and pool it into a common output size. This is how FastRCNN avoids a CNN model per RoI, **it just uses the ROI bounding boxes to extract a part of the global feature vector**. Finally it passes this fixed size vector through fully connected layers into two distinct heads for classification and bounding box updates
 
 ![FastRCNN Architecture](/img/fastrcnn_architecture.png)
+
+### Faster RCNN
+There's an **even faster** model that will simply just change the selective search RoI proposal method to a regional proposal network. The CNN global feature map is sent through another CNN network to create RoI proposals and classify them on the fly
+
+It will use a $3 \times 3$ spatial window sliding across the global feature map, and at each sliding position the Region Proposal Network (RPN) will evaluate $k$ anchor boxes. The output of this is fed into classification and regression layers that FastRCNN typically outputs
 
 ### YOLO
 YOLO is magnitudes faster than most other object detection algorithms, but it struggles with small objects inside of an image
@@ -640,7 +637,7 @@ YOLO takes an image and split it into an $S \times S$ grid, within each of the g
 
 The overall goal was that certain textual information has context from where it sits - John Smith at the top left of a page in bold means it's most likely a name of a person, and LayoutLM sought to include the positioning and layout of a page into the text reasoning model itself
 
-LayoutLM requires an OCR engine / PDF parser to run separately and extract the actual text / bounding boxes from an image, and then it sends those bounding boxes as the initial regions of interest into [FastRCNN](#fastrcnn) to get output feature vectors for each RoI from it. Finally it will combine the word text embedding, 2D position embedding, and visual feature vector from FastRCNN together and input all of them into a typical [transformer](/docs/transformer_and_llm/TRANSFORMERS.md) architecture
+LayoutLM requires an OCR engine / PDF parser to run separately and extract the actual text / bounding boxes from an image, and then it sends those bounding boxes as the initial regions of interest into [FastRCNN](#fastrcnn) to get output feature vectors for each RoI from it. The classification + bounding box layers **aren't used**, it simply uses the global feature pooling output as it's own feature vector. Altogether it will combine the word text embedding, 2D position embedding, and visual feature vector from FastRCNN together and input all of them into a typical [transformer](/docs/transformer_and_llm/TRANSFORMERS.md) architecture
 
 ## Designing Convolutional Networks
 Most of the convolutional networks above were heavily informed by human creativity, and less informed by systematic exploration of the design space. When you look up the choices behind each of these architectures, why they chose certain parameters, layer structures, and designs, most of it was just tweaking until loss converged. This *network engineering* approach was tremendously successful!
