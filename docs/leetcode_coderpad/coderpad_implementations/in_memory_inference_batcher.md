@@ -118,6 +118,8 @@ class InferenceBatcher:
         self,
         now_ms: int
     ) -> list[list[str, list[str]]]:
+        # TODO: This can just be a queue since the ones coming in are 
+        #   guaranteed monotonically increasing
         while self.batchHeap and (now_ms - self.batchHeap[0][0]) >= self.maxWaitMs:
             firstTs, thisBatchVersion, model_id = heapq.heappop(self.batchHeap)
             if thisBatchVersion == self.batchVersion[model_id]:
@@ -164,43 +166,27 @@ batcher.poll(30)
 ```
 
 ## Systems Design
+Design a system to handle inference serving with batching and max time
+
+### Requirements
+- Peak traffic: 10,000 RPS
+- Latency target: p99 < 100 ms
+- Models: 30+
+- Availability: 99.95%
 
 
-### High Level requirements
+#### Model characteristics
+- Mix of CPU-based tabular models and GPU-based neural networks
+- Models are independently versioned and deployed
+- Some models receive substantially more traffic than others
+- Requests are synchronous and require a response
+- Model serving should scale horizontally
 
-
-#### API Surface
-
-#### Clarifying Questions
-Questions around implementations, strict vs approximate, and anything that would kill any choices made in future
-
-#### System Constraints
-Summarize system constraints in your own words
-- QPS 
-- latency SLO    
-- consistency requirements
-- failure tolerance
-
-#### Identify Core Challenges
-What makes this problem hard in distributed manner (MOST IMPORTANT PART)
-- Distributed correctness (no double allow)
-- Routing / management
-- Data structure
-- Scale + latency
-- Failure behavior
-- single-writer vs linearizable store
-- availability vs consistency
-- data plane vs control plane
-
-#### Starter Architecture
-Distributed compatible, but high level components and algorithms, focus on partitioning and scaling, not frontend or anything. Some data structure information is OK, specifically ones that relate to the core problem.
-
-Components + Flow + network, partition, and some data structures
-
-#### Real Architecture
-Now you make in depth choices on literally everything, and draw the entire thing out
-
-#### Component Deep Dive
-Usually one or two, picked by interviewer or you know to dive into them
-
-Potentially pseucode or pseudo architecture
+To discuss
+1. Serving stack: Ray Serve vs Triton vs custom FastAPI/ECS services
+2. Request routing: Model identification, version selection, and replica discovery
+3. Batching: Where batching happens, queue ownership, and per-model isolation
+4. GPU execution: Device placement, memory utilization, and model concurrency
+5. Reliability: Request deadlines, retries, backpressure, and degraded service
+6. Performance: p50/p95/p99 latency, throughput, batching efficiency, and autoscaling
+But I don't want to hand you the architecture. This should be your design
